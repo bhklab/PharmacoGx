@@ -1,0 +1,15 @@
+citHeader("To cite mRMRe in publications use:")
+
+citEntry(entry="article",
+  title  ="mRMRe: an R package for parallelized mRMR ensemble feature selection",
+  author = "N De Jay, S Papillon-Cavanagh, C Olsen, G Bontempi and B Haibe-Kains",
+  journal = "Submitted",
+  year = "2012",
+  volume = "",
+  pages = ".",
+  textVersion = paste("N De Jay, S Papillon-Cavanagh, C Olsen, G Bontempi and B Haibe-Kains",
+    "mRMRe: an R package for parallelized mRMR ensemble feature selection",
+    "Submitted (2012)."))
+
+citFooter("We have invested our time and effort in creating mRMRe,",
+          "we would be grateful if you could cite it when using it in your analysis.")

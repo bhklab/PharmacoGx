@@ -1,0 +1,8 @@
+inst/doc/.*[.]bib$
+test/*
+TODO
+README
+REVISIONS
+.DS_Store
+.git/*
+

@@ -1,0 +1,51 @@
+########################
+## Benjamin Haibe-Kains
+## All rights Reserved
+## October 23, 2013
+########################
+
+#################################################
+#' Calculate the GWC score between two vectors, using either a weighted spearman or pearson correlation
+#'
+#'  @param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
+#'  @param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
+#'  @param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
+#'  @param p2 \code{numeric} vector of p-values for each corresponding effect size for the second experiment
+#'  @param nperm \code{numeric} how many permutations should be done to determine
+#'  @param method.cor \code{character} string identifying if a \code{pearson} or
+#'    \code{spearman} correlation should be used
+#'  @param ... Other passed down to internal functions
+#'  
+#' @return \code{numeric} a vector of two values, the correlation and associated p-value.
+#' 
+#' @export
+##			- 
+##
+## http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient#Calculating_a_weighted_correlation
+## http://www.mathworks.com/matlabcentral/fileexchange/20846-weighted-correlation-matrix
+## F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI: 10.1140/epjb/e2012-20697-x
+#################################################
+
+GWC <- 
+function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, ...) {
+  
+	method.cor <- match.arg(method.cor)
+  ## intersection between x and y
+  ii <- intersectList(names(x1), names(p1), names(x2), names(p2))
+  if(length(ii) < 10) {
+    stop ("Less than 10 probes/genes in common between x and y")
+  }
+  x1 <- x1[ii]
+  p1 <- p1[ii]
+  x2 <- x2[ii]
+  p2 <- p2[ii]
+  ## scaled weights
+  p1 <- -log10(p1)
+  p1 <- p1 / sum(p1, na.rm=TRUE)
+  p2 <- -log10(p2)
+  p2 <- p2 / sum(p2, na.rm=TRUE)
+  w <- p1 + p2
+  ## compute genome-wide connectivity score
+  res <- corWeighted(x=x1, y=x2, w=w, method=method.cor, nperm=nperm, ...)
+	return(res)
+}

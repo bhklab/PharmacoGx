@@ -1,0 +1,13 @@
+Package: PharmacoGx
+Type: Package
+Title: R Package for Large-Scale Analysis of Pharmacogenomic Data
+Version: 0.9.0
+Date: 2015-07-13
+Author: Petr Smirnov, Zhaleh Safikhani, Benjamin Haibe-Kains
+Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
+Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
+License: Artistic-2.0
+Suggests: xtable
+Encoding: UTF-8
+Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods
+Depends: jetset, R (>= 2.10)
