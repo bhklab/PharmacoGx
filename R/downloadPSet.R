@@ -46,7 +46,7 @@ downloadPSet <- function(name=c('CGP', 'CCLE', 'CMAP'), download.method = 'auto'
          }, {
            stop('Unknown Dataset. Please check the documentation of this function or the vignette for the list of available PharamcoSets.')
          })
-  download.file(file.path('https://www.pmgenomics.ca/bhklab/sites/default/files/downloads/', myfn), method=download.method, destfile = file.path(saveDir, myfn))
+  download.file(file.path('http://www.pmgenomics.ca/bhklab/sites/default/files/downloads/', myfn), method=download.method, destfile = file.path(saveDir, myfn))
   pSet <- load(file.path(saveDir,myfn))
   return(pSet)
 }
