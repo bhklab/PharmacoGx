@@ -21,7 +21,7 @@ downloadPSet <- function(name=c('CGP', 'CCLE', 'CMAP'), download.method = 'auto'
   
   name <- match.arg(name)
 
-  if(!dir.exists(saveDir)) {
+  if(!file.exists(saveDir)) {
     dir.create(saveDir)
   }
   
