@@ -17,6 +17,8 @@
 \author[1]{Donald Wang}
 \author[1]{Adrian She}
 \author[1]{Catherina Olsen}
+\author[1]{Mark Freeman}
+\author[1]{Heather Selby}
 \author[1]{Deena Gendoo}
 \author[3]{Patrick Grossman}
 \author[4]{Andrew Beck}
