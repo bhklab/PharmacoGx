@@ -138,10 +138,19 @@ The packages utilisizes the core R package \textit{parallel} to preform parallel
 
 We have made the PharmacoSet objects of the datasets he have curated available online at:
 
-However, to make the process of obtaining the data easier through the R shell, we have also written a function \textit{getPSet} which automates downloading the datasets into a directory of the users choice, and returns the data into the R session. 
+However, to make the process of obtaining the data easier through the R shell, we have also written a function \textit{downloadPSet} which automates downloading the datasets into a directory of the users choice, and returns the data into the R session. 
 
 <<download-example, results=hide,eval=False>>=
-x <- 'nothing'
+CGP <- downloadPSet('CGP') 
+@
+%------------------------------------------------------------
+\subsection{Downloading Drug Signatures}
+%------------------------------------------------------------
+
+The package also provides tools to compute drug perturbation and senstivity signatures, as explained below. However, this computation is lengthy, so for users convinience we have precomputed signatures for our three PharmacoSet objects and made them available for download using the function \textit{downloadSignatures}.
+
+<<download-sig, results=hide, eval=False>>=
+CGP.sigs <- downloadSignatures('CGP')
 @
 
 %------------------------------------------------------------
