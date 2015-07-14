@@ -16,7 +16,7 @@
 #' @export
 #' @import downloader 
 
-downloadSignatures <- function(name=c('CGP', 'CCLE', 'CMAP'), download.method = 'auto', saveDir = './PSets/Sigs/', myfn=NULL) {
+downloadSignatures <- function(name=c('CGP', 'CCLE', 'CMAP'), saveDir = './PSets/Sigs/', myfn=NULL) {
   
   
   name <- match.arg(name)
