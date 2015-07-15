@@ -116,7 +116,7 @@ probeGeneMapping <- function (pSet, platform=c("MISC", "GPL8300", "GPL96", "GPL3
       gid <- stripWhiteSpace(as.character(mapping[ , "GENEID"]))
       names(gid) <- as.character(mapping[ , "PROBE"])
       ugid <- sort(unique(gid))
-      rr <- geneid.map(geneid1=gid, data1=t(Biobase::exprs(eset)), geneid2=ugid)
+      rr <- geneIdMap(geneid1=gid, data1=t(Biobase::exprs(eset)), geneid2=ugid)
       probes <- colnames(rr$data1)
       names(probes) <- paste("geneid", rr$geneid1, sep=".")
       eset <- eset[probes, ]

@@ -1,4 +1,4 @@
-'combine.test' <-
+combineTest <-
 function(p, weight, method=c("fisher", "z.transform", "logit"), hetero=FALSE, na.rm=FALSE) {
 	if(hetero) { stop("function to deal with heterogeneity is not implemented yet!") }
 	method <- match.arg(method)

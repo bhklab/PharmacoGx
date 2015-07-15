@@ -96,7 +96,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nbcore=1
       nes.down <- c(nes$statDistinctDir[which(names(nes$gsc) == "DOWN"), 1], nes$pDistinctDir[which(names(nes$gsc) == "DOWN"), 1])
       ## combine UP and DOWN
       if (complete.cases(cbind(nes.up, nes.down)) && sign(nes.up[1]) != sign(nes.down[1])) {
-        score <- c("es"=(nes.up[1] - nes.down[1]) / 2, "p"=combine.test(p=c(nes.up[2], nes.down[2]), method="fisher", na.rm=TRUE))
+        score <- c("es"=(nes.up[1] - nes.down[1]) / 2, "p"=combineTest(p=c(nes.up[2], nes.down[2]), method="fisher", na.rm=TRUE))
       } else {
         score <- c("score"=0, "p"=1)
       }
