@@ -5,7 +5,7 @@
 #' a PharacoSet class, enabling use with all the analysis tools provided in
 #' \code{PharmacoGx}.
 #'
-#' @param name \code{Character} string, the name of the PhamracoSet to download.
+#' @param name \code{Character} string, the name of the PharmacoSet to download.
 #'   The available options are CGP, CCLE, and CMAP
 #' @param saveDir \code{Character} string with the folder path where the
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
