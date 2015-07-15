@@ -11,3 +11,5 @@ Suggests: xtable
 Encoding: UTF-8
 Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader
 Depends: jetset, R (>= 2.10)
+URL: http://www.pmgenomics.ca/bhklab/software/pharmacogx
+LazyData: yes
