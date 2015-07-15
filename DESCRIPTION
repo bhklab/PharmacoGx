@@ -1,11 +1,11 @@
 Package: PharmacoGx
 Type: Package
 Title: R Package for Large-Scale Analysis of Pharmacogenomic Data
-Version: 1.0.0
+Version: 1.0.1
 Date: 2015-07-15
 Author: Petr Smirnov, Zhaleh Safikhani, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
-Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data. NB: To install package jetset must be installed, can be obtained from: 'http://www.cbs.dtu.dk/biotools/jetset/current/jetset_3.1.2.zip'.
+Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data. NB: The package jetset must be installed, which can be obtained from: 'http://www.cbs.dtu.dk/biotools/jetset/current/jetset_3.1.2.zip'.
 License: Artistic-2.0
 Suggests: xtable
 Encoding: UTF-8
