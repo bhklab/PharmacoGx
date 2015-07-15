@@ -15,8 +15,7 @@ should be provided.}
 
 \item{cellline}{[string] A cell line name for which the drug response curve should be
 plotted. If the plot is desirable for more than one pharmaco set, A unique cell id
-should be provided.
-#'}
+should be provided.}
 
 \item{pSets}{[list] a list of PharmacoSet objects, for which the function
 should plot the curves.}

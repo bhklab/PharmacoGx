@@ -4,15 +4,12 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name = c("CGP", "CCLE", "CMAP"), download.method = "auto",
-  saveDir = "./PSets/", myfn = NULL)
+downloadPSet(name = c("CGP", "CCLE", "CMAP"), saveDir = "./PSets/",
+  myfn = NULL)
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PhamracoSet to download.
+\item{name}{\code{Character} string, the name of the PharmacoSet to download.
 The available options are CGP, CCLE, and CMAP}
-
-\item{download.method}{\code{Character} string, the method used by
-\code{download.file}. Defaults to \code{auto}.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create

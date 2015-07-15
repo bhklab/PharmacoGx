@@ -5,14 +5,11 @@
 \title{Download Drug Signatures}
 \usage{
 downloadSignatures(name = c("CGP", "CCLE", "CMAP"),
-  download.method = "auto", saveDir = "./PSets/Sigs/", myfn = NULL)
+  saveDir = "./PSets/Sigs/", myfn = NULL)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PhamracoSet for which to
 download signatures. The available options are CGP, CCLE, and CMAP}
-
-\item{download.method}{\code{Character} string, the method used by
-\code{download.file}. Defaults to \code{auto}.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{'./PSets/Sigs/'}. Will create
