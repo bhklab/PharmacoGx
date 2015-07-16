@@ -63,7 +63,7 @@ computeIC50 <- function(conc, viability, trunc = TRUE) {
   }
   
   #FIT CURVE AND CALCULATE IC50
-  pars <- unlist(LogLogisticRegression(log_conc,
+  pars <- unlist(logLogisticRegression(log_conc,
                                        viability,
                                        conc_as_log = TRUE,
                                        viability_as_pct = FALSE,

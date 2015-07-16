@@ -8,10 +8,10 @@
 #'  Fits curves of the form E = E_inf + (1 - E_inf)/(1 + (c/EC50)^HS) to dose-response data points (c, E) given by the user
 #'  and returns a vector containing estimates for HS, E_inf, and EC50.
 #'  
-#'  By default, LogLogisticRegression uses an L-BFGS algorithm to generate the fit. However, if
-#'  this fails to converge to solution, LogLogisticRegression samples lattice points throughout the parameter space.
+#'  By default, logLogisticRegression uses an L-BFGS algorithm to generate the fit. However, if
+#'  this fails to converge to solution, logLogisticRegression samples lattice points throughout the parameter space.
 #'  It then uses the lattice point with minimal least-squares residual as an initial guess for the optimal parameters,
-#'  passes this guess to drm, and re-attempts the optimization. If this still fails, LogLogisticRegression uses the
+#'  passes this guess to drm, and re-attempts the optimization. If this still fails, logLogisticRegression uses the
 #'  PatternSearch algorithm to fit a log-logistic curve to the data.
 #'  
 #'  @param conc [vector] is a vector of drug concentrations.
@@ -51,7 +51,7 @@
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
 
-LogLogisticRegression <- function(conc,
+logLogisticRegression <- function(conc,
                                   viability,
                                   density = c(2, 10, 2),
                                   step = .5 / density,
@@ -199,14 +199,14 @@ LogLogisticRegression <- function(conc,
   }
   
   #GENERATE INITIAL GUESS BY OBJECTIVE FUNCTION EVALUATION AT LATTICE POINTS
-  sieve_guess <- .MeshEval(log_conc,
+  sieve_guess <- .meshEval(log_conc,
                            viability,
                            lower_bounds = lower_bounds,
                            upper_bounds = upper_bounds,
                            density = c(2, 10, 2),
                            scale = scale,
                            Cauchy_flag = Cauchy_flag)
-  sieve_guess_residual <- .Residual(log_conc,
+  sieve_guess_residual <- .residual(log_conc,
                                     viability,
                                     pars = sieve_guess,
                                     scale = scale,
@@ -214,7 +214,7 @@ LogLogisticRegression <- function(conc,
   
   #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
   guess <- tryCatch(optim(par = sieve_guess,
-                          fn = function(x) {.Residual(log_conc,
+                          fn = function(x) {.residual(log_conc,
                                                       viability,
                                                       pars = x,
                                                       scale = scale,
@@ -226,7 +226,7 @@ LogLogisticRegression <- function(conc,
                     error = function(e) {
                       c(NA, NA, NA)
                     })
-  guess_residual <- .Residual(log_conc,
+  guess_residual <- .residual(log_conc,
                               viability,
                               pars = guess,
                               scale = scale,
@@ -249,7 +249,7 @@ LogLogisticRegression <- function(conc,
       neighbours[6, 3] <- pmax(neighbours[6, 3] - span * step[3], lower_bounds[3])
       
       for (i in 1:nrow(neighbours)) {
-        neighbour_residuals[i] <- .Residual(log_conc,
+        neighbour_residuals[i] <- .residual(log_conc,
                                             viability,
                                             pars = neighbours[i, ],
                                             scale = scale,

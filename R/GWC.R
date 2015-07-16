@@ -5,7 +5,7 @@
 ########################
 
 #################################################
-#' Calculate the GWC score between two vectors, using either a weighted spearman or pearson correlation
+#' Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation
 #'
 #'  @param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
 #'  @param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
@@ -26,7 +26,7 @@
 ## F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI: 10.1140/epjb/e2012-20697-x
 #################################################
 
-GWC <- 
+gwc <- 
 function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, ...) {
   
 	method.cor <- match.arg(method.cor)

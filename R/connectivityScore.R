@@ -9,7 +9,7 @@
 #' Function computing connectivity scores between two signatures
 #' 
 #' A function for finding the connectivity between two signatures, using either
-#' the GSEA method based on the KS statistic, or the GWC method based on a 
+#' the GSEA method based on the KS statistic, or the gwc method based on a 
 #' weighted spearman statistic. The GSEA analysis is implemented in the piano package. 
 #' 
 #' @references 
@@ -34,11 +34,11 @@
 #' 
 #' @param x A \code{matrix} with the first gene signature. In the case of GSEA the vector of
 #'   values per gene for GSEA in which we are looking for an enrichment. In the 
-#'   case of GWC, this should be a matrix, with the per gene responses in the 
+#'   case of gwc, this should be a matrix, with the per gene responses in the 
 #'   first column, and the significance values in the second.
 #' @param y A \code{matrix} with the second signature. In the case of GSEA, this is the
 #'   vector of up and down regulated genes we are looking for in our signature,
-#'   with the direction being determined from the sign. In the case of GWC, this
+#'   with the direction being determined from the sign. In the case of gwc, this
 #'   should be a matrix of identical size to x, once again with the per gene
 #'   responses in the first column, and their significance in the second.
 #' @param method \code{character} string identifying which method to use, out of 'gsea' and 'gwc'
@@ -46,7 +46,7 @@
 #'   significance through permutation testing? The minimum is 100, default is
 #'   1e4.
 #' @param nbcore \code{numeric}, how many cores to run parallel processing on.
-#' @param gwc.method \code{character}, should GWC use a weighted spearman or pearson
+#' @param gwc.method \code{character}, should gwc use a weighted spearman or pearson
 #'   statistic?
 #' @param ... Additional arguments passed down to gsea and gwc functions
 #' @return \code{numeric} a numeric vector with the score and the p-value associated
@@ -107,7 +107,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nbcore=1
       if(length(ii) < 10) {
         stop ("Less than 10 probes/genes in common between x and y")
       }
-      score <- GWC(x1=x[ii, 1], p1=x[ii, 2], x2=y[ii, 1], p2=y[ii, 2], method.cor=gwc.method, nperm=nperm, ...)
+      score <- gwc(x1=x[ii, 1], p1=x[ii, 2], x2=y[ii, 1], p2=y[ii, 2], method.cor=gwc.method, nperm=nperm, ...)
       names(score) <- c("score", "p")
     }
   )
