@@ -5,11 +5,11 @@ Version: 1.0.2
 Date: 2015-07-15
 Author: Petr Smirnov, Zhaleh Safikhani, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
-Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data. NB: The package jetset must be installed, which can be obtained from: 'http://www.cbs.dtu.dk/biotools/jetset/current/'.
+Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
 Suggests: xtable
 Encoding: UTF-8
 Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader
-Depends: jetset, R (>= 2.10)
+Depends: R (>= 2.10)
 URL: http://www.pmgenomics.ca/bhklab/software/pharmacogx
 LazyData: yes
