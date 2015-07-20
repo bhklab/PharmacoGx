@@ -10,12 +10,12 @@ connectivityScore(x, y, method = c("gsea", "gwc"), nperm = 10000,
 \arguments{
 \item{x}{A \code{matrix} with the first gene signature. In the case of GSEA the vector of
 values per gene for GSEA in which we are looking for an enrichment. In the
-case of GWC, this should be a matrix, with the per gene responses in the
+case of gwc, this should be a matrix, with the per gene responses in the
 first column, and the significance values in the second.}
 
 \item{y}{A \code{matrix} with the second signature. In the case of GSEA, this is the
 vector of up and down regulated genes we are looking for in our signature,
-with the direction being determined from the sign. In the case of GWC, this
+with the direction being determined from the sign. In the case of gwc, this
 should be a matrix of identical size to x, once again with the per gene
 responses in the first column, and their significance in the second.}
 
@@ -27,7 +27,7 @@ significance through permutation testing? The minimum is 100, default is
 
 \item{nbcore}{\code{numeric}, how many cores to run parallel processing on.}
 
-\item{gwc.method}{\code{character}, should GWC use a weighted spearman or pearson
+\item{gwc.method}{\code{character}, should gwc use a weighted spearman or pearson
 statistic?}
 
 \item{...}{Additional arguments passed down to gsea and gwc functions}
@@ -38,7 +38,7 @@ statistic?}
 }
 \description{
 A function for finding the connectivity between two signatures, using either
-the GSEA method based on the KS statistic, or the GWC method based on a
+the GSEA method based on the KS statistic, or the gwc method based on a
 weighted spearman statistic. The GSEA analysis is implemented in the piano package.
 }
 \examples{
