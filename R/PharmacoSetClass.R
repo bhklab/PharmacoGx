@@ -517,13 +517,8 @@ setGeneric("geneInfo<-", function(object, value) standardGeneric("geneInfo<-"))
 #' @export
 setReplaceMethod("geneInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
 	
-	object@molecularData <- lapply(object@molecularData, function(x, value){
-		
-		fData(x) <- value
-		
-	}, value = value)
+	fData(object@molecularData$rna) <- value
 	
-	# fData(object@molecularData$rna) <- value
 	object
 })
 

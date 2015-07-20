@@ -107,5 +107,8 @@ drugPertubrationSig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv"
     }, j=j, k=rownames(geneInfo(pSet)))
     drug.perturbation[rownames(ttt), colnames(ttt), j] <- ttt
   }
+  
+  drug.perturbation <- PharmacoGxSignatures(drug.perturbation, PSetName = pSetName(pSet), Call = as.character(match.call()), SigType='Perturbation')
+  
   return(drug.perturbation)
 }

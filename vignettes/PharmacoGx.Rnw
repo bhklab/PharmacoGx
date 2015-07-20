@@ -174,12 +174,8 @@ To begin, you would load the datasets from disk or download them using the \text
   library(PharmacoGx)
   data("CGPsmall")
   data("CCLEsmall")
-  CGPsmall <- probeGeneMapping(CGPsmall, 
-                               platform='GPL96', 
-                               method='jetset')
-  CCLEsmall <- probeGeneMapping(CCLEsmall, 
-                                platform = 'GPL97', 
-                                method='jetset')
+  CGPsmall <- probeGeneMapping(CGPsmall) 
+  CCLEsmall <- probeGeneMapping(CCLEsmall) 
 @
 We then want to investigate the consistency of the data between the two datasets. The common intersection between the datasets can then be found using \textit{intersectPSet}. We then create a summary of the gene expression and drug sensitivity measures for both datasets, and compare them using a standard correlation coefficient. 
 
@@ -187,12 +183,8 @@ We then want to investigate the consistency of the data between the two datasets
 library(PharmacoGx)
   data("CGPsmall")
   data("CCLEsmall")
-  CGPsmall <- probeGeneMapping(CGPsmall, 
-                               platform='GPL96', 
-                               method='jetset')
-  CCLEsmall <- probeGeneMapping(CCLEsmall, 
-                                platform = 'GPL97', 
-                                method='jetset')
+  CGPsmall <- probeGeneMapping(CGPsmall) 
+  CCLEsmall <- probeGeneMapping(CCLEsmall) 
   common <- intersectPSet(list('CCLE'=CCLEsmall,
                                'CGP'=CGPsmall),
                           intersectOn=c("cell.lines", "drugs", 'genes'))

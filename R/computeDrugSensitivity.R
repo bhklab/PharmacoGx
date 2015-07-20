@@ -7,7 +7,7 @@
 
 .calculateSensitivities <-
   function(pSets = list(), cellMatch=NULL, drugMatch=NULL, cap=NA, na.rm=TRUE){
-  #require(caTools) || stop("Library caTools is not available!") # trapezoid function 
+#  require(caTools) || stop("Library caTools is not available!") # trapezoid function 
   
   cell.match.flag <- ifelse(is.null(cellMatch), T, F)
   drug.match.flag <- ifelse(is.null(drugMatch), T, F)
@@ -110,16 +110,16 @@
 #HIDDEN FUNCTIONS
 
 #PREDICT VIABILITY FROM CONCENTRATION DATA AND CURVE PARAMETERS
-.hill<-function(x, pars) {
+.Hill<-function(x, pars) {
     return(pars[2] + (1 - pars[2]) / (1 + (10 ^ x / 10 ^ pars[3]) ^ pars[1]))
 }
 
 #CALCULATE RESIDUAL OF FIT
 .residual<-function(x, y, pars, scale = 0.07, Cauchy_flag = TRUE, trunc = FALSE) {
     if (Cauchy_flag == FALSE) {
-        return(sum((.hill(x, pars) - y) ^ 2))
+        return(sum((.Hill(x, pars) - y) ^ 2))
     } else {
-        diffs <- .hill(x, pars)-y
+        diffs <- .Hill(x, pars)-y
         if (trunc == FALSE) {
             return(sum(-log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs / scale)) * (1 / 2 - 1 / pi * atan(diffs / scale)))))
         } else {
@@ -160,4 +160,9 @@ trunc = FALSE) {
         }
     }
     return(guess)
+}
+
+#GET VECTOR OF INTERPOLATED CONCENTRATIONS FOR GRAPHING PURPOSES
+.GetSupportVec <- function(x, output_length = 1001) {
+  return(seq(from = min(x), to = max(x), length.out = output_length))
 }

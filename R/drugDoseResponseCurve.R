@@ -37,20 +37,27 @@
 #' @param mycol [vector] A vector with the same lenght of the pSets parameter which 
 #' will determine the color of the curve for the pharmaco sets. If this parameter is 
 #' missed default colors from Rcolorbrewer package will be used as curves color. 
-#' @export
+#' @param plot_type [character] Plot type which can be the actual one ("Actual") or 
+#' the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
+#' If this parameter is missed by default actual curve is plotted. 
 #' @import RColorBrewer
 #' @import magicaxis
+#' @export
 
 
 drugDoseResponseCurve <- 
-  function(drug, cellline, pSets = list(), legends.label = c("ic50_published","auc_published","auc_recomputed","auc_recomputed_star"), ylim, xlim, mycol) {
+  function(drug, cellline, pSets = list(), legends.label = c("ic50_published", "gi50_published","auc_published","auc_recomputed","ic50_recomputed"), ylim, xlim, mycol, plot_type=c("Fitted","Actual", "Both")) {
     if (typeof(pSets) != "list"){stop("type of pSets parameter should be list.")}
-   # require(magicaxis) || stop("Library magicaxis is not available!")
+    #require(magicaxis) || stop("Library magicaxis is not available!")
+    
+    if(missing(plot_type)){
+      plot_type <- "Actual"
+    }
     
     doses <- list(); responses <- list(); legend.values <- list()
     for(i in 1:length(pSets))
     {
-      exp_i <- which(pSets[[i]]@sensitivity$info$cellid == cellline & pSets[[i]]@sensitivity$info$drugid == drug)
+      exp_i <- which(pSets[[i]]@sensitivity$info[,"cellid"] == cellline & pSets[[i]]@sensitivity$info[,"drugid"] == drug)
       if(length(exp_i) > 0)
       {
         doses[[i]] <- as.numeric(pSets[[i]]@sensitivity$raw[exp_i, ,"Dose"])
@@ -93,7 +100,7 @@ drugDoseResponseCurve <-
     if(!missing(xlim)){dose.range <- xlim}
     if(!missing(ylim)){viability.range <- ylim}
     
-    plot(NA, xlab = "Concentration (nM)",ylab="% Viability",axes =FALSE, main=sprintf("%s:%s",drug,cellline),log="x",ylim = viability.range, xlim = dose.range, pch=8,cex=.7, cex.main = .9)
+    plot(NA, xlab = "Concentration (uM)",ylab="% Viability",axes =FALSE, main=sprintf("%s:%s",drug,cellline),log="x",ylim = viability.range, xlim = dose.range, pch=8,cex=.7, cex.main = .9)
     magicaxis::magaxis(side=1:2,box = TRUE,tcl=-.3,majorn=c(5,3),minorn=c(5,2))
     legends <- NULL
     legends.col <- NULL
@@ -105,7 +112,19 @@ drugDoseResponseCurve <-
     for(i in 1:length(doses))
     {
       points(doses[[i]],responses[[i]],pch=20,col = mycol[i])
-      lines(doses[[i]],responses[[i]],lty=1,lwd=.5,col = mycol[i])
+      
+      switch(plot_type , "Actual" = {
+        lines(doses[[i]],responses[[i]],lty=1,lwd=.5,col = mycol[i])
+        }, "Fitted" = { 
+          log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
+          log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+          lines(10 ^ log10_x_vals,.Hill(log10_x_vals, pars = c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1,lwd=.5,col = mycol[i])
+        },"Both"={
+          lines(doses[[i]],responses[[i]],lty=1,lwd=.5,col = mycol[i])
+          log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
+          log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+          lines(10 ^ log10_x_vals,.Hill(log10_x_vals, pars = c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1,lwd=.5,col = mycol[i])
+        })
       if(!missing(legends.label))
       {
         legends<- c(legends,sprintf("%s %s", pSetName(pSets[[i]]), legend.values[[i]]))
