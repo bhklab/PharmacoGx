@@ -13,8 +13,8 @@
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/Sigs/'}. Will create
 #'     directory if it does not exist.
 #' @param myfn \code{character} string, the file name to save the dataset under
-#' @param gene \code{bool}, should the signatures be at the gene level (TRUE) or probe level (FALSE).
-#'     defaults to TRUE.
+#' @param gene \code{bool} Should the signatures be downloaded at the gene level
+#'   (TRUE) or probe level (FALSE). Defaults to TRUE.
 #' @export
 #' @import downloader 
 

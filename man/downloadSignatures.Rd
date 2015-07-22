@@ -4,12 +4,15 @@
 \alias{downloadSignatures}
 \title{Download Drug Signatures}
 \usage{
-downloadSignatures(name = c("CGP", "CCLE", "CMAP"),
+downloadSignatures(name = c("CGP", "CCLE", "CMAP"), gene = TRUE,
   saveDir = "./PSets/Sigs/", myfn = NULL)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PhamracoSet for which to
 download signatures. The available options are CGP, CCLE, and CMAP}
+
+\item{gene}{\code{bool} Should the signatures be downloaded at the gene level
+(TRUE) or probe level (FALSE). Defaults to TRUE.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{'./PSets/Sigs/'}. Will create
