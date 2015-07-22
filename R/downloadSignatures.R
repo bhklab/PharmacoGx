@@ -13,10 +13,12 @@
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/Sigs/'}. Will create
 #'     directory if it does not exist.
 #' @param myfn \code{character} string, the file name to save the dataset under
+#' @param gene \code{bool}, should the signatures be at the gene level (TRUE) or probe level (FALSE).
+#'     defaults to TRUE.
 #' @export
 #' @import downloader 
 
-downloadSignatures <- function(name=c('CGP', 'CCLE', 'CMAP'), saveDir = './PSets/Sigs/', myfn=NULL) {
+downloadSignatures <- function(name=c('CGP', 'CCLE', 'CMAP'), gene = TRUE,saveDir = './PSets/Sigs/', myfn=NULL) {
   
   
   name <- match.arg(name)
@@ -27,21 +29,33 @@ downloadSignatures <- function(name=c('CGP', 'CCLE', 'CMAP'), saveDir = './PSets
   
   switch(name, 
          'CGP'={ 
-           downfn <- ''
+           if (gene){  
+           downfn <- 'CGP_gene_signatures.RData'
+           } else {
+           downfn <- 'CGP_signatures.RData'
+           }
            if (is.null(myfn)){
-             myfn <- 'CGP_signatures.RData'
+             myfn <- downfn 
            }
          },
          'CCLE'={
-           downfn <- ''
+           if (gene){
+           downfn <- 'CCLE_gene_signatures.RData'
+           } else {
+           downfn <- 'CCLE_signatures.RData' 
+           }
            if (is.null(myfn)){
-             myfn <- 'CCLE_signatures.RData'
+             myfn <- downfn
            }
          },
          'CMAP'={
-           downfn <- ''
+           if (gene){
+           downfn <- 'CMAP_gene_signatures.RData'
+           } else {
+           downfn <- 'CMAP_gene_signatures.RData'
+           }
            if (is.null(myfn)){
-             myfn <- 'CMAP_signatures.RData'
+             myfn <- downfn
            }
          }, {
            stop('Unknown Dataset. Please check the documentation of this function or the vignette for the list of available PharamcoSets.')
