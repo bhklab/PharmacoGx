@@ -12,25 +12,10 @@
 
 \title{PharmacoGx: an R package for analysis of large pharmacogenomic datasets}
 \author[1]{Petr Smirnov}
-\author[1]{Zhaleh Safikhani}
-\author[2]{Nehme El-Hechem}
-\author[1]{Donald Wang}
-\author[1]{Adrian She}
-\author[1]{Catherina Olsen}
-\author[1]{Mark Freeman}
-\author[1]{Heather Selby}
-\author[1]{Deena Gendoo}
-\author[3]{Patrick Grossman}
-\author[4]{Andrew Beck}
-\author[3]{Hugo Aerts}
-\author[1]{Mathiew Lupien}
-\author[5]{Anna Goldenburg}
-\author[1]{Benjamin Haibe-Kains}
+\author[1,2]{Zhaleh Safikhani}
+\author[1,2]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
-\affil[2]{Institut de recherches clinque de Montr\'{e}al, Montr\'{e}al, Canada}
-\affil[3]{Dana-Farber Cancer Institute, Boston, USA}
-\affil[4]{Beth Israel Deaconess Medical Center, Boston, USA}
-\affil[5]{Department of Computer Science, University of Toronto, Toronto, Canada}
+\affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
 
 
 
@@ -121,7 +106,7 @@ Load \textit{PharamacoGx} into your current workspace:
 \end{Schunk}
 
 %------------------------------------------------------------
-\subsection{Requirements}
+\subsection*{Requirements}
 %------------------------------------------------------------
 
 \textit{PharmacoGx} has been tested on Windows, Mac and Cent OS platforms.
@@ -142,7 +127,7 @@ However, to make the process of obtaining the data easier through the R shell, w
 \end{Sinput}
 \end{Schunk}
 %------------------------------------------------------------
-\subsection{Downloading Drug Signatures}
+\subsection*{Downloading Drug Signatures}
 %------------------------------------------------------------
 
 The package also provides tools to compute drug perturbation and sensitivity signatures, as explained below. However, this computation is lengthy, so for users convenience we have precomputed signatures for our three PharmacoSet objects and made them available for download using the function \textit{downloadSignatures}.
@@ -155,13 +140,16 @@ The package also provides tools to compute drug perturbation and sensitivity sig
 \end{Schunk}
 
 %------------------------------------------------------------
-\section{Sensitivity Case Study}
+\section{Case Study}
 %------------------------------------------------------------
 
-Our first case study illustrates the functions for analysis of the \textit{sensitivity} type of dataset. The case study will investigate the consistency between the CGP and CCLE datasets, recreating the analysis similar to our \textit{Inconsistency in Large Pharmacogenomic Studies} paper \cite{HaibeKains:2013ie}. In both CCLE and CGP, the transcriptome of cells was profiled using an Affymatrix microarray chip. Cells were also tested for their response to increasing concentrations of various compounds, and form this the IC50 and AUC were computed. However, the cell and drugs names used between the two datasets were not consistent. Furthermore, two different microarray platforms were used. However, \textit{PharmacoGx} allows us to overcome these differences to do a comparative study between these two datasets. \\
+%------------------------------------------------------------
+\subsection{(In)Consistency across large pharmacogenomic studies}
+%------------------------------------------------------------
+Our first case study illustrates the functions for analysis of the \textit{sensitivity} type of dataset. The case study will investigate the consistency between the CGP and CCLE datasets, recreating the analysis similar to our paper \cite{HaibeKains:2013ie}. In both CCLE and CGP, the transcriptome of cells was profiled using an Affymetrix microarray chip. Cells were also tested for their response to increasing concentrations of various compounds, and form this the IC50 and AUC for cell mortality was computed. However, the cell and drugs names used between the two datasets were not consistent. Furthermore, two different microarray platforms were used. However, \textit{PharmacoGx} allows us to overcome these differences to do a comparative study between these two datasets. \\
 
 
-CGP was profiled using the hgu133a platform, while CCLE was profiled with the expanded hgu133plus2 platform. While in this case the hgu133a is almost a strict subset of hgu133plus2 platform, we can use the best information from each platform by comparing the best probes within each dataset per gene. The function \textit{probeGeneMapping} selects a probe for each gene profiled in the microarray platform. It picks the most accurate probe for each gene using annotations extracted from the jetset package \cite{Li:2011cc}. Jetset scores each probe on how sensitive and specific it is, allowing probeGeneMapping to pick the probe which is most representative of each genes true expression. \\
+CGP was profiled using the hgu133a platform, while CCLE was profiled with the expanded hgu133plus2 platform. While in this case the hgu133a is almost a strict subset of hgu133plus2 platform, we can use the best information from each platform by comparing the best probes within each dataset per gene. The function \textit{probeGeneMapping} helps select a probe for each gene profiled in the microarray platform. It provides two methods of probe selection, either by picking the most variant probe, which should be the probe most senstitive to variations in gene expression between cells, or by using jetset \cite{Li:2011cc}. Jetset scores each probe on how sensitive and specific it is, allowing probeGeneMapping to pick the probe which is most representative of each genes true expression. \\
 
 To begin, you would load the datasets from disk or download them using the \textit{downloadPSet} function above, and then execute probeGeneMapping on the datasets. 
 
@@ -175,6 +163,7 @@ To begin, you would load the datasets from disk or download them using the \text
 >   CCLEsmall <- probeGeneMapping(CCLEsmall) 
 \end{Sinput}
 \end{Schunk}
+
 We then want to investigate the consistency of the data between the two datasets. The common intersection between the datasets can then be found using \textit{intersectPSet}. We then create a summary of the gene expression and drug sensitivity measures for both datasets, and compare them using a standard correlation coefficient. 
 
 \begin{Schunk}
@@ -248,7 +237,7 @@ We then want to investigate the consistency of the data between the two datasets
 \end{figure}
 
 %------------------------------------------------------------
-\section{Perturbation Case Study}
+\subsection{Query the Connectivity Map}
 %------------------------------------------------------------
 
 The second case study illustrates the analysis of a perturbation type datasets, where the changes in cellular molecular profiles are compared before and after administering a compound to the cell line. Of these datasets, we have currently curated and made available for download the Connectivity Map (CMAP) dataset \cite{Lamb:2006hf}. \\
@@ -275,8 +264,8 @@ Once again, we load the dataset, and we summarize the expression on the gene lev
 >   xtable(res, 
 +     caption='Connectivity Score results for HDAC inhibitor gene signature.')
 \end{Sinput}
-% latex table generated in R 3.2.1 by xtable 1.7-4 package
-% Tue Jul 21 22:02:12 2015
+% latex table generated in R 3.3.0 by xtable 1.7-4 package
+% Wed Jul 22 11:18:05 2015
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -285,7 +274,7 @@ Once again, we load the dataset, and we summarize the expression on the gene lev
   \hline
 vorinostat & 0.99 & 0.00 \\ 
   alvespimycin & 0.82 & 0.00 \\ 
-  acetylsalicylic acid & 0.50 & 0.33 \\ 
+  acetylsalicylic acid & 0.50 & 0.36 \\ 
   rosiglitazone & 0.00 & 1.00 \\ 
   pioglitazone & 0.00 & 1.00 \\ 
    \hline
@@ -296,22 +285,22 @@ As we can see, the known HDAC inhibitor Varinostat has a very strong connectivit
 
 This example serves as a validation of the method, and demonstrates the ease with which drug perturbation analysis can be done using \textit{PharmacoGx}. While in this case we were matching a drug signature with a drug class signature, this method can also be used in the discovery of drugs that are anticorrelated with known disease signatures, to look for potential new treatments and drug repurposing. 
 %------------------------------------------------------------
-\section{Session Info}
+\section*{Session Info}
 %------------------------------------------------------------ 
 
 \begin{itemize}\raggedright
-  \item R version 3.2.1 Patched (2015-07-08 r68642), \verb|x86_64-apple-darwin13.4.0|
+  \item R Under development (unstable) (2015-07-21 r68714), \verb|x86_64-apple-darwin13.4.0|
   \item Locale: \verb|en_CA.UTF-8/en_CA.UTF-8/en_CA.UTF-8/C/en_CA.UTF-8/en_CA.UTF-8|
   \item Base packages: base, datasets, graphics, grDevices, methods,
     stats, utils
   \item Other packages: PharmacoGx~1.0.3, xtable~1.7-4
   \item Loaded via a namespace (and not attached): Biobase~2.29.1,
-    BiocGenerics~0.15.3, bitops~1.0-6, caTools~1.17.1, cluster~2.0.2,
+    BiocGenerics~0.15.3, bitops~1.0-6, caTools~1.17.1, cluster~2.0.3,
     digest~0.6.8, downloader~0.4, gdata~2.17.0, gplots~2.17.0,
     gtools~3.5.0, igraph~1.0.1, KernSmooth~2.23-15, limma~3.25.13,
-    magicaxis~1.9.4, magrittr~1.5, marray~1.47.0, MASS~7.3-42,
-    parallel~3.2.1, piano~1.9.4, plotrix~3.5-12, RColorBrewer~1.1-2,
-    relations~0.6-5, sets~1.0-15, slam~0.1-32, sm~2.2-5.4, tools~3.2.1
+    magicaxis~1.9.4, magrittr~1.5, marray~1.47.0, MASS~7.3-43,
+    parallel~3.3.0, piano~1.9.4, plotrix~3.5-12, RColorBrewer~1.1-2,
+    relations~0.6-5, sets~1.0-15, slam~0.1-32, sm~2.2-5.4, tools~3.3.0
 \end{itemize}
 \bibliographystyle{plain}
 \bibliography{biblio}
