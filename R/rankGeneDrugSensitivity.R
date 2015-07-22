@@ -22,6 +22,10 @@
 ## Notes:	duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
+
+#' @importFrom stats complete.cases
+#' @importFrom stats p.adjust
+
 rankGeneDrugSensitivity <- 
 function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FALSE) {
   if (nthread != 1) {

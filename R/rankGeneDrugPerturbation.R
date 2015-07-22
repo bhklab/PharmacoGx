@@ -25,6 +25,11 @@
 ##
 #################################################
 
+#' @importFrom stats complete.cases
+#' @importFrom stats p.adjust
+
+
+
 rankGeneDrugPerturbation <-
 function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, single.type=FALSE, nthread=1, verbose=FALSE) {
 

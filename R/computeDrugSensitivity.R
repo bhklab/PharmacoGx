@@ -3,7 +3,7 @@
 ## All rights Reserved
 ## May 26, 2015
 ########################
-
+#' @importFrom stats na.omit
 
 .calculateSensitivities <-
   function(pSets = list(), cellMatch=NULL, drugMatch=NULL, cap=NA, na.rm=TRUE){

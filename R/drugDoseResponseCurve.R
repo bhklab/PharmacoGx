@@ -42,6 +42,12 @@
 #' If this parameter is missed by default actual curve is plotted. 
 #' @import RColorBrewer
 #' @import magicaxis
+#' @importFrom graphics plot
+#' @importFrom graphics rect
+#' @importFrom grDevices rgb
+#' @importFrom graphics points
+#' @importFrom graphics lines
+#' @importFrom graphics legend
 #' @export
 
 

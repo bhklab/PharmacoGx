@@ -1,3 +1,10 @@
+#' @importFrom stats median
+#' @importFrom stats complete.cases
+#' @importFrom stats lm
+#' @importFrom stats anova
+#' @importFrom stats pf
+#' 
+
 ## function computing gene-drug associations from perturbation data (CMAP)
 geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=FALSE) {
 ## input:
@@ -11,6 +18,8 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
 ## output:
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
 	
+  
+  
 	nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
 	if (length(sort(unique(concentration))) < 2) {
 		warning("No drug concentrations tested")

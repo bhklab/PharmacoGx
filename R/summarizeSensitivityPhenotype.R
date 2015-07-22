@@ -25,6 +25,7 @@
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
 #' @export
+#' @importFrom stats median
 
 
 summarizeSensitivityPhenotype <- function(pSet, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recompted", "auc_recomputed"), summaryStat=c("median","mean", "first", "last")){

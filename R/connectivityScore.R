@@ -52,7 +52,9 @@
 #' @return \code{numeric} a numeric vector with the score and the p-value associated
 #'   with it
 #' @export
-#' @import piano
+#' @importFrom piano runGSA
+#' @importFrom piano loadGSC
+#' @importFrom stats complete.cases
 
 
 

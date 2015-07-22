@@ -1,3 +1,6 @@
+#' @importFrom stats sd
+
+
 geneIdMap <-
 function (geneid1, data1, geneid2, data2, verbose=FALSE) {
 	

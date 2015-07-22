@@ -1,3 +1,8 @@
+#' @importFrom stats pchisq
+#' @importFrom stats qnorm
+#' @importFrom stats pnorm
+#' @importFrom stats pt
+
 combineTest <-
 function(p, weight, method=c("fisher", "z.transform", "logit"), hetero=FALSE, na.rm=FALSE) {
 	if(hetero) { stop("function to deal with heterogeneity is not implemented yet!") }

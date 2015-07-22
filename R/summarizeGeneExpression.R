@@ -32,6 +32,10 @@
 ##' @return \code{matrix} An updated PharmacoSet with the RNA expression summarized
 ##'   per cell line.
 ##' @export
+##' @importFrom utils txtProgressBar
+##' @importFrom stats median
+##' @importFrom utils setTxtProgressBar
+##' 
 
 
 

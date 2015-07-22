@@ -50,6 +50,8 @@
 #'  
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
+#'  
+#'  @importFrom stats optim
 
 logLogisticRegression <- function(conc,
                                   viability,

@@ -46,7 +46,7 @@ logLogisticRegression(conc, viability, density = c(2, 10, 2),
  than a percentage, and that E_inf should be returned as a decimal rather than a percentage.}
 
 \item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-curve-fitting is performed.}
+ curve-fitting is performed.}
 }
 \description{
 By default, logLogisticRegression uses an L-BFGS algorithm to generate the fit. However, if

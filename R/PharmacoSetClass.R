@@ -106,6 +106,7 @@
 #' @export
 #' @import Biobase
 #' @import methods
+#' @importFrom utils sessionInfo
 PharmacoSet<-  function(name, 
                           rna=ExpressionSet(), 
                           dna=ExpressionSet(), 

@@ -4,7 +4,6 @@
 ## July 20, 2015
 ###########################
 
-
 setOldClass('sessionInfo', sessionInfo())
 
 .PharmacoGxSignatures <- setClass('PharmacoGxSignatures', slots=list(
@@ -27,6 +26,8 @@ return(.PharmacoGxSignatures(Data, PSetName=PSetName, DateCreated=DateCreated, S
 #' @param object \code{PharmacoGxSignatures}
 #' 
 #' @export
+#' @importFrom utils sessionInfo
+
 setMethod("show", signature=signature(object='PharmacoGxSignatures'),
 		function(object) {
 		cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")

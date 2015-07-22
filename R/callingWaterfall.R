@@ -19,6 +19,17 @@
 ##  actarea: Activity Area, that is area under the drug activity curve (positive values)
 ##  amax: Activity at max concentration (positive values)
 ##  intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
+#' @importFrom stats complete.cases
+#' @importFrom stats cor.test
+#' @importFrom stats lm
+#' @importFrom stats median
+#' @importFrom graphics par
+#' @importFrom grDevices rainbow
+#' @importFrom graphics points
+#' @importFrom graphics abline
+#' @importFrom graphics lines
+#' @importFrom graphics legend
+#' 
 `callingWaterfall` <- 
 function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), cor.min.linear=0.95, name="Drug", plot=FALSE) {
   

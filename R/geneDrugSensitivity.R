@@ -4,6 +4,15 @@
 ## October 23, 2013
 ########################
 
+#' @importFrom stats sd
+#' @importFrom stats complete.cases
+#' @importFrom stats lm
+#' @importFrom stats anova
+#' @importFrom stats pf
+#' @importFrom stats formula
+#' @importFrom stats var
+
+
 geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE) {
 ## input:
 ##  x: numeric vector of gene expression values
