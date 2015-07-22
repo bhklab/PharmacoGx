@@ -29,6 +29,7 @@ probeGeneMapping <- function (pSet){
 
   pSet@molecularData$rna <- pSet@molecularData$rna[geneInfo(pSet)[,"BEST"] == TRUE, ]
   rownames(geneInfo(pSet)) <- paste('geneid', geneInfo(pSet)[,'GENEID'], sep='.')
+  rownames(rnaData(pSet)) <- paste('geneid', geneInfo(pSet)[,'GENEID'], sep='.')
   return (pSet)
 }
 
