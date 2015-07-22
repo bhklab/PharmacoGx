@@ -810,10 +810,10 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 		cat("CNV: \n")
 		cat("\tDim: ", dim(object@molecularData$cnv), "\n")
 		cat("Drug pertubation: \n")
-		cat("\tPlease look at pertInfo(pSet) to determine number of experiments for each drug-cell combination.\n")
+		cat("\tPlease look at pertNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
 		cat("Drug sensitivity: \n")
 		cat("\tNumber of Experiments: ",nrow(object@sensitivity$raw),"\n")
-		cat("\tPlease look at sensInfo(pSet) to determine number of experiments for each drug-cell combination.\n")
+		cat("\tPlease look at sensNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
 	})
 
 
