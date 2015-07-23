@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  22 JUL 2015 11:18
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  23 JUL 2015 09:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -622,13 +622,18 @@ File: ts1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `TS1/aett/m/sl' in size <10.95> not available
 (Font)              Font shape `TS1/cmtt/m/sl' tried instead on input line 96.
- [3]
-Underfull \hbox (badness 10000) in paragraph at lines 149--150
+
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
+
+ []
+
+[3]
+Underfull \hbox (badness 10000) in paragraph at lines 148--149
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 152--153
+Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
@@ -636,28 +641,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 152--153
 File: PharmacoGx-fig2.pdf Graphic file (type pdf)
 
 <use PharmacoGx-fig2.pdf>
-Package pdftex.def Info: PharmacoGx-fig2.pdf used on input line 234.
+Package pdftex.def Info: PharmacoGx-fig2.pdf used on input line 233.
 (pdftex.def)             Requested size: 288.0011pt x 288.01624pt.
 
-Overfull \hbox (0.65395pt too wide) in paragraph at lines 243--244
+Overfull \hbox (0.65395pt too wide) in paragraph at lines 242--243
 \T1/aer/m/n/10.95 The sec-ond case study il-lus-trates the anal-y-sis of a per-
 tur-ba-tion type datasets,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 243--244
+Underfull \hbox (badness 10000) in paragraph at lines 242--243
 
  []
 
-[6] [7]
-LaTeX Font Info:    Try loading font information for TS1+aer on input line 292.
+[6] [7 <./PharmacoGx-fig2.pdf>] [8]
+LaTeX Font Info:    Try loading font information for TS1+aer on input line 291.
 
 
 (/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/ts1aer.fd
 File: ts1aer.fd 
 )
 LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 292.
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 291.
 
 (./PharmacoGx.bbl
 Underfull \hbox (badness 2158) in paragraph at lines 4--21
@@ -665,29 +670,29 @@ Underfull \hbox (badness 2158) in paragraph at lines 4--21
 , Kavitha
  []
 
-[8] [9]) [10] [11 <./PharmacoGx-fig2.pdf>] (./PharmacoGx.aux) ) 
+[9] [10]) [11] (./PharmacoGx.aux) ) 
 Here is how much of TeX's memory you used:
  3123 strings out of 493315
  43935 string characters out of 6137904
- 96728 words of memory out of 5000000
+ 96727 words of memory out of 5000000
  6466 multiletter control sequences out of 15000+600000
  32915 words of font info for 71 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 37i,7n,23p,828b,284s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texl
-ive/2013/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texli
-ve/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texliv
-e/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive
-/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2
-013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/201
-3/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2013/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2013/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2013/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2013/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2013/texm
-f-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2013/texmf-
-dist/fonts/type1/public/cm-super/sfst1095.pfb>
-Output written on PharmacoGx.pdf (11 pages, 180408 bytes).
+ 37i,7n,23p,859b,284s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2013/texmf-dist/fonts/en
+c/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2013/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmsltt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmti10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmtt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/cm
+-super/sfrm1095.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/cm-s
+uper/sfst1095.pfb>
+Output written on PharmacoGx.pdf (11 pages, 180962 bytes).
 PDF statistics:
  93 PDF objects out of 1000 (max. 8388607)
  65 compressed objects within 1 object stream

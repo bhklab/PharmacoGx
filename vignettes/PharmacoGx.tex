@@ -77,7 +77,7 @@ measures across the CCLE and CGP projects. The second case study will
 interrogate the CMAP database with a known signature of up and down regulated
 genes for HDAC inhibitors as published in ~\cite{Glaser:2003gk}. Using the
 Connectivity Score as defined in ~\cite{Lamb:2006hf}, it will be seen that
-known HDAC inhibitors have a high numerical score and high significance.\\ %%'check if the reference is right
+known HDAC inhibitors have a high numerical score and high significance.\\ 
 
 For the purpose of this vignette, an extremely minuscule subset of all three
 \textit{PharmacoSet} objects are included with the package as example data.
@@ -109,21 +109,20 @@ Load \textit{PharamacoGx} into your current workspace:
 \subsection*{Requirements}
 %------------------------------------------------------------
 
-\textit{PharmacoGx} has been tested on Windows, Mac and Cent OS platforms.
-
-The packages uses the core R package \textit{parallel} to preform parallel computations, and therefore if parallelization is desired, the dependencies for the parallel package must be met. 
+\textit{PharmacoGx} has been tested on Windows, Mac and Cent OS platforms. The packages uses the core R package \textit{parallel} to preform parallel computations, and therefore if parallelization is desired, the dependencies for the parallel package must be met. 
 
 %------------------------------------------------------------
 \section{Downloading PharmacoSet objects}
 %------------------------------------------------------------
 
 We have made the PharmacoSet objects of the curated datasets available online at:\\ \textit{www.pmgenomics.ca/bhklab/software/pharmacogx/}\\
+
 However, to make the process of obtaining the data easier through the R shell, we have also written a function \textit{downloadPSet} which automates downloading the datasets into a directory of the users choice, and returns the data into the R session. 
 
 \begin{Schunk}
 \begin{Sinput}
 > ## Example
-> CGP <- downloadPSet('CGP') 
+> CGP <- downloadPSet("CGP") 
 \end{Sinput}
 \end{Schunk}
 %------------------------------------------------------------
@@ -135,7 +134,7 @@ The package also provides tools to compute drug perturbation and sensitivity sig
 \begin{Schunk}
 \begin{Sinput}
 > ## Example
-> CGP.sigs <- downloadSignatures('CGP')
+> CGP.sigs <- downloadSignatures("CGP")
 \end{Sinput}
 \end{Schunk}
 
@@ -146,10 +145,10 @@ The package also provides tools to compute drug perturbation and sensitivity sig
 %------------------------------------------------------------
 \subsection{(In)Consistency across large pharmacogenomic studies}
 %------------------------------------------------------------
-Our first case study illustrates the functions for analysis of the \textit{sensitivity} type of dataset. The case study will investigate the consistency between the CGP and CCLE datasets, recreating the analysis similar to our paper \cite{HaibeKains:2013ie}. In both CCLE and CGP, the transcriptome of cells was profiled using an Affymetrix microarray chip. Cells were also tested for their response to increasing concentrations of various compounds, and form this the IC50 and AUC for cell mortality was computed. However, the cell and drugs names used between the two datasets were not consistent. Furthermore, two different microarray platforms were used. However, \textit{PharmacoGx} allows us to overcome these differences to do a comparative study between these two datasets. \\
+Our first case study illustrates the functions for analysis of the \textit{sensitivity} type of dataset. The case study will investigate the consistency between the CGP and CCLE datasets, recreating the analysis similar to our \textit{Inconsistency in Large Pharmacogenomic Studies} paper \cite{HaibeKains:2013ie}. In both CCLE and CGP, the transcriptome of cells was profiled using an Affymatrix microarray chip. Cells were also tested for their response to increasing concentrations of various compounds, and form this the IC50 and AUC were computed. However, the cell and drugs names used between the two datasets were not consistent. Furthermore, two different microarray platforms were used. However, \textit{PharmacoGx} allows us to overcome these differences to do a comparative study between these two datasets. \\
 
 
-CGP was profiled using the hgu133a platform, while CCLE was profiled with the expanded hgu133plus2 platform. While in this case the hgu133a is almost a strict subset of hgu133plus2 platform, we can use the best information from each platform by comparing the best probes within each dataset per gene. The function \textit{probeGeneMapping} helps select a probe for each gene profiled in the microarray platform. It provides two methods of probe selection, either by picking the most variant probe, which should be the probe most senstitive to variations in gene expression between cells, or by using jetset \cite{Li:2011cc}. Jetset scores each probe on how sensitive and specific it is, allowing probeGeneMapping to pick the probe which is most representative of each genes true expression. \\
+CGP was profiled using the hgu133a platform, while CCLE was profiled with the expanded hgu133plus2 platform. While in this case the hgu133a is almost a strict subset of hgu133plus2 platform, we can use the best information from each platform by comparing the best probes within each dataset per gene. The function \textit{probeGeneMapping} selects a probe for each gene profiled in the microarray platform. It picks the most accurate probe for each gene using annotations extracted from the jetset package \cite{Li:2011cc}. Jetset scores each probe on how sensitive and specific it is, allowing probeGeneMapping to pick the probe which is most representative of each genes true expression. \\
 
 To begin, you would load the datasets from disk or download them using the \textit{downloadPSet} function above, and then execute probeGeneMapping on the datasets. 
 
@@ -201,19 +200,19 @@ We then want to investigate the consistency of the data between the two datasets
 >   gg <- geneNames(common[[1]])
 >   cc <- cellNames(common[[1]])
 >   ge.cor <- sapply(cc, function (x, d1, d2) {
-+     return (cor(d1[ , x], d2[ , x], method="spearman",
++     return (stats::cor(d1[ , x], d2[ , x], method="spearman",
 +                 use="pairwise.complete.obs"))
 +   }, d1=rnaData(common$CGP), d2=rnaData(common$CCLE))
 >   ic50.cor <- sapply(cc, function (x, d1, d2) {
-+     return (cor(d1[, x], d2[ , x], method="spearman",
++     return (stats::cor(d1[, x], d2[ , x], method="spearman",
 +                 use="pairwise.complete.obs"))
 +   }, d1=t(CGP.ic50), d2=t(CCLE.ic50))
 >   auc.cor <- sapply(cc, function (x, d1, d2) {
-+     return (cor(d1[ , x], d2[ , x], method="spearman",
++     return (stats::cor(d1[ , x], d2[ , x], method="spearman",
 +                 use="pairwise.complete.obs"))
 +   }, d1=t(CGP.auc), d2=t(CCLE.auc))
->   w1 <- wilcox.test(x=ge.cor, y=auc.cor, conf.int=TRUE)
->   w2 <- wilcox.test(x=ge.cor, y=ic50.cor, conf.int=TRUE)
+>   w1 <- stats::wilcox.test(x=ge.cor, y=auc.cor, conf.int=TRUE, exact=FALSE)
+>   w2 <- stats::wilcox.test(x=ge.cor, y=ic50.cor, conf.int=TRUE, exact=FALSE)
 >   yylim <- c(-1, 1)
 >   ss <- sprintf("GE vs. AUC = %.1E\nGE vs. IC50 = %.1E",
 +                 w1$p.value, w2$p.value)
@@ -229,7 +228,7 @@ We then want to investigate the consistency of the data between the two datasets
 \end{Sinput}
 \end{Schunk}
 
-\begin{figure}[H!]
+\begin{figure}[hbtp]
 \begin{center}
 \includegraphics{PharmacoGx-fig2}
 \end{center}
@@ -244,7 +243,7 @@ The second case study illustrates the analysis of a perturbation type datasets, 
 
 For this case study, we will recreate an analysis from the paper by Lamb et al., in which a known signature for HDAC inhibitors \cite{Glaser:2003gk} is used to recover drugs in the CMAP dataset that are also known HDAC inhibitors. For this example, the package includes this signature, already mapped to the gene level, and it can be loaded by calling \textit{data(HDAC\_genes)}.
 
-Once again, we load the dataset, and we summarize the expression on the gene level using \textit{probeGeneMapping}. We then recreate drug signatures for each drug use the function \textit{drugPerturbationSig} to preform statistical modelling of the transcriptomic response to the application of each drug. We then compare the observed upregulated and downregulated genes to a the known HDAC signature, using the GSEA connectivity score to determine the correlation between the two signatures. 
+Once again, we load the dataset, and we summarize the expression on the gene level using \textit{probeGeneMapping}. We then recreate drug signatures for each drug use the function \textit{drugPerturbationSig} to preform statistical modelling of the transcriptomic response to the application of each drug. We then compare the observed up-regulated and down-regulated genes to a the known HDAC signature, using the GSEA connectivity score to determine the correlation between the two signatures. 
 
 \begin{Schunk}
 \begin{Sinput}
@@ -265,7 +264,7 @@ Once again, we load the dataset, and we summarize the expression on the gene lev
 +     caption='Connectivity Score results for HDAC inhibitor gene signature.')
 \end{Sinput}
 % latex table generated in R 3.3.0 by xtable 1.7-4 package
-% Wed Jul 22 11:18:05 2015
+% Thu Jul 23 09:11:07 2015
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -274,7 +273,7 @@ Once again, we load the dataset, and we summarize the expression on the gene lev
   \hline
 vorinostat & 0.99 & 0.00 \\ 
   alvespimycin & 0.82 & 0.00 \\ 
-  acetylsalicylic acid & 0.50 & 0.36 \\ 
+  acetylsalicylic acid & 0.50 & 0.38 \\ 
   rosiglitazone & 0.00 & 1.00 \\ 
   pioglitazone & 0.00 & 1.00 \\ 
    \hline
@@ -297,7 +296,7 @@ This example serves as a validation of the method, and demonstrates the ease wit
   \item Loaded via a namespace (and not attached): Biobase~2.29.1,
     BiocGenerics~0.15.3, bitops~1.0-6, caTools~1.17.1, cluster~2.0.3,
     digest~0.6.8, downloader~0.4, gdata~2.17.0, gplots~2.17.0,
-    gtools~3.5.0, igraph~1.0.1, KernSmooth~2.23-15, limma~3.25.13,
+    gtools~3.5.0, igraph~1.0.1, KernSmooth~2.23-15, limma~3.25.14,
     magicaxis~1.9.4, magrittr~1.5, marray~1.47.0, MASS~7.3-43,
     parallel~3.3.0, piano~1.9.4, plotrix~3.5-12, RColorBrewer~1.1-2,
     relations~0.6-5, sets~1.0-15, slam~0.1-32, sm~2.2-5.4, tools~3.3.0

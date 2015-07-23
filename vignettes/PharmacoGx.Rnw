@@ -157,7 +157,7 @@ To begin, you would load the datasets from disk or download them using the \text
 
 We then want to investigate the consistency of the data between the two datasets. The common intersection between the datasets can then be found using \textit{intersectPSet}. We then create a summary of the gene expression and drug sensitivity measures for both datasets, and compare them using a standard correlation coefficient. 
 
-<<inconsistincies,eval=False, include=False>>=
+<<inconsistencies,eval=False, include=False>>=
   library(PharmacoGx)
   data("CGPsmall")
   data("CCLEsmall")
