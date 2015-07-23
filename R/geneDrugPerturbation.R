@@ -56,7 +56,7 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
 		mm0 <- lm(formula=ff0, data=dd, model=FALSE, x=FALSE, y=FALSE, qr=TRUE)
 		mm <- lm(formula=ff, data=dd, model=model, x=FALSE, y=FALSE, qr=TRUE)
 
-		mmc <- anova(mm0, mm)
+		mmc <- stats::anova(mm0, mm)
 		mm <- summary(mm)
 ## extract statistics
 		tt <- c("estimate"=mm$coefficients["concentration", "Estimate"], "se"=mm$coefficients["concentration", "Std. Error"], "n"=nn, "tsat"=mm$coefficients["concentration", "t value"], "fstat"=mmc$F[2], "pvalue"=mmc$'Pr(>F)'[2])

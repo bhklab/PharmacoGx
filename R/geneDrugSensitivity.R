@@ -53,7 +53,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 #   }
   rr0 <- lm(formula(ff0), data=dd, model=FALSE, x=FALSE, y=FALSE, qr=TRUE)
   rr1 <- lm(formula(ff1), data=dd, model=FALSE, x=FALSE, y=FALSE, qr=TRUE)
-  rrc <- anova(rr0, rr1)
+  rrc <- stats::anova(rr0, rr1)
   rr <- summary(rr1)
   tt <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
   names(tt) <- nc

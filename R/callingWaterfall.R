@@ -76,7 +76,7 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   
   oo <- order(xx, decreasing=TRUE)
   ## test linearity with Pearson correlation
-  cc <- cor.test(-xx[oo], 1:length(oo), method="pearson")
+  cc <- stats::cor.test(-xx[oo], 1:length(oo), method="pearson")
   ## line between the two extreme sensitivity values
   dd <- cbind("y"=xx[oo][c(1, length(oo))], "x"=c(1, length(oo)))
   rr <- lm(y ~ x, data=data.frame(dd))
@@ -155,7 +155,7 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
     mypch[cutoffn] <- 19
     plot(xx[oo], col=mycol[oo], pch=mypch[oo], ylab=ylabel, main=sprintf("%s\nWaterfall", name))
     points(x=cutoff, y=xx[cutoffn], pch=mypch[cutoffn], col=mycol[cutoffn])
-    abline(a=rr$coefficients[1], b=rr$coefficients[2], lwd=2, col="darkgrey")
+    graphics::abline(a=rr$coefficients[1], b=rr$coefficients[2], lwd=2, col="darkgrey")
     lines(x=c(cutoff, cutoff), y=c(par("usr")[3], xx[cutoffn]), col="red")
     lines(x=c(par("usr")[1], cutoff), y=c(xx[cutoffn], xx[cutoffn]), col="red")
     legend("topright", legend=c(sprintf("resistant (n=%i)", sum(!is.na(calls) & calls == "resistant")), sprintf("intermediate (n=%i)", sum(!is.na(calls) & calls == "intermediate")), sprintf("sensitive (n=%i)", sum(!is.na(calls) & calls == "sensitive")), "cutoff", sprintf("R=%.3g", cc$estimate)), col=c(rev(ccols), NA), pch=c(16, 16, 16, 19, NA), bty="n")
