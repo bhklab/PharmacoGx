@@ -4,8 +4,8 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name = c("CGP", "CCLE", "CMAP"), saveDir = "./PSets/",
-  myfn = NULL)
+downloadPSet(name = c("CGP", "CCLE", "CMAP"), saveDir = file.path(".",
+  "PSets"), myfn = NULL, verbose = TRUE)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PharmacoSet to download.
@@ -16,6 +16,9 @@ PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
 directory if it does not exist.}
 
 \item{myfn}{\code{character} string, the file name to save the dataset under}
+
+\item{verbose}{\code{bool} Should status message be printed during download.
+Defaults to TRUE.}
 }
 \description{
 This function allows you to download a \code{PharmacoSet} object for use with this

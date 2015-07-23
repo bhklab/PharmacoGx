@@ -7,7 +7,7 @@
 showSigAnnot(Sigs)
 }
 \arguments{
-\item{Sigs}{An object of the \code{PharmacoGxSignatures} Class, as
+\item{Sigs}{An object of the \code{PharmacoSig} Class, as
 returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}}
 }
 \description{

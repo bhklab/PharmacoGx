@@ -156,7 +156,7 @@ drugSensitivitySig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv")
       drug.sensitivity[rownames(ttt), colnames(ttt), j] <- ttt
     }
 
-drug.perturbation <- PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call =match.call(), SigType='Sensitivity')
+drug.perturbation <- PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call =as.character(match.call()), SigType='Sensitivity')
 
 	return(drug.sensitivity)
 }

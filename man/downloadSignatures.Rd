@@ -5,7 +5,7 @@
 \title{Download Drug Signatures}
 \usage{
 downloadSignatures(name = c("CGP", "CCLE", "CMAP"), gene = TRUE,
-  saveDir = "./PSets/Sigs/", myfn = NULL)
+  saveDir = file.path(".", "PSets", "Sigs"), myfn = NULL, verbose = TRUE)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PhamracoSet for which to
@@ -15,10 +15,13 @@ download signatures. The available options are CGP, CCLE, and CMAP}
 (TRUE) or probe level (FALSE). Defaults to TRUE.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
-PharmacoSet should be saved. Defaults to \code{'./PSets/Sigs/'}. Will create
+PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will create
 directory if it does not exist.}
 
 \item{myfn}{\code{character} string, the file name to save the dataset under}
+
+\item{verbose}{\code{bool} Should status message be printed during download.
+Defaults to TRUE.}
 }
 \description{
 This function allows you to download an array of drug signatures, as would be

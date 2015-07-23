@@ -11,8 +11,8 @@
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
 #'     directory if it does not exist.
 #' @param myfn \code{character} string, the file name to save the dataset under
-#" @param verbose \code{bool} Should status message be printed during download.
-#"   Defaults to TRUE.
+#' @param verbose \code{bool} Should status message be printed during download.
+#'   Defaults to TRUE.
 #' @export
 #' @import downloader 
 
