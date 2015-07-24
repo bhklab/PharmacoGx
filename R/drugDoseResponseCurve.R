@@ -107,7 +107,7 @@ drugDoseResponseCurve <-
     if(!missing(ylim)){viability.range <- ylim}
     
     plot(NA, xlab = "Concentration (uM)",ylab="% Viability",axes =FALSE, main=sprintf("%s:%s",drug,cellline),log="x",ylim = viability.range, xlim = dose.range, pch=8,cex=.7, cex.main = .9)
-    magicaxis::magaxis(side=1:2,box = TRUE,tcl=-.3,majorn=c(5,3),minorn=c(5,2))
+    magicaxis::magaxis(side=1:2,frame.plot = TRUE,tcl=-.3,majorn=c(5,3),minorn=c(5,2))
     legends <- NULL
     legends.col <- NULL
     if(length(doses) > 1)
