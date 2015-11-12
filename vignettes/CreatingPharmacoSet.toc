@@ -1,0 +1,11 @@
+\contentsline {section}{\numberline {1}Intro}{1}
+\contentsline {section}{\numberline {2}PharamcoSet Structure}{2}
+\contentsline {subsection}{\numberline {2.1}annotation}{3}
+\contentsline {subsection}{\numberline {2.2}datasetType}{3}
+\contentsline {subsection}{\numberline {2.3}cell}{3}
+\contentsline {subsection}{\numberline {2.4}drug}{3}
+\contentsline {subsection}{\numberline {2.5}molecularProfiles}{3}
+\contentsline {subsection}{\numberline {2.6}sensitivity}{5}
+\contentsline {subsection}{\numberline {2.7}perturbation}{6}
+\contentsline {subsection}{\numberline {2.8}curation}{6}
+\contentsline {section}{\numberline {3}Creating the PharmacoSet}{6}

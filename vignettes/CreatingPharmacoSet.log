@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  11 NOV 2015 23:45
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  25 OCT 2015 17:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**PharmacoGx.tex
-(./PharmacoGx.tex
+**CreatingPharmacoSet.tex
+(./CreatingPharmacoSet.tex
 LaTeX2e <2011/06/27>
 Babel <3.9f> and hyphenation patterns for 78 languages loaded.
 (/usr/local/texlive/2013/texmf-dist/tex/latex/base/article.cls
@@ -474,27 +474,29 @@ LaTeX Font Info:    Try loading font information for T1+aer on input line 100.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/ae/t1aer.fd
 File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
-)))) (./PharmacoGx.aux)
-\openout1 = `PharmacoGx.aux'.
+))))
+(./CreatingPharmacoSet.aux)
+\openout1 = `CreatingPharmacoSet.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 25.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 25.
- (/usr/local/texlive/2013/texmf-dist/tex/latex/base/ts1cmr.fd
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 34.
+
+(/usr/local/texlive/2013/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    ... okay on input line 34.
 
 (/usr/local/texlive/2013/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -557,162 +559,122 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-(./PharmacoGx-concordance.tex)
+(./CreatingPharmacoSet-concordance.tex)
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 28.
+(Font)              <12> on input line 37.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 28.
+(Font)              <8> on input line 37.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 28.
- (./PharmacoGx.toc
+(Font)              <6> on input line 37.
+ (./CreatingPharmacoSet.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 2.
+(Font)              <10.95> on input line 3.
 )
 \tf@toc=\write4
-\openout4 = `PharmacoGx.toc'.
+\openout4 = `CreatingPharmacoSet.toc'.
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 35--43
-
- []
-
-[1
+ [1
 
 {/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 44--52
+LaTeX Font Info:    Try loading font information for T1+aett on input line 55.
 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 53--64
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 65--72
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 73--82
-
- []
-
-[2]
-Underfull \hbox (badness 10000) in paragraph at lines 83--87
-
- []
-
-LaTeX Font Info:    Try loading font information for T1+aett on input line 96.
 (/usr/local/texlive/2013/texmf-dist/tex/latex/ae/t1aett.fd
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
 )
-LaTeX Font Info:    Try loading font information for TS1+aett on input line 97.
+Overfull \hbox (5.11807pt too wide) in paragraph at lines 74--75
+[]\T1/aett/m/n/10.95 profiles\T1/aer/m/n/10.95 : Drug sen-si-tiv-ity val-ues su
+m-ma-riz-ing each dose-response
+ []
 
-
-(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/ts1aett.fd
-File: ts1aett.fd 
-)
-LaTeX Font Info:    Try loading font information for TS1+cmtt on input line 97.
-
-
-(/usr/local/texlive/2013/texmf-dist/tex/latex/base/ts1cmtt.fd
-File: ts1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `TS1/aett/m/sl' in size <10.95> not available
-(Font)              Font shape `TS1/cmtt/m/sl' tried instead on input line 97.
-
-Underfull \hbox (badness 10000) in paragraph at lines 119--120
+[2] [3]
+Underfull \hbox (badness 10000) in paragraph at lines 130--131
 
  []
 
-[3]
+
+Underfull \hbox (badness 10000) in paragraph at lines 132--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 137--141
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 142--143
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 149--150
 
  []
 
-[4] [5] [6] <PharmacoGx-fig2.pdf, id=31, 433.62pt x 433.62pt>
-File: PharmacoGx-fig2.pdf Graphic file (type pdf)
-
-<use PharmacoGx-fig2.pdf>
-Package pdftex.def Info: PharmacoGx-fig2.pdf used on input line 241.
-(pdftex.def)             Requested size: 288.0011pt x 288.01624pt.
-
-Overfull \hbox (0.65395pt too wide) in paragraph at lines 250--251
-\T1/aer/m/n/10.95 The sec-ond case study il-lus-trates the anal-y-sis of a per-
-tur-ba-tion type datasets,
+[4]
+Overfull \hbox (21.5321pt too wide) in paragraph at lines 151--152
+[]\T1/aett/m/n/10.95 info\T1/aer/m/n/10.95 . Meta-data for each phar-ma-co-log-
+i-cal ex-per-i-ment stored in a \T1/aett/m/n/10.95 data.frame\T1/aer/m/n/10.95 
+.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--251
-
- []
-
-[7 <./PharmacoGx-fig2.pdf>] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 320--322
-
- []
-
-[9]
-Underfull \hbox (badness 10000) in paragraph at lines 329--331
+Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
 
-Overfull \hbox (8.03532pt too wide) in paragraph at lines 332--333
-\T1/aer/m/n/10.95 the sig-nif-i-cance of the as-so-ci-a-tion be-tween two drugs
- and their known biomark-
+Underfull \hbox (badness 10000) in paragraph at lines 155--156
+
  []
 
-[10] [11] [12]
-LaTeX Font Info:    Try loading font information for TS1+aer on input line 413.
 
+Underfull \hbox (badness 10000) in paragraph at lines 157--158
 
-(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/ts1aer.fd
-File: ts1aer.fd 
-)
-LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 413.
-
-(./PharmacoGx.bbl
-Underfull \hbox (badness 2158) in paragraph at lines 4--21
-[]\T1/aer/m/n/10.95 Jordi Bar-retina, Gior-dano Capon-i-gro, Nico-las Stran-sky
-, Kavitha
  []
 
-[13] [14]) [15] (./PharmacoGx.aux) ) 
+
+Underfull \hbox (badness 10000) in paragraph at lines 159--160
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--169
+
+ []
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 170--171
+
+ []
+
+[6] [7] (./CreatingPharmacoSet.aux) ) 
 Here is how much of TeX's memory you used:
- 3124 strings out of 493315
- 44079 string characters out of 6137904
- 96730 words of memory out of 5000000
- 6467 multiletter control sequences out of 15000+600000
- 32915 words of font info for 71 fonts, out of 8000000 for 9000
+ 3057 strings out of 493315
+ 42358 string characters out of 6137904
+ 96721 words of memory out of 5000000
+ 6419 multiletter control sequences out of 15000+600000
+ 29791 words of font info for 66 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 37i,7n,23p,887b,284s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2013/texmf-dist/fonts/e
-nc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2013/texmf-dist/fonts/ty
-pe1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type
-1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmr6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmsltt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmsy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmsy8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmti10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmtt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/cm-super/sfrm
-1095.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/cm-super/sfst10
-95.pfb>
-Output written on PharmacoGx.pdf (15 pages, 260260 bytes).
+ 37i,5n,23p,888b,276s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2013/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmtt10.pfb>
+Output written on CreatingPharmacoSet.pdf (7 pages, 126891 bytes).
 PDF statistics:
- 134 PDF objects out of 1000 (max. 8388607)
- 95 compressed objects within 1 object stream
+ 61 PDF objects out of 1000 (max. 8388607)
+ 42 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 10 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 5 words of extra memory for PDF output out of 10000 (max. 10000000)
 
