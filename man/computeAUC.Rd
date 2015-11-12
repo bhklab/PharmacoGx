@@ -5,7 +5,8 @@
 \title{Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking
 its concentration and viability as input.}
 \usage{
-computeAUC(concentration, viability, trunc = TRUE)
+computeAUC(concentration, viability, trunc = TRUE, area.type = c("Fitted",
+  "Actual"), verbose = TRUE)
 }
 \arguments{
 \item{concentration}{[vector] A concentration range that the AUC should be computed for that range.
@@ -17,6 +18,10 @@ The range of viablity values by definition should be between 0 and 100. But the 
 
 \item{trunc}{[binary] A flag that identify if the viabality values should be truncated to be in the
 range of (0,100)}
+
+\item{area.type}{Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")}
+
+\item{verbose}{[boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.}
 }
 \description{
 Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking

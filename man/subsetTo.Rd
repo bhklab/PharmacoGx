@@ -4,8 +4,8 @@
 \alias{subsetTo}
 \title{A function to subset a PharmacoSet to data containing only specified drugs, cells and genes}
 \usage{
-subsetTo(pSet, cells = NULL, drugs = NULL, genes = NULL,
-  keep.controls = TRUE)
+subsetTo(pSet, cells = NULL, drugs = NULL, molecular.data.cells = NULL,
+  keep.controls = TRUE, ...)
 }
 \arguments{
 \item{pSet}{A \code{PharmacoSet} to be subsetted}
@@ -18,15 +18,16 @@ the dataset.}
 the object will be subsetted. If left blank, then all drugs will be left in
 the dataset.}
 
-\item{genes}{A list or vector of gene names as used in the dataset to which
-the object will be subsetted. If left blank, then all genes will be left in
-the dataset.}
+\item{molecular.data.cells}{A list or vector of cell names to keep in the
+molecular data}
 
 \item{keep.controls}{If the dataset has perturbation type experiments, should
 the controls be kept in the dataset? Defaults to true.}
+
+\item{...}{Other arguments passed by other function within the package}
 }
 \value{
-A PharmacoSet with only the selected drugs, cells and genes
+A PharmacoSet with only the selected drugs and cells
 }
 \description{
 This is the prefered method of subsetting a PharmacoSet. This function allows

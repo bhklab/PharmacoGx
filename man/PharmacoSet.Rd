@@ -4,22 +4,19 @@
 \alias{PharmacoSet}
 \title{PharmacoSet constructor}
 \usage{
-PharmacoSet(name, rna = ExpressionSet(), dna = ExpressionSet(),
-  snp = ExpressionSet(), cnv = ExpressionSet(), cell = data.frame(),
+PharmacoSet(name, molecularProfiles = list(), cell = data.frame(),
   drug = data.frame(), sensitivityInfo = data.frame(),
-  sensitivityRaw = array(dim = c(0, 0, 0)), sensitivityPhenotype = matrix(),
+  sensitivityRaw = array(dim = c(0, 0, 0)), sensitivityProfiles = matrix(),
   sensitivityN = matrix(nrow = 0, ncol = 0), perturbationN = array(NA, dim =
   c(0, 0, 0)), curationDrug = data.frame(), curationCell = data.frame(),
   curationTissue = data.frame(), datasetType = c("sensitivity",
-  "perturbation", "both"))
+  "perturbation", "both"), verify = TRUE)
 }
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset}
 
-\item{rna,dna,snp,cnv}{A \code{Biobase::ExpressionSet} type object containing
-data for RNA, DNA SNP and Copy Number Variation respectively, with
-associated \code{fData} and \code{pData} containing the row and column
-metadata}
+\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing
+molecular profiles}
 
 \item{cell}{A \code{data.frame} containg the annotations for all the cell
 lines profiled in the data set, across all data types}
@@ -33,7 +30,7 @@ sensitivity experiments}
 \item{sensitivityRaw}{A 3 Dimensional \code{array} contaning the raw drug
 dose response data for the sensitivity experiments}
 
-\item{sensitivityPhenotype}{\code{data.frame} containing drug sensitivity phenotype
+\item{sensitivityProfiles}{\code{data.frame} containing drug sensitivity profile
 statistics such as IC50 and AUC}
 
 \item{sensitivityN,perturbationN}{A \code{data.frame} summarizing the
@@ -44,8 +41,11 @@ the names for drugs, cells and tissues used in the data set to universal
 identifiers used between different PharmacoSet objects}
 
 \item{datasetType}{A \code{character} string of 'sensitivity',
-  'preturbation', or both detailing what type of data can be found in the
-  PharmacoSet, for proper processing of the data}
+'preturbation', or both detailing what type of data can be found in the
+PharmacoSet, for proper processing of the data}
+
+\item{verify}{\code{boolean} Should the function verify the PharmacoSet and
+print out any errors it finds after construction?}
 }
 \value{
 An object of class PharmacoSet

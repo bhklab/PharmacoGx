@@ -6,40 +6,51 @@
 other molecular profile) and drug dose response, for use in drug sensitivity
 analysis.}
 \usage{
-drugSensitivitySig(pSet, molecularData = c("rna", "dna", "snp", "cnv"), drugs,
+drugSensitivitySig(pSet, mDataType, drugs, features,
   sensitivity.measure = c("ic50_published", "auc_published",
-  "ic50_recomputed", "auc_recomputed"), duplicates = "median",
-  returnValues = c("estimate", "tstat", "pvalue", "fdr"), nbcore = 1,
-  verbose = FALSE)
+  "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"),
+  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+  sensitivity.summary.stat = c("mean", "median", "first", "last"),
+  returnValues = c("estimate", "pvalue", "fdr"), sensitivity.cutoff,
+  nthread = 1, verbose = TRUE)
 }
 \arguments{
-\item{pSet}{\code{PharmacoSet} of the perturbation experiment type}
+\item{pSet}{[PharmacoSet] a PharmacoSet of the perturbation experiment type}
 
-\item{molecularData}{\code{character} string, which one of the molecular data
-types to use in the analysis, out of DNA, RNA, SNP, CNV}
+\item{mDataType}{[character] which one of the molecular data types to use
+in the analysis, out of dna, rna, rnaseq, snp, cnv}
 
-\item{drugs}{\code{character} vector of drug names for which to compute the
+\item{drugs}{[character] a vector of drug names for which to compute the
 signatures. Should match the names used in the PharmacoSet.}
 
-\item{sensitivity.measure}{\code{character} string, idetifying which measure
-of the drug dose sensitivity should the function use for its computations?
-The current choices are 'ic50_published', 'auc_published',
-'ic50_recomputed', 'auc_recomputed'.}
+\item{features}{[character] a vector of features for which to compute the
+signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
-\item{duplicates}{\code{character} string, identifying which summary
-statistic should be used to summarize duplicates for cell line sensitivity
-measurements? Currently implemented is only the median.}
+\item{sensitivity.measure}{[character] which measure of the drug dose
+sensitivity should the function use for its computations? The current
+choices are 'ic50_published', 'auc_published', 'ic50_recomputed',
+'auc_recomputed'.}
 
-\item{returnValues}{\code{character} vector, detailing which of estimate,
-t-stat, p-value and fdr should the function return for each gene drug pair?}
+\item{molecular.summary.stat}{What summary statistic should be used to
+summarize duplicates for cell line molecular profile measurements?}
 
-\item{nbcore}{\code{numeric}, if multiple cores are available, how many cores
+\item{sensitivity.summary.stat}{What summary statistic should be used to
+summarize duplicates for cell line sensitivity measurements?}
+
+\item{returnValues}{[character] Which of estimate, t-stat, p-value and fdr
+should the function return for each gene drug pair?}
+
+\item{sensitivity.cutoff}{Allows to provide upper and lower bounds to
+sensitivity measures in the cases where the values exceed physical values
+due to numerical or other errors.}
+
+\item{nthread}{[numeric] if multiple cores are available, how many cores
 should the computation be parallelized over?}
 
-\item{verbose}{\code{bool} Should the function print diagnostic messages?}
+\item{verbose}{[boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed}
 }
 \value{
-A 3D \code{array} with genes in the first dimension, drugs in the
+[list] a 3D array with genes in the first dimension, drugs in the
   second, and return values in the third.
 }
 \description{

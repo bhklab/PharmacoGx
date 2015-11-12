@@ -10,9 +10,9 @@ sensitivityInfo(pSet)
 \item{pSet}{The \code{PharmacoSet} to retrieve sensitivity experiment annotations from}
 }
 \value{
-a \code{data.frame} with the sensitivity annotations
+a \code{data.frame} with the experiment info
 }
 \description{
-Generic for rnaInfo method
+Generic for sensitivityInfo method
 }
 

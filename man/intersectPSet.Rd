@@ -2,44 +2,26 @@
 % Please edit documentation in R/intersectPSets.R
 \name{intersectPSet}
 \alias{intersectPSet}
-\title{Intersects objects of the PharmacoSet class, subsetting them to the common genes, drugs and/or cell lines as selected by the user.}
+\title{Intersects objects of the PharmacoSet class, subsetting them to the common
+drugs and/or cell lines as selected by the user.}
 \usage{
-intersectPSet(pSets = list(), intersectOn = c("drugs", "genes",
-  "cell.lines", "concentrations"), drugMatch = NULL, cellMatch = NULL,
-  geneMatch = NULL, strictIntersect = FALSE, verbose = TRUE)
+intersectPSet(pSets, intersectOn = c("drugs", "cell.lines", "concentrations"),
+  cells, drugs, strictIntersect = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{pSets}{[list] a list of PharmacoSet objects, of which the function
 should find the intersection}
 
-\item{intersectOn}{[character] which identifiers to intersect on, genes,
+\item{intersectOn}{[character] which identifiers to intersect on,
 drugs or cell lines}
 
-\item{drugMatch}{[matrix] a matrix which specifies the mapping between each
-dataset in the list. Should have the same number of columns as objects in
-the pSets list. Each column should have the Drug Idetifiers used in that
-pSet. Each row will then map the different identifiers across datasets.
-The name of each row should be set to the universal identifier you wish
-to use across all the datasets. If no drugMatch table is provided, the
-function will attempt to use the curation slot of each pSet to create
-a mapping between the datasets.}
+\item{cells}{a vector of common cell lines between pSets.
+In case user is intersted on getting intersection on certain cell lines,
+they can provide their list of cell lines}
 
-\item{cellMatch}{[matrix] a matrix which specifies the mapping between each
-dataset in the list. Should have the same number of columns as objects in
-the pSets list. Each column should have the Cell Idetifiers used in that
-pSet. Each row will then map the different identifiers across datasets.
-The name of each row should be set to the universal identifier you wish
-to use across all the datasets. If no cellMatch table is provided, the
-function will attempt to use the curation slot of each pSet to create
-a mapping between the datasets.}
-
-\item{geneMatch}{[matrix] a matrix which specifies the mapping between each
-dataset in the list. Should have the same number of columns as objects in
-the pSets list. Each column should have the Gene/Probe Idetifiers used in that
-pSet. Each row will then map the different identifiers across datasets.
-The name of each row should be set to the universal identifier you wish
-to use across all the datasets. If no geneMatch table is provided, the
-function will assume that the gene/probe names already match between datasets.}
+\item{drugs}{a vector of common drugs between pSets.
+In case user is intersted on getting intersection on certain drugs,
+they can provide their list of drugs.}
 
 \item{strictIntersect}{[boolean] Should the intersection keep only the drugs
 and cell lines that have been tested on together?}
@@ -50,18 +32,18 @@ and cell lines that have been tested on together?}
 [list] a list of pSets, contatining only the intersection
 }
 \description{
-Given a list of PharmacoSets, the function will find the common genes, drugs,
+Given a list of PharmacoSets, the function will find the common drugs,
 and/or cell lines, and return PharmacoSets that contain data only pertaining
-to the common genes, drugs, and/or cell lines. The mapping between dataset
-drug, cell and gene names is done either using annotations found in the
+to the common drugs, and/or cell lines. The mapping between dataset
+drug and cell names is done either using annotations found in the
 PharmacoSet object's internal curation slot, or according to matching tables
 provided by the user
 }
 \examples{
-data(CGPsmall)
+data(GDSCsmall)
 data(CCLEsmall)
-common <- intersectPSet(list('CGP'=CGPsmall, 'CCLE'=CCLEsmall),
-                        intersectOn = c("drugs", "cell.lines"))
+common <- intersectPSet(list('GDSC'=GDSCsmall,
+  'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
 common$CGP
 common$CCLE
 }

@@ -4,11 +4,11 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name = c("CGP", "CCLE", "CMAP"), saveDir = file.path(".",
-  "PSets"), myfn = NULL, verbose = TRUE)
+downloadPSet(name, saveDir = file.path(".", "PSets"), myfn = NULL,
+  verbose = TRUE)
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PharmacoSet to download.
+\item{name}{\code{Character} string, the name of the PhamracoSet to download.
 The available options are CGP, CCLE, and CMAP}
 
 \item{saveDir}{\code{Character} string with the folder path where the
@@ -17,7 +17,7 @@ directory if it does not exist.}
 
 \item{myfn}{\code{character} string, the file name to save the dataset under}
 
-\item{verbose}{\code{bool} Should status message be printed during download.
+\item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
 }
 \description{

@@ -8,7 +8,8 @@
 logLogisticRegression(conc, viability, density = c(2, 10, 2),
   step = 0.5/density, precision = 0.05, lower_bounds = c(0, 0, -6),
   upper_bounds = c(4, 1, 6), scale = 0.07, Cauchy_flag = FALSE,
-  conc_as_log = FALSE, viability_as_pct = TRUE, trunc = TRUE)
+  conc_as_log = FALSE, viability_as_pct = TRUE, trunc = TRUE,
+  verbose = FALSE)
 }
 \arguments{
 \item{conc}{[vector] is a vector of drug concentrations.}
@@ -47,6 +48,11 @@ logLogisticRegression(conc, viability, density = c(2, 10, 2),
 
 \item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
  curve-fitting is performed.}
+
+\item{verbose}{[logical], if true, causes warnings thrown by the function to be printed.}
+}
+\value{
+A vector containing estimates for HS, E_inf, and EC50
 }
 \description{
 By default, logLogisticRegression uses an L-BFGS algorithm to generate the fit. However, if

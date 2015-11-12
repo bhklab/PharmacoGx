@@ -8,40 +8,28 @@
 \alias{cellInfo<-,PharmacoSet,data.frame-method}
 \alias{cellNames,PharmacoSet-method}
 \alias{cellNames<-,PharmacoSet,character-method}
-\alias{cnvData,PharmacoSet-method}
-\alias{cnvData<-,PharmacoSet,matrix-method}
-\alias{cnvInfo,PharmacoSet-method}
-\alias{cnvInfo<-,PharmacoSet,data.frame-method}
 \alias{dateCreated,PharmacoSet-method}
-\alias{dnaData,PharmacoSet-method}
-\alias{dnaData<-,PharmacoSet,matrix-method}
-\alias{dnaInfo,PharmacoSet-method}
-\alias{dnaInfo<-,PharmacoSet,data.frame-method}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{drugNames,PharmacoSet-method}
 \alias{drugNames<-,PharmacoSet,character-method}
-\alias{geneInfo,PharmacoSet-method}
-\alias{geneInfo<-,PharmacoSet,data.frame-method}
-\alias{geneNames,PharmacoSet-method}
+\alias{featureInfo,PharmacoSet-method}
+\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
+\alias{featureNames,PharmacoSet-method}
+\alias{molecularProfiles,PharmacoSet-method}
+\alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
 \alias{pSetName,PharmacoSet-method}
 \alias{pertNumber,PharmacoSet-method}
 \alias{pertNumber<-,PharmacoSet,array-method}
-\alias{rnaData,PharmacoSet-method}
-\alias{rnaData<-,PharmacoSet,matrix-method}
-\alias{rnaInfo,PharmacoSet-method}
-\alias{rnaInfo<-,PharmacoSet,data.frame-method}
+\alias{phenoInfo,PharmacoSet-method}
+\alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{sensNumber<-,PharmacoSet,matrix-method}
-\alias{sensitivityData,PharmacoSet-method}
-\alias{sensitivityData<-,PharmacoSet,matrix-method}
 \alias{sensitivityInfo,PharmacoSet-method}
 \alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
 \alias{sensitivityMeasures,PharmacoSet-method}
-\alias{snpData,PharmacoSet-method}
-\alias{snpData<-,PharmacoSet,matrix-method}
-\alias{snpInfo,PharmacoSet-method}
-\alias{snpInfo<-,PharmacoSet,data.frame-method}
+\alias{sensitivityProfiles,PharmacoSet-method}
+\alias{sensitivityProfiles<-,PharmacoSet,matrix-method}
 \title{A Class to Contain PharmacoGenomic datasets together with their curations}
 \usage{
 \S4method{cellInfo}{PharmacoSet}(pSet)
@@ -52,49 +40,28 @@
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{rnaInfo}{PharmacoSet}(pSet)
+\S4method{phenoInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{rnaInfo}{PharmacoSet,data.frame}(object) <- value
+\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <-
+  value
 
-\S4method{rnaData}{PharmacoSet}(pSet)
+\S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
 
-\S4method{rnaData}{PharmacoSet,matrix}(object) <- value
+\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object, mDataType) <-
+  value
 
-\S4method{dnaInfo}{PharmacoSet}(pSet)
+\S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{dnaInfo}{PharmacoSet,data.frame}(object) <- value
-
-\S4method{dnaData}{PharmacoSet}(pSet)
-
-\S4method{dnaData}{PharmacoSet,matrix}(object) <- value
-
-\S4method{snpInfo}{PharmacoSet}(pSet)
-
-\S4method{snpInfo}{PharmacoSet,data.frame}(object) <- value
-
-\S4method{snpData}{PharmacoSet}(pSet)
-
-\S4method{snpData}{PharmacoSet,matrix}(object) <- value
-
-\S4method{cnvInfo}{PharmacoSet}(pSet)
-
-\S4method{cnvInfo}{PharmacoSet,data.frame}(object) <- value
-
-\S4method{cnvData}{PharmacoSet}(pSet)
-
-\S4method{cnvData}{PharmacoSet,matrix}(object) <- value
-
-\S4method{geneInfo}{PharmacoSet}(pSet)
-
-\S4method{geneInfo}{PharmacoSet,data.frame}(object) <- value
+\S4method{featureInfo}{PharmacoSet,character,data.frame}(object, mDataType) <-
+  value
 
 \S4method{sensitivityInfo}{PharmacoSet}(pSet)
 
 \S4method{sensitivityInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{sensitivityData}{PharmacoSet}(pSet)
+\S4method{sensitivityProfiles}{PharmacoSet}(pSet)
 
-\S4method{sensitivityData}{PharmacoSet,matrix}(object) <- value
+\S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
 
 \S4method{sensitivityMeasures}{PharmacoSet}(pSet)
 
@@ -106,7 +73,7 @@
 
 \S4method{cellNames}{PharmacoSet,character}(object) <- value
 
-\S4method{geneNames}{PharmacoSet}(pSet)
+\S4method{featureNames}{PharmacoSet}(pSet, mDataType)
 
 \S4method{dateCreated}{PharmacoSet}(pSet)
 
@@ -126,6 +93,8 @@
 \item{object}{A \code{PharmacoSet} object}
 
 \item{value}{A replacement value}
+
+\item{mDataType}{A \code{character} with the type of molecular data to return/update}
 }
 \description{
 The PharmacoSet (PSet) class was developed to contain and organise large
@@ -149,52 +118,28 @@ respecitively as sensitivity and perturbation datasets.
 
 \item \code{drugInfo<-}: Update the drug annotations
 
-\item \code{rnaInfo}: Return the RNA experiment info from the PharmacoSet
+\item \code{phenoInfo}: Return the experiment info from the given type of molecular data in PharmacoSet
 
-\item \code{rnaInfo<-}: Update the RNA experiment info from the PharmacoSet
+\item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the PharmacoSet
 
-\item \code{rnaData}: Return the RNA data from the PharmacoSet
+\item \code{molecularProfiles}: Return the given type of molecular data from the PharmacoSet
 
-\item \code{rnaData<-}: Update the RNA data from the PharmacoSet
+\item \code{molecularProfiles<-}: Update the given type of molecular data from the PharmacoSet
 
-\item \code{dnaInfo}: Return the DNA experiment info from the PharmacoSet
+\item \code{featureInfo}: Return the feature info for the given molecular data
 
-\item \code{dnaInfo<-}: UPdate the DNA experiment info from the PharmacoSet
+\item \code{featureInfo<-}: Replace the gene info for the molecular data
 
-\item \code{dnaData}: Return the DNA data from the PharmacoSet
-
-\item \code{dnaData<-}: Update the DNA data from the PharmacoSet
-
-\item \code{snpInfo}: Return the SNP experiment info from the PharmacoSet
-
-\item \code{snpInfo<-}: Update the SNP experiment info from the PharmacoSet
-
-\item \code{snpData}: Return the SNP data from the PharmacoSet
-
-\item \code{snpData<-}: Update the SNP data from the PharmacoSet
-
-\item \code{cnvInfo}: Return the CNV experiment info from the PharmacoSet
-
-\item \code{cnvInfo<-}: Update the CNV experiment info from the PharmacoSet
-
-\item \code{cnvData}: Return the CNV data from the PharmacoSet
-
-\item \code{cnvData<-}: Update the CNV data from the PharmacoSet
-
-\item \code{geneInfo}: Return the gene info for the molecular data
-
-\item \code{geneInfo<-}: Replace the gene info for the molecular data
-
-\item \code{sensitivityInfo}: Return the sensitivity experiment info
+\item \code{sensitivityInfo}: Return the drug dose sensitivity experiment info
 
 \item \code{sensitivityInfo<-}: Update the sensitivity experiment info
 
-\item \code{sensitivityData}: Return the phenotypic data for the drug dose sensitivity
+\item \code{sensitivityProfiles}: Return the phenotypic data for the drug dose sensitivity
 
-\item \code{sensitivityData<-}: Update the phenotypic data for the drug dose
+\item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
 
-\item \code{sensitivityMeasures}: Returns the available sensitivity phenotype
+\item \code{sensitivityMeasures}: Returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
 \item \code{drugNames}: Return the names of the drugs used in the PharmacoSet
@@ -205,7 +150,7 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{cellNames<-}: Update the cell names used in the dataset
 
-\item \code{geneNames}: Return the gene names used in the dataset
+\item \code{featureNames}: Return the feature names used in the dataset
 
 \item \code{dateCreated}: Return the date the PharmacoSet was created
 
@@ -230,7 +175,7 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularData}}{A \code{list} containing 4 \code{Biobase::ExpressionSet}
+\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{Biobase::ExpressionSet}
 type object for holding data for RNA, DNA, SNP and Copy Number Variation
 measurements respectively, with associated \code{fData} and \code{pData}
 containing the row and column metadata}
@@ -244,7 +189,7 @@ profiled in the data set, across all data types}
 \item{\code{sensitivity}}{A \code{list} containing all the data for the sensitivity
 experiments, including \code{$info}, a \code{data.frame} containing the
 experimental info,\code{$raw} a 3D \code{array} containing raw data,
-\code{$phenotype}, a \code{data.frame} containing sensitivity phenotype
+\code{$profiles}, a \code{data.frame} containing sensitivity profiles
 statistics, and \code{$n}, a \code{data.frame} detailing the number of
 experiments for each cell-drug pair}
 

@@ -7,7 +7,7 @@
 drugDoseResponseCurve(drug, cellline, pSets = list(),
   legends.label = c("ic50_published", "gi50_published", "auc_published",
   "auc_recomputed", "ic50_recomputed"), ylim, xlim, mycol,
-  plot_type = c("Fitted", "Actual", "Both"))
+  plot.type = c("Fitted", "Actual", "Both"), summarize.replicates = TRUE)
 }
 \arguments{
 \item{drug}{[string] A drug name for which the drug response curve should be
@@ -38,9 +38,12 @@ the pSets would be used as plot xlim.}
 will determine the color of the curve for the pharmaco sets. If this parameter is
 missed default colors from Rcolorbrewer package will be used as curves color.}
 
-\item{plot_type}{[character] Plot type which can be the actual one ("Actual") or
+\item{plot.type}{[character] Plot type which can be the actual one ("Actual") or
 the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 If this parameter is missed by default actual curve is plotted.}
+
+\item{summarize.replicates}{[character] If this parameter is set to true replicates
+are summarized and replicates are plotted individually otherwise}
 }
 \description{
 Given a list of PharmacoSets, the function will plot the drug_response curve,

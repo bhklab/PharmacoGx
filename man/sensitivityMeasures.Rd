@@ -7,12 +7,12 @@
 sensitivityMeasures(pSet)
 }
 \arguments{
-\item{pSet}{A \code{PharmacoSet}}
+\item{pSet}{The \code{PharmacoSet}}
 }
 \value{
-A \code{character} vector of available sensitivity measures
+A \code{character} vector of all the available sensitivity measures
 }
 \description{
-A generic for the sensitivity measures function
+A generic for the sensitivityMeasures  method
 }
 

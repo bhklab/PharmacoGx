@@ -5,7 +5,7 @@
 \title{Function computing connectivity scores between two signatures}
 \usage{
 connectivityScore(x, y, method = c("gsea", "gwc"), nperm = 10000,
-  nbcore = 1, gwc.method = c("spearman", "pearson"), ...)
+  nthread = 1, gwc.method = c("spearman", "pearson"), ...)
 }
 \arguments{
 \item{x}{A \code{matrix} with the first gene signature. In the case of GSEA the vector of
@@ -25,7 +25,7 @@ responses in the first column, and their significance in the second.}
 significance through permutation testing? The minimum is 100, default is
 1e4.}
 
-\item{nbcore}{\code{numeric}, how many cores to run parallel processing on.}
+\item{nthread}{\code{numeric}, how many cores to run parallel processing on.}
 
 \item{gwc.method}{\code{character}, should gwc use a weighted spearman or pearson
 statistic?}

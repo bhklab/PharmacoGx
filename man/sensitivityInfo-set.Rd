@@ -7,7 +7,7 @@
 sensitivityInfo(object) <- value
 }
 \arguments{
-\item{object}{The \code{PharmacoSet} to replace sensitivity experiment annotations in}
+\item{object}{The \code{PharmacoSet} to update}
 
 \item{value}{A \code{data.frame} with the new sensitivity annotations}
 }
@@ -15,6 +15,6 @@ sensitivityInfo(object) <- value
 Updated \code{PharmacoSet}
 }
 \description{
-Generic for sensitivityInfo replace method
+A generic for the sensitivityInfo replacement method
 }
 
