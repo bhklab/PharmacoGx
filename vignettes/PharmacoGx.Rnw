@@ -13,7 +13,6 @@
 \title{PharmacoGx: an R package for analysis of large pharmacogenomic datasets}
 \author[1]{Petr Smirnov}
 \author[1,2]{Zhaleh Safikhani}
-%\author[1]{Mark Freeman}
 \author[1,2]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
@@ -373,6 +372,11 @@ Then the weighted correlation is given by:
 $$ cor(X,Y,W) = \frac{\frac{\sum_i W_i (X_i - m(X;W))(Y_i - m(Y,W))}{\sum_i W_i}}{\sqrt{(\frac{\sum_i W_i (X_i - m(X;W))^2}{\sum_i W_i})(\frac{\sum_i W_i (Y_i - m(Y;W))^2}{\sum_i W_i})}}$$
 
 This correlation therefore takes into account not only the ranking of each feature in a signature, but also of the significance of each rank.
+
+%------------------------------------------------------------
+\section{Acknowledgements}
+%------------------------------------------------------------ 
+The authors of the package would like to thank the investigators of the Genomics of Drug Sensitivity in Cancer Project, the Cancer Cell Line Encyclopedia and the Connectivity Map Project who have made their invaluable data available to the scientific community. We would also like to thank Mark Freeman for contributing the code for fitting drug-dose response curves towards this package and his lucid documentation of this code. We are indebted to Nehme El-Hachem and Donald Wang for their contributions towards the accurate curation of the datasets. Finally, it is important to acknowledge all the members of the Benjamin Haibe-Kains lab for their contribution towards testing and feedback during the design of the package.\\
 
 %------------------------------------------------------------
 \section*{Session Info}

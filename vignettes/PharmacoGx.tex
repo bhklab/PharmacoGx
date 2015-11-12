@@ -13,7 +13,6 @@
 \title{PharmacoGx: an R package for analysis of large pharmacogenomic datasets}
 \author[1]{Petr Smirnov}
 \author[1,2]{Zhaleh Safikhani}
-%\author[1]{Mark Freeman}
 \author[1,2]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
@@ -273,7 +272,7 @@ Once again, we load the dataset, downloading it if needed using \textit{download
 +     caption='Connectivity Score results for HDAC inhibitor gene signature.')
 \end{Sinput}
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Wed Nov 11 23:45:28 2015
+% Thu Nov 12 18:21:02 2015
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -284,7 +283,7 @@ vorinostat & 0.94 & 0.00 \\
   alvespimycin & 0.88 & 0.00 \\ 
   acetylsalicylic acid & 0.00 & 1.00 \\ 
   rosiglitazone & -0.71 & 0.00 \\ 
-  pioglitazone & -0.73 & 0.09 \\ 
+  pioglitazone & -0.73 & 0.08 \\ 
    \hline
 \end{tabular}
 \caption{Connectivity Score results for HDAC inhibitor gene signature.} 
@@ -350,7 +349,7 @@ As an example of the efficacy of the modelling approach, we can model the signif
 >   xtable(sig[,,"pvalue"], caption='P Value of Gene-Drug Association')
 \end{Sinput}
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Wed Nov 11 23:45:32 2015
+% Thu Nov 12 18:21:06 2015
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -404,23 +403,28 @@ $$ cor(X,Y,W) = \frac{\frac{\sum_i W_i (X_i - m(X;W))(Y_i - m(Y,W))}{\sum_i W_i}
 This correlation therefore takes into account not only the ranking of each feature in a signature, but also of the significance of each rank.
 
 %------------------------------------------------------------
+\section{Acknowledgements}
+%------------------------------------------------------------ 
+The authors of the package would like to thank the investigators of the Genomics of Drug Sensitivity in Cancer Project, the Cancer Cell Line Encyclopedia and the Connectivity Map Project who have made their invaluable data available to the scientific community. We would also like to thank Mark Freeman for contributing the code for fitting drug-dose response curves towards this package and his lucid documentation of this code. We are indebted to Nehme El-Hachem and Donald Wang for their contributions towards the accurate curation of the datasets. Finally, it is important to acknowledge all the members of the Benjamin Haibe-Kains lab for their contribution towards testing and feedback during the design of the package.\\
+
+%------------------------------------------------------------
 \section*{Session Info}
 %------------------------------------------------------------ 
 
 This Vignette was generated with the following R version and packages loaded:
 
 \begin{itemize}\raggedright
-  \item R version 3.2.2 (2015-08-14), \verb|x86_64-apple-darwin13.4.0|
-  \item Locale: \verb|en_CA.UTF-8/en_CA.UTF-8/en_CA.UTF-8/C/en_CA.UTF-8/en_CA.UTF-8|
+  \item R version 3.2.2 (2015-08-14), \verb|x86_64-w64-mingw32|
+  \item Locale: \verb|LC_COLLATE=English_Canada.1252|, \verb|LC_CTYPE=English_Canada.1252|, \verb|LC_MONETARY=English_Canada.1252|, \verb|LC_NUMERIC=C|, \verb|LC_TIME=English_Canada.1252|
   \item Base packages: base, datasets, graphics, grDevices, methods,
     parallel, stats, utils
-  \item Other packages: Biobase~2.28.0, BiocGenerics~0.15.6,
+  \item Other packages: Biobase~2.29.1, BiocGenerics~0.15.3,
     PharmacoGx~1.1.0, xtable~1.7-4
   \item Loaded via a namespace (and not attached): bitops~1.0-6,
     caTools~1.17.1, cluster~2.0.3, digest~0.6.8, downloader~0.4,
     gdata~2.17.0, gplots~2.17.0, gtools~3.5.0, igraph~1.0.1,
-    KernSmooth~2.23-15, limma~3.25.15, magrittr~1.5, marray~1.47.1,
-    piano~1.8.2, RColorBrewer~1.1-2, relations~0.6-5, sets~1.0-15,
+    KernSmooth~2.23-15, limma~3.25.13, magrittr~1.5, marray~1.47.0,
+    piano~1.9.4, RColorBrewer~1.1-2, relations~0.6-5, sets~1.0-15,
     slam~0.1-32, tools~3.2.2
 \end{itemize}
 \bibliographystyle{plain}
