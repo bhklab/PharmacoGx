@@ -1,91 +1,65 @@
-########################
-## Mark Freeman, Zhaleh Safikhani, Petr Smirnov, Benjamin Haibe-Kains
-## All rights Reserved
-## May 26, 2015
-########################
-#' @importFrom stats na.omit
-
-.calculateSensitivities <-
-  function(pSets = list(), cellMatch=NULL, drugMatch=NULL, cap=NA, na.rm=TRUE){
-#  require(caTools) || stop("Library caTools is not available!") # trapezoid function 
+.calculateSensitivitiesStar <-
+  function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual")) {
   
-  cell.match.flag <- ifelse(is.null(cellMatch), T, F)
-  drug.match.flag <- ifelse(is.null(drugMatch), T, F)
-  
-  if(cell.match.flag){cellMatch <- pSets[[1]]@curation$cell$unique.cellid}
-  if(drug.match.flag){drugMatch <- pSets[[1]]@curation$drug$unique.drugid}
-  
-  for (i in 1:length(pSets))
-  {
-    sensitivityData(pSets[[i]]) <- cbind(sensitivityData(pSets[[i]]), "auc_recomputed_star" = NA)
-    if(cell.match.flag){cellMatch <- intersect(cellMatch, pSets[[i]]@curation$cell$unique.cellid)}
-    if(drug.match.flag){drugMatch <- intersect(drugMatch, pSets[[i]]@curation$drug$unique.drugid)}  
+  if (missing(area.type)) {
+    area.type <- "Fitted"
   }
-  if (!is.na(cap)) {trunc <- TRUE}else{trunc <- FALSE}
-  
-  for(x in 1:length(cellMatch))
-  {
-      for(d in 1: length(drugMatch))
-      {
-        ranges <- list()
-        exp_id <- list()
-        flag <- F
-        for(i in 1:length(pSets))
-        {
-          study <- names(pSets)[i]
-          #exp_id[[i]] <- paste(drugMatch[d,study], cellMatch[x,paste0(study,".cellid")], sep = "_")
-          exp_id[[i]] <- paste(x, d, sep = "_")
-          if(is.null(exp_id[[i]]) | length(exp_id[[i]]) == 0){ stop("Studies should have names equal to the ones used in matching data frames")}
-          if(exp_id[[i]] %in% dimnames(pSets[[i]]@sensitivity$raw)[[1]])
-          {
-            ranges[[i]] <- as.numeric(pSets[[i]]@sensitivity$raw[exp_id[[i]],,"Dose"])
-          }else{
-            flag <- T
-          }
-        }
-        if(!flag)
-        {
-          ranges <- .getCommonConcentrationRange(ranges)
-          for(i in 1:length(pSets))
-          {
-            sensitivityData(pSets[[i]])[exp_id[[i]], "auc_recomputed_star"] <- computeAUC(na.omit(ranges[[i]]), na.omit(pSets[[i]]@sensitivity$raw[exp_id[[i]],which(pSets[[i]]@sensitivity$raw[exp_id[[i]],,"Dose"] %in% ranges[[i]]),"Viability"]), trunc)
-          }
-        }
-      } 
+  if (is.null(exps)) {
+    stop("expriments is empty!")
   }
+  for (study in names(pSets)) {
+    pSets[[study]]@sensitivity$profiles$auc_recomputed_star <- NA
+  }
+  if (!is.na(cap)) {
+    trunc <- TRUE
+    }else{
+      trunc <- FALSE
+    }
   
-  #pSet <- updateTables(pSet,summary=pSet@table.summary["auc_recomputed"], measures="auc_recomputed", verbose=FALSE)
+  for(i in 1:nrow(exps)) {
+      ranges <- list()
+      for (study in names(pSets)) {
+          ranges[[study]] <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i,study], ,"Dose"])
+      }
+      ranges <- .getCommonConcentrationRange(ranges)
+      names(ranges) <- names(pSets)
+      for(study in names(pSets)) {
+        pSets[[study]]@sensitivity$profiles[exps[i,study], "auc_recomputed_star"] <- computeAUC(concentration=as.numeric(na.omit(ranges[[study]])), 
+                                                                                 viability=as.numeric(na.omit(pSets[[study]]@sensitivity$raw[exps[i, study],which(as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]),"Viability"])), 
+                                                                                 trunc, area.type)
+      }
+  }
   return(pSets)
 }
 
-## This function computes sensitivity for the whole raw sensitivity data of a pset
-.calculateFromRaw <- function(raw.sensitivity, dose.range=vector(), cap=NA, na.rm=TRUE, nbcore = 1){
-  #require(caTools) || stop("Library magicaxis is not available!")
-  
+## This function computes AUC for the whole raw sensitivity data of a pset
+.calculateFromRaw <- function(raw.sensitivity, cap=NA, nthread=1){
   
   AUC <- vector(length=dim(raw.sensitivity)[1])
   names(AUC) <- dimnames(raw.sensitivity)[[1]]
   
+  IC50 <- vector(length=dim(raw.sensitivity)[1])
+  names(IC50) <- dimnames(raw.sensitivity)[[1]]
+  
+  
   
   if (!is.na(cap)) {trunc <- TRUE}else{trunc <- FALSE}
   
-  if(na.rm){
-    if (nbcore ==1){
-      AUC <- unlist(lapply(names(AUC), function(exp){computeAUC(na.omit(raw.sensitivity[exp,,"Dose"]), na.omit(raw.sensitivity[exp,,"Viability"]), trunc)}))
-    }else{ 
-      AUC <- unlist(parallel::mclapply(names(AUC), function(exp){computeAUC(na.omit(raw.sensitivity[exp,,"Dose"]), na.omit(raw.sensitivity[exp,,"Viability"]), trunc)}, mc.cores = nbcore))
-    }
-  }else{
-    if (nbcore ==1){
-      AUC <- unlist(lapply(names(AUC), function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}))
-    }else{            
-      AUC <- unlist(parallel::mclapply(names(AUC)[1:10], function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}, mc.cores = nbcore))
-    }
+   if (nthread ==1){
+    AUC <- unlist(lapply(names(AUC), function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}))
+    IC50 <- unlist(lapply(names(IC50), function(exp){computeIC50(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}))
+    
+  }else{ 
+    AUC <- unlist(parallel::mclapply(names(AUC), function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}, mc.cores = nthread))
+    IC50 <- unlist(parallel::mclapply(names(IC50), function(exp){computeIC50(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}, mc.cores = nthread))
   }
+
   
   names(AUC) <- dimnames(raw.sensitivity)[[1]]
+  names(IC50) <- dimnames(raw.sensitivity)[[1]]
   
-  return(list("AUC" = AUC))
+  
+  return(list("AUC"=AUC, "IC50"=IC50))
 }
 
 
@@ -107,14 +81,13 @@
   }
   return(common.ranges)
 }
-#HIDDEN FUNCTIONS
 
-#PREDICT VIABILITY FROM CONCENTRATION DATA AND CURVE PARAMETERS
+## predict viability from concentration data and curve parameters
 .Hill<-function(x, pars) {
     return(pars[2] + (1 - pars[2]) / (1 + (10 ^ x / 10 ^ pars[3]) ^ pars[1]))
 }
 
-#CALCULATE RESIDUAL OF FIT
+## calculate residual of fit
 .residual<-function(x, y, pars, scale = 0.07, Cauchy_flag = TRUE, trunc = FALSE) {
     if (Cauchy_flag == FALSE) {
         return(sum((.Hill(x, pars) - y) ^ 2))
@@ -133,7 +106,7 @@
     }
 }
 
-#GENERATE AN INITIAL GUESS FOR DOSE-RESPONSE CURVE PARAMETERS BY EVALUATING THE RESIDUALS AT DIFFERENT LATTICE POINTS OF THE SEARCH SPACE
+## generate an initial guess for dose-response curve parameters by evaluating the residuals at different lattice points of the search space
 .meshEval<-function(log_conc,
 viability,
 lower_bounds = c(0, 0, -6),
@@ -162,7 +135,73 @@ trunc = FALSE) {
     return(guess)
 }
 
-#GET VECTOR OF INTERPOLATED CONCENTRATIONS FOR GRAPHING PURPOSES
+## get vector of interpolated concentrations for graphing purposes
 .GetSupportVec <- function(x, output_length = 1001) {
   return(seq(from = min(x), to = max(x), length.out = output_length))
 }
+#'  Fits dose-response curves to data given by the user
+#'  and returns the AUC of the fitted curve, normalized to the length of the concentration range.
+#'
+#'  @param conc [vector] is a vector of drug concentrations.
+#'
+#'  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#'  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
+#'  of viability in the absence of any drug.
+#'
+#'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#'  curve-fitting is performed.
+.computeAUCUnderFittedCurve <- function(conc, viability, trunc=TRUE, verbose=FALSE) {
+  
+  #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
+  if (prod(is.finite(conc)) != 1) {
+    print(conc)
+    stop("Concentration vector contains elements which are not real numbers.")
+  }
+  
+  if (prod(is.finite(viability)) != 1) {
+    print(viability)
+    stop("Viability vector contains elements which are not real numbers.")
+  }
+  
+  if (is.logical(trunc) == FALSE) {
+    print(trunc)
+    stop("'trunc' is not a logical.")
+  }
+  
+  if (length(conc) != length(viability)) {
+    print(conc)
+    print(viability)
+    stop("Concentration vector is not of same length as viability vector.")
+  }
+  
+  if (min(conc) < 0) {
+    stop("Concentration vector contains negative data.")
+  }
+  
+  if (min(viability) < 0 && verbose) {
+    warning("Warning: Negative viability data.")
+  }
+  
+  if (max(viability) > 100 && verbose) {
+    warning("Warning: Viability data exceeds negative control.")
+  }
+  
+  #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
+  log_conc <- log10(conc)
+  viability <- viability / 100
+  
+  if (trunc == TRUE) {
+    viability[which(viability < 0)] <- 0
+    viability[which(viability > 1)] <- 1
+  }
+  
+  #FIT CURVE AND CALCULATE IC50
+  pars <- unlist(logLogisticRegression(log_conc,
+                                       viability,
+                                       conc_as_log = TRUE,
+                                       viability_as_pct = FALSE,
+                                       trunc = trunc))
+  x <- .GetSupportVec(log_conc)
+  return(1 - trapz(x, .Hill(x, pars)) / (log_conc[length(log_conc)] - log_conc[1]))
+}
+

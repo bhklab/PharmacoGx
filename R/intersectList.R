@@ -1,8 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## September 1, 2013
-########################
 #' Utility to find the intersection between a list of more than two vectors or
 #' lists
 #' 

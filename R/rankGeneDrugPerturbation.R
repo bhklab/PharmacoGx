@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kains & Cat Olsen
-## All rights Reserved
-## September 9, 2014
-########################
-
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
@@ -24,11 +18,6 @@
 ##			- list of data.frame with similar results for each type line separately if any
 ##
 #################################################
-
-#' @importFrom stats complete.cases
-#' @importFrom stats p.adjust
-
-
 
 rankGeneDrugPerturbation <-
 function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, single.type=FALSE, nthread=1, verbose=FALSE) {
@@ -84,9 +73,9 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 			if (!all(is.element(ctrlix, rownames(data)))) {
 				stop("data for some control experiments are missing!")
 			}
-			if (verbose) {
-				cat(sprintf("type %s: batch %i/%i -> %i vs %i\n", utype[bb], bb, length(ubatch), length(xpix), length(ctrlix)))
-			}
+# 			if (verbose) { #What is cc?????
+# 				cat(sprintf("type %s: batch %i/%i -> %i vs %i\n", utype[cc], bb, length(ubatch), length(xpix), length(ctrlix)))
+# 			}
 ## transformation of drug concentrations values
 			conc <- drug.concentration * 10^6
 			inpumat <- rbind(inpumat, data.frame("treated"=c(rep(1, length(xpix)), rep(0, length(ctrlix))), "type"=c(type[xpix], type[ctrlix]), "batch"=paste("batch", c(batch[xpix], batch[ctrlix]), sep=""), "concentration"=c(conc[xpix], conc[ctrlix]), "duration"= c(duration[xpix], duration[ctrlix])))

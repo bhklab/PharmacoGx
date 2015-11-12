@@ -1,8 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## September 1, 2013
-########################
 #' Utility to find the union between a list of more than two vectors or
 #' lists
 #' 
@@ -20,7 +15,8 @@
 #'   which could also be operated on by the native R set operations
 #' @return A vector like object of the same mode as the first argument,
 #'   containing all the elements of all arguments passed to the function
-#' @export
+#' @export 
+
 
 
 unionList <-
@@ -39,6 +35,3 @@ function(...) {
      return (union(args[[1]], unionList(args[-1])))
    }
 }
-
-## End
-

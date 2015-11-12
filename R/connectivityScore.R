@@ -45,7 +45,7 @@
 #' @param nperm \code{numeric}, how many permutations should be done to determine
 #'   significance through permutation testing? The minimum is 100, default is
 #'   1e4.
-#' @param nbcore \code{numeric}, how many cores to run parallel processing on.
+#' @param nthread \code{numeric}, how many cores to run parallel processing on.
 #' @param gwc.method \code{character}, should gwc use a weighted spearman or pearson
 #'   statistic?
 #' @param ... Additional arguments passed down to gsea and gwc functions
@@ -58,13 +58,13 @@
 
 
 
-connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nbcore=1, gwc.method=c("spearman", "pearson"), ...) {
+connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
   
   method <- match.arg(method)
-  if (class(x) != "matrix" ){
+  if (class(x) != "matrix") {
 	  x <- as.matrix(x)
   }
-  if (class(y) != "matrix"){
+  if (class(y) != "matrix") {
 	  y <- as.matrix(y)
   }
   if ((ncol(x) != 2 || ncol(y) != 2) && method=="gwc") {
@@ -90,7 +90,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nbcore=1
       gset <- cbind("gene"=rownames(y), "set"=ifelse(as.numeric(y[ , 1]) >= 0, "UP", "DOWN")) 
       gset <- piano::loadGSC(gset)
       ## run enrichment analysis
-      nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="gsea", gsc=gset, nPerm=nperm, ncpus=nbcore, verbose=FALSE, ...)
+      nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="gsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, ...)
       ## merge p-values for negative and positive enrichment scores
       nes$pDistinctDir <- nes$pDistinctDirUp
       nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]

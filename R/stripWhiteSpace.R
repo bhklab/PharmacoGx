@@ -1,12 +1,4 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## September 1, 2013
-########################
-
-
-`stripWhiteSpace` <-
-function (str, method=c("both", "head", "tail")) {
+stripWhiteSpace <- function (str, method=c("both", "head", "tail")) {
   method <- match.arg(method)
   str2 <- NULL
   if (length(str) == 1) {

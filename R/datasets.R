@@ -15,18 +15,18 @@
 #'
 NULL
 
-#' Cancer Genome Project Example PharmacoSet
+#' Genomics of Drug Sensitivity in Cancer Example PharmacoSet
 #'
-#' A small example version of the Cancer Genome Project PharmacoSet, used in the
-#' documentation examples. All credit for the data goes to the Cancer Genome Project
-#' group at the Sanger.
+#' A small example version of the Genomics of Drug Sensitivity in Cancer Project
+#' PharmacoSet, used in the documentation examples. All credit for the data goes
+#' to the Genomics of Drug Sensitivity in Cancer Project group at the Sanger.
 #' 
 #' @references
 #' Garnett et al. Systematic identification of genomic markers of drug sensitivity in cancer cells. Nature, 2012.
 #' 
 #' @docType data
-#' @name CGPsmall
-#' @usage data(CGPsmall)
+#' @name GDSCsmall
+#' @usage data(GDSCsmall)
 #' @keywords dataset
 #' @format PharmacoSet object
 #'

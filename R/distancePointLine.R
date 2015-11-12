@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## October 23, 2013
-########################
-
 ##========================================================
 ##  Credits:
 ##  Theory by Paul Bourke http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/

@@ -1,9 +1,3 @@
-###########################
-## Petr Smirnov
-## All rights reserved
-## July 20, 2015
-###########################
-
 setOldClass('sessionInfo', sessionInfo())
 
 .PharmacoSig <- setClass('PharmacoSig', slots=list(
@@ -26,8 +20,6 @@ return(.PharmacoSig(Data, PSetName=PSetName, DateCreated=DateCreated, SigType=Si
 #' @param object \code{PharmacoSig}
 #' 
 #' @export
-#' @importFrom utils sessionInfo
-
 setMethod("show", signature=signature(object='PharmacoSig'),
 		function(object) {
 		cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")

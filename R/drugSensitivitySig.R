@@ -2,12 +2,6 @@
 ## TODO:: SOMEONE WITH MORE KNOWLEDGE OF
 ## THESE FUNCTIONS SHOULD WRITE BETTER DOCUMENTATION
 
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## October 23, 2013
-########################
-
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
@@ -39,29 +33,34 @@
 #' drugs in the second, and the selected return values in the third.
 #' 
 #' 
-#' @param pSet \code{PharmacoSet} of the perturbation experiment type
-#' @param molecularData \code{character} string, which one of the molecular data
-#'   types to use in the analysis, out of DNA, RNA, SNP, CNV
-#' @param drugs \code{character} vector of drug names for which to compute the 
+#' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
+#' @param mDataType [character] which one of the molecular data types to use
+#'   in the analysis, out of dna, rna, rnaseq, snp, cnv
+#' @param drugs [character] a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
-#' @param nbcore \code{numeric}, if multiple cores are available, how many cores
+#' @param features [character] a vector of features for which to compute the
+#'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
+#' @param nthread [numeric] if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
-#' @param returnValues \code{character} vector, detailing which of estimate,
-#'   t-stat, p-value and fdr should the function return for each gene drug pair?
-#' @param sensitivity.measure \code{character} string, idetifying which measure
-#'   of the drug dose sensitivity should the function use for its computations?
-#'   The current choices are 'ic50_published', 'auc_published',
-#'   'ic50_recomputed', 'auc_recomputed'.
-#' @param duplicates \code{character} string, identifying which summary
-#'   statistic should be used to summarize duplicates for cell line sensitivity
-#'   measurements? Currently implemented is only the median.
-#' @param verbose \code{bool} Should the function print diagnostic messages?
-#' @return A 3D \code{array} with genes in the first dimension, drugs in the 
+#' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
+#'   should the function return for each gene drug pair?
+#' @param sensitivity.measure [character] which measure of the drug dose 
+#'   sensitivity should the function use for its computations? The current
+#'   choices are 'ic50_published', 'auc_published', 'ic50_recomputed',
+#'   'auc_recomputed'.
+#' @param molecular.summary.stat What summary statistic should be used to
+#'   summarize duplicates for cell line molecular profile measurements? 
+#' @param sensitivity.summary.stat What summary statistic should be used to
+#'   summarize duplicates for cell line sensitivity measurements? 
+#' @param sensitivity.cutoff Allows to provide upper and lower bounds to
+#'   sensitivity measures in the cases where the values exceed physical values
+#'   due to numerical or other errors.
+#' @param verbose [boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed
+#' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export
-#' @import parallel
 
-drugSensitivitySig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv"), drugs, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed"), duplicates="median", returnValues=c("estimate","tstat", "pvalue", "fdr"), nbcore=1, verbose=FALSE) {
+drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"), molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
 	
 	### This function needs to: Get a table of AUC values per cell line / drug
 	### Be able to recompute those values on the fly from raw data if needed to change concentration
@@ -69,94 +68,120 @@ drugSensitivitySig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv")
 	### Be able to extract genomic data 
 	### Run rankGeneDrugSens in parallel at the drug level
 	### Return matrix as we had before
-	
   
-  molecularData <- match.arg(molecularData)
   sensitivity.measure <- match.arg(sensitivity.measure)
+  molecular.summary.stat <- match.arg(molecular.summary.stat)
+  sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
   
-  if(missing(drugs)){
+  
+  if (!(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
+    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
+  }
+  
+  if (!(mDataType %in% names(pSet@molecularProfiles))) {
+    stop (sprintf("Invalid mDataType for %s, choose among: %s", pSet@annotation$name, paste(names(pSet@molecularProfiles), collapse=", ")))
+  }
+  switch (Biobase::annotation(pSet@molecularProfiles[[mDataType]]),
+    "mutation" = {
+      if (!is.element(molecular.summary.stat, c("or", "and"))) {
+        stop ("Molecular summary statistic for mutation must be either 'or' or 'and'")
+      }
+    },
+    "fusion" = {
+      if (!is.element(molecular.summary.stat, c("or", "and"))) {
+        stop ("Molecular summary statistic for fusion must be either 'or' or 'and'")
+      }
+    },
+    "rna" = {
+      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      }
+    },
+    "cnv" = {
+      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+        stop ("Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'")
+      }
+    },
+    stop (sprintf("No summary statistic for %s has been implemented yet", Biobase::annotation(pSet@molecularProfiles[[mDataType]])))
+  )
+  
+  if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
+    stop ("Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'")
+  }
+  
+  if (missing(sensitivity.cutoff)) {
+    sensitivity.cutoff <- NA
+  }
+  if (missing(drugs)){
     drugn <- drugNames(pSet)
   } else {
     drugn <- drugs
   }
+  availcore <- parallel::detectCores()
+  if (missing(nthread) || nthread > availcore) {
+    nthread <- availcore
+  }
   
-	drugpheno.all <- summarizeSensitivityPhenotype(pSet, sensitivity.measure=sensitivity.measure)
+  if (missing(features)) {
+    features <- rownames(featureInfo(pSet, mDataType))
+  } else {
+    fix <- is.element(features, rownames(featureInfo(pSet, mDataType)))
+    if (verbose && !all(fix)) {
+      warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
+    }
+    features <- features[fix]
+  }
+  
+	drugpheno.all <- t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose))
 	dix <- is.element(drugn, colnames(drugpheno.all))
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
   drugn <- drugn[dix]
-
-	switch (molecularData, 
-    "rna" = {
-      eset <- pSet@molecularData$rna
-      },
-    "dna" = {
-      stop ("Drug sensitivity signature for DNA is not implemented yet")
-      eset <- pSet@molecularData$dna
-      },
-    "snp" = {
-      stop ("Drug sensitivity signature for SNP is not implemented yet")
-      eset <- pSet@molecularData$snp
-      },
-    "cnv" = {
-      stop ("Drug sensitivity signature for CNV is not implemented yet")
-      eset <- pSet@molecularData$cnv
-    }
-  )
   
-	if (any(duplicated(pData(eset)[,"cellid"]))){
-		
-		dupl_cells = unique(pData(eset)[which(duplicated(pData(eset)[,"cellid"])),"cellid"])
-		for (cell in dupl_cells){
-			myx <- which(pData(eset)[,"cellid"]==cell)
-			med_exprs <- median(exprs(eset)[,myx])
-			exprs(eset)[,myx[1]] <- med_exprs 
-		}
-		exprs(eset) <- exprs(eset)[,!duplicated(pData(eset)[,"cellid"])]
-		pData(eset) <- pData(eset)[!duplicated(pData(eset)[,"cellid"]),]
-	}
-	pSet@molecularData$rna <- eset
+	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
+	drugpheno.all <- drugpheno.all[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
 	
-	drugpheno.all <- drugpheno.all[rnaInfo(pSet)[,"cellid"],, drop=FALSE]
-	
-	type <- as.factor(cellInfo(pSet)[rnaInfo(pSet)[,"cellid"], "tissue.type"]) 
-    batch <- rnaInfo(pSet)[, "batch"]
-    batch[!is.na(batch) & batch == "NA"] <- NA
-    batch <- as.factor(batch)
-	names(batch) <- rnaInfo(pSet)[ , "cellid"]
+	type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
+  batch <- phenoInfo(pSet, mDataType)[, "batchid"]
+  batch[!is.na(batch) & batch == "NA"] <- NA
+  batch <- as.factor(batch)
+	names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
 	batch <- batch[rownames(drugpheno.all)]
 	# duration <- sensitivityInfo(pSet)[,"duration_h"]
-    ## compute drug sensitivity signatures
-    availcore <- parallel::detectCores()
-    if (is.null(nbcore) || nbcore > availcore) { nbcore <- availcore }
-    options("mc.cores"=nbcore)
-    message("Compute sensitivity signatures for all drugs")
-    splitix <- parallel::splitIndices(nx=length(drugn), ncl=nbcore)
-    splitix <- splitix[sapply(splitix, length) > 0]
-    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch) {
-      res <- NULL
-      for(i in drugn[x]) {
-        ## using a linear model (x ~ concentration + cell + batch)
-        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=drugpheno[ , i], type=type, batch=batch, single.type=FALSE, nthread=1)
-        res <- c(res, list(rr$all))
+  ## compute drug sensitivity signatures
+  if (verbose) {
+    message("Computation of drug sensitivity signatures...")
+  }
+  splitix <- parallel::splitIndices(nx=length(drugn), ncl=nthread)
+  splitix <- splitix[sapply(splitix, length) > 0]
+  mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch) {
+  res <- NULL
+  for(i in drugn[x]) {
+  ## using a linear model (x ~ concentration + cell + batch)
+      dd <- drugpheno[ , i]
+      if(!is.na(sensitivity.cutoff)) {
+            dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      names(res) <- drugn[x]
-      return(res)
-    }, drugn=drugn, expr=t(rnaData(pSet)), drugpheno=drugpheno.all, type=type, batch=batch)
-    res <- do.call(c, mcres)
-    res <- res[!sapply(res, is.null)]
-    drug.sensitivity <- array(NA, dim=c(nrow(geneInfo(pSet)), length(res), ncol(res[[1]])), dimnames=list(rownames(geneInfo(pSet)), names(res), colnames(res[[1]])))
-    for(j in 1:ncol(res[[1]])) {
-      ttt <- sapply(res, function(x, j, k) {
-        xx <- array(NA, dim=length(k), dimnames=list(k))
-        xx[rownames(x)] <- x[ , j]
-        return (xx)
-      }, j=j, k=rownames(geneInfo(pSet)))
-      drug.sensitivity[rownames(ttt), colnames(ttt), j] <- ttt
+      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=1, verbose=verbose)
+      res <- c(res, list(rr$all))
     }
+    names(res) <- drugn[x]
+    return(res)
+  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch)
+  res <- do.call(c, mcres)
+  res <- res[!sapply(res, is.null)]
+  drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
+  for(j in 1:ncol(res[[1]])) {
+    ttt <- sapply(res, function(x, j, k) {
+      xx <- array(NA, dim=length(k), dimnames=list(k))
+      xx[rownames(x)] <- x[ , j, drop=FALSE]
+      return (xx)
+    }, j=j, k=rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]))
+    drug.sensitivity[rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), j] <- ttt
+  }
 
-drug.perturbation <- PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call =as.character(match.call()), SigType='Sensitivity')
+drug.sensitivity <- PharmacoSig(drug.sensitivity, PSetName = pSetName(pSet), Call ="as.character(match.call())", SigType='Sensitivity')
 
 	return(drug.sensitivity)
 }

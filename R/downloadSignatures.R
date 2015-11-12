@@ -1,68 +1,43 @@
-#' Download Drug Signatures
-#'
-#' This function allows you to download an array of drug signatures, as would be
-#' computed by the \code{drugPerturbationSig} and \code{drugSensitivitySig}
-#' functions, for available perturbation and sensitivity
-#' \code{PharmacoSets} respectively. This function allows the user to skip these very
-#' lengthy calculation steps for the datasets available, and start their
-#' analysis from the already computed signatures
+#' Download Drug Perturbation Signatures
 #' 
-#' @param name \code{Character} string, the name of the PhamracoSet for which to
-#'   download signatures. The available options are CGP, CCLE, and CMAP
-#' @param saveDir \code{Character} string with the folder path where the
-#'     PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will create
-#'     directory if it does not exist.
+#' This function allows you to download an array of drug perturbation
+#' signatures, as would be computed by the \code{drugPerturbationSig} function,
+#' for the available perturbation \code{PharmacoSets}. This function allows the
+#' user to skip these very lengthy calculation steps for the datasets available,
+#' and start their analysis from the already computed signatures
+#' 
+#' @param name \code{Character} string, the name of the PharmacoSet for which to
+#'   download signatures. The name should match the names returned in the
+#'   availablePSets table.
+#' @param saveDir \code{Character} string with the folder path where the 
+#'   PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
+#'   create directory if it does not exist.
 #' @param myfn \code{character} string, the file name to save the dataset under
-#' @param gene \code{bool} Should the signatures be downloaded at the gene level
-#'   (TRUE) or probe level (FALSE). Defaults to TRUE.
-#' @param verbose \code{bool} Should status message be printed during download.
+#' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
 #' @export
-#' @import downloader 
+#' @import downloader
 
-downloadSignatures <- function(name=c("CGP", "CCLE", "CMAP"), gene=TRUE,saveDir=file.path(".", "PSets", "Sigs"), myfn=NULL, verbose=TRUE) {
+downloadPertSig <- function(name, saveDir=file.path(".", "PSets", "Sigs"), myfn=NULL, verbose=TRUE) {
   
   
-  name <- match.arg(name)
-
+  pSetTable <- availablePSets()
+  
+  whichx <- match(name, pSetTable[,1])
+  if (is.na(whichx)){
+    stop('Unknown Dataset. Please use the availablePSet function for the table of available PharamcoSets.')
+  }
+  if (!pSetTable[whichx,"Dataset.Type"]%in%c("perturbation", "both")){
+    stop('Signatures are available only for perturbation type datasets')
+  }
+  
   if(!file.exists(saveDir)) {
     dir.create(saveDir, recursive=TRUE)
   }
+
+  myfn <- paste(name, "_signatures.RData", sep="")
   
-  switch(name, 
-         "CGP"={ 
-           if (gene){  
-             downfn <- "CGP_gene_signatures.RData"
-           } else {
-             downfn <- "CGP_signatures.RData"
-           }
-           if (is.null(myfn)){
-             myfn <- downfn 
-           }
-         },
-         "CCLE"={
-           if (gene){
-             downfn <- "CCLE_gene_signatures.RData"
-           } else {
-             downfn <- "CCLE_signatures.RData" 
-           }
-           if (is.null(myfn)){
-             myfn <- downfn
-           }
-         },
-         "CMAP"={
-           if (gene){
-             downfn <- "CMAP_gene_signatures.RData"
-           } else {
-             downfn <- "CMAP_signatures.RData"
-           }
-           if (is.null(myfn)){
-             myfn <- downfn
-           }
-         }, {
-           stop("Unknown Dataset. Please check the documentation of this function or the vignette for the list of available PharamcoSets.")
-         })
-  downloader::download(file.path("http://www.pmgenomics.ca/bhklab/sites/default/files/downloads/", myfn), destfile=file.path(saveDir, myfn), quiet=!verbose)
-  pSet <- load(file.path(saveDir, myfn))
-  return(get(pSet))
+  downloader::download(file.path("https://www.pmgenomics.ca/bhklab/sites/default/files/downloads/", myfn), destfile=file.path(saveDir, myfn), quiet=!verbose)
+  sig <- load(file.path(saveDir, myfn))
+  return(get(sig))
 }

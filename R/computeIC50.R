@@ -1,23 +1,25 @@
-########################
-## Mark Freeman
-## All rights Reserved
-## July 8, 2015
-## Function to fit log-logistic curves to dose-response data
-########################
-
 #'  Fits dose-response curves to data given by the user
 #'  and returns the IC50 of the fitted curve.
 #'  
 #'  @param conc [vector] is a vector of drug concentrations.
-#'  
 #'  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
 #'  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
 #'  of viability in the absence of any drug.
-#'  
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
+#'  @param verbose [logical] should diagnostic messages be printed? (default=FALSE)
+#'  @return An estimate of the IC50 for the concentrations and viabilities provided
+#'  @export
 
-computeIC50 <- function(conc, viability, trunc = TRUE) {
+computeIC50 <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
+  
+  conc <- as.numeric(conc[!is.na(conc)])
+  viability <- as.numeric(viability[!is.na(viability)])
+  ii <- which(conc == 0)
+  if(length(ii) > 0) {
+    conc <- conc[-ii]
+    viability <- viability[-ii]
+  }
   
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (prod(is.finite(conc)) != 1) {
@@ -45,11 +47,11 @@ computeIC50 <- function(conc, viability, trunc = TRUE) {
     stop("Concentration vector contains negative data.")
   }
   
-  if (min(viability) < 0) {
+  if (min(viability) < 0 & verbose) {
     warning("Warning: Negative viability data.")
   }
   
-  if (max(viability) > 100) {
+  if (max(viability) > 100 & verbose) {
     warning("Warning: Viability data exceeds negative control.")
   }
   

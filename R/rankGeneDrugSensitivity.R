@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## October 23, 2013
-########################
-
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
@@ -22,12 +16,7 @@
 ## Notes:	duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
-
-#' @importFrom stats complete.cases
-#' @importFrom stats p.adjust
-
-rankGeneDrugSensitivity <- 
-function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FALSE) {
+rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FALSE) {
   if (nthread != 1) {
     availcore <- parallel::detectCores()
     if (missing(nthread) || nthread < 1 || nthread > availcore) {
@@ -53,8 +42,9 @@ function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FA
     names(ltype)[-1] <- utype
   }
   res <- NULL
-#   nc <- c("estimate", "pvalue", "fdr")
-  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
+#  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
+  nc <- c("estimate", "se", "n", "pvalue", "fdr")
+  
   for (ll in 1:length(ltype)) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
     ccix <- complete.cases(data[iix, , drop=FALSE], drugpheno[iix], type[iix], batch[iix])
@@ -66,7 +56,7 @@ function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FA
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[sapply(splitix, length) > 0]
       mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno) {
-        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno))
+        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose))
         return(res)
       }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix])
       rest <- do.call(rbind, mcres)

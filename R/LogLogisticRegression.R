@@ -1,10 +1,3 @@
-########################
-## Mark Freeman
-## All rights Reserved
-## June 18, 2015
-## Function to fit log-logistic curves to dose-response data
-########################
-
 #'  Fits curves of the form E = E_inf + (1 - E_inf)/(1 + (c/EC50)^HS) to dose-response data points (c, E) given by the user
 #'  and returns a vector containing estimates for HS, E_inf, and EC50.
 #'  
@@ -51,7 +44,9 @@
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
 #'  
-#'  @importFrom stats optim
+#'  @param verbose [logical], if true, causes warnings thrown by the function to be printed.
+#'  @return A vector containing estimates for HS, E_inf, and EC50
+#'  @export
 
 logLogisticRegression <- function(conc,
                                   viability,
@@ -64,7 +59,17 @@ logLogisticRegression <- function(conc,
                                   Cauchy_flag = FALSE,
                                   conc_as_log = FALSE,
                                   viability_as_pct = TRUE,
-                                  trunc = TRUE) {
+                                  trunc = TRUE,
+                                  verbose = FALSE) {
+  conc <- as.numeric(conc[!is.na(conc)])
+  viability <- as.numeric(viability[!is.na(viability)])
+  ii <- which(conc == 0)
+  if(length(ii) > 0) {
+    conc <- conc[-ii]
+    viability <- viability[-ii]
+  }
+  
+  
   
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (prod(is.finite(conc)) != 1) {
@@ -139,11 +144,15 @@ logLogisticRegression <- function(conc,
   }
   
   if (min(viability) < 0) {
-    warning("Warning: Negative viability data.")
+    if (verbose == TRUE) {
+      warning("Warning: Negative viability data.")
+    }
   }
   
   if (max(viability) > 100 / (1 + 99 * viability_as_pct)) {
-    warning("Warning: Viability data exceeds negative control.")
+    if (verbose == TRUE) {
+      warning("Warning: Viability data exceeds negative control.")
+    }
   }
   
   if (min(density) <= 0) {
@@ -175,13 +184,17 @@ logLogisticRegression <- function(conc,
   if (viability_as_pct == TRUE && max(viability) < 5) {
     print(viability)
     print(viability_as_pct)
-    warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
+    if (verbose == TRUE) {
+      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
+    }
   }
   
   if (viability_as_pct == FALSE && max(viability) > 5) {
     print(viability)
     print(viability_as_pct)
-    warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
+    if (verbose == TRUE) {
+      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
+    }
   }
   
   #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION

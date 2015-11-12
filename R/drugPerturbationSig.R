@@ -1,9 +1,3 @@
-########################
-## Petr Smirnov
-## All rights Reserved
-## September 3. 2014
-########################
-
 #	Get Drug Perturbation Signatures from a PharmacoSet
 ###############################################################################
 ## Drug perturbation analysis
@@ -27,64 +21,65 @@
 #' 
 #' @examples
 #' data(CMAPsmall)
-#' drug.perturbation <- drugPertubrationSig(CMAPsmall)
+#' drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType='rna')
 #' head(drug.perturbation)
 #' 
-#' @param pSet \code{PharmacoSet} of the perturbation experiment type
-#' @param molecularData \code{character} string, which one of the molecular data
-#'   types to use in the analysis, out of DNA, RNA, SNP, CNV
-#' @param drugs \code{character} vector of drug names for which to compute the 
+#' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
+#' @param mDataType [character] which one of the molecular data types to use
+#'   in the analysis, out of dna, rna, rnaseq, snp, cnv
+#' @param drugs [character] a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
-#' @param nbcore \code{numeric}, if multiple cores are available, how many cores
+#' @param features [character] a vector of features for which to compute the
+#'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
+#' @param nthread [numeric] if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
-#' @param returnValues \code{character} vector, identifying which of estimate,
-#'   t-stat, p-value and fdr should the function return for each gene drug pair?
-#' @param verbose \code{bool} Should the function print diagnostic messages?
-#'   Defaults to FALSE
-#' @return A 3D \code{array} with genes in the first dimension, drugs in the 
+#' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
+#'   should the function return for each gene drug pair?
+#' @param verbose [bool] Should diagnostive messages be printed? (default false)
+#' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export
-#' @import parallel
 
-drugPertubrationSig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv"), drugs, nbcore=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
+drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
   
-  molecularData <- match.arg(molecularData)
+	availcore <- parallel::detectCores()
+	if (missing(nthread) || nthread > availcore) {
+	  nthread <- availcore
+	}
+  options("mc.cores"=nthread)
   
-  availcore <- parallel::detectCores()
-  if (is.null(nbcore) || nbcore > availcore) { nbcore <- availcore }
-  options("mc.cores"=nbcore)
+  if (mDataType %in% names(pSet@molecularProfiles)) {
+    #eset <- pSet@molecularProfiles[[mDataType]]
+		if(Biobase::annotation(pSet@molecularProfiles[[mDataType]])!="rna"){
+			stop(sprintf("Only rna data type perturbations are currently implemented"))
+		}
+  } else {
+    stop (sprintf("This pSet does not have any molecular data of type %s, choose among: %s", mDataType), paste(names(pSet@molecularProfiles), collapse=", "))
+  }
   
-  if(missing(drugs)){
+  
+  if (missing(drugs)) {
     drugn <- drugNames(pSet)
   } else {
     drugn <- drugs
   }
-  
-	switch (molecularData, 
-    "rna" = {
-      eset <- pSet@molecularData$rna
-      },
-    "dna" = {
-      stop ("Drug sensitivity signature for DNA is not implemented yet")
-      eset <- pSet@molecularData$dna
-      },
-    "snp" = {
-      stop ("Drug sensitivity signature for SNP is not implemented yet")
-      eset <- pSet@molecularData$snp
-      },
-    "cnv" = {
-      stop ("Drug sensitivity signature for CNV is not implemented yet")
-      eset <- pSet@molecularData$cnv
-    }
-  )
-  
-	dix <- is.element(drugn, pData(eset)[ , "drugid"])
+  dix <- is.element(drugn, PharmacoGx::phenoInfo(pSet, mDataType)[ , "drugid"])
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
   drugn <- drugn[dix]
   
-  splitix <- parallel::splitIndices(nx=length(drugn), ncl=nbcore)
+  if (missing(features)) {
+    features <- rownames(featureInfo(pSet, mDataType))
+  } else {
+    fix <- is.element(features, rownames(featureInfo(pSet, mDataType)))
+    if (verbose && !all(fix)) {
+      warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
+    }
+    features <- features[fix]
+  }
+  
+  splitix <- parallel::splitIndices(nx=length(drugn), ncl=nthread)
   splitix <- splitix[sapply(splitix, length) > 0]
   mcres <- parallel::mclapply(splitix, function(x, drugn, exprs, sampleinfo) {
     res <- NULL
@@ -95,17 +90,17 @@ drugPertubrationSig <- function(pSet, molecularData=c("rna", "dna", "snp", "cnv"
     }
     names(res) <- drugn[x]
     return(res)
-  }, drugn=drugn, exprs=t(exprs(eset)), sampleinfo=pData(eset))
-  tt <- do.call(c, mcres)
-  tt <- tt[!sapply(tt, is.null)]
-  drug.perturbation <- array(NA, dim=c(nrow(geneInfo(pSet)), length(tt), ncol(tt[[1]])), dimnames=list(rownames(geneInfo(pSet)), names(tt), colnames(tt[[1]])))
-  for(j in 1:ncol(tt[[1]])) {
-    ttt <- sapply(tt, function(x, j, k) {
+  }, drugn=drugn, exprs=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), sampleinfo=PharmacoGx::phenoInfo(pSet, mDataType))
+  res <- do.call(c, mcres)
+  res <- res[!sapply(res, is.null)]
+  drug.perturbation <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
+  for(j in 1:ncol(res[[1]])) {
+    ttt <- sapply(res, function(x, j, k) {
       xx <- array(NA, dim=length(k), dimnames=list(k))
-      xx[rownames(x)] <- x[ , j]
+      xx[rownames(x)] <- x[ , j, drop=FALSE]
       return (xx)
-    }, j=j, k=rownames(geneInfo(pSet)))
-    drug.perturbation[rownames(ttt), colnames(ttt), j] <- ttt
+    }, j=j, k=rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]))
+    drug.perturbation[rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), j] <- ttt
   }
   
   drug.perturbation <- PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call = as.character(match.call()), SigType='Perturbation')

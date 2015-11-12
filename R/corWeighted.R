@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## October 23, 2013
-########################
-
 #################################################
 ## Compute a weighted correlation coefficient
 ## inspired from package boot
@@ -16,18 +10,18 @@
 ##
 #################################################
 
-#' @importFrom stats complete.cases
-
 corWeighted <- 
 function (x, y, w, method=c("pearson", "spearman"), alternative=c("two.sided", "greater", "less"), nperm=0, nthread=1, setseed, na.rm=FALSE) {
  
   ######################
-  
   wcor <- function (d, w, na.rm=TRUE) {
-    s <- sum(w, na.rm=na.rm)
-    m1 <- sum(d[ , 1L] * w, na.rm=na.rm) / s
-    m2 <- sum(d[ , 2L] * w, na.rm=na.rm) / s
-    res <- (sum(d[ , 1L] * d[ , 2L] * w, na.rm=na.rm) / s - m1 * m2) / sqrt((sum(d[ , 1L]^2 * w, na.rm=na.rm) / s - m1^2) * (sum(d[ , 2L]^2 * w, na.rm=na.rm) / s - m2^2))
+### NOTE::: THIS FORMULA CAN SUFFER CATASTROPHIC CANCELATION AND SHOULD BE FIXED!!!
+#     s <- sum(w, na.rm=na.rm)
+#     m1 <- sum(d[ , 1L] * w, na.rm=na.rm) / s
+#     m2 <- sum(d[ , 2L] * w, na.rm=na.rm) / s
+#     res <- (sum(d[ , 1L] * d[ , 2L] * w, na.rm=na.rm) / s - m1 * m2) / sqrt((sum(d[ , 1L]^2 * w, na.rm=na.rm) / s - m1^2) * (sum(d[ , 2L]^2 * w, na.rm=na.rm) / s - m2^2))
+    CovM <- cov.wt(d, wt=w)[["cov"]]
+    res <- CovM[1,2]/sqrt(CovM[1,1]*CovM[2,2])
     return (res)
   }
   

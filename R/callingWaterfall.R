@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kains
-## All rights Reserved
-## October 23, 2013
-########################
-
 ## Drug sensitivity calling using waterfall plots
 ## Method:
 ## 1. Sensitivity calls were made using one of IC50, ActArea or Amax
@@ -30,7 +24,7 @@
 #' @importFrom graphics lines
 #' @importFrom graphics legend
 #' 
-`callingWaterfall` <- 
+callingWaterfall <-
 function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), cor.min.linear=0.95, name="Drug", plot=FALSE) {
   
   type <- match.arg(type)
