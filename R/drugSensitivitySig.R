@@ -1,8 +1,4 @@
-## TODO::: NEED TO DEAL WITH DUPLICATES 
-## TODO:: SOMEONE WITH MORE KNOWLEDGE OF
-## THESE FUNCTIONS SHOULD WRITE BETTER DOCUMENTATION
-
-#################################################
+################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
 ## inputs:	
@@ -32,6 +28,10 @@
 #' coefficient, in a 3 dimensional array, with genes in the first direction, 
 #' drugs in the second, and the selected return values in the third.
 #' 
+#' @examples
+#' data(CCLEsmall)
+#' drug.sensitivity <- drugSensitivitySig(CCLEsmall, mDataType="rna", nthread=1)
+#' print(drug.sensitivity)
 #' 
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
 #' @param mDataType [character] which one of the molecular data types to use

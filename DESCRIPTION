@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
-Title: Large-scale analysis of pharmacogenomic data
+Title: Analysis of Large-Scale Pharmacogenomic Data
 Version: 1.1.0
-Date: 2015-09-18
+Date: 2015-11-12
 Author: Petr Smirnov, Zhaleh Safikhani, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.

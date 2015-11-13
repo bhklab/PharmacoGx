@@ -21,8 +21,8 @@
 #' 
 #' @examples
 #' data(CMAPsmall)
-#' drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType='rna')
-#' head(drug.perturbation)
+#' drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType="rna", nthread=1)
+#' print(drug.perturbation)
 #' 
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
 #' @param mDataType [character] which one of the molecular data types to use

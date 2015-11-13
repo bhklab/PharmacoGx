@@ -45,7 +45,7 @@ drugs in the second, and the selected return values in the third.
 }
 \examples{
 data(CMAPsmall)
-drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType='rna')
+drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType="rna", nthread=1)
 head(drug.perturbation)
 }
 
