@@ -6,10 +6,11 @@
 \contentsline {subsection}{\numberline {3.2}Query the Connectivity Map}{7}
 \contentsline {section}{\numberline {4}Estimating Drug Sensitivity Measures}{9}
 \contentsline {subsection}{\numberline {4.1}Curve Fitting}{9}
-\contentsline {section}{\numberline {5}Gene-Drug Association Modelling}{9}
+\contentsline {subsection}{\numberline {4.2}Plotting Drug-Dose Response Data}{10}
+\contentsline {section}{\numberline {5}Gene-Drug Association Modelling}{10}
 \contentsline {subsection}{\numberline {5.1}Sensitivity Modelling}{10}
-\contentsline {subsection}{\numberline {5.2}Perturbation Modelling}{11}
-\contentsline {section}{\numberline {6}Connectivity Scoring}{11}
+\contentsline {subsection}{\numberline {5.2}Perturbation Modelling}{12}
+\contentsline {section}{\numberline {6}Connectivity Scoring}{12}
 \contentsline {subsection}{\numberline {6.1}GSEA}{12}
-\contentsline {subsection}{\numberline {6.2}GWC}{12}
+\contentsline {subsection}{\numberline {6.2}GWC}{13}
 \contentsline {section}{\numberline {7}Acknowledgements}{13}
