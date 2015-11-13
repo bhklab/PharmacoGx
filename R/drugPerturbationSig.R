@@ -43,7 +43,7 @@
 drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
   
 	availcore <- parallel::detectCores()
-	if (missing(nthread) || nthread > availcore) {
+	if ( nthread > availcore) {
 	  nthread <- availcore
 	}
   options("mc.cores"=nthread)
