@@ -13,9 +13,10 @@
 \title{PharmacoGx: an R package for analysis of large pharmacogenomic datasets}
 \author[1]{Petr Smirnov}
 \author[1,2]{Zhaleh Safikhani}
-\author[1,2]{Benjamin Haibe-Kains}
+\author[1,2,3]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
 
 \SweaveOpts{highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE}
 
