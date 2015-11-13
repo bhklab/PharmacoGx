@@ -118,7 +118,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
     drugn <- drugs
   }
   availcore <- parallel::detectCores()
-  if (missing(nthread) || nthread > availcore) {
+  if ( nthread > availcore) {
     nthread <- availcore
   }
   
