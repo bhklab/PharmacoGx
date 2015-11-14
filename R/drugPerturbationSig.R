@@ -67,6 +67,9 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, ret
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
+  if (!any(dix)) {
+    stop("None of the drugs were found in the dataset")
+  }
   drugn <- drugn[dix]
   
   if (missing(features)) {

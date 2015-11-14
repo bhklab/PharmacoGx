@@ -137,6 +137,9 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
+  if (!any(dix)) {
+    stop("None of the drugs were found in the dataset")
+  }
   drugn <- drugn[dix]
   
 	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
