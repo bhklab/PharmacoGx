@@ -27,6 +27,7 @@
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
 #' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom stats median
 #' @export
 
 

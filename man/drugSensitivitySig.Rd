@@ -62,8 +62,8 @@ coefficient, in a 3 dimensional array, with genes in the first direction,
 drugs in the second, and the selected return values in the third.
 }
 \examples{
-data(CMAPsmall)
-drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType="rna", nthread=1)
-head(drug.perturbation)
+data(CCLEsmall)
+drug.sensitivity <- drugSensitivitySig(CCLEsmall, mDataType="rna", nthread=1)
+print(drug.sensitivity)
 }
 

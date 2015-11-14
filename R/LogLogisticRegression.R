@@ -47,6 +47,7 @@
 #'  @param verbose [logical], if true, causes warnings thrown by the function to be printed.
 #'  @return A vector containing estimates for HS, E_inf, and EC50
 #'  @export
+#'  @importFrom stats optim
 
 logLogisticRegression <- function(conc,
                                   viability,

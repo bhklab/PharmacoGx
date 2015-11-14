@@ -10,6 +10,7 @@
 #' @return A data.frame with details about the available PharmacoSet objects
 #' @export
 #' @import downloader
+#' @importFrom utils read.table write.table
 availablePSets <- function(saveDir=file.path(".", "PSets"), myfn="PSets.csv", verbose=TRUE){
   
   if(!file.exists(saveDir)) {
@@ -65,6 +66,7 @@ downloadPSet <- function(name, saveDir=file.path(".", "PSets"), myfn=NULL, verbo
   return(get(pSet))
 }
 
+#' @importFrom utils read.table write.table
 .createPSetEntry <- function(pSet, outfn){
   
   if(file.exists(outfn)){

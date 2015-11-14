@@ -1,6 +1,5 @@
 ########################
 ## Benjamin Haibe-Kains & Cat Olsen
-## All rights Reserved
 ## September 9, 2014
 ########################
 

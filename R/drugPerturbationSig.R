@@ -39,6 +39,7 @@
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export
+#' @import parallel
 
 drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
   

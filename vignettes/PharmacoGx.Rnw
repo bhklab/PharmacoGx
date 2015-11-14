@@ -114,12 +114,11 @@ library(PharmacoGx)
 \section{Downloading PharmacoSet objects}
 %------------------------------------------------------------
 
-We have made the PharmacoSet objects of the curated datasets available online at:\\ \textit{www.pmgenomics.ca/bhklab/software/pharmacogx/}\\
-
-However, to make the process of obtaining the data easier through the R shell, we have also written a function \textit{downloadPSet} which automates downloading the datasets into a directory of the users choice, and returns the data into the R session. 
+We have made the PharmacoSet objects of the curated datasets available for download using functions provided in the package. A table of available PharmacoSet objects can be obtained by using the \textit{availablePSets} function. Any of the PharmacoSets in the table can then be downloaded by calling \textit{downloadPSet}, which saves the datasets into a directory of the users choice, and returns the data into the R session. 
 
 <<download-example, results=hide,eval=False>>=
 ## Example
+availablePSets()
 GDSC <- downloadPSet("GDSC") 
 @
 %------------------------------------------------------------

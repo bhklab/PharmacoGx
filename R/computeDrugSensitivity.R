@@ -1,3 +1,4 @@
+#' @importFrom stats na.omit
 .calculateSensitivitiesStar <-
   function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual")) {
   

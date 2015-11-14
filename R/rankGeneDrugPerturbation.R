@@ -1,3 +1,10 @@
+
+#' @importFrom stats complete.cases
+#' @importFrom stats p.adjust
+
+
+
+
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##

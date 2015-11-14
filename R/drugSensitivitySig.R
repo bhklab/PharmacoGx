@@ -59,6 +59,7 @@
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export
+#' @import parallel
 
 drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"), molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
 	

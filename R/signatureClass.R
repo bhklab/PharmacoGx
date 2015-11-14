@@ -1,5 +1,6 @@
 setOldClass('sessionInfo', sessionInfo())
 
+#' @importFrom utils sessionInfo
 .PharmacoSig <- setClass('PharmacoSig', slots=list(
 			
 			PSetName='character',

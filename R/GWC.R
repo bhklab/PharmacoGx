@@ -1,6 +1,5 @@
 ########################
 ## Benjamin Haibe-Kains
-## All rights Reserved
 ## October 23, 2013
 ########################
 

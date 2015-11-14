@@ -36,6 +36,14 @@
 #' are summarized and replicates are plotted individually otherwise
 #' @export
 #' @import RColorBrewer
+#' @importFrom graphics plot rect
+#' @importFrom grDevices rgb
+#' @importFrom graphics plot
+#' @importFrom graphics rect
+#' @importFrom grDevices rgb
+#' @importFrom graphics points
+#' @importFrom graphics lines
+#' @importFrom graphics legend
 
 
 drugDoseResponseCurve <- 

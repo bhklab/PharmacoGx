@@ -98,6 +98,7 @@
 #' @return An object of class PharmacoSet
 #' @export
 #' @import methods
+#' @importFrom utils sessionInfo
 PharmacoSet <-  function(name, 
                           molecularProfiles=list(), 
                           cell=data.frame(), 
@@ -687,6 +688,18 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   } else {
     exps <- NULL
   }
+  if(!missing(cells)){
+    cells <- unique(cells)
+  }
+  
+  if(!missing(drugs)){
+    drugs <- unique(drugs)
+  }
+  
+  if(!missing(molecular.data.cells)){
+    molecular.data.cells <- unique(molecular.data.cells)
+  }
+  
 	### TODO:: implement strict subsetting at this level!!!!
   
 	### the function missing does not work as expected in the context below, because the arguments are passed to the anonymous
@@ -1004,6 +1017,8 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 #' @param plotDist Should the function also plot the distribution of molecular data?
 #' @param result.dir The path to the directory for saving the plots as a string
 #' @export
+#' @importFrom graphics hist
+#' @importFrom grDevices dev.off pdf
 
 checkPSetStructure <-
   function(pSet, plotDist=FALSE, result.dir=".") {

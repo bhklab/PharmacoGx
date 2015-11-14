@@ -10,6 +10,8 @@
 ##
 #################################################
 
+#' @importFrom stats cov.wt complete.cases
+
 corWeighted <- 
 function (x, y, w, method=c("pearson", "spearman"), alternative=c("two.sided", "greater", "less"), nperm=0, nthread=1, setseed, na.rm=FALSE) {
  
