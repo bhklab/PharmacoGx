@@ -62,8 +62,9 @@ coefficient, in a 3 dimensional array, with genes in the first direction,
 drugs in the second, and the selected return values in the third.
 }
 \examples{
-data(CCLEsmall)
-drug.sensitivity <- drugSensitivitySig(CCLEsmall, mDataType="rna", nthread=1)
+data(GDSCsmall)
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
+             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
 print(drug.sensitivity)
 }
 

@@ -29,8 +29,9 @@
 #' drugs in the second, and the selected return values in the third.
 #' 
 #' @examples
-#' data(CCLEsmall)
-#' drug.sensitivity <- drugSensitivitySig(CCLEsmall, mDataType="rna", nthread=1)
+#' data(GDSCsmall)
+#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+#'              nthread=1, features = featureNames(GDSCsmall, "rna")[1])
 #' print(drug.sensitivity)
 #' 
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
