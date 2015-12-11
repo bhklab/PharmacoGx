@@ -2,12 +2,12 @@ setOldClass('sessionInfo', sessionInfo())
 
 #' @importFrom utils sessionInfo
 .PharmacoSig <- setClass('PharmacoSig', slots=list(
-            
-            PSetName='character',
-            DateCreated = 'character',
-            SigType = 'character',
-            SessionInfo = 'sessionInfo',
-            Call = 'character'), contains='array')
+			
+			PSetName='character',
+			DateCreated = 'character',
+			SigType = 'character',
+			SessionInfo = 'sessionInfo',
+			Call = 'character'), contains='array')
 
 PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity', SessionInfo=sessionInfo(), Call='No Call Recorded'){
 
@@ -22,13 +22,13 @@ return(.PharmacoSig(Data, PSetName=PSetName, DateCreated=DateCreated, SigType=Si
 #' 
 #' @export
 setMethod("show", signature=signature(object='PharmacoSig'),
-        function(object) {
-        cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")
-        cat('Signature Type: ', attr(object, 'SigType'), "\n")
-        cat("Date Created: ", attr(object, 'DateCreated'), "\n")
-        cat("Number of Drugs: ", dim(object)[[2]], "\n")
-        cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
-           })
+		function(object) {
+		cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")
+		cat('Signature Type: ', attr(object, 'SigType'), "\n")
+		cat("Date Created: ", attr(object, 'DateCreated'), "\n")
+		cat("Number of Drugs: ", dim(object)[[2]], "\n")
+		cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
+		   })
 
 #' Show the Annotations of a signature object
 #' 

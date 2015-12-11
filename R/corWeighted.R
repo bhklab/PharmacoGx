@@ -2,11 +2,11 @@
 ## Compute a weighted correlation coefficient
 ## inspired from package boot
 ##
-## inputs:    
+## inputs:	
 ##      - 
 ##
 ## outputs, a list of items:
-##            - 
+##			- 
 ##
 #################################################
 

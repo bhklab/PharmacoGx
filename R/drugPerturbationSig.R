@@ -1,4 +1,4 @@
-#    Get Drug Perturbation Signatures from a PharmacoSet
+#	Get Drug Perturbation Signatures from a PharmacoSet
 ###############################################################################
 ## Drug perturbation analysis
 ## create profiles before vs after drug for each drug 
@@ -43,17 +43,17 @@
 
 drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
   
-    availcore <- parallel::detectCores()
-    if ( nthread > availcore) {
-      nthread <- availcore
-    }
+	availcore <- parallel::detectCores()
+	if ( nthread > availcore) {
+	  nthread <- availcore
+	}
   options("mc.cores"=nthread)
   
   if (mDataType %in% names(pSet@molecularProfiles)) {
     #eset <- pSet@molecularProfiles[[mDataType]]
-        if(Biobase::annotation(pSet@molecularProfiles[[mDataType]])!="rna"){
-            stop(sprintf("Only rna data type perturbations are currently implemented"))
-        }
+		if(Biobase::annotation(pSet@molecularProfiles[[mDataType]])!="rna"){
+			stop(sprintf("Only rna data type perturbations are currently implemented"))
+		}
   } else {
     stop (sprintf("This pSet does not have any molecular data of type %s, choose among: %s", mDataType), paste(names(pSet@molecularProfiles), collapse=", "))
   }
