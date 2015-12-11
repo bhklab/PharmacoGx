@@ -38,6 +38,7 @@ availablePSets <- function(saveDir=file.path(".", "PSets"), myfn="PSets.csv", ve
 #' @param myfn \code{character} string, the file name to save the dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
+#' @return A PSet object with the dataset, downloaded from our server
 #' @export
 #' @import downloader 
 

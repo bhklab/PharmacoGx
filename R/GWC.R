@@ -6,6 +6,16 @@
 #################################################
 #' Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation
 #'
+#'  @examples
+#'  data(CCLEsmall)
+#  x <- molecularProfiles(CCLEsmall,"rna")[,1]
+#  y <- molecularProfiles(CCLEsmall,"rna")[,2]
+#  x_p <- rep(0.05, times=length(x))
+#  y_p <- rep(0.05, times=length(y))
+#  names(x_p) <- names(x)
+#  names(y_p) <- names(y)
+#  gwc(x,x_p,y,y_p, nperm=100)
+#'
 #'  @param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
 #'  @param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
 #'  @param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
@@ -14,11 +24,11 @@
 #'  @param method.cor \code{character} string identifying if a \code{pearson} or
 #'    \code{spearman} correlation should be used
 #'  @param ... Other passed down to internal functions
-#'
+#'  
 #' @return \code{numeric} a vector of two values, the correlation and associated p-value.
 #'
 #' @export
-##			-
+##            -
 ##
 ## http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient#Calculating_a_weighted_correlation
 ## http://www.mathworks.com/matlabcentral/fileexchange/20846-weighted-correlation-matrix

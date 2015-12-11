@@ -5,19 +5,19 @@
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
-## inputs:	
+## inputs:    
 ##      - data: gene expression data matrix
-##			- drugpheno: sensititivity values fo thr drug of interest
-##			- type: cell or tissue type for each experiment
-##			- duration: experiment duration in hours
+##            - drugpheno: sensititivity values fo thr drug of interest
+##            - type: cell or tissue type for each experiment
+##            - duration: experiment duration in hours
 ##      - batch: experiment batches
-##			- single.type: Should the statitsics be computed for each cell/tissue type separately?
+##            - single.type: Should the statitsics be computed for each cell/tissue type separately?
 ##      - nthread: number of parallel threads (bound to the maximum number of cores available)
 ##
 ## outputs:
 ## list of datafraes with the statistics for each gene, for each type
 ##
-## Notes:	duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
+## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
 rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FALSE) {
@@ -33,10 +33,10 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
   if (missing(batch) || all(is.na(batch))) {
     batch <- array(1, dim=nrow(data), dimnames=list(rownames(data)))
   }
-	if (any(c(length(drugpheno), length(type), length(batch)) != nrow(data))) {
+    if (any(c(length(drugpheno), length(type), length(batch)) != nrow(data))) {
     stop("length of drugpheno, type, duration, and batch should be equal to the number of rows of data!")
   }
-	names(drugpheno) <- names(type) <- names(batch) <- rownames(data)
+    names(drugpheno) <- names(type) <- names(batch) <- rownames(data)
   
   res <- NULL
   utype <- sort(unique(as.character(type)))
@@ -70,7 +70,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     }
   }
   names(res) <- names(ltype)
-	return(res)
+    return(res)
 }
 
 ## End
