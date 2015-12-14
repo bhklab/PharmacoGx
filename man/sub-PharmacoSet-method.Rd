@@ -3,23 +3,22 @@
 \docType{methods}
 \name{[,PharmacoSet-method}
 \alias{[,PharmacoSet-method}
-\title{`[` 
- @param x numeric
- @param i numeric
- @param j numeric
- @param ... further arguments
- @param drop A boolean flag of whether to drop single dimensions or not
- @export}
+\title{`[`}
 \usage{
 \S4method{[}{PharmacoSet}(x, i, j, ..., drop = FALSE)
 }
+\arguments{
+\item{x}{numeric}
+
+\item{i}{numeric}
+
+\item{j}{numeric}
+
+\item{...}{further arguments}
+
+\item{drop}{A boolean flag of whether to drop single dimensions or not}
+}
 \description{
-`[` 
- @param x numeric
- @param i numeric
- @param j numeric
- @param ... further arguments
- @param drop A boolean flag of whether to drop single dimensions or not
- @export
+`[`
 }
 

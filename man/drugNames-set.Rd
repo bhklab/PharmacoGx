@@ -19,7 +19,7 @@ A generic for the drugNames replacement method
 }
 \examples{
 data(CCLEsmall)
-drugNames(CCLE) <- drugNames(CCLE)
+drugNames(CCLEsmall) <- drugNames(CCLEsmall)
 
 }
 

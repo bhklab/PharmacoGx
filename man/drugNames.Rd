@@ -17,7 +17,7 @@ A generic for the drugNames method
 }
 \examples{
 data(CCLEsmall)
-drugNames(CCLE)
+drugNames(CCLEsmall)
 
 }
 

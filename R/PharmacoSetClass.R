@@ -494,7 +494,7 @@ setMethod(sensitivityMeasures, "PharmacoSet", function(pSet){
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' drugNames(CCLE)
+#' drugNames(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} to return drug names from
 #' @return A vector of the drug names used in the PharmacoSet
@@ -520,7 +520,7 @@ setMethod(drugNames, "PharmacoSet", function(pSet){
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' drugNames(CCLE) <- drugNames(CCLE)
+#' drugNames(CCLEsmall) <- drugNames(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{character} vector of the new drug names
@@ -750,13 +750,14 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 
 
 
-#' `[` 
-#'  @param x numeric
-#'  @param i numeric
-#'  @param j numeric
-#'  @param ... further arguments
-#'  @param drop A boolean flag of whether to drop single dimensions or not
-#'  @export
+#'`[`
+#'
+#'@param x numeric
+#'@param i numeric
+#'@param j numeric
+#'@param ... further arguments
+#'@param drop A boolean flag of whether to drop single dimensions or not
+#'@export
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
     stop("Please use the subsetTo function and the getter functions to access the object data. Other methods of accessing the object slots are discouraged and may lead to unexpected behaviour.")
 })
@@ -1156,50 +1157,50 @@ checkPSetStructure <-
       }
       if("cellid" %in% colnames(Biobase::pData(profile))) {
         if(!all(Biobase::pData(profile)[,"cellid"] %in% rownames(pSet@cell))) {
-          sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn)
+          warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
         }
       }else {
-        sprintf("%s: cellid does not exist in pData", nn)
+        warning(sprintf("%s: cellid does not exist in pData", nn))
       }
     }
     if("tissueid" %in% colnames(pSet@cell)) {
-      print(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))
+      message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))
     } else {
-      print("tissueid does not exist in cell slot")
+      warning("tissueid does not exist in cell slot")
     }
     if(class(pSet@cell) != "data.frame") {
-      print("cell slot class type should be dataframe")
+      warning("cell slot class type should be dataframe")
     }
     if(class(pSet@drug) != "data.frame") {
-      print("drug slot class type should be dataframe")
+      warning("drug slot class type should be dataframe")
     }
     if(pSet@datasetType %in% c("sensitivity", "both"))
     {
       if(class(pSet@sensitivity$info) != "data.frame") {
-        print("sensitivity info slot class type should be dataframe")
+        warning("sensitivity info slot class type should be dataframe")
       }
       if("cellid" %in% colnames(pSet@sensitivity$info)) {
         if(!all(pSet@sensitivity$info[,"cellid"] %in% rownames(pSet@cell))) {
-          print("not all the cell lines in sensitivity data are in cell slot")
+          warning("not all the cell lines in sensitivity data are in cell slot")
         }
       }else {
-        print("cellid does not exist in sensitivity info")
+        warning("cellid does not exist in sensitivity info")
       }
       if("drugid" %in% colnames(pSet@sensitivity$info)) {
         if(!all(pSet@sensitivity$info[,"drugid"] %in% rownames(pSet@drug))) {
-          print("not all the drugs in sensitivity data are in drug slot")
+          warning("not all the drugs in sensitivity data are in drug slot")
         }
       }else {
-        print("drugid does not exist in sensitivity info")
+        warning("drugid does not exist in sensitivity info")
       }
       
       if(!is.na(pSet@sensitivity$raw)) {
         if(!all(dimnames(pSet@sensitivity$raw)[[1]] %in% rownames(pSet@sensitivity$info))) {
-          print("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
+          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
         }
       }
       if(!all(rownames(pSet@sensitivity$profiles) %in% rownames(pSet@sensitivity$info))) {
-        print("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
+        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
       }
     }
   }

@@ -5,25 +5,12 @@ Version: 1.1.2
 Date: 2015-11-13
 Author: Petr Smirnov, Zhaleh Safikhani, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
-Description: Contains a set of functions to perform large-scale analysis of
-    pharmacogenomic data.
+Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
-Suggests:
-    xtable
+Suggests: xtable
 Encoding: UTF-8
-Imports:
-    Biobase,
-    piano,
-    magicaxis,
-    RColorBrewer,
-    parallel,
-    caTools,
-    methods,
-    downloader,
-    stats,
-    utils,
-    graphics,
-    grDevices
-Depends:
-    R (>= 2.10)
+Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader, stats, utils, graphics, grDevices
+Depends: R (>= 3.2)
 RoxygenNote: 5.0.1
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software
+BugReports: https://github.com/bhklab/PharmacoGx
