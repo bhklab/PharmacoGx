@@ -1,19 +1,19 @@
 ################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
-## inputs:	
+## inputs:    
 ##      - data: gene expression data matrix
-##			- drugpheno: sensititivity values fo thr drug of interest
-##			- type: cell or tissue type for each experiment
-##			- duration: experiment duration in hours
+##            - drugpheno: sensititivity values fo thr drug of interest
+##            - type: cell or tissue type for each experiment
+##            - duration: experiment duration in hours
 ##      - batch: experiment batches
-##			- single.type: Should the statitsics be computed for each cell/tissue type separately?
+##            - single.type: Should the statitsics be computed for each cell/tissue type separately?
 ##      - nthread: number of parallel threads (bound to the maximum number of cores available)
 ##
 ## outputs:
 ## list of datafraes with the statistics for each gene, for each type
 ##
-## Notes:	duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
+## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
 
@@ -63,13 +63,13 @@
 #' @import parallel
 
 drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"), molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
-	
-	### This function needs to: Get a table of AUC values per cell line / drug
-	### Be able to recompute those values on the fly from raw data if needed to change concentration
-	### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
-	### Be able to extract genomic data 
-	### Run rankGeneDrugSens in parallel at the drug level
-	### Return matrix as we had before
+    
+    ### This function needs to: Get a table of AUC values per cell line / drug
+    ### Be able to recompute those values on the fly from raw data if needed to change concentration
+    ### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
+    ### Be able to extract genomic data 
+    ### Run rankGeneDrugSens in parallel at the drug level
+    ### Return matrix as we had before
   
   sensitivity.measure <- match.arg(sensitivity.measure)
   molecular.summary.stat <- match.arg(molecular.summary.stat)
@@ -134,8 +134,8 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
     features <- features[fix]
   }
   
-	drugpheno.all <- t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose))
-	dix <- is.element(drugn, colnames(drugpheno.all))
+    drugpheno.all <- t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose))
+    dix <- is.element(drugn, colnames(drugpheno.all))
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
@@ -144,16 +144,16 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   }
   drugn <- drugn[dix]
   
-	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
-	drugpheno.all <- drugpheno.all[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
-	
-	type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
+    pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
+    drugpheno.all <- drugpheno.all[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
+    
+    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
   batch <- phenoInfo(pSet, mDataType)[, "batchid"]
   batch[!is.na(batch) & batch == "NA"] <- NA
   batch <- as.factor(batch)
-	names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
-	batch <- batch[rownames(drugpheno.all)]
-	# duration <- sensitivityInfo(pSet)[,"duration_h"]
+    names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
+    batch <- batch[rownames(drugpheno.all)]
+    # duration <- sensitivityInfo(pSet)[,"duration_h"]
   ## compute drug sensitivity signatures
   if (verbose) {
     message("Computation of drug sensitivity signatures...")
@@ -188,5 +188,5 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
 
 drug.sensitivity <- PharmacoSig(drug.sensitivity, PSetName = pSetName(pSet), Call ="as.character(match.call())", SigType='Sensitivity')
 
-	return(drug.sensitivity)
+    return(drug.sensitivity)
 }

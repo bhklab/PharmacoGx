@@ -61,10 +61,10 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=
   
   method <- match.arg(method)
   if (class(x) != "matrix") {
-	  x <- as.matrix(x)
+      x <- as.matrix(x)
   }
   if (class(y) != "matrix") {
-	  y <- as.matrix(y)
+      y <- as.matrix(y)
   }
   if ((ncol(x) != 2 || ncol(y) != 2) && method=="gwc") {
     stop ("x and y should have 2 columns: effect size and corresponding p-values")

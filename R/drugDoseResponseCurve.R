@@ -72,7 +72,7 @@ drugDoseResponseCurve <-
           pSetIndex[[i]] <- i
           if (length(exp_i) == 1) {
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
-                                                "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=F))
+                                                "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=FALSE))
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }else{
             drug.responses <- as.data.frame(cbind("Dose"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
