@@ -13,4 +13,4 @@ Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, do
 Depends: R (>= 3.2)
 RoxygenNote: 5.0.1
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software
-BugReports: https://github.com/bhklab/PharmacoGx
+BugReports: https://github.com/bhklab/PharmacoGx/issues
