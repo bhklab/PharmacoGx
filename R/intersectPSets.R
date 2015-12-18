@@ -5,8 +5,7 @@
 #' and/or cell lines, and return PharmacoSets that contain data only pertaining 
 #' to the common drugs, and/or cell lines. The mapping between dataset 
 #' drug and cell names is done either using annotations found in the 
-#' PharmacoSet object's internal curation slot, or according to matching tables 
-#' provided by the user
+#' PharmacoSet object's internal curation slot
 #' 
 #' @examples 
 #' data(GDSCsmall)
@@ -99,7 +98,11 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     }
     
     for(i in 1:length(pSets)){
-      pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
+      if(strictIntersect){
+          pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
+      } else {
+          pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs, cells=common.cells, molecular.data.cells=common.molecular.cells)
+      }    
     }
     return(pSets)
   }

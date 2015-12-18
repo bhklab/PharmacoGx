@@ -797,7 +797,10 @@ setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 # subsetTo <- function(pSet, cells=NULL, drugs=NULL, exps=NULL, molecular.data.cells=NULL, keep.controls=TRUE) {
 subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...) {
   drop=FALSE
-  if (exists("exps")) {
+  if (!is.null(exps)) {
+  adArgs = list(...)
+  if ("exps" %in% names(adArgs)) {
+    exps <- adArgs[["exps"]]
     exps <- exps[,pSetName(pSet)]
   } else {
     exps <- NULL
@@ -884,10 +887,15 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   
   if ((pSet@datasetType == "sensitivity" | pSet@datasetType == "both") & length(exps) != 0) {
       pSet@sensitivity$info <- pSet@sensitivity$info[exps, , drop=drop]
+      rownames(pSet@sensitivity$info) <- names(exps)
       if(length(pSet@sensitivity$raw) > 0) {
         pSet@sensitivity$raw <- pSet@sensitivity$raw[exps, , , drop=drop]
+        dimnames(pSet@sensitivity$raw)[[1]] <- names(exps)
       }
       pSet@sensitivity$profiles <- pSet@sensitivity$profiles[exps, , drop=drop]
+      rownames(pSet@sensitivity$profiles) <- names(exps)
+      
+      pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
   }
   else if ((pSet@datasetType == "sensitivity" | pSet@datasetType == "both") & (length(drugs) != 0 | length(cells) != 0)) {
     
@@ -920,26 +928,30 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
           }, i=row_indices, drop=drop)
   }
   
-    if (length(drugs)==0) {
-        if(pSet@datasetType == "sensitivity" | pSet@datasetType == "both"){
-            drugs <- unique(sensitivityInfo(pSet)[["drugid"]])
+	if (length(drugs)==0) {
+		if(pSet@datasetType == "sensitivity" | pSet@datasetType == "both"){
+			drugs <- unique(sensitivityInfo(pSet)[["drugid"]])
+		}
+		if(pSet@datasetType == "perturbation" | pSet@datasetType == "both"){
+			drugs <- union(drugs, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["drugid"]])}))))
+		}
+	}
+	if (length(cells)==0) {
+		cells <- union(cells, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["cellid"]])}))))
+        if (pSet@datasetType =="sensitivity" | pSet@datasetType == "both"){
+            cells <- union(cells, sensitivityInfo(pSet)[["cellid"]])
         }
-        if(pSet@datasetType == "perturbation" | pSet@datasetType == "both"){
-            drugs <- union(drugs, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["drugid"]])}))))        }
-    }
-    if (length(cells)==0) {
-        cells <- union(cells, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["cellid"]])}))))
-    }
-    drugInfo(pSet) <- drugInfo(pSet)[drugs , , drop=drop]
-    cellInfo(pSet) <- cellInfo(pSet)[cells , , drop=drop]
-    pSet@curation$drug <- pSet@curation$drug[drugs , , drop=drop]
-    pSet@curation$cell <- pSet@curation$cell[cells , , drop=drop]
-    pSet@curation$tissue <- pSet@curation$tissue[cells , , drop=drop]
-    if (pSet@datasetType == "sensitivity" | pSet@datasetType == "both") {
-      pSet@sensitivity$n <- pSet@sensitivity$n[cells, drugs , drop=drop]
-    }
-    if (pSet@datasetType == "perturbation" | pSet@datasetType == "both") {
-        pSet@perturbation$n <- pSet@perturbation$n[cells,drugs, , drop=drop]
+	}
+	drugInfo(pSet) <- drugInfo(pSet)[drugs , , drop=drop]
+	cellInfo(pSet) <- cellInfo(pSet)[cells , , drop=drop]
+	pSet@curation$drug <- pSet@curation$drug[drugs , , drop=drop]
+	pSet@curation$cell <- pSet@curation$cell[cells , , drop=drop]
+	pSet@curation$tissue <- pSet@curation$tissue[cells , , drop=drop]
+	if (pSet@datasetType == "sensitivity" | pSet@datasetType == "both"  & length(exps) == 0) {
+	  pSet@sensitivity$n <- pSet@sensitivity$n[cells, drugs , drop=drop]
+	}
+	if (pSet@datasetType == "perturbation" | pSet@datasetType == "both") {
+	    pSet@perturbation$n <- pSet@perturbation$n[cells,drugs, , drop=drop]
     }
       return(pSet)
 }
