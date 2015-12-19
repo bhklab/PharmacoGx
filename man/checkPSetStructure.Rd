@@ -21,6 +21,7 @@ of data and with other studies.
 }
 \examples{
 data(CCLEsmall)
+
 checkPSetStructure(CCLEsmall)
 
 }
