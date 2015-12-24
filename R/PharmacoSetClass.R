@@ -797,7 +797,7 @@ setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 # subsetTo <- function(pSet, cells=NULL, drugs=NULL, exps=NULL, molecular.data.cells=NULL, keep.controls=TRUE) {
 subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...) {
   drop=FALSE
-  if (!is.null(exps)) {
+  
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
     exps <- adArgs[["exps"]]
