@@ -289,6 +289,7 @@ setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
 #' @param object The \code{PharmacoSet} to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data 
 #' @param value a \code{data.frame} with the new experiment annotations
+#' @return The updated \code{PharmacoSet}
 setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
 #' @describeIn PharmacoSet Update the the given type of molecular data experiment info in the PharmacoSet 
 #' @export

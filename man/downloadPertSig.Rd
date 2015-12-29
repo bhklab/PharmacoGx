@@ -21,6 +21,9 @@ create directory if it does not exist.}
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
 }
+\value{
+An array type object contaning the signatures
+}
 \description{
 This function allows you to download an array of drug perturbation
 signatures, as would be computed by the \code{drugPerturbationSig} function,

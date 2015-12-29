@@ -15,6 +15,7 @@
 #' @param myfn \code{character} string, the file name to save the dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
+#' @return An array type object contaning the signatures
 #' @export
 #' @import downloader
 

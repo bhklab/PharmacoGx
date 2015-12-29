@@ -23,6 +23,9 @@ range of (0,100)}
 
 \item{verbose}{[boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.}
 }
+\value{
+Numeric AUC value
+}
 \description{
 Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking 
 its concentration and viability as input.

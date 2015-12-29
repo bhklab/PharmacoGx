@@ -10,6 +10,7 @@
 #' range of (0,100)
 #' @param area.type Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")
 #' @param verbose [boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.
+#' @return Numeric AUC value
 #' @export
 #' @import caTools
 

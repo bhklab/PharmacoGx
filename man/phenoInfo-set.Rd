@@ -13,6 +13,9 @@ phenoInfo(object, mDataType) <- value
 
 \item{value}{a \code{data.frame} with the new experiment annotations}
 }
+\value{
+The updated \code{PharmacoSet}
+}
 \description{
 Generic for phenoInfo replace method
 }
