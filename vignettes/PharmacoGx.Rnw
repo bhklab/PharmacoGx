@@ -262,7 +262,7 @@ Once again, we load the dataset, downloading it if needed using \textit{download
   
   rownames(res) <- c("Connectivity", "P Value")
   res <- t(res)
-  res <- res[order(res[,1], decreasing=T),]
+  res <- res[order(res[,1], decreasing=TRUE),]
   xtable(res, 
     caption='Connectivity Score results for HDAC inhibitor gene signature.')
 @
