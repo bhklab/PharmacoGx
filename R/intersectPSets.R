@@ -87,15 +87,33 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     }
     common.molecular.cells <- list()
     for (molecular.type in molecular.types) {
-      common.molecular.cells[[molecular.type]] <- intersectList(lapply(pSets, 
-        function (pSet) { return(unionList(sapply(pSet@molecularProfiles, 
+      if(strictIntersect){
+        common.molecular.cells[[molecular.type]] <- intersectList(lapply(pSets, 
+          function (pSet) { 
+            eSets <- names(unlist(sapply(pSet@molecularProfiles, function(eSet){grep(molecular.type, Biobase::annotation(eSet))})))
+            if(length(eSets) > 0){
+              return(intersectList(sapply(eSets, 
+              function(eSet) {
+                if (length(grep(molecular.type, Biobase::annotation(pSet@molecularProfiles[[eSet]]))) > 0) {
+                  intersect(Biobase::pData(pSet@molecularProfiles[[eSet]])$cellid, common.cells)
+                }
+              })))
+            }
+        }))
+      }else{
+        common.molecular.cells[[molecular.type]] <- intersectList(lapply(pSets, 
+        function (pSet) { 
+          eSets <- names(unlist(sapply(pSet@molecularProfiles, function(eSet){grep(molecular.type, Biobase::annotation(eSet))})))
+          return(unionList(sapply(eSets, 
           function(eSet) {
-            if (length(grep(molecular.type, Biobase::annotation(eSet))) > 0) {
-              intersect(Biobase::pData(eSet)$cellid, common.cells)
-          }
-        })))
-      }))
+            if (length(grep(molecular.type, Biobase::annotation(pSet@molecularProfiles[[eSet]]))) > 0) {
+              intersect(Biobase::pData(pSet@molecularProfiles[[eSet]])$cellid, common.cells)
+            }
+          })))
+        }))
+      }
     }
+    
     
     for(i in 1:length(pSets)){
       if(strictIntersect){
