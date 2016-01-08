@@ -157,7 +157,7 @@ We want to investigate the consistency of the data between the two datasets. The
                            featureNames(CCLEsmall,"rna"))
   common <- intersectPSet(list('CCLE'=CCLEsmall,
                                'GDSC'=GDSCsmall),
-                          intersectOn=c("cell.lines", "drugs"))
+                          intersectOn=c("cell.lines", "drugs"), strictIntersect=TRUE)
 
   
   GDSC.auc <- summarizeSensitivityProfiles(
