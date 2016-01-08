@@ -22,7 +22,10 @@ intersectList <-
 function(...) {
    args <- list(...)
    nargs <- length(args)
-   if (nargs <= 1) {
+   if(nargs == 0) {
+     return(args)
+   }
+   if (nargs == 1) {
      if (nargs == 1 && is.list(args[[1]])) {
        do.call("intersectList", args[[1]])
      } else {
