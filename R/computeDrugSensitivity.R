@@ -205,4 +205,11 @@ trunc = FALSE) {
   x <- .GetSupportVec(log_conc)
   return(1 - trapz(x, .Hill(x, pars)) / (log_conc[length(log_conc)] - log_conc[1]))
 }
+#This function is being used in computeSlope 
+.optimizeRegression <- function(x, y, x0 = -3, y0 = 100)
+{
+    beta1 = (sum(x * y) - y0 * sum(x)) / (sum(x * x) - x0 * sum(x))
+    return(beta1)
+}
+
 
