@@ -1,14 +1,14 @@
-#'  Fits dose-response curves to data given by the user
-#'  and returns the log10(IC50x) of the fitted curve.
-#'  
-#'  @param conc [vector] is a vector of drug concentrations.
-#'  
-#'  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
-#'  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-#'  of viability in the absence of any drug.
-#'  
-#'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-#'  curve-fitting is performed.
+#'Fits dose-response curves to data given by the user
+#'and returns the log10(IC50x) of the fitted curve.
+#'
+#'@param conc [vector] is a vector of drug concentrations.
+#'
+#'@param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#'drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
+#'of viability in the absence of any drug.
+#'
+#'@param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#'curve-fitting is performed.
 
 logIC50x <- function(conc, viability, trunc = TRUE) {
   
@@ -56,7 +56,7 @@ logIC50x <- function(conc, viability, trunc = TRUE) {
   }
   
   #FIT CURVE AND CALCULATE IC50
-  pars <- as.numeric(LogLogisticRegression(log_conc,
+  pars <- as.numeric(logLogisticRegression(log_conc,
                                        viability,
                                        conc_as_log = TRUE,
                                        viability_as_pct = FALSE,

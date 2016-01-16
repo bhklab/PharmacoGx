@@ -5,23 +5,23 @@
 ## Function to calculate area between dose-response curves over their common concentration range
 ########################
 
-#'  Fits dose-response curves to data given by the user
-#'  and returns the ABC of the fitted curves.
+#'Fits dose-response curves to data given by the user
+#'and returns the ABC of the fitted curves.
+#'
+#'@param conc1 [vector] is a vector of drug concentrations.
+#'
+#'@param conc2 [vector] is a vector of drug concentrations.
+#'
+#'@param viability1 [vector] is a vector whose entries are the viability values observed in the presence of the
+#'drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
+#'of viability in the absence of any drug.
+#'
+#'@param viability2 [vector] is a vector whose entries are the viability values observed in the presence of the
+#'drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
+#'of viability in the absence of any drug.
 #'  
-#'  @param conc1 [vector] is a vector of drug concentrations.
-#'  
-#'  @param conc2 [vector] is a vector of drug concentrations.
-#'  
-#'  @param viability1 [vector] is a vector whose entries are the viability values observed in the presence of the
-#'  drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
-#'  of viability in the absence of any drug.
-#'  
-#'  @param viability2 [vector] is a vector whose entries are the viability values observed in the presence of the
-#'  drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
-#'  of viability in the absence of any drug.
-#'  
-#'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-#'  curve-fitting is performed.
+#'@param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#'curve-fitting is performed.
 
 computeABC <- function(conc1, conc2, viability1, viability2, trunc = TRUE) {
   
