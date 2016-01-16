@@ -15,17 +15,17 @@
 #'names(x_p) <- names(x)
 #'names(y_p) <- names(y)
 #'gwc(x,x_p,y,y_p, nperm=100)
-#'
-#'@param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
-#'@param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
-#'@param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
-#'@param p2 \code{numeric} vector of p-values for each corresponding effect size for the second experiment
-#'@param nperm \code{numeric} how many permutations should be done to determine
-#'@param method.cor \code{character} string identifying if a \code{pearson} or 
-#'\code{spearman} correlation should be used
-#'@param ... Other passed down to internal functions
+#'  @param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
+#'  @param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
+#'  @param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
+#'  @param p2 \code{numeric} vector of p-values for each corresponding effect size for the second experiment
+#'  @param method.cor \code{character} string identifying if a \code{pearson} or
+#'    \code{spearman} correlation should be used
+#'  @param nperm \code{numeric} how many permutations should be done to determine
+#'  @param truncate.p \code{numeric} Truncation value for extremely low p-values
+#'  @param ... Other passed down to internal functions
 #'  
-#'@return \code{numeric} a vector of two values, the correlation and associated p-value.
+#'  @return \code{numeric} a vector of two values, the correlation and associated p-value.
 #'@export
 ##            -
 ##
@@ -35,7 +35,7 @@
 #################################################
 
 gwc <-
-function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, ...) {
+function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, truncate.p=1e-16, ...) {
     
     method.cor <- match.arg(method.cor)
     ## intersection between x and y
@@ -47,6 +47,9 @@ function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, ...) {
     p1 <- p1[ii]
     x2 <- x2[ii]
     p2 <- p2[ii]
+    ## truncate extremely low p-values
+    p1[!is.na(p1) & p1 < truncate.p] <- truncate.p
+    p2[!is.na(p2) & p2 < truncate.p] <- truncate.p
     ## scaled weights
     p1 <- -log10(p1)
     p1 <- p1 / sum(p1, na.rm=TRUE)

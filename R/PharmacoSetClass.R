@@ -1079,8 +1079,13 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   celln <- rownames(pSet@cell)
   
   sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), dimnames=list(celln, drugn))
-    
-  tt <- table(pSet@sensitivity$info[ , "cellid"], pSet@sensitivity$info[ , "drugid"])
+  drugids <- pSet@sensitivity$info[ , "drugid"]
+  cellids <- pSet@sensitivity$info[ , "cellid"]
+  cellids <- cellids[grep("///", drugids, invert=TRUE)]
+  drugids <- drugids[grep("///", drugids, invert=TRUE)]
+  
+  
+  tt <- table(cellids, drugids)
   sensitivity.info[rownames(tt), colnames(tt)] <- tt
   
     return(sensitivity.info)
@@ -1177,10 +1182,62 @@ checkPSetStructure <-
       }
     }
     if("tissueid" %in% colnames(pSet@cell)) {
-      message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))
+      if("unique.tissueid" %in% colnames(pSet@curation$tissue))
+      {
+        if(length(intersect(rownames(pSet@curation$tissue), rownames(pSet@cell))) != nrow(pSet@cell)) {
+          message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
+        } else{
+          if(lenght(intersect(pSet@cell$tissueid, pSet@curation$tissue$unique.tissueid)) != length(table(pSet@cell$tissueid))){
+            message("tissueid should be the same as unique tissue id from tissue curation slot")
+          }
+          message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))
+        }
+      } else {
+        message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
+      }
     } else {
       warning("tissueid does not exist in cell slot")
     }
+    
+    if("unique.cellid" %in% colnames(pSet@curation$cell)) {
+      if(length(intersect(pSet@curation$cell$unique.cellid, rownames(pSet@cell))) != nrow(pSet@cell)) {
+        print("rownames of cell slot should be curated cell ids")
+      }
+    } else {
+      print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
+    }
+#     if("cellid" %in% colnames(pSet@cell)) {
+#       if(length(intersect(pSet@curation$cell$cellid, rownames(pSet@cell))) != nrow(pSet@cell)) {
+#         print("values of cellid column should be curated cell line ids")
+#       }
+#     } else {
+#       print("cellid which is curated cell id across data set should be a column of cell slot")
+#     }
+    
+    if(length(intersect(rownames(pSet@curation$cell), rownames(pSet@cell))) != nrow(pSet@cell)) {
+      print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
+    }
+    
+    if("unique.drugid" %in% colnames(pSet@curation$drug)) {
+      if(length(intersect(pSet@curation$drug$unique.drugid, rownames(pSet@drug))) != nrow(pSet@drug)) {
+        print("rownames of drug slot should be curated drug ids")
+      }
+    } else {
+      print("unique.drugid which is curated drug id across data set should be a column of drug curation slot")
+    }
+    
+#     if("drugid" %in% colnames(pSet@drug)) {
+#       if(length(intersect(pSet@curation$drug$drugid, rownames(pSet@drug))) != nrow(pSet@drug)) {
+#         print("values of drugid column should be curated drug ids")
+#       }
+#     } else {
+#       print("drugid which is curated drug id across data set should be a column of drug slot")
+#     }
+    
+    if(length(intersect(rownames(pSet@curation$cell), rownames(pSet@cell))) != nrow(pSet@cell)) {
+      print("rownames of curation drug slot should be the same as drug slot (curated drug ids)")
+    }
+    
     if(class(pSet@cell) != "data.frame") {
       warning("cell slot class type should be dataframe")
     }
@@ -1200,8 +1257,10 @@ checkPSetStructure <-
         warning("cellid does not exist in sensitivity info")
       }
       if("drugid" %in% colnames(pSet@sensitivity$info)) {
-        if(!all(pSet@sensitivity$info[,"drugid"] %in% rownames(pSet@drug))) {
-          warning("not all the drugs in sensitivity data are in drug slot")
+        drug.ids <- unique(pSet@sensitivity$info[,"drugid"])
+        drug.ids <- drug.ids[grep("///",drug.ids, invert=T)]
+        if(!all(drug.ids %in% rownames(pSet@drug))) {
+          print("not all the drugs in sensitivity data are in drug slot")
         }
       }else {
         warning("drugid does not exist in sensitivity info")

@@ -30,7 +30,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 #  rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "type.fstat"=NA, "type.pvalue"=NA)
   rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
   
-  if(nn < 3 || var(x, na.rm=TRUE) == 0) {
+  if(nn < 3 || var(x[ccix], na.rm=TRUE) == 0) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
