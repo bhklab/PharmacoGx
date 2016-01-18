@@ -760,7 +760,7 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 #'@param drop A boolean flag of whether to drop single dimensions or not
 #'@export
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
-    stop("Please use the subsetTo function and the getter functions to access the object data. Other methods of accessing the object slots are discouraged and may lead to unexpected behaviour.")
+	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
 })
 
 ## FIXED? TODO:: Subset function breaks if it doesnt find cell line in sensitivity info
