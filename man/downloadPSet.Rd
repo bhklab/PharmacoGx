@@ -8,8 +8,7 @@ downloadPSet(name, saveDir = file.path(".", "PSets"), myfn = NULL,
   verbose = TRUE)
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PhamracoSet to download.
-The available options are CGP, CCLE, and CMAP}
+\item{name}{\code{Character} string, the name of the PhamracoSet to download.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create

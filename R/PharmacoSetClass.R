@@ -1187,7 +1187,7 @@ checkPSetStructure <-
         if(length(intersect(rownames(pSet@curation$tissue), rownames(pSet@cell))) != nrow(pSet@cell)) {
           message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
         } else{
-          if(lenght(intersect(pSet@cell$tissueid, pSet@curation$tissue$unique.tissueid)) != length(table(pSet@cell$tissueid))){
+          if(length(intersect(pSet@cell$tissueid, pSet@curation$tissue$unique.tissueid)) != length(table(pSet@cell$tissueid))){
             message("tissueid should be the same as unique tissue id from tissue curation slot")
           }
           message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))

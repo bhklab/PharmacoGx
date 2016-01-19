@@ -15,17 +15,18 @@
 #'names(x_p) <- names(x)
 #'names(y_p) <- names(y)
 #'gwc(x,x_p,y,y_p, nperm=100)
-#'  @param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
-#'  @param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
-#'  @param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
-#'  @param p2 \code{numeric} vector of p-values for each corresponding effect size for the second experiment
-#'  @param method.cor \code{character} string identifying if a \code{pearson} or
-#'    \code{spearman} correlation should be used
-#'  @param nperm \code{numeric} how many permutations should be done to determine
-#'  @param truncate.p \code{numeric} Truncation value for extremely low p-values
-#'  @param ... Other passed down to internal functions
-#'  
-#'  @return \code{numeric} a vector of two values, the correlation and associated p-value.
+#'
+#'@param x1 \code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment
+#'@param p1 \code{numeric} vector of p-values for each corresponding effect size for the first experiment
+#'@param x2 \code{numeric} effect size (e.g., fold change or t statitsics) for the second experiment
+#'@param p2 \code{numeric} vector of p-values for each corresponding effect size for the second experiment
+#'@param method.cor \code{character} string identifying if a \code{pearson} or
+#'\code{spearman} correlation should be used
+#'@param nperm \code{numeric} how many permutations should be done to determine
+#'@param truncate.p \code{numeric} Truncation value for extremely low p-values
+#'@param ... Other passed down to internal functions
+#'
+#'@return \code{numeric} a vector of two values, the correlation and associated p-value.
 #'@export
 ##            -
 ##

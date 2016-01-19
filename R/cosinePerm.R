@@ -1,21 +1,21 @@
-#'  Computes the cosine similarity and significance using permutation test
-#'  
-#'  @param x [factor] is the factors for the first variable
-#'  @param y [factor] is the factors for the second variable
-#'  @param nperm [integer] is the number of permutations to comput ethe null distribution of MCC estimates
-#'  @param alternative [string] indicates the alternative hypothesis and must be one of
-#'    ‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
-#'    the initial letter.  ‘"greater"’ corresponds to positive
-#'    association, ‘"less"’ to negative association.
-#'    Options are "two.sided", "less", or "greater"
-#'  @param include.perm [boolean] indicates whetehr the estimates for the null distribution should be returned.
-#'  Default set to 'FALSE'
-#'  @param setseed [integer] is the seed specified by the user. Defaults is '12345'
-#'  @param nthread [integer] is the number of threads to be used to perform the permutations in parallel
-#'  @return [list] estimate of the cosine similarity, p-value and estimates after random permutations (null distribution) in include.perm is set to 'TRUE'
-#'  @import lsa
-#'  @import parallel 
-#'  @export
+#'Computes the cosine similarity and significance using permutation test
+#'
+#'@param x [factor] is the factors for the first variable
+#'@param y [factor] is the factors for the second variable
+#'@param nperm [integer] is the number of permutations to comput ethe null distribution of MCC estimates
+#'@param alternative [string] indicates the alternative hypothesis and must be one of
+#'‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
+#'the initial letter.  ‘"greater"’ corresponds to positive
+#'association, ‘"less"’ to negative association.
+#'Options are "two.sided", "less", or "greater"
+#'@param include.perm [boolean] indicates whetehr the estimates for the null distribution should be returned.
+#'Default set to 'FALSE'
+#'@param setseed [integer] is the seed specified by the user. Defaults is '12345'
+#'@param nthread [integer] is the number of threads to be used to perform the permutations in parallel
+#'@return [list] estimate of the cosine similarity, p-value and estimates after random permutations (null distribution) in include.perm is set to 'TRUE'
+#'@importFrom lsa cosine
+#'@import parallel 
+#'@export
 
 cosinePerm <- function(x, y, nperm=1000, alternative=c("two.sided", "less", "greater"), include.perm=FALSE, setseed=12345, nthread=1) {
   set.seed(setseed)

@@ -35,9 +35,8 @@ and cell lines that have been tested on together?}
 Given a list of PharmacoSets, the function will find the common drugs,
 and/or cell lines, and return PharmacoSets that contain data only pertaining 
 to the common drugs, and/or cell lines. The mapping between dataset 
-drug and cell names is done either using annotations found in the 
-PharmacoSet object's internal curation slot, or according to matching tables 
-provided by the user
+drug and cell names is done using annotations found in the 
+PharmacoSet object's internal curation slot
 }
 \examples{
 data(GDSCsmall)

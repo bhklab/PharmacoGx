@@ -5,7 +5,7 @@
 \title{Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation}
 \usage{
 gwc(x1, p1, x2, p2, method.cor = c("pearson", "spearman"), nperm = 10000,
-  ...)
+  truncate.p = 1e-16, ...)
 }
 \arguments{
 \item{x1}{\code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment}
@@ -16,10 +16,12 @@ gwc(x1, p1, x2, p2, method.cor = c("pearson", "spearman"), nperm = 10000,
 
 \item{p2}{\code{numeric} vector of p-values for each corresponding effect size for the second experiment}
 
-\item{method.cor}{\code{character} string identifying if a \code{pearson} or 
+\item{method.cor}{\code{character} string identifying if a \code{pearson} or
 \code{spearman} correlation should be used}
 
 \item{nperm}{\code{numeric} how many permutations should be done to determine}
+
+\item{truncate.p}{\code{numeric} Truncation value for extremely low p-values}
 
 \item{...}{Other passed down to internal functions}
 }
