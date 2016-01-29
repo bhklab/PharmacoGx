@@ -20,14 +20,14 @@ computeSlope <- function(concentration, viability, trunc=TRUE, verbose=TRUE) {
     viability <- viability[-ii]
   }
   ##convert to nanomolar with the assumption that always concentrations are in micro molar
-  concentration <- concentration * 10 ^ 3
-  concentration <- log10(concentration)
-  if(trunc) {viability = pmin(viability, 100)}
+  concentration <- concentration 
+  concentration <- log10(concentration) + 6
+  if(trunc) {viability = pmin(viability, 100); viability = pmax(viability, 0)}
   
   most.sensitive = NULL
   for(dose in concentration)
   {
-    most.sensitive = rbind(most.sensitive, cbind(dose, 0))
+    most.sensitive = rbind(most.sensitive, cbind(dose,0))
   }
   
   slope.prime = .optimizeRegression(x = most.sensitive[,1], y = most.sensitive[,2])
