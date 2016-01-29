@@ -33,7 +33,7 @@
 #' @export
 
 
-    
+
 summarizeSensitivityProfiles <- function(pSet, sensitivity.measure=c("gi50_published", "ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star", "Synergy_score", "amax_published", "amax_recomputed", "slope_recomputed"), cell.lines, drugs, summary.stat=c("mean", "median", "first", "last"), fill.missing=TRUE, verbose=TRUE){
 	
 	summary.stat <- match.arg(summary.stat)
@@ -53,19 +53,19 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure=c("gi50_publi
     }
   }
   
-    pp <- sensitivityInfo(pSet)
+	pp <- sensitivityInfo(pSet)
   pp <- pp[which(pp$cellid %in% cell.lines & pp$drugid %in% drugs),]
-    dd <- sensitivityProfiles(pSet)[rownames(pp),]
-    
-    if (!fill.missing) {
-      cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "cellid"]), "cellid"]))
-    }
-    if (!fill.missing) {
-      drugs <- intersect(drugs, unique(pp[!is.na(pp[ , "drugid"]), "drugid"]))
-    }
-    
-    
-    ## select profiles with no replicates
+	dd <- sensitivityProfiles(pSet)[rownames(pp),]
+	
+	if (!fill.missing) {
+	  cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "cellid"]), "cellid"]))
+	}
+	if (!fill.missing) {
+	  drugs <- intersect(drugs, unique(pp[!is.na(pp[ , "drugid"]), "drugid"]))
+	}
+	
+	
+	## select profiles with no replicates
   # xps <- apply(pp[ , c("drugid", "cellid")], 1, function (x) {
   #   if(any(is.na(x))) {
   #     x <- NA
@@ -102,20 +102,20 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure=c("gi50_publi
     ## there are some replicates to collapse
     for (x in duplix) {
       myx <- which(!is.na(xps) & xps == x)
-      iix <- unlist(strsplit(duplix, "////"))
-            switch(summary.stat, 
+      iix <- unlist(strsplit(x, "////"))
+			switch(summary.stat, 
         "mean" = {
-                  dd2[iix[1], iix[2]] <- mean(dd[myx, sensitivity.measure])
-              },
-              "median" = {
-                  dd2[iix[1], iix[2]] <- median(dd[myx, sensitivity.measure])
-              }, 
-              "first" = {
-                  dd2[iix[1], iix[2]] <- dd[myx[1], sensitivity.measure]
-              },
-              "last" = {
-                  dd2[iix[1], iix[2]] <- dd[myx[length(myx)], sensitivity.measure]
-              }
+  				dd2[iix[1], iix[2]] <- mean(dd[myx, sensitivity.measure])
+  			},
+  			"median" = {
+  				dd2[iix[1], iix[2]] <- median(dd[myx, sensitivity.measure])
+  			}, 
+  			"first" = {
+  				dd2[iix[1], iix[2]] <- sensData[myx[1], sensitivity.measure]
+  			},
+  			"last" = {
+  				dd2[iix[1], iix[2]] <- sensData[myx[length(myx)], sensitivity.measure]
+  			}
       )
       # ppt <- apply(pp[myx, , drop=FALSE], 2, function (x) {
       #   x <- paste(unique(x), collapse="////")
