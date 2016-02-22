@@ -5,18 +5,20 @@
 \title{Takes the sensitivity data from a PharmacoSet, and summarises them into a
 drug vs cell line table}
 \usage{
-summarizeSensitivityProfiles(pSet, sensitivity.measure = c("ic50_published",
-  "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star",
-  "Synergy_score", "amax_published", "amax_recomputed"), cell.lines, drugs,
-  summary.stat = c("mean", "median", "first", "last"), fill.missing = TRUE,
-  verbose = TRUE)
+summarizeSensitivityProfiles(pSet, sensitivity.measure = c("gi50_published",
+  "ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed",
+  "auc_recomputed_star", "Synergy_score", "amax_published", "amax_recomputed",
+  "slope_recomputed"), cell.lines, drugs, summary.stat = c("mean", "median",
+  "first", "last"), fill.missing = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] The PharmacoSet from which to extract the data}
 
 \item{sensitivity.measure}{[character] which sensitivity sensitivity.measure to use? The current
-choices are 'ic50_published', 'auc_published', 'ic50_recomputed',
-'auc_recomputed', 'auc_recomputed_star'.}
+choices are 'gi50_published', 'ic50_published', 'ic50_recomputed',
+'auc_published', auc_recomputed', 'auc_recomputed_star',
+ 'amax_published', 'amax_recomputed',
+ 'Synergy_score' and 'slope_recomputed'.}
 
 \item{cell.lines}{\code{character} The cell lines to be summarized. 
  If any cell lines has no data, it will be filled with

@@ -733,22 +733,21 @@ setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value=
 #' @export
 setMethod("show", signature=signature(object="PharmacoSet"), 
     function(object) {
-        cat("Name: ", object@annotation$name, "\n")
-        cat("Date Created: ", object@annotation$dateCreated, "\n")
-    cat("Number of cell lines: ", nrow(object@cell), "\n")
-    cat("Number of drug compounds: ", nrow(object@drug), "\n")
-        if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(object@molecularProfiles$dna), "\n")}
-      if("rna" %in% names(object@molecularProfiles)){cat("RNA: \n");cat("\tDim: ", dim(object@molecularProfiles$rna), "\n")}
-      if("rnaseq" %in% names(object@molecularProfiles)){cat("RNASeq: \n");cat("\tDim: ", dim(object@molecularProfiles$rnaseq), "\n")}
-      if("snp" %in% names(object@molecularProfiles)){cat("SNP: \n");cat("\tDim: ", dim(object@molecularProfiles$snp), "\n")}
-      if("cnv" %in% names(object@molecularProfiles)){cat("CNV: \n");cat("\tDim: ", dim(object@molecularProfiles$cnv), "\n")}
+        cat("Name: ", pSetName(object), "\n")
+        cat("Date Created: ", dateCreated(object), "\n")
+    cat("Number of cell lines: ", nrow(cellInfo(object)), "\n")
+    cat("Number of drug compounds: ", nrow(drugInfo(object)), "\n")
+        if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")}
+      if("rna" %in% names(object@molecularProfiles)){cat("RNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rna")), "\n")}
+      if("rnaseq" %in% names(object@molecularProfiles)){cat("RNASeq: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rnaseq")), "\n")}
+      if("snp" %in% names(object@molecularProfiles)){cat("SNP: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="snp")), "\n")}
+      if("cnv" %in% names(object@molecularProfiles)){cat("CNV: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="cnv")), "\n")}
         cat("Drug pertubation: \n")
         cat("\tPlease look at pertNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
         cat("Drug sensitivity: \n")
-        cat("\tNumber of Experiments: ",nrow(object@sensitivity$raw),"\n")
+        cat("\tNumber of Experiments: ",nrow(sensitivityInfo(object)),"\n")
         cat("\tPlease look at sensNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
     })
-
 
 
 #'`[`
