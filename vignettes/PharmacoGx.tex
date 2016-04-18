@@ -13,9 +13,10 @@
 \title{PharmacoGx: an R package for analysis of large pharmacogenomic datasets}
 \author[1]{Petr Smirnov}
 \author[1,2]{Zhaleh Safikhani}
-\author[1,2]{Benjamin Haibe-Kains}
+\author[1,2,3]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
 
 
 
@@ -115,13 +116,12 @@ Load \textit{PharamacoGx} into your current workspace:
 \section{Downloading PharmacoSet objects}
 %------------------------------------------------------------
 
-We have made the PharmacoSet objects of the curated datasets available online at:\\ \textit{www.pmgenomics.ca/bhklab/software/pharmacogx/}\\
-
-However, to make the process of obtaining the data easier through the R shell, we have also written a function \textit{downloadPSet} which automates downloading the datasets into a directory of the users choice, and returns the data into the R session. 
+We have made the PharmacoSet objects of the curated datasets available for download using functions provided in the package. A table of available PharmacoSet objects can be obtained by using the \textit{availablePSets} function. Any of the PharmacoSets in the table can then be downloaded by calling \textit{downloadPSet}, which saves the datasets into a directory of the users choice, and returns the data into the R session. 
 
 \begin{Schunk}
 \begin{Sinput}
 > ## Example
+> availablePSets()
 > GDSC <- downloadPSet("GDSC") 
 \end{Sinput}
 \end{Schunk}
@@ -164,7 +164,7 @@ We want to investigate the consistency of the data between the two datasets. The
 +                            featureNames(CCLEsmall,"rna"))
 >   common <- intersectPSet(list('CCLE'=CCLEsmall,
 +                                'GDSC'=GDSCsmall),
-+                           intersectOn=c("cell.lines", "drugs"))
++                           intersectOn=c("cell.lines", "drugs"), strictIntersect=TRUE)
 >   GDSC.auc <- summarizeSensitivityProfiles(
 +                 common$GDSC,
 +                 sensitivity.measure='auc_published', 
@@ -258,12 +258,12 @@ Once again, we load the dataset, downloading it if needed using \textit{download
 + 	}, HDAC=HDAC_genes)
 >   rownames(res) <- c("Connectivity", "P Value")
 >   res <- t(res)
->   res <- res[order(res[,1], decreasing=T),]
+>   res <- res[order(res[,1], decreasing=TRUE),]
 >   xtable(res, 
 +     caption='Connectivity Score results for HDAC inhibitor gene signature.')
 \end{Sinput}
-% latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Fri Nov 13 01:35:55 2015
+% latex table generated in R 3.2.3 by xtable 1.8-0 package
+% Mon Apr 18 11:00:15 2016
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -273,8 +273,8 @@ Once again, we load the dataset, downloading it if needed using \textit{download
 vorinostat & 0.94 & 0.00 \\ 
   alvespimycin & 0.88 & 0.00 \\ 
   acetylsalicylic acid & 0.00 & 1.00 \\ 
-  rosiglitazone & -0.71 & 0.04 \\ 
-  pioglitazone & -0.73 & 0.05 \\ 
+  rosiglitazone & -0.71 & 0.00 \\ 
+  pioglitazone & -0.73 & 0.11 \\ 
    \hline
 \end{tabular}
 \caption{Connectivity Score results for HDAC inhibitor gene signature.} 
@@ -350,8 +350,8 @@ As an example of the efficacy of the modelling approach, we can model the signif
 >   colnames(sig) <- dimnames(sig.mut)[[3]]
 >   xtable(sig, caption='P Value of Gene-Drug Association')
 \end{Sinput}
-% latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Fri Nov 13 01:36:02 2015
+% latex table generated in R 3.2.3 by xtable 1.8-0 package
+% Mon Apr 18 11:00:22 2016
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
@@ -416,18 +416,19 @@ The authors of the package would like to thank the investigators of the Genomics
 This Vignette was generated with the following R version and packages loaded:
 
 \begin{itemize}\raggedright
-  \item R version 3.2.2 (2015-08-14), \verb|x86_64-apple-darwin13.4.0|
+  \item R version 3.2.3 (2015-12-10), \verb|x86_64-apple-darwin15.2.0|
   \item Locale: \verb|en_CA.UTF-8/en_CA.UTF-8/en_CA.UTF-8/C/en_CA.UTF-8/en_CA.UTF-8|
   \item Base packages: base, datasets, graphics, grDevices, methods,
     parallel, stats, utils
-  \item Other packages: Biobase~2.28.0, BiocGenerics~0.15.6,
-    PharmacoGx~1.1.0, xtable~1.7-4
+  \item Other packages: Biobase~2.30.0, BiocGenerics~0.16.1,
+    PharmacoGx~1.1.5, xtable~1.8-0
   \item Loaded via a namespace (and not attached): bitops~1.0-6,
     caTools~1.17.1, cluster~2.0.3, digest~0.6.8, downloader~0.4,
     gdata~2.17.0, gplots~2.17.0, gtools~3.5.0, igraph~1.0.1,
-    KernSmooth~2.23-15, limma~3.25.15, magrittr~1.5, marray~1.47.1,
-    piano~1.8.2, RColorBrewer~1.1-2, relations~0.6-5, sets~1.0-15,
-    slam~0.1-32, tools~3.2.2
+    KernSmooth~2.23-15, limma~3.26.3, lsa~0.73.1, magicaxis~1.9.4,
+    magrittr~1.5, marray~1.48.0, MASS~7.3-45, piano~1.10.2,
+    plotrix~3.6, RColorBrewer~1.1-2, relations~0.6-6, sets~1.0-16,
+    slam~0.1-32, sm~2.2-5.4, SnowballC~0.5.1, tools~3.2.3
 \end{itemize}
 \bibliographystyle{plain}
 \bibliography{pharmacogx}

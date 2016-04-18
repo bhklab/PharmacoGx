@@ -20,7 +20,7 @@
 
 \SweaveOpts{highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE}
 
-<<setup,echo=FALSE,results=hide,eval=False>>=
+<<setup,echo=FALSE,results=hide,eval=FALSE>>=
 options(keep.source=TRUE)
 @
 
@@ -100,7 +100,7 @@ biocLite('PharmacoGx')
 @
 
 Load \textit{PharamacoGx} into your current workspace:
-<<loadlib,results=hide,eval=False>>=
+<<loadlib,results=hide,eval=FALSE>>=
 library(PharmacoGx)
 @ 
 
@@ -116,7 +116,7 @@ library(PharmacoGx)
 
 We have made the PharmacoSet objects of the curated datasets available for download using functions provided in the package. A table of available PharmacoSet objects can be obtained by using the \textit{availablePSets} function. Any of the PharmacoSets in the table can then be downloaded by calling \textit{downloadPSet}, which saves the datasets into a directory of the users choice, and returns the data into the R session. 
 
-<<download-example, results=hide,eval=False>>=
+<<download-example, results=hide,eval=FALSE>>=
 ## Example
 availablePSets()
 GDSC <- downloadPSet("GDSC") 
@@ -127,7 +127,7 @@ GDSC <- downloadPSet("GDSC")
 
 The package also provides tools to compute drug perturbation and sensitivity signatures, as explained below. However, the computation of the perturbation signatures is very lengthy, so for users' convenience we have precomputed the signatures for our perturbation PharmacoSet objects and made them available for download using the function \textit{downloadPertSig}.
 
-<<download-sig, results=hide, eval=False>>=
+<<download-sig, results=hide, eval=FALSE>>=
 ## Example
 CMAP.sigs <- downloadPertSig("CMAP")
 @
@@ -148,7 +148,7 @@ To begin, you would load the datasets from disk or download them using the \text
 
 We want to investigate the consistency of the data between the two datasets. The common intersection between the datasets can then be found using \textit{intersectPSet}. We create a summary of the gene expression and drug sensitivity measures for both datasets, so we are left with one gene expression profile and one sensitivity profile per cell line within each dataset. We can then compare the gene expression and sensitivity measures between the datasets using a standard correlation coefficient. 
 
-<<inconsistencies,eval=False, include=False>>=
+<<inconsistencies,eval=FALSE, include=FALSE>>=
   library(Biobase)
   library(PharmacoGx)
   data("GDSCsmall")
@@ -226,7 +226,7 @@ We want to investigate the consistency of the data between the two datasets. The
 
 \begin{figure}[hbtp]
 \begin{center}
-<<fig2, fig=TRUE, eval=True, echo=False>>=
+<<fig2, fig=TRUE, eval=TRUE, echo=FALSE>>=
 
 <<inconsistencies>>
     
@@ -246,7 +246,7 @@ For this case study, we will recreate an analysis from the paper by Lamb et al.,
 
 Once again, we load the dataset, downloading it if needed using \textit{downloadPSet}. We then recreate drug signatures for each drug using the function \textit{drugPerturbationSig} to preform statistical modelling of the transcriptomic response to the application of each drug. We then compare the observed up-regulated and down-regulated genes to a the known HDAC signature, using the GSEA connectivity score to determine the correlation between the two signatures. 
 
-<<load-cmap,eval=True, results=tex>>=
+<<load-cmap,eval=TRUE, results=tex>>=
   library(PharmacoGx)
   require(xtable)
   data(CMAPsmall)
@@ -312,7 +312,7 @@ where $Y$ denotes the drug sensitivity variable, $G_i$, $T$ and $B$ denote the e
 
 As an example of the efficacy of the modelling approach, we can model the significance of the association between two drugs and their known biomarkers in CCLE. We examine the association between drug \textit{17-AAG} and gene \textit{NQO1}, as well as drug \textit{PD-0325901} and gene \textit{BRAF}:
 
-<<biomarkers,eval=True, results=tex>>=
+<<biomarkers,eval=TRUE, results=tex>>=
 
   data(CCLEsmall)
   features <- featureNames(CCLEsmall, "rna")[
@@ -388,7 +388,7 @@ The authors of the package would like to thank the investigators of the Genomics
 
 This Vignette was generated with the following R version and packages loaded:
 
-<<sessionInfo,echo=FALSE,results=tex,eval=True>>=
+<<sessionInfo,echo=FALSE,results=tex,eval=TRUE>>=
 toLatex(sessionInfo())
 @
 

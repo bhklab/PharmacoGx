@@ -35,6 +35,7 @@
 #'   should the computation be parallelized over?
 #' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
 #'   should the function return for each gene drug pair?
+#' @param verbose [bool] Should diagnostive messages be printed? (default false)
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export

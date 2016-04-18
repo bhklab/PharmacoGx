@@ -30,7 +30,7 @@
 
 \SweaveOpts{highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE}
 
-<<setup,echo=FALSE,results=hide,eval=False>>=
+<<setup,echo=FALSE,results=hide,eval=FALSE>>=
 options(keep.source=TRUE)
 @
 
