@@ -800,9 +800,15 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
-    exps <- adArgs[["exps"]]
-    exps <- exps[,pSetName(pSet)]
-  } else {
+  	exps <- adArgs[["exps"]]
+  	if(class(exps)=="data.frame"){
+  		exps2 <- exps[[pSetName(pSet)]]
+  		names(exps2) <- rownames(exps)
+  		exps <- exps2
+  	} else{
+  		exps <- exps[[pSetName(pSet)]]
+  	}
+  }else {
     exps <- NULL
   }
   if(!missing(cells)){
