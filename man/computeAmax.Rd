@@ -17,6 +17,8 @@ of viability in the absence of any drug.}
 
 \item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
+
+\item{verbose}{[logical] should warnings be printed}
 }
 \description{
 Fits dose-response curves to data given by the user

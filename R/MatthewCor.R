@@ -1,4 +1,14 @@
 ## Matthews correlatipon coefficient
+#' Compute a Mathews Correlation Coefficient 
+#' 
+#' The funciton computes a Mathews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
+#' and the enteries are paired in order of the vectors.
+#' 
+#' @param x,y factor of the same length with the same number of levels
+#' @param nperm number of permutations for significance estimation. If 0, no permutation testing is done
+#' @param setseed seed for permutation testing
+#' @param nthread can parallelize permutation texting using parallel's mclapply 
+#' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
 mcc <- 
   function(x, y, nperm=1000, setseed=12345, nthread=1) {

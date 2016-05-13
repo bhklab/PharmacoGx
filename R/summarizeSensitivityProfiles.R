@@ -111,10 +111,10 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure=c("gi50_publi
   				dd2[iix[1], iix[2]] <- median(dd[myx, sensitivity.measure])
   			}, 
   			"first" = {
-  				dd2[iix[1], iix[2]] <- sensData[myx[1], sensitivity.measure]
+  				dd2[iix[1], iix[2]] <- dd[myx[1], sensitivity.measure]
   			},
   			"last" = {
-  				dd2[iix[1], iix[2]] <- sensData[myx[length(myx)], sensitivity.measure]
+  				dd2[iix[1], iix[2]] <- dd[myx[length(myx)], sensitivity.measure]
   			}
       )
       # ppt <- apply(pp[myx, , drop=FALSE], 2, function (x) {

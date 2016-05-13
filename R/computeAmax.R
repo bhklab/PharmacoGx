@@ -10,6 +10,7 @@
 #'
 #'@param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'curve-fitting is performed.
+#' @param verbose [logical] should warnings be printed
 
 
 computeAmax <- function(conc, viability, trunc = TRUE, verbose=FALSE) {

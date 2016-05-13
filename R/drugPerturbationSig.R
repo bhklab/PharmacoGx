@@ -87,7 +87,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, ret
     res <- NULL
     i = x 
     ## using a linear model (x ~ concentration + cell + batch + duration)
-    res <- PharmacoGx:::rankGeneDrugPerturbation(data=exprs, drug=i, drug.id=as.character(sampleinfo[ , "drugid"]), drug.concentration=as.numeric(sampleinfo[ , "concentration"]), type=as.character(sampleinfo[ , "cellid"]), xp=as.character(sampleinfo[ , "xptype"]), batch=as.character(sampleinfo[ , "batchid"]), duration=as.character(sampleinfo[ , "duration"]) ,single.type=FALSE, nthread=nthread, verbose=FALSE)$all[ , returnValues, drop=FALSE]
+    res <- rankGeneDrugPerturbation(data=exprs, drug=i, drug.id=as.character(sampleinfo[ , "drugid"]), drug.concentration=as.numeric(sampleinfo[ , "concentration"]), type=as.character(sampleinfo[ , "cellid"]), xp=as.character(sampleinfo[ , "xptype"]), batch=as.character(sampleinfo[ , "batchid"]), duration=as.character(sampleinfo[ , "duration"]) ,single.type=FALSE, nthread=nthread, verbose=FALSE)$all[ , returnValues, drop=FALSE]
     res <- list(res)
     names(res) <- i
     return(res)
@@ -104,7 +104,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, ret
     drug.perturbation[rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), j] <- ttt
   }
   
-  drug.perturbation <- PharmacoGx:::PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call = as.character(match.call()), SigType='Perturbation')
+  drug.perturbation <- PharmacoSig(drug.perturbation, PSetName = pSetName(pSet), Call = as.character(match.call()), SigType='Perturbation')
   
   return(drug.perturbation)
 }

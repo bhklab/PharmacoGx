@@ -4,4 +4,4 @@ TODO
 REVISIONS
 .DS_Store
 .git/*
-
+.docker/*
