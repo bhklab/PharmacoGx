@@ -4,6 +4,11 @@
 #' The function computes a Matthews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
 #' and the enteries are paired in order of the vectors.
 #' 
+#' @examples
+#' x <- factor(c(1,2,1,2,3,1))
+#' y <- factor(c(2,1,1,1,2,2))
+#' mcc(x,y)
+#' 
 #' @param x,y factor of the same length with the same number of levels
 #' @param nperm number of permutations for significance estimation. If 0, no permutation testing is done
 #' @param setseed seed for permutation testing

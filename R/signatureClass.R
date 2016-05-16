@@ -18,8 +18,13 @@ return(.PharmacoSig(Data, PSetName=PSetName, DateCreated=DateCreated, SigType=Si
 
 #' Show PharmacoGx Signatures  
 #' 
-#' @param object \code{PharmacoSig}
+#' @examples
+#' data(GDSCsmall)
+#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+#'              nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+#' drug.sensitivity
 #' 
+#' @param object \code{PharmacoSig}
 #' @export
 setMethod("show", signature=signature(object='PharmacoSig'),
         function(object) {
@@ -32,9 +37,11 @@ setMethod("show", signature=signature(object='PharmacoSig'),
 
 #' Show the Annotations of a signature object
 #' 
+#' This funtion prints out the information about the call used to compute the drug signatures, and the session info 
+#' for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures. 
+#' 
 #' @param Sigs An object of the \code{PharmacoSig} Class, as
 #' returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}
-#'
 #' @export
 showSigAnnot <- function(Sigs){
 

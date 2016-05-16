@@ -44,7 +44,7 @@
 .PharmacoSet <- setClass("PharmacoSet", slots = list(
                                                      annotation = "list",
                                                      molecularProfiles = "list",
-                                                      cell="data.frame", 
+                                                     cell="data.frame", 
                                                      drug="data.frame", 
                                                      datasetType="character", 
                                                      sensitivity="list",
@@ -54,16 +54,11 @@
                                                      # table.summary="list",
                                                      # dateCreated="character",
                                                      ))
-#test <- new("PharmacoSet",cell=data.cmap$cell, drug=data.cmap$drug)
-#exprs(test)
-# setGeneric("PharmacoSet",
-#     function(annotation,
-#         molecularProfiles,
-#         cell=matrix(),
-#         drug=list(),
-#         sensitivity=list(),
-#         datasetType=c("sensitivity", "perturbation"),
-#         ... ) standardGeneric("PharmacoSet"), signature="ExpressionSet")
+
+
+# The default constructor above does a poor job of explaining the required structure of a PharmacoSet. 
+# The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
+# and hides the annotation slot which the user does not need to manually fill. 
 
 #' PharmacoSet constructor
 #' 
@@ -510,7 +505,7 @@ setMethod(drugNames, "PharmacoSet", function(pSet){
 #     pData(pSet)[["drugid"]]
 #   
 #  }
-  rownames(pSet@drug)
+  rownames(drugInfo(pSet))
 
 })
 
@@ -552,7 +547,7 @@ setGeneric("cellNames", function(pSet) standardGeneric("cellNames"))
 #' @export
 setMethod(cellNames, "PharmacoSet", function(pSet){
   
-  rownames(pSet@cell)
+  rownames(cellInfo(pSet))
   
 })
 
