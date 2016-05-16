@@ -1,7 +1,7 @@
 ## Matthews correlatipon coefficient
 #' Compute a Mathews Correlation Coefficient 
 #' 
-#' The funciton computes a Mathews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
+#' The function computes a Matthews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
 #' and the enteries are paired in order of the vectors.
 #' 
 #' @param x,y factor of the same length with the same number of levels
@@ -14,6 +14,13 @@ mcc <-
   function(x, y, nperm=1000, setseed=12345, nthread=1) {
     set.seed(setseed)
     if ((length(x) != length(y)) || (!is.factor(x) || length(levels(x)) < 2) || (!is.factor(y) || length(levels(y)) < 2)) { stop("x and y must be factors of the same length with at least two levels") }
+    if(length(levels(x))!= length(levels(y))){
+
+      warning("The number of levels x and y was different. Taking the union of all class labels.")
+      levels(x) <- union(levels(x), levels(y))
+      levels(y) <- union(levels(x), levels(y))
+
+    }
     res <- list("estimate"=NA, "p.value"=NA)
     ## compute MCC
     res[["estimate"]] <- .mcc(ct=table(x, y))

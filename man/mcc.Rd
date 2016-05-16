@@ -19,7 +19,7 @@ mcc(x, y, nperm = 1000, setseed = 12345, nthread = 1)
 A list with the MCC as the $estimate, and p value as $p.value
 }
 \description{
-The funciton computes a Mathews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
+The function computes a Matthews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
 and the enteries are paired in order of the vectors.
 }
 

@@ -10,7 +10,7 @@ License: Artistic-2.0
 Suggests: xtable
 Encoding: UTF-8
 Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader, stats, utils, graphics, grDevices, lsa
-Depends: R (>= 3.3)
+Depends: R (>= 3.2)
 RoxygenNote: 5.0.1
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software
 BugReports: https://github.com/bhklab/PharmacoGx/issues
