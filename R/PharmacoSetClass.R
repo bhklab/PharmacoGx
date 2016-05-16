@@ -59,6 +59,7 @@
 # The default constructor above does a poor job of explaining the required structure of a PharmacoSet. 
 # The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
 # and hides the annotation slot which the user does not need to manually fill. 
+# This also follows the design of the Expression Set class.
 
 #' PharmacoSet constructor
 #' 
@@ -756,6 +757,17 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
 })
+
+#'Get the dimensions of a PharmacoSet
+#'
+#'@param x PharmacoSet
+#'@export
+setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
+
+  return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
+
+})
+
 
 ## FIXED? TODO:: Subset function breaks if it doesnt find cell line in sensitivity info
 #' A function to subset a PharmacoSet to data containing only specified drugs, cells and genes

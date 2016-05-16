@@ -61,4 +61,11 @@ It then uses the lattice point with minimal least-squares residual as an initial
 passes this guess to drm, and re-attempts the optimization. If this still fails, logLogisticRegression uses the
 PatternSearch algorithm to fit a log-logistic curve to the data.
 }
+\examples{
+dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+viability <- c("108.67","111","102.16","100.27","90","87","74","57")
+computeAUC(dose, viability)
+
+
+}
 

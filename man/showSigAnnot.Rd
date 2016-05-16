@@ -11,6 +11,7 @@ showSigAnnot(Sigs)
 returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}}
 }
 \description{
-Show the Annotations of a signature object
+This funtion prints out the information about the call used to compute the drug signatures, and the session info 
+for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures.
 }
 

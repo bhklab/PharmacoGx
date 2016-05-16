@@ -13,4 +13,11 @@
 \description{
 Show PharmacoGx Signatures
 }
+\examples{
+data(GDSCsmall)
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+drug.sensitivity
+
+}
 

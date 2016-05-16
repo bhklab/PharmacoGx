@@ -5,25 +5,27 @@
 ## Function to calculate area between dose-response curves over their common concentration range
 ########################
 
-#'Fits dose-response curves to data given by the user
-#'and returns the ABC of the fitted curves.
+#' Fits dose-response curves to data given by the user
+#' and returns the ABC of the fitted curves.
+#' @examples
+#' dose1 <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+#' viability1 <- c("108.67","111","102.16","100.27","90","87","74","57")
+#' dose2 <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+#' viability2 <- c("100.94","112.5","86","104.16","75","68","48","29")
+#' computeABC(dose1, dose2, viability1, viability2)
 #'
-#'@param conc1 [vector] is a vector of drug concentrations.
-#'
-#'@param conc2 [vector] is a vector of drug concentrations.
-#'
-#'@param viability1 [vector] is a vector whose entries are the viability values observed in the presence of the
-#'drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
-#'of viability in the absence of any drug.
-#'
-#'@param viability2 [vector] is a vector whose entries are the viability values observed in the presence of the
-#'drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
-#'of viability in the absence of any drug.
-#'  
-#'@param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-#'curve-fitting is performed.
-
-computeABC <- function(conc1, conc2, viability1, viability2, trunc = TRUE) {
+#' @param conc1 [vector] is a vector of drug concentrations.
+#' @param conc2 [vector] is a vector of drug concentrations.
+#' @param viability1 [vector] is a vector whose entries are the viability values observed in the presence of the
+#' drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
+#' of viability in the absence of any drug.
+#' @param viability2 [vector] is a vector whose entries are the viability values observed in the presence of the
+#' drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
+#' of viability in the absence of any drug.
+#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#' curve-fitting is performed.
+#' @export
+computeABC <- function(conc1, conc2, viability1, viability2, trunc=TRUE) {
   
   conc1 <- na.omit(as.numeric(conc1))
   conc2 <- na.omit(as.numeric(conc2))

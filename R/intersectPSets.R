@@ -103,7 +103,7 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
 
       if(strictIntersect){
         if(length(unique(sapply(expMatch, length)))>1){
-          error("Strict Intersecting works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required")
+          stop("Strict Intersecting works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required")
         }
         expMatch <- data.frame(expMatch,  stringsAsFactors=FALSE)
       # expMatch2 <- as.matrix(expMatch2)
@@ -118,7 +118,7 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     if (("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn) & ("concentrations" %in% intersectOn)) {
 
       if(length(unique(sapply(expMatch, length)))>1){
-        error("Intersecting on concentrations works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required")
+        stop("Intersecting on concentrations works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required")
       }
       
       expMatch <- data.frame(expMatch,  stringsAsFactors=FALSE)

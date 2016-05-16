@@ -12,8 +12,7 @@ amcc(x, y, step.prct = 0, min.cat = 3, nperm = 1000, setseed = 12345,
 
 \item{step.prct}{Instead of testing all possible splits of the data, it is possible to test steps of a percentage size of the total number of ranks in x/y. If this variable is 0, function defaults to testing all possible splits.}
 
-\item{min.cat}{The minimum number of complete cases between x and y for which the function will attempt to calculate an AMCC. If the number of complete cases is smaller, the function will return NA for the AMCC and NA for the mcc table. 
-Useful for cases when the number of complete cases cannot be determined beforehand, but a minimum threshold should be enforced.}
+\item{min.cat}{The minimum number of members per category. Classifications with less members fitting into both categories will not be considered.}
 
 \item{nperm}{The number of perumatation to use for estimating significance. If 0, then no p-value is calculated.}
 
@@ -29,5 +28,11 @@ This function calculates an Adaptive Matthews Correlation Coefficient (AMCC) for
 The Adaptive Matthews Correlation Coefficient for two vectors of values is defined as the Maximum Matthews Coefficient over all possible 
 binary splits of the ranks of the two vectors. In this way, it calculates the best possible agreement of a binary 
 classifier on the two vectors of data. #If the AMCC is low, then it is impossible to find any binary classification of the two vectors with a high degree of concordance.
+}
+\examples{
+x <- c(1,2,3,4,5,6,7)
+y <- c(1,3,5,4,2,7,6)
+amcc(x,y, min.cat=2)
+
 }
 

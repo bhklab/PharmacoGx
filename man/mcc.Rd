@@ -22,4 +22,10 @@ A list with the MCC as the $estimate, and p value as $p.value
 The function computes a Matthews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
 and the enteries are paired in order of the vectors.
 }
+\examples{
+x <- factor(c(1,2,1,2,3,1))
+y <- factor(c(2,1,1,1,2,2))
+mcc(x,y)
+
+}
 

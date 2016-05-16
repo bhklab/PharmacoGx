@@ -1,16 +1,22 @@
-#'Fits dose-response curves to data given by the user
-#'and returns the Amax of the fitted curve.
-#'Amax: 100 - viability at maximum concentarion (in fitted curve)
+#' Fits dose-response curves to data given by the user
+#' and returns the Amax of the fitted curve.
+#' Amax: 100 - viability at maximum concentarion (in fitted curve)
+#' 
+#' @examples
+#' dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+#' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
+#' computeAmax(dose, viability)
 #'
-#'@param conc [vector] is a vector of drug concentrations.
-#'
-#'@param viability [vector] is a vector whose entries are the viability values observed in the presence of the
-#'drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-#'of viability in the absence of any drug.
-#'
-#'@param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-#'curve-fitting is performed.
+#' @param conc [vector] is a vector of drug concentrations.
+#' 
+#' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#' drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
+#' of viability in the absence of any drug.
+#' 
+#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#' curve-fitting is performed.
 #' @param verbose [logical] should warnings be printed
+#' @export
 
 
 computeAmax <- function(conc, viability, trunc = TRUE, verbose=FALSE) {

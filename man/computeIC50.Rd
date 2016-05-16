@@ -26,4 +26,10 @@ An estimate of the IC50 for the concentrations and viabilities provided
 Fits dose-response curves to data given by the user
 and returns the IC50 of the fitted curve.
 }
+\examples{
+dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+viability <- c("108.67","111","102.16","100.27","90","87","74","57")
+computeIC50(dose, viability)
+
+}
 
