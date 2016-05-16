@@ -34,6 +34,7 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
     }
 }
 
+#' @importFrom utils combn
 .computeCumSumDelta <- function(xx, trunc = TRUE) {
     xx <- as.numeric(xx)
     if(trunc) {

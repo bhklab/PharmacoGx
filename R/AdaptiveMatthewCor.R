@@ -19,6 +19,7 @@
 #' @param nthread Number of threads to parallize over. Both the AMCC calculation and the permutation testing is done in parallel. 
 #' @return Returns a list with two elements. $amcc contains the highest "mcc" value over all the splits, the p value, as well as the rank at which the split was done. 
 #' @import parallel
+#' @importFrom stats quantile
 #' @export
 amcc <- 
   function(x, y, step.prct=0, min.cat=3, nperm=1000, setseed=12345, nthread=1) {
