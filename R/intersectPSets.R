@@ -115,21 +115,6 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
         expMatch <- lapply(expMatch, function(x){names(x) <- x; return(x)})
       }
     }
-
-      if(strictIntersect){
-        if(length(unique(sapply(expMatch, length)))>1){
-          error("Strict Intersecting works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required")
-        }
-        expMatch <- data.frame(expMatch,  stringsAsFactors=FALSE)
-      # expMatch2 <- as.matrix(expMatch2)
-        rownames(expMatch) <- common.exps
-        colnames(expMatch) <- names(pSets)
-
-      } else {
-        
-        expMatch <- lapply(expMatch, function(x){names(x) <- x; return(x)})
-      }
-    }
     if (("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn) & ("concentrations" %in% intersectOn)) {
 
       if(length(unique(sapply(expMatch, length)))>1){
@@ -189,4 +174,5 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     return(pSets)
   }
 }
+
 
