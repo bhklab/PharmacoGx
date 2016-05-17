@@ -42,7 +42,11 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     return(pSets) 
   }
   if (length(pSets) > 1) {
-    
+    if(is.null(names(pSets)) ){
+
+      names(pSets) <- sapply(pSets, pSetName)
+
+    }
     if ("drugs" %in% intersectOn){
       common.drugs <- intersectList(lapply(pSets, function(x){return(drugNames(x))}))
       if(!missing(drugs)) {
@@ -164,12 +168,22 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
     }
     
     
+    
     for(i in 1:length(pSets)){
-      if(strictIntersect){
+      if(("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn)){
+        if(strictIntersect){
           pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
-      } else {
+
+        } else {
           pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs, cells=common.cells, molecular.data.cells=common.molecular.cells)
-      }    
+        } 
+      } else if(("cell.lines" %in% intersectOn)) {
+        pSets[[i]] <- subsetTo(pSet=pSets[[i]], cells=common.cells, molecular.data.cells=common.molecular.cells)
+
+      } else if(("drugs" %in% intersectOn)) {
+        pSets[[i]] <- subsetTo(pSet=pSets[[i]], drugs=common.drugs)
+
+      }
     }
     return(pSets)
   }
