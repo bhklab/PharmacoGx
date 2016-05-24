@@ -33,11 +33,10 @@
 #' @export
 
 
-
-summarizeSensitivityProfiles <- function(pSet, sensitivity.measure=c("gi50_published", "ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star", "Synergy_score", "amax_published", "amax_recomputed", "slope_recomputed"), cell.lines, drugs, summary.stat=c("mean", "median", "first", "last"), fill.missing=TRUE, verbose=TRUE){
+summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomputed", cell.lines, drugs, summary.stat=c("mean", "median", "first", "last"), fill.missing=TRUE, verbose=TRUE){
 	
 	summary.stat <- match.arg(summary.stat)
-  sensitivity.measure <- match.arg(sensitivity.measure)
+  #sensitivity.measure <- match.arg(sensitivity.measure)
   if (!(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
   }

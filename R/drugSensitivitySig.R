@@ -62,16 +62,16 @@
 #' @export
 #' @import parallel
 
-drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure=c("ic50_published", "auc_published", "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"), molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
-    
-    ### This function needs to: Get a table of AUC values per cell line / drug
-    ### Be able to recompute those values on the fly from raw data if needed to change concentration
-    ### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
-    ### Be able to extract genomic data 
-    ### Run rankGeneDrugSens in parallel at the drug level
-    ### Return matrix as we had before
+drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure="auc_recomputed", molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
+	
+	### This function needs to: Get a table of AUC values per cell line / drug
+	### Be able to recompute those values on the fly from raw data if needed to change concentration
+	### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
+	### Be able to extract genomic data 
+	### Run rankGeneDrugSens in parallel at the drug level
+	### Return matrix as we had before
   
-  sensitivity.measure <- match.arg(sensitivity.measure)
+  #sensitivity.measure <- match.arg(sensitivity.measure)
   molecular.summary.stat <- match.arg(molecular.summary.stat)
   sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
   
@@ -104,6 +104,10 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
         stop ("Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'")
       }
     },
+    "rnaseq" = {
+      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+    }},
     stop (sprintf("No summary statistic for %s has been implemented yet", Biobase::annotation(pSet@molecularProfiles[[mDataType]])))
   )
   
