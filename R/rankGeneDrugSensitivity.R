@@ -27,16 +27,23 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       nthread <- availcore
     }
   }
+
+  if(is.null(dim(drugpheno))){
+
+    drugpheno <- data.frame(drugpheno)
+
+  }
+
   if (missing(type) || all(is.na(type))) {
     type <- array("other", dim=nrow(data), dimnames=list(rownames(data)))
   }
   if (missing(batch) || all(is.na(batch))) {
     batch <- array(1, dim=nrow(data), dimnames=list(rownames(data)))
   }
-    if (any(c(length(drugpheno), length(type), length(batch)) != nrow(data))) {
+  if (any(c(nrow(drugpheno), length(type), length(batch)) != nrow(data))) {
     stop("length of drugpheno, type, duration, and batch should be equal to the number of rows of data!")
   }
-    names(drugpheno) <- names(type) <- names(batch) <- rownames(data)
+  rownames(drugpheno) <- names(type) <- names(batch) <- rownames(data)
   
   res <- NULL
   utype <- sort(unique(as.character(type)))
@@ -49,9 +56,11 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
 #  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
   nc <- c("estimate", "se", "n", "pvalue", "fdr")
   
+
+  
   for (ll in 1:length(ltype)) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
-    ccix <- complete.cases(data[iix, , drop=FALSE], drugpheno[iix], type[iix], batch[iix])
+    ccix <- complete.cases(data[iix, , drop=FALSE], drugpheno[iix,,drop=FALSE], type[iix], batch[iix])
     if (sum(ccix) < 3) {
       ## not enough experiments
       rest <- list(matrix(NA, nrow=ncol(data), ncol=length(nc), dimnames=list(colnames(data), nc)))
@@ -62,15 +71,15 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno) {
         res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose))
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix])
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE])
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
-      rest <- rest[ , nc, drop=FALSE]
+      # rest <- rest[ , nc, drop=FALSE]
       res <- c(res, list(rest))
     }
   }
   names(res) <- names(ltype)
-    return(res)
+  return(res)
 }
 
 ## End

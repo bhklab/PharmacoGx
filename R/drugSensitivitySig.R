@@ -76,7 +76,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
   
   
-  if (!(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
+  if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
   }
   
@@ -138,8 +138,13 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
     features <- features[fix]
   }
   
-    drugpheno.all <- t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose))
-    dix <- is.element(drugn, colnames(drugpheno.all))
+	drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
+
+    return(t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose)))
+
+  })
+
+	dix <- is.element(drugn, do.call(colnames,drugpheno.all))
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
@@ -148,36 +153,44 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   }
   drugn <- drugn[dix]
   
-    pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
-    drugpheno.all <- drugpheno.all[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
-    
-    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
+	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
+
+
+	drugpheno.all <- lapply(drugpheno.all, function(x) {
+
+      x[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
+
+  })
+
+
+	type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
   batch <- phenoInfo(pSet, mDataType)[, "batchid"]
   batch[!is.na(batch) & batch == "NA"] <- NA
   batch <- as.factor(batch)
-    names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
-    batch <- batch[rownames(drugpheno.all)]
-    # duration <- sensitivityInfo(pSet)[,"duration_h"]
+	names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
+	batch <- batch[rownames(drugpheno.all[[1]])]
+	# duration <- sensitivityInfo(pSet)[,"duration_h"]
   ## compute drug sensitivity signatures
   if (verbose) {
     message("Computation of drug sensitivity signatures...")
   }
-  splitix <- parallel::splitIndices(nx=length(drugn), ncl=nthread)
+  splitix <- parallel::splitIndices(nx=length(drugn), ncl=1)
   splitix <- splitix[sapply(splitix, length) > 0]
-  mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch) {
+  mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, nthread) {
   res <- NULL
   for(i in drugn[x]) {
   ## using a linear model (x ~ concentration + cell + batch)
-      dd <- drugpheno[ , i]
+      dd <- lapply(drugpheno, function(x) x[,i])
+      dd <- do.call(cbind, dd)
       if(!is.na(sensitivity.cutoff)) {
             dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=1, verbose=verbose)
+      rr <- PharmacoGx:::rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=nthread, verbose=verbose)
       res <- c(res, list(rr$all))
     }
     names(res) <- drugn[x]
     return(res)
-  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch)
+  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread)
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
   drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))

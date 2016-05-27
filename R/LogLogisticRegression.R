@@ -55,6 +55,26 @@ logLogisticRegression <- function(conc,
                                   viability_as_pct = TRUE,
                                   trunc = TRUE,
                                   verbose = FALSE) {
+  guess <- .logLogisticRegressionRaw(conc, viability, density , step, precision, lower_bounds, upper_bounds, scale, Cauchy_flag, conc_as_log, viability_as_pct, trunc, verbose)
+  return(list("HS" = guess[1],
+              "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
+              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
+}
+
+.logLogisticRegressionRaw <- function(conc,
+                                  viability,
+                                  density = c(2, 10, 2),
+                                  step = .5 / density,
+                                  precision = 0.05,
+                                  lower_bounds = c(0, 0, -6),
+                                  upper_bounds = c(4, 1, 6),
+                                  scale = 0.07,
+                                  Cauchy_flag = FALSE,
+                                  conc_as_log = FALSE,
+                                  viability_as_pct = TRUE,
+                                  trunc = TRUE,
+                                  verbose = FALSE) {
+
   conc <- as.numeric(conc[!is.na(conc)])
   viability <- as.numeric(viability[!is.na(viability)])
   ii <- which(conc == 0)
@@ -62,9 +82,7 @@ logLogisticRegression <- function(conc,
     conc <- conc[-ii]
     viability <- viability[-ii]
   }
-  
-  
-  
+
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (prod(is.finite(conc)) != 1) {
     print(conc)
@@ -273,7 +291,7 @@ logLogisticRegression <- function(conc,
       }
     }
   }
-  return(list("HS" = guess[1],
-              "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
-              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
+
+return(guess)
+
 }

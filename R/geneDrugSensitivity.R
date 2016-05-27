@@ -27,72 +27,163 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
-#  rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "type.fstat"=NA, "type.pvalue"=NA)
-  rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
+
+  if(length(table(drugpheno)) > 2){
+     if(ncol(drugpheno)>1){
+      ##### FIX NAMES!!!
+      rest <- lapply(1:ncol(drugpheno), function(i){
+
+        est <- paste("estimate", i, sep=".")
+        se <-  paste("se", i, sep=".")
+        tstat <- paste("tstat", i, sep=".")
+
+        rest <- rep(NA, 3)
+        names(rest) <- c(est, se, tstat)
+        return(rest)
+
+      })
+      rest <- do.call(c, rest)
+      rest <- c(rest, n=nn, "fstat"=NA, "pvalue"=NA)
+    } else {
+      rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA)
+    }
+  } else {
+    rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
+  }  
   
   if(nn < 3 || var(x[ccix], na.rm=TRUE) == 0) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
-  ## standardized coefficient in linear model
+
+  ## standardized coefficient in linear model 
   if(length(table(drugpheno)) > 2) {
-    drugpheno <- drugpheno[ccix] / sd(drugpheno[ccix], na.rm=TRUE)
+    drugpheno <- apply(drugpheno, 2, function(x){
+      return(x[ccix]/sd(as.numeric(x[ccix])))
+    })
   }else{
-    drugpheno <- drugpheno[ccix]
+    drugpheno <- drugpheno[ccix,,drop=FALSE]
   }
   if(length(table(x)) > 2){
     xx <- x[ccix] / sd(x[ccix], na.rm=TRUE)
   }else{
     xx <- x[ccix]
   }
+  if(ncol(drugpheno)>1){
+    ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
+  } else {
+    ff0 <- sprintf("drugpheno")
+  }
+
+  # ff1 <- sprintf("%s + x", ff0)
+
+  dd <- data.frame("drugpheno"=drugpheno, "x"=xx)
+  # , "x"=xx, "type"=type[ccix], "batch"=batch[ccix])
   
-  dd <- data.frame("drugpheno"=drugpheno, "x"=xx, "type"=type[ccix], "batch"=batch[ccix])
-  ff0 <- sprintf("drugpheno ~ 1")
-  ff1 <- sprintf("%s + x", ff0)
   ## control for tissue type
   if(length(sort(unique(type))) > 1) { 
-    ff0 <- sprintf("%s + type", ff0)
-    ff1 <- sprintf("%s + type", ff1)
+    dd <- cbind(dd, type[ccix])
   }
   ## control for batch
   if(length(sort(unique(batch))) > 1) {
-    ff0 <- sprintf("%s + batch", ff0)
-    ff1 <- sprintf("%s + batch", ff1)
+        dd <- cbind(dd, batch[ccix])
   }
   ## control for duration
   # if(length(sort(unique(duration))) > 1){
   #   ff0 <- sprintf("%s + duration", ff0)
   #   ff <- sprintf("%s + duration", ff)
   # }
-  rr0 <- tryCatch(try(glm(formula(ff0), data=dd, model=FALSE, x=FALSE, y=FALSE, family=ifelse(is.factor(drugpheno), "binomial", "gaussian"))), 
-                  warning=function(w) {
-                    if(verbose) {
-                      ww <- "Null model did not convrge"
-                      tt <- table(dd[,"type"])
-                      print(ww)
-                      print(tt)
-                    }
-                  })
-  rr1 <- tryCatch(try(glm(formula(ff1), data=dd, model=FALSE, x=FALSE, y=FALSE, family=ifelse(is.factor(drugpheno), "binomial", "gaussian"))), 
-                  warning=function(w) {
-                    if(verbose) {
-                      ww <- "Model did not convrge"
-                      tt <- table(dd[,"drugpheno"])
-                      print(ww)
-                      print(tt)
-                      return(ww)
-                    }
-                  })
+  
+  # if(is.factor(drugpheno[,1])){
 
-if (class(rr0) != "try-error" && class(rr1) != "try-error" & class(rr0) != "character" && class(rr1) != "character") {
-    rrc <- stats::anova(rr0, rr1, test="Chisq")
-    
+  #   drugpheno <- drugpheno[,1]
+
+  # } else {
+
+  #   drugpheno <- as.matrix(drugpheno)
+
+  # }
+if(is.factor(drugpheno)){
+
+rr0 <- tryCatch(try(glm(formula(drugpheno ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+    warning=function(w) {
+      if(verbose) {
+        ww <- "Null model did not convrge"
+        tt <- table(dd[,"type"])
+        print(ww)
+        print(tt)
+      }
+    })
+  rr1 <- tryCatch(try(glm(formula(drugpheno ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+    warning=function(w) {
+      if(verbose) {
+        ww <- "Model did not convrge"
+        tt <- table(dd[,"drugpheno"])
+        print(ww)
+        print(tt)
+        return(ww)
+      }
+    })
+
+
+} else{
+
+rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)), 
+    warning=function(w) {
+      if(verbose) {
+        ww <- "Null model did not convrge"
+        tt <- table(dd[,"type"])
+        print(ww)
+        print(tt)
+      }
+    })
+  rr1 <- tryCatch(try(lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)), 
+    warning=function(w) {
+      if(verbose) {
+        ww <- "Model did not convrge"
+        tt <- table(dd[,"drugpheno"])
+        print(ww)
+        print(tt)
+        return(ww)
+      }
+    })
+
+
+}
+  
+  
+  if (class(rr0) != "try-error" && class(rr1) != "try-error" & class(rr0) != "character" && class(rr1) != "character") {
     rr <- summary(rr1)
+
+    if(is.factor(drugpheno)){
+      rrc <- stats::anova(rr0, rr1, test="Chisq")
+      rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"], "n"=nn, "pvalue"=rrc$'Pr(>Chi)'[2])
+      names(rest) <- c("estimate", "se", "n", "pvalue")
+
+    } else {
+      if(ncol(drugpheno)>1){
+        rrc <- summary(stats::manova(rr1))
+        rest <- lapply(1:ncol(drugpheno), function(i) {
+          est <- paste("estimate", i, sep=".")
+          se <-  paste("se", i, sep=".")
+          tstat <- paste("tstat", i, sep=".")
+          rest <- c(rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "Estimate"], rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "Std. Error"], rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "t value"])
+          names(rest) <- c(est, se, tstat)
+          return(rest)
+        })
+        rest <- do.call(c, rest)
+        rest <- c(rest,"n"=nn, "fstat"=rrc$stats[grep("^x", rownames(rrc$stats)), "approx F"], "pvalue"=rrc$stats[grep("^x", rownames(rrc$stats)), "Pr(>F)"])
+      } else {
+        rrc <- stats::anova(rr0, rr1, test = "F") 
+        rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"],"n"=nn, "tstat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
+        names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
+      }
+    }
+    
+    
 #    rest <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
-    rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"], "n"=nn, "pvalue"=rrc$'Pr(>Chi)'[2])
     
 #   names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
-    names(rest) <- c("estimate", "se", "n", "pvalue")
 
 ## add tissue type/cell line statistics
 #     if(length(sort(unique(type))) > 1) {
