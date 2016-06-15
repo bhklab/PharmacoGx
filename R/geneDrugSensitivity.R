@@ -176,7 +176,7 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
       } else {
         rrc <- stats::anova(rr0, rr1, test = "F") 
         rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"],"n"=nn, "tstat"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2], "df"=rr1$df.residual)
-        names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
+        names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df")
       }
     }
     
