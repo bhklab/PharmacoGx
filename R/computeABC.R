@@ -24,6 +24,7 @@
 #' of viability in the absence of any drug.
 #' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
+#' @return The numeric area between curves
 #' @export
 computeABC <- function(conc1, conc2, viability1, viability2, trunc=TRUE) {
   

@@ -23,6 +23,9 @@ of viability in the absence of any drug.}
 \item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 }
+\value{
+The numeric area between curves
+}
 \description{
 Fits dose-response curves to data given by the user
 and returns the ABC of the fitted curves.

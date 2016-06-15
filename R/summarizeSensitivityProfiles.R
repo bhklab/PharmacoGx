@@ -10,11 +10,8 @@
 #' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
 #'
 #' @param pSet [PharmacoSet] The PharmacoSet from which to extract the data
-#' @param sensitivity.measure [character] which sensitivity sensitivity.measure to use? The current
-#'   choices are 'gi50_published', 'ic50_published', 'ic50_recomputed',
-#'   'auc_published', auc_recomputed', 'auc_recomputed_star',
-#'    'amax_published', 'amax_recomputed',
-#'    'Synergy_score' and 'slope_recomputed'.
+#' @param sensitivity.measure [character] which sensitivity sensitivity.measure to use? Use the 
+#'   sensitivityMeasures function to find out what measures are available for each PSet.
 #' @param cell.lines \code{character} The cell lines to be summarized. 
 #'    If any cell lines has no data, it will be filled with
 #'   missing values

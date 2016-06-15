@@ -46,9 +46,8 @@
 #' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
 #'   should the function return for each gene drug pair?
 #' @param sensitivity.measure [character] which measure of the drug dose 
-#'   sensitivity should the function use for its computations? The current
-#'   choices are 'ic50_published', 'auc_published', 'ic50_recomputed',
-#'   'auc_recomputed'.
+#'   sensitivity should the function use for its computations? Use the 
+#'   sensitivityMeasures function to find out what measures are available for each PSet.
 #' @param molecular.summary.stat What summary statistic should be used to
 #'   summarize duplicates for cell line molecular profile measurements? 
 #' @param sensitivity.summary.stat What summary statistic should be used to
@@ -185,7 +184,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
       if(!is.na(sensitivity.cutoff)) {
             dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      rr <- PharmacoGx:::rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=nthread, verbose=verbose)
+      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=nthread, verbose=verbose)
       res <- c(res, list(rr$all))
     }
     names(res) <- drugn[x]

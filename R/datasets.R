@@ -2,7 +2,9 @@
 #'
 #' A small example version of the Connectivity Map PharmacoSet, used in the
 #' documentation examples. All credit for the data goes to the Connectivity Map
-#' group at the Broad Institute.
+#' group at the Broad Institute. This is not a full version of the dataset, most of
+#' of the dataset was removed to make runnable example code. For the full dataset,
+#' please download using the downloadPSet function. 
 #' 
 #' @references
 #' Lamb et al. The Connectivity Map: using gene-expression signatures to connect small molecules, genes, and disease. Science, 2006.
@@ -19,7 +21,9 @@ NULL
 #'
 #' A small example version of the Genomics of Drug Sensitivity in Cancer Project
 #' PharmacoSet, used in the documentation examples. All credit for the data goes
-#' to the Genomics of Drug Sensitivity in Cancer Project group at the Sanger.
+#' to the Genomics of Drug Sensitivity in Cancer Project group at the Sanger.This is not a full version of the dataset, most of
+#' of the dataset was removed to make runnable example code. For the full dataset,
+#' please download using the downloadPSet function. 
 #' 
 #' @references
 #' Garnett et al. Systematic identification of genomic markers of drug sensitivity in cancer cells. Nature, 2012.
@@ -36,7 +40,9 @@ NULL
 #'
 #' A small example version of the CCLE PharmacoSet, used in the
 #' documentation examples. All credit for the data goes to the CCLE
-#' group at the Broad Institute.
+#' group at the Broad Institute. This is not a full version of the dataset, most of
+#' of the dataset was removed to make runnable example code. For the full dataset,
+#' please download using the downloadPSet function. 
 #' 
 #' @references
 #' Barretina et al. The Cancer Cell Line Encyclopedia enables predictive modelling of anticancer drug sensitivity. Nature, 2012

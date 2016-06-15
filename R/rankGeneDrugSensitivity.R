@@ -53,9 +53,32 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     names(ltype)[-1] <- utype
   }
   res <- NULL
+  ccix <- complete.cases(data, type, batch, drugpheno)
+  nn <- sum(ccix)
 #  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
-  nc <- c("estimate", "se", "n", "pvalue", "fdr")
-  
+#  nc <- c("estimate", "se", "n", "pvalue", "fdr")
+  if(!any(apply(drugpheno,2,is.factor))){
+     if(ncol(drugpheno)>1){
+      ##### FIX NAMES!!!
+      nc <- lapply(1:ncol(drugpheno), function(i){
+
+        est <- paste("estimate", i, sep=".")
+        se <-  paste("se", i, sep=".")
+        tstat <- paste("tstat", i, sep=".")
+
+        nc <- c(est, se, tstat)
+        return(nc)
+
+      })
+      nc <- do.call(c, rest)
+      nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
+    } else {
+      nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
+    }
+  } else {
+    nc  <- c("estimate", "se", "n", "pvalue", "fdr")
+  }  
+    
 
   
   for (ll in 1:length(ltype)) {

@@ -1270,7 +1270,7 @@ checkPSetStructure <-
       }
       if("drugid" %in% colnames(pSet@sensitivity$info)) {
         drug.ids <- unique(pSet@sensitivity$info[,"drugid"])
-        drug.ids <- drug.ids[grep("///",drug.ids, invert=T)]
+        drug.ids <- drug.ids[grep("///",drug.ids, invert=TRUE)]
         if(!all(drug.ids %in% rownames(pSet@drug))) {
           print("not all the drugs in sensitivity data are in drug slot")
         }

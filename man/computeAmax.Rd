@@ -20,6 +20,9 @@ curve-fitting is performed.}
 
 \item{verbose}{[logical] should warnings be printed}
 }
+\value{
+The numerical Amax
+}
 \description{
 Fits dose-response curves to data given by the user
 and returns the Amax of the fitted curve.

@@ -7,9 +7,8 @@ other molecular profile) and drug dose response, for use in drug sensitivity
 analysis.}
 \usage{
 drugSensitivitySig(pSet, mDataType, drugs, features,
-  sensitivity.measure = c("ic50_published", "auc_published",
-  "ic50_recomputed", "auc_recomputed", "auc_recomputed_star"),
-  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+  sensitivity.measure = "auc_recomputed", molecular.summary.stat = c("mean",
+  "median", "first", "last", "or", "and"),
   sensitivity.summary.stat = c("mean", "median", "first", "last"),
   returnValues = c("estimate", "pvalue", "fdr"), sensitivity.cutoff,
   nthread = 1, verbose = TRUE)
@@ -27,9 +26,8 @@ signatures. Should match the names used in the PharmacoSet.}
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
 \item{sensitivity.measure}{[character] which measure of the drug dose 
-sensitivity should the function use for its computations? The current
-choices are 'ic50_published', 'auc_published', 'ic50_recomputed',
-'auc_recomputed'.}
+sensitivity should the function use for its computations? Use the 
+sensitivityMeasures function to find out what measures are available for each PSet.}
 
 \item{molecular.summary.stat}{What summary statistic should be used to
 summarize duplicates for cell line molecular profile measurements?}
