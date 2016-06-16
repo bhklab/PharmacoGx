@@ -28,4 +28,10 @@ package. The \code{PharmacoSets} have been extensively curated and organised wit
 a PharacoSet class, enabling use with all the analysis tools provided in
 \code{PharmacoGx}.
 }
+\examples{
+\dontrun{
+downloadPSet("CMAP")
+}
+
+}
 

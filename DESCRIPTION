@@ -12,5 +12,5 @@ Encoding: UTF-8
 Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader, stats, utils, graphics, grDevices, lsa
 Depends: R (>= 3.3)
 RoxygenNote: 5.0.1
-biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues

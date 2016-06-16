@@ -20,7 +20,7 @@ the initial letter.  ‘"greater"’ corresponds to positive
 association, ‘"less"’ to negative association.
 Options are "two.sided", "less", or "greater"}
 
-\item{include.perm}{[boolean] indicates whetehr the estimates for the null distribution should be returned.
+\item{include.perm}{[boolean] indicates whether the estimates for the null distribution should be returned.
 Default set to 'FALSE'}
 
 \item{setseed}{[integer] is the seed specified by the user. Defaults is '12345'}
@@ -32,5 +32,11 @@ Default set to 'FALSE'}
 }
 \description{
 Computes the cosine similarity and significance using permutation test
+}
+\examples{
+x <- factor(c(1,2,1,2,1))
+y <- factor(c(2,2,1,1,1))
+cosinePerm(x, y)
+
 }
 

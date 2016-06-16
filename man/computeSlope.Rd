@@ -9,11 +9,11 @@ computeSlope(concentration, viability, trunc = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{concentration}{[vector] A concentration range that the AUC should be computed for that range.
-Concentration range by default considered as not logarithmic scaled.}
+Concentration range by default considered as not logarithmic scaled. Converted to numeric by function if necessary.}
 
 \item{viability}{[vector] Viablities correspondant to the concentration range passed as first parameter.
 The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
-100 and lower than 0 are also accepted.}
+100 and lower than 0 are also accepted. Converted to numeric by function if necessary.}
 
 \item{trunc}{[binary] A flag that identify if the viabality values should be truncated to be in the
 range of (0,100)}
@@ -23,5 +23,11 @@ range of (0,100)}
 \description{
 Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking 
 its concentration and viability as input.
+}
+\examples{
+dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
+viability <- c("108.67","111","102.16","100.27","90","87","74","57")
+computeSlope(dose, viability)
+
 }
 

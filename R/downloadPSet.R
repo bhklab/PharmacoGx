@@ -4,6 +4,11 @@
 #' The table includes the names of the PharamcoSet, the types of data available
 #' in the object, and the date of last update.
 #'
+#' @examples
+#' \dontrun{
+#' availablePSets()
+#' }
+#' 
 #' @param saveDir \code{character} Directory to save the table of PSets
 #' @param myfn \code{character} The filename for the table of PSets
 #' @param verbose \code{bool} Should status messages be printed during download.
@@ -29,7 +34,12 @@ availablePSets <- function(saveDir=file.path(".", "PSets"), myfn="PSets.csv", ve
 #' package. The \code{PharmacoSets} have been extensively curated and organised within
 #' a PharacoSet class, enabling use with all the analysis tools provided in
 #' \code{PharmacoGx}.
-#'
+#' 
+#' @examples
+#' \dontrun{
+#' downloadPSet("CMAP")
+#' }
+#' 
 #' @param name \code{Character} string, the name of the PhamracoSet to download.
 #' @param saveDir \code{Character} string with the folder path where the
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create

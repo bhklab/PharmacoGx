@@ -746,6 +746,19 @@ setMethod("show", signature=signature(object="PharmacoSet"),
     })
 
 
+#' mDataNames
+#' 
+#' Returns the molecular data names for the PharmacoSet.
+#' 
+#' @param pSet PharamcoSet object
+#' @return vector of names of the molecular data types
+#' @export
+mDataNames <- function(pSet){
+
+  return(names(pSet@molecularData))
+
+}
+
 #'`[`
 #'
 #'@param x numeric
