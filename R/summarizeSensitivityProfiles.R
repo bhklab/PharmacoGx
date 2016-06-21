@@ -30,11 +30,11 @@
 #' @export
 
 
-summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomputed", cell.lines, drugs, summary.stat=c("mean", "median", "first", "last"), fill.missing=TRUE, verbose=TRUE){
+summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomputed", cell.lines, drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"), fill.missing=TRUE, verbose=TRUE){
 	
 	summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
-  if (!(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
+  if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(pSet)),"max.conc"))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
   }
   if (missing(cell.lines)) {
@@ -51,7 +51,18 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
   
 	pp <- sensitivityInfo(pSet)
   pp <- pp[which(pp$cellid %in% cell.lines & pp$drugid %in% drugs),]
-	dd <- sensitivityProfiles(pSet)[rownames(pp),]
+  if(sensitivity.measure != "max.conc") {
+	  dd <- sensitivityProfiles(pSet)[rownames(pp),]
+  } else {
+
+    if(!"max.conc"%in% colnames(sensitivityInfo(pSet))){
+
+      pSet <- updateMaxConc(pSet)
+
+    }
+    dd <- sensitivityInfo(pSet)[rownames(pp),]
+
+  }
 	
 	if (!fill.missing) {
 	  cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "cellid"]), "cellid"]))
@@ -111,7 +122,14 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
   			},
   			"last" = {
   				dd2[iix[1], iix[2]] <- dd[myx[length(myx)], sensitivity.measure]
-  			}
+  			},
+        "max"= {
+          dd2[iix[1], iix[2]] <- max(dd[myx, sensitivity.measure])
+        },
+        "min" = {
+          dd2[iix[1], iix[2]] <- min(dd[myx, sensitivity.measure])
+        }
+
       )
       # ppt <- apply(pp[myx, , drop=FALSE], 2, function (x) {
       #   x <- paste(unique(x), collapse="////")

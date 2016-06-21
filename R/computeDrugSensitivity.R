@@ -215,4 +215,9 @@ trunc = FALSE) {
     return(beta1)
 }
 
+updateMaxConc <- function(pSet){
+  
+  pSet@sensitivity$info$max.conc <- apply(pSet@sensitivity$raw[,,"Dose"], 1, max, na.rm=TRUE)
+  return(pSet)
+}
 
