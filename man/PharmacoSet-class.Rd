@@ -96,6 +96,9 @@
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
 }
+\value{
+An object of the PharmacoSet class
+}
 \description{
 The PharmacoSet (PSet) class was developed to contain and organise large 
 PharmacoGenomic datasets, and aid in their metanalysis. It was designed 
@@ -201,7 +204,7 @@ summarizing the available perturbation data,}
 identifiers used between different PharmacoSet objects}
 
 \item{\code{datasetType}}{A \code{character} string of 'sensitivity', 
-'preturbation', or both detailing what type of data can be found in the 
+'perturbation', or both detailing what type of data can be found in the 
 PharmacoSet, for proper processing of the data}
 }}
 

@@ -14,4 +14,11 @@ returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}}
 This funtion prints out the information about the call used to compute the drug signatures, and the session info 
 for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures.
 }
+\examples{
+data(GDSCsmall)
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+showSigAnnot(drug.sensitivity)
+
+}
 
