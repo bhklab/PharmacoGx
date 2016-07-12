@@ -20,7 +20,7 @@
 ## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
-rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, nthread=1, verbose=FALSE) {
+rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, standardize = "SD", nthread=1, verbose=FALSE) {
   if (nthread != 1) {
     availcore <- parallel::detectCores()
     if (missing(nthread) || nthread < 1 || nthread > availcore) {
@@ -91,10 +91,10 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[sapply(splitix, length) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno) {
-        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose))
+      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
+        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE])
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
