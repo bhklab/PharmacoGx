@@ -54,6 +54,13 @@ An object of class PharmacoSet
 A constructor that simplifies the process of creating PharmacoSets, as well 
 as creates empty objects for data not provided to the constructor. Only
 objects returned by this constructor are expected to work with the PharmacoSet
-methods.
+methods. For a much more detailed instruction on creating PharmacoSets, please
+see the "CreatingPharmacoSet" vignette.
+}
+\examples{
+ 
+## For help creating a PharmacoSet object, please see the following vignette:
+browseVignettes("PharmacoGx")
+
 }
 

@@ -10,6 +10,9 @@
 \arguments{
 \item{x}{PharmacoSet}
 }
+\value{
+A named vector with the number of Cells and Drugs in the PharmacoSet
+}
 \description{
 Get the dimensions of a PharmacoSet
 }

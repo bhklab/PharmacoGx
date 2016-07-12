@@ -10,9 +10,14 @@ mDataNames(pSet)
 \item{pSet}{PharamcoSet object}
 }
 \value{
-vector of names of the molecular data types
+Vector of names of the molecular data types
 }
 \description{
 Returns the molecular data names for the PharmacoSet.
+}
+\examples{
+data(CCLEsmall)
+mDataNames(CCLEsmall)
+
 }
 

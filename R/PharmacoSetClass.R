@@ -39,8 +39,9 @@
 #'   \code{cell}, \code{tissue} names  used in the data set to universal 
 #'   identifiers used between different PharmacoSet objects
 #' @slot datasetType A \code{character} string of 'sensitivity', 
-#'   'preturbation', or both detailing what type of data can be found in the 
+#'   'perturbation', or both detailing what type of data can be found in the 
 #'   PharmacoSet, for proper processing of the data
+#' @return An object of the PharmacoSet class
 .PharmacoSet <- setClass("PharmacoSet", slots = list(
                                                      annotation = "list",
                                                      molecularProfiles = "list",
@@ -66,7 +67,12 @@
 #' A constructor that simplifies the process of creating PharmacoSets, as well 
 #' as creates empty objects for data not provided to the constructor. Only
 #' objects returned by this constructor are expected to work with the PharmacoSet
-#' methods.
+#' methods. For a much more detailed instruction on creating PharmacoSets, please
+#' see the "CreatingPharmacoSet" vignette.
+#' 
+#' @examples  
+#' ## For help creating a PharmacoSet object, please see the following vignette:
+#' browseVignettes("PharmacoGx")
 #' 
 #' @param name A \code{character} string detailing the name of the dataset
 #' @param molecularProfiles A \code{list} of ExpressionSet objects containing
@@ -750,12 +756,16 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 #' 
 #' Returns the molecular data names for the PharmacoSet.
 #' 
+#' @examples
+#' data(CCLEsmall)
+#' mDataNames(CCLEsmall)
+#' 
 #' @param pSet PharamcoSet object
-#' @return vector of names of the molecular data types
+#' @return Vector of names of the molecular data types
 #' @export
 mDataNames <- function(pSet){
 
-  return(names(pSet@molecularData))
+  return(names(pSet@molecularProfiles))
 
 }
 
@@ -771,10 +781,11 @@ setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
 })
 
-#'Get the dimensions of a PharmacoSet
-#'
-#'@param x PharmacoSet
-#'@export
+#' Get the dimensions of a PharmacoSet
+#' 
+#' @param x PharmacoSet
+#' @return A named vector with the number of Cells and Drugs in the PharmacoSet
+#' @export
 setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 
   return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
