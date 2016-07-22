@@ -80,7 +80,7 @@
   {
     common.ranges[[i]] <- doses[[i]][
     which.min(abs(as.numeric(doses[[i]])-min.dose)):max(
-      which(abs(as.numeric(doses[[i]]) - max.dose)==min(abs(as.numeric(doses[[i]]) - max.dose))))
+      which(abs(as.numeric(doses[[i]]) - max.dose)==min(abs(as.numeric(doses[[i]]) - max.dose), na.rm=TRUE)))
     ]
   }
   return(common.ranges)
