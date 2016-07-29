@@ -94,7 +94,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, ret
   }, exprs=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), sampleinfo=PharmacoGx::phenoInfo(pSet, mDataType))
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
-  drug.perturbation <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
+  drug.perturbation <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,,drop=FALSE]), names(res), colnames(res[[1]])))
   for(j in 1:ncol(res[[1]])) {
     ttt <- sapply(res, function(x, j, k) {
       xx <- array(NA, dim=length(k), dimnames=list(k))

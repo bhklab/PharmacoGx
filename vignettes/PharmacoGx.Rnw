@@ -153,8 +153,8 @@ We want to investigate the consistency of the data between the two datasets. The
   library(PharmacoGx)
   data("GDSCsmall")
   data("CCLEsmall")
-  commonGenes <- intersect(featureNames(GDSCsmall, "rna"),
-                           featureNames(CCLEsmall,"rna"))
+  commonGenes <- intersect(fNames(GDSCsmall, "rna"),
+                           fNames(CCLEsmall,"rna"))
   common <- intersectPSet(list('CCLE'=CCLEsmall,
                                'GDSC'=GDSCsmall),
                           intersectOn=c("cell.lines", "drugs"), strictIntersect=TRUE)
@@ -188,7 +188,7 @@ We want to investigate the consistency of the data between the two datasets. The
                                          mDataType="rna",
                                          features=commonGenes,
                                          verbose=FALSE)
-  gg <- featureNames(common[[1]], 'rna')
+  gg <- fNames(common[[1]], 'rna')
   cc <- cellNames(common[[1]])
   
   ge.cor <- sapply(cc, function (x, d1, d2) {
@@ -315,7 +315,7 @@ As an example of the efficacy of the modelling approach, we can model the signif
 <<biomarkers,eval=TRUE, results=tex>>=
 
   data(CCLEsmall)
-  features <- featureNames(CCLEsmall, "rna")[
+  features <- fNames(CCLEsmall, "rna")[
                           which(featureInfo(CCLEsmall,
                                             "rna")$Symbol == "NQO1")]
   sig.rna <- drugSensitivitySig(pSet=CCLEsmall, 

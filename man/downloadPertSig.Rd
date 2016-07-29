@@ -31,4 +31,10 @@ for the available perturbation \code{PharmacoSets}. This function allows the
 user to skip these very lengthy calculation steps for the datasets available,
 and start their analysis from the already computed signatures
 }
+\examples{
+if (interactive()){
+downloadPertSig("CMAP")
+}
+ 
+}
 

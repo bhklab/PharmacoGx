@@ -18,5 +18,5 @@ please download using the downloadPSet function.
 \references{
 Lamb et al. The Connectivity Map: using gene-expression signatures to connect small molecules, genes, and disease. Science, 2006.
 }
-\keyword{dataset}
+\keyword{datasets}
 

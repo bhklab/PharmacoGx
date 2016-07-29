@@ -10,13 +10,16 @@
 \arguments{
 \item{object}{\code{PharmacoSig}}
 }
+\value{
+Prints the PharmacoGx Signatures object to the output stream, and returns invisible NULL.
+}
 \description{
 Show PharmacoGx Signatures
 }
 \examples{
 data(GDSCsmall)
 drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+             nthread=1, features = fNames(GDSCsmall, "rna")[1])
 drug.sensitivity
 
 }

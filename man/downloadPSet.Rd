@@ -29,7 +29,7 @@ a PharacoSet class, enabling use with all the analysis tools provided in
 \code{PharmacoGx}.
 }
 \examples{
-\dontrun{
+if (interactive()){
 downloadPSet("CMAP")
 }
 

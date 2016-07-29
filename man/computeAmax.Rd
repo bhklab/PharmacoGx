@@ -6,10 +6,10 @@
 and returns the Amax of the fitted curve.
 Amax: 100 - viability at maximum concentarion (in fitted curve)}
 \usage{
-computeAmax(conc, viability, trunc = TRUE, verbose = FALSE)
+computeAmax(concentration, viability, trunc = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{conc}{[vector] is a vector of drug concentrations.}
+\item{concentration}{[vector] is a vector of drug concentrations.}
 
 \item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages

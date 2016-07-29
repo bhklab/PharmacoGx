@@ -18,5 +18,5 @@ please download using the downloadPSet function.
 \references{
 Barretina et al. The Cancer Cell Line Encyclopedia enables predictive modelling of anticancer drug sensitivity. Nature, 2012
 }
-\keyword{dataset}
+\keyword{datasets}
 

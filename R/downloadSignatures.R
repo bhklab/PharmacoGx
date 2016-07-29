@@ -6,6 +6,11 @@
 #' user to skip these very lengthy calculation steps for the datasets available,
 #' and start their analysis from the already computed signatures
 #' 
+#' @examples
+#' if (interactive()){
+#' downloadPertSig("CMAP")
+#' }
+#'  
 #' @param name \code{Character} string, the name of the PharmacoSet for which to
 #'   download signatures. The name should match the names returned in the
 #'   availablePSets table.

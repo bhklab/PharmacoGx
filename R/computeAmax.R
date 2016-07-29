@@ -7,7 +7,7 @@
 #' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 #' computeAmax(dose, viability)
 #'
-#' @param conc [vector] is a vector of drug concentrations.
+#' @param concentration [vector] is a vector of drug concentrations.
 #' 
 #' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
@@ -20,18 +20,18 @@
 #' @export
 
 
-computeAmax <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
-  conc <- as.numeric(conc[!is.na(conc)])
+computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
+  concentration <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])
-  ii <- which(conc == 0)
+  ii <- which(concentration == 0)
   if(length(ii) > 0) {
-    conc <- conc[-ii]
+    concentration <- concentration[-ii]
     viability <- viability[-ii]
   }
   
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
-  if (!all(is.finite(conc))) {
-    print(conc)
+  if (!all(is.finite(concentration))) {
+    print(concentration)
     stop("Concentration vector contains elements which are not real numbers.")
   }
   
@@ -45,13 +45,13 @@ computeAmax <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
     stop("'trunc' is not a logical.")
   }
   
-  if (length(conc) != length(viability)) {
-    print(conc)
+  if (length(concentration) != length(viability)) {
+    print(concentration)
     print(viability)
     stop("Concentration vector is not of same length as viability vector.")
   }
   
-  if (min(conc) < 0) {
+  if (min(concentration) < 0) {
     stop("Concentration vector contains negative data.")
   }
   
@@ -64,7 +64,7 @@ computeAmax <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
   }
   
   #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
-  log_conc <- log10(conc)
+  log_conc <- log10(concentration)
   viability <- viability / 100
   
   if (trunc == TRUE) {

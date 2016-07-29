@@ -10,10 +10,11 @@
 #' Concentration range by default considered as not logarithmic scaled. Converted to numeric by function if necessary.
 #' @param viability [vector] Viablities corresponding to the concentration range passed as first parameter.
 #' The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
-#' 100 and lower than 0 are also accepted. Converted to numeric by function if necessary.
+#' 100 and lower than 0 are also accepted.
 #' @param trunc [binary] A flag that identify if the viabality values should be truncated to be in the
 #' range of (0,100)
 #' @param verbose [boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.
+#' @return Returns the normalized linear slope of the drug response curve
 #' @export
 
 computeSlope <- function(concentration, viability, trunc=TRUE, verbose=TRUE) {

@@ -21,10 +21,11 @@ return(.PharmacoSig(Data, PSetName=PSetName, DateCreated=DateCreated, SigType=Si
 #' @examples
 #' data(GDSCsmall)
 #' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-#'              nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+#'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' drug.sensitivity
 #' 
 #' @param object \code{PharmacoSig}
+#' @return Prints the PharmacoGx Signatures object to the output stream, and returns invisible NULL. 
 #' @export
 setMethod("show", signature=signature(object='PharmacoSig'),
         function(object) {
@@ -43,16 +44,18 @@ setMethod("show", signature=signature(object='PharmacoSig'),
 #' @examples
 #' data(GDSCsmall)
 #' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-#'              nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+#'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' showSigAnnot(drug.sensitivity)
 #' 
 #' @param Sigs An object of the \code{PharmacoSig} Class, as
 #' returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}
+#' @return Prints the PharmacoGx Signatures annotations to the output stream, and returns invisible NULL. 
 #' @export
 showSigAnnot <- function(Sigs){
 
   print(Sigs@Call)
   print(Sigs@SessionInfo)
+  return(invisible(NULL))
 } 
 
 

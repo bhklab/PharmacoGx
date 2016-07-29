@@ -2,38 +2,51 @@
 % Please edit documentation in R/computeAUC.R
 \name{computeAUC}
 \alias{computeAUC}
-\title{Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking 
-its concentration and viability as input.}
+\title{Computes the AUC for a Drug Dose Viability Curve}
 \usage{
-computeAUC(concentration, viability, trunc = TRUE, area.type = c("Fitted",
+computeAUC(concentration, viability, Hill_fit, conc_as_log = FALSE,
+  viability_as_pct = TRUE, trunc = TRUE, area.type = c("Fitted",
   "Actual"), verbose = TRUE)
 }
 \arguments{
-\item{concentration}{[vector] A concentration range that the AUC should be computed for that range.
-Concentration range by default considered as not logarithmic scaled.}
+\item{concentration}{[vector] is a vector of drug concentrations.}
 
-\item{viability}{[vector] Viablities correspondant to the concentration range passed as first parameter.
-The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
-100 and lower than 0 are also accepted.}
+\item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
+drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
+indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells.}
 
-\item{trunc}{[binary] A flag that identify if the viabality values should be truncated to be in the
-range of (0,100)}
+\item{Hill_fit}{[list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
+viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
+and EC50 as a concentration.}
+
+\item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data.}
+
+\item{viability_as_pct}{[logical], if false, assumes that viability is given as a decimal rather
+than a percentage, and returns AUC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.}
+
+\item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+curve-fitting is performed.}
 
 \item{area.type}{Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")}
 
-\item{verbose}{[boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.}
+\item{verbose}{[logical], if true, causes warnings thrown by the function to be printed.}
 }
 \value{
 Numeric AUC value
 }
 \description{
-Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking 
-its concentration and viability as input.
+Returns the AUC (Area Under the drug response Curve) given concentration and viability as input, normalized by the concentration
+range of the experiment. The area returned is the response (1-Viablility) area, i.e. area under the curve when the response curve 
+is plotted on a log10 concentration scale, with high AUC implying high sensitivity to the drug. The function can calculate both 
+the area under a fitted Hill Curve to the data, and a trapz numeric integral of the actual data provided. Alternatively, the parameters
+of a Hill Slope returned by logLogisticRegression can be passed in if they already known.
 }
 \examples{
 dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
 viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 computeAUC(dose, viability)
+
 
 }
 

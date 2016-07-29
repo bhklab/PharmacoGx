@@ -1,22 +1,33 @@
-#' Fits dose-response curves to data given by the user
-#' and returns the IC50 of the fitted curve.
-#'
-#' @examples
-#' dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
-#' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
-#' computeIC50(dose, viability)
-#' 
-#' @param conc [vector] is a vector of drug concentrations.
-#' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
-#' drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-#' of viability in the absence of any drug.
-#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-#' curve-fitting is performed.
-#' @param verbose [logical] should diagnostic messages be printed? (default=FALSE)
-#' @return An estimate of the IC50 for the concentrations and viabilities provided
+#' @describeIn computeICn Returns the IC50 of a Drug Dose response curve
 #' @export
+computeIC50 <- function(conc,
+                       viability,
+                       Hill_fit,
+                       conc_as_log = FALSE,
+                       viability_as_pct = TRUE, 
+                       verbose=TRUE,
+                       trunc=TRUE) {
 
-computeIC50 <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
+  return(computeICn(conc, viability, Hill_fit,
+                    n = ifelse(viability_as_pct, 50, .5),
+                    conc_as_log = conc_as_log,
+                    viability_as_pct = viability_as_pct, 
+                    verbose=TRUE,
+                    trunc=TRUE))
+}
+
+
+# Fits dose-response curves to data given by the user
+# and returns the IC50 of the fitted curve.
+# 
+# @param conc [vector] is a vector of drug concentrations.
+# @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+# drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
+# of viability in the absence of any drug.
+# @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+# curve-fitting is performed.
+
+computeIC50_old <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
   
   conc <- as.numeric(conc[!is.na(conc)])
   viability <- as.numeric(viability[!is.na(viability)])

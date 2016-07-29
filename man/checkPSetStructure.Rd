@@ -13,6 +13,9 @@ checkPSetStructure(pSet, plotDist = FALSE, result.dir = ".")
 
 \item{result.dir}{The path to the directory for saving the plots as a string}
 }
+\value{
+Prints out messages whenever describing the errors found in the structure of the pset object passed in.
+}
 \description{
 This function checks the structure of a PharamcoSet, ensuring that the
 correct annotations are in place and all the required slots are filled so

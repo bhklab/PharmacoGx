@@ -8,15 +8,18 @@
 \S4method{[}{PharmacoSet}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{numeric}
+\item{x}{PSet}
 
-\item{i}{numeric}
+\item{i}{Cell lines to keep in PSet}
 
-\item{j}{numeric}
+\item{j}{Drugs to keep in PSet}
 
 \item{...}{further arguments}
 
 \item{drop}{A boolean flag of whether to drop single dimensions or not}
+}
+\value{
+Returns the subsetted PSet
 }
 \description{
 `[`

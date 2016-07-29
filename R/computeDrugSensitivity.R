@@ -1,37 +1,36 @@
-#' @importFrom stats na.omit
 .calculateSensitivitiesStar <-
   function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual")) {
-  
-  if (missing(area.type)) {
-    area.type <- "Fitted"
-  }
-  if (is.null(exps)) {
-    stop("expriments is empty!")
-  }
-  for (study in names(pSets)) {
-    pSets[[study]]@sensitivity$profiles$auc_recomputed_star <- NA
-  }
-  if (!is.na(cap)) {
-    trunc <- TRUE
+    
+    if (missing(area.type)) {
+      area.type <- "Fitted"
+    }
+    if (is.null(exps)) {
+      stop("expriments is empty!")
+    }
+    for (study in names(pSets)) {
+      pSets[[study]]@sensitivity$profiles$auc_recomputed_star <- NA
+    }
+    if (!is.na(cap)) {
+      trunc <- TRUE
     }else{
       trunc <- FALSE
     }
-  
-  for(i in 1:nrow(exps)) {
+    
+    for(i in 1:nrow(exps)) {
       ranges <- list()
       for (study in names(pSets)) {
-          ranges[[study]] <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i,study], ,"Dose"])
+        ranges[[study]] <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i,study], ,"Dose"])
       }
       ranges <- .getCommonConcentrationRange(ranges)
       names(ranges) <- names(pSets)
       for(study in names(pSets)) {
         pSets[[study]]@sensitivity$profiles[exps[i,study], "auc_recomputed_star"] <- computeAUC(concentration=as.numeric(na.omit(ranges[[study]])), 
-                                                                                 viability=as.numeric(na.omit(pSets[[study]]@sensitivity$raw[exps[i, study],which(as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]),"Viability"])), 
-                                                                                 trunc, area.type)
+                                                                                                viability=as.numeric(na.omit(pSets[[study]]@sensitivity$raw[exps[i, study],which(as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]),"Viability"])), 
+                                                                                                trunc, area.type)
       }
+    }
+    return(pSets)
   }
-  return(pSets)
-}
 
 ## This function computes AUC for the whole raw sensitivity data of a pset
 .calculateFromRaw <- function(raw.sensitivity, cap=NA, nthread=1){
@@ -42,19 +41,60 @@
   IC50 <- vector(length=dim(raw.sensitivity)[1])
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
   
-  
+  #pars <- logLogisticRegression(raw.sensitivity[exp, , "Dose"], raw.sensitivity[exp, , "Viability"], conc_as_log=FALSE, viability_as_pct=TRUE, trunc=trunc)
   
   if (!is.na(cap)) {trunc <- TRUE}else{trunc <- FALSE}
   
-   if (nthread ==1){
-    AUC <- unlist(lapply(names(AUC), function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}))
-    IC50 <- unlist(lapply(names(IC50), function(exp){computeIC50(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}))
-    
-  }else{ 
-    AUC <- unlist(parallel::mclapply(names(AUC), function(exp){computeAUC(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}, mc.cores = nthread))
-    IC50 <- unlist(parallel::mclapply(names(IC50), function(exp){computeIC50(raw.sensitivity[exp,,"Dose"], raw.sensitivity[exp,,"Viability"], trunc)}, mc.cores = nthread))
+  if (nthread ==1){
+    pars <- lapply(names(AUC), function(exp, raw.sensitivity) {
+      if(length(grep("///", raw.sensitivity[exp, , "Dose"])) > 0 | all(is.na(raw.sensitivity[exp, , "Dose"]))) {
+        NA
+      } else{
+        logLogisticRegression(raw.sensitivity[exp, , "Dose"], raw.sensitivity[exp, , "Viability"], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+        #computeAUC(concentration=raw.sensitivity[exp, , "Dose"], Hill_fit=Hill_fit, trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    },raw.sensitivity=raw.sensitivity)
+    names(pars) <- dimnames(raw.sensitivity)[[1]]
+    AUC <- unlist(lapply(names(AUC), function(exp,raw.sensitivity, pars) {
+      if(any(is.na(pars[[exp]]))) {
+        NA
+      } else{
+        computeAUC(concentration=raw.sensitivity[exp, , "Dose"], Hill_fit=pars[[exp]], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    },raw.sensitivity=raw.sensitivity, pars=pars))
+    IC50 <- unlist(lapply(names(IC50), function(exp,pars) {
+      if(any(is.na(pars[[exp]]))) {
+        NA
+      } else{
+        computeIC50(Hill_fit=pars[[exp]], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    }, pars=pars))
+  } else {
+    pars <- parallel::mclapply(names(AUC), function(exp, raw.sensitivity) {
+      if(length(grep("///", raw.sensitivity[exp, , "Dose"])) > 0 | all(is.na(raw.sensitivity[exp, , "Dose"]))) {
+        NA
+      } else{
+        logLogisticRegression(raw.sensitivity[exp, , "Dose"], raw.sensitivity[exp, , "Viability"], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+        #computeAUC(concentration=raw.sensitivity[exp, , "Dose"], Hill_fit=Hill_fit, trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    },raw.sensitivity=raw.sensitivity, mc.cores = nthread)
+    names(pars) <- dimnames(raw.sensitivity)[[1]]
+    AUC <- unlist(parallel::mclapply(names(AUC), function(exp, raw.sensitivity, pars) {
+      if(any(is.na(pars[[exp]]))) {
+        NA
+      } else{
+        computeAUC(concentration=raw.sensitivity[exp, , "Dose"], Hill_fit=pars[[exp]], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    },raw.sensitivity=raw.sensitivity, pars=pars, mc.cores = nthread))
+    IC50 <- unlist(parallel::mclapply(names(IC50), function(exp, pars) {
+      if(any(is.na(pars[[exp]]))) {
+        NA
+      } else{
+        computeIC50(Hill_fit=pars[[exp]], trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
+      }
+    }, pars=pars, mc.cores = nthread))
   }
-
+  
   
   names(AUC) <- dimnames(raw.sensitivity)[[1]]
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
@@ -79,72 +119,115 @@
   for(i in 1:length(doses))
   {
     common.ranges[[i]] <- doses[[i]][
-    which.min(abs(as.numeric(doses[[i]])-min.dose)):max(
-      which(abs(as.numeric(doses[[i]]) - max.dose)==min(abs(as.numeric(doses[[i]]) - max.dose), na.rm=TRUE)))
-    ]
+      which.min(abs(as.numeric(doses[[i]])-min.dose)):max(
+        which(abs(as.numeric(doses[[i]]) - max.dose)==min(abs(as.numeric(doses[[i]]) - max.dose), na.rm=TRUE)))]
   }
   return(common.ranges)
 }
 
 ## predict viability from concentration data and curve parameters
 .Hill<-function(x, pars) {
-    return(pars[2] + (1 - pars[2]) / (1 + (10 ^ x / 10 ^ pars[3]) ^ pars[1]))
+  return(pars[2] + (1 - pars[2]) / (1 + (10 ^ x / 10 ^ pars[3]) ^ pars[1]))
 }
 
 ## calculate residual of fit
-.residual<-function(x, y, pars, scale = 0.07, Cauchy_flag = TRUE, trunc = FALSE) {
-    if (Cauchy_flag == FALSE) {
-        return(sum((.Hill(x, pars) - y) ^ 2))
+.residual<-function(x, y, n, pars, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
+  family <- match.arg(family)
+  Cauchy_flag = (family == "Cauchy")
+  if (Cauchy_flag == FALSE) {
+    # return(sum((.Hill(x, pars) - y) ^ 2))
+    diffs <- .Hill(x, pars)-y
+    if (trunc == FALSE) {
+      return(sum(-log(.dmednnormals(diffs, n, scale))))
     } else {
-        diffs <- .Hill(x, pars)-y
-        if (trunc == FALSE) {
-            return(sum(-log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs / scale)) * (1 / 2 - 1 / pi * atan(diffs / scale)))))
-        } else {
-            down_truncated <- which(abs(y) > 1)
-            up_truncated <- which(abs(y) < 0)
-            return(sum(log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))
-            * (1 / 2 - 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))),
-            -log(1 / 2 - 3 / (2 * pi) * atan((1 - diffs[down_truncated] - y[down_truncated]) / scale) + 2 / pi ^ 3 * (atan((1 - diffs[down_truncated] - y[down_truncated]) / scale)) ^ 3),
-            -log(-1 / 2 + 3 / (2 * pi) * atan((-diffs[up_truncated] - y[up_truncated]) / scale) - 2 / pi ^ 3 * (atan((- diffs[up_truncated] - y[up_truncated]) / scale)) ^ 3)))
-        }
+      down_truncated <- abs(y) >= 1
+      up_truncated <- abs(y) <= 0
+      
+      # For up truncated, integrate the cauchy dist up until -diff because anything less gets truncated to 0, and thus the residual is -diff, and the prob
+      # function becomes discrete
+      # For down_truncated, 1-cdf(diffs) = cdf(-diffs) 
+      
+      return(sum(-log(.dmednnormals(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmednnormals(-diffs[up_truncated | down_truncated], n, scale))))
+      
     }
+    
+  } else {
+    diffs <- .Hill(x, pars)-y
+    if (trunc == FALSE) {
+      # return(sum(-log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs / scale)) * (1 / 2 - 1 / pi * atan(diffs / scale)))))
+      return(sum(-log(.dmedncauchys(diffs, n, scale))))
+    } else {
+      down_truncated <- abs(y) >= 1
+      up_truncated <- abs(y) <= 0
+      
+      # For up truncated, integrate the cauchy dist up until -diff because anything less gets truncated to 0, and thus the residual is -diff, and the prob
+      # function becomes discrete
+      # For down_truncated, 1-cdf(diffs) = cdf(-diffs) 
+      
+      return(sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmedncauchys(-diffs[up_truncated | down_truncated], n, scale))))
+      
+      # return(sum(log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))
+      # * (1 / 2 - 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))),
+      # -log(1 / 2 - 3 / (2 * pi) * atan((1 - diffs[down_truncated] - y[down_truncated]) / scale) + 2 / pi ^ 3 * (atan((1 - diffs[down_truncated] - y[down_truncated]) / scale)) ^ 3),
+      # -log(-1 / 2 + 3 / (2 * pi) * atan((-diffs[up_truncated] - y[up_truncated]) / scale) - 2 / pi ^ 3 * (atan((- diffs[up_truncated] - y[up_truncated]) / scale)) ^ 3)))
+    }
+  }
 }
 
 ## generate an initial guess for dose-response curve parameters by evaluating the residuals at different lattice points of the search space
 .meshEval<-function(log_conc,
-viability,
-lower_bounds = c(0, 0, -6),
-upper_bounds = c(4, 1, 6),
-density = c(2, 10, 2),
-scale = 0.07,
-Cauchy_flag = TRUE,
-trunc = FALSE) {
-    guess_residual<-Inf
-    for (i in seq(from = lower_bounds[1], to = upper_bounds[1], by = 1 / density[1])) {
-        for (j in seq(from = lower_bounds[2], to = upper_bounds[2], by = 1 / density[2])) {
-            for (k in seq(from = lower_bounds[3], to = upper_bounds[3], by = 1 / density[3])) {
-                test_guess_residual <- .residual(log_conc,
-                viability,
-                pars = c(i, j, k),
-                scale = scale,
-                Cauchy_flag = Cauchy_flag,
-                trunc = trunc)
-                if (test_guess_residual < guess_residual) {
-                    guess <- c(i, j, k)
-                    guess_residual <- test_guess_residual
-                }
-            }
+                    viability,
+                    lower_bounds = c(0, 0, -6),
+                    upper_bounds = c(4, 1, 6),
+                    density = c(2, 10, 2),
+                    scale = 0.07,
+                    n = 1,
+                    family = c("normal", "Cauchy"),
+                    trunc = FALSE) {
+  family <- match.arg(family)
+  guess <- c(1,min(viability), log_conc[which.min(abs(viability - 1/2))])   
+  guess_residual<- .residual(log_conc,
+                             viability,
+                             pars = guess,
+                             n=n,
+                             scale = scale,
+                             family = family,
+                             trunc = trunc)
+  for (i in seq(from = lower_bounds[1], to = upper_bounds[1], by = 1 / density[1])) {
+    for (j in seq(from = lower_bounds[2], to = upper_bounds[2], by = 1 / density[2])) {
+      for (k in seq(from = lower_bounds[3], to = upper_bounds[3], by = 1 / density[3])) {
+        test_guess_residual <- .residual(log_conc,
+                                         viability,
+                                         pars = c(i, j, k),
+                                         n=n,
+                                         scale = scale,
+                                         family = family,
+                                         trunc = trunc)
+        if(!is.finite(test_guess_residual)){
+          warning(paste0(" Test Guess Residual is: ", test_guess_residual, "\n Other Pars: log_conc: ", paste(log_conc, collapse=", "), "\n Viability: ", paste(viability, collapse=", "), "\n Scale: ", scale, "\n Family: ", family, "\n Trunc ", trunc, "\n HS: ", i, ", Einf: ", j, ", logEC50: ", k, "\n n: ", n))
         }
+        if(!length(test_guess_residual)){
+          warning(paste0(" Test Guess Residual is: ", test_guess_residual, "\n Other Pars: log_conc: ", paste(log_conc, collapse=", "), "\n Viability: ", paste(viability, collapse=", "), "\n Scale: ", scale, "\n Family: ", family, "\n Trunc ", trunc, "\n HS: ", i, ", Einf: ", j, ", logEC50: ", k, "\n n: ", n))
+        }
+        if (test_guess_residual < guess_residual) {
+          guess <- c(i, j, k)
+          guess_residual <- test_guess_residual
+        }
+      }
     }
-    return(guess)
+  }
+  return(guess)
 }
 
 ## get vector of interpolated concentrations for graphing purposes
 .GetSupportVec <- function(x, output_length = 1001) {
   return(seq(from = min(x), to = max(x), length.out = output_length))
 }
+######## TODO ADD computationg from  being passed in params
+
+
 #'  Fits dose-response curves to data given by the user
-#'  and returns the AUC of the fitted curve, normalized to the length of the concentration range.
+#'  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
 #'
 #'  @param conc [vector] is a vector of drug concentrations.
 #'
@@ -156,49 +239,49 @@ trunc = FALSE) {
 #'  curve-fitting is performed.
 .computeAUCUnderFittedCurve <- function(conc, viability, trunc=TRUE, verbose=FALSE) {
   
-  #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
-  if (prod(is.finite(conc)) != 1) {
-    print(conc)
-    stop("Concentration vector contains elements which are not real numbers.")
-  }
+  # #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
+  # if (prod(is.finite(conc)) != 1) {
+  #   print(conc)
+  #   stop("Concentration vector contains elements which are not real numbers.")
+  # }
   
-  if (prod(is.finite(viability)) != 1) {
-    print(viability)
-    stop("Viability vector contains elements which are not real numbers.")
-  }
+  # if (prod(is.finite(viability)) != 1) {
+  #   print(viability)
+  #   stop("Viability vector contains elements which are not real numbers.")
+  # }
   
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
-  }
+  # if (is.logical(trunc) == FALSE) {
+  #   print(trunc)
+  #   stop("'trunc' is not a logical.")
+  # }
   
-  if (length(conc) != length(viability)) {
-    print(conc)
-    print(viability)
-    stop("Concentration vector is not of same length as viability vector.")
-  }
+  # if (length(conc) != length(viability)) {
+  #   print(conc)
+  #   print(viability)
+  #   stop("Concentration vector is not of same length as viability vector.")
+  # }
   
-  if (min(conc) < 0) {
-    stop("Concentration vector contains negative data.")
-  }
+  # if (min(conc) < 0) {
+  #   stop("Concentration vector contains negative data.")
+  # }
   
-  if (min(viability) < 0 && verbose) {
-    warning("Warning: Negative viability data.")
-  }
+  # if (min(viability) < 0 && verbose) {
+  #   warning("Warning: Negative viability data.")
+  # }
   
-  if (max(viability) > 100 && verbose) {
-    warning("Warning: Viability data exceeds negative control.")
-  }
+  # if (max(viability) > 100 && verbose) {
+  #   warning("Warning: Viability data exceeds negative control.")
+  # }
   
-  #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
-  log_conc <- log10(conc)
-  viability <- viability / 100
+  # #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
+  # log_conc <- log10(conc)
+  # viability <- viability / 100
   
-  if (trunc == TRUE) {
-    viability[which(viability < 0)] <- 0
-    viability[which(viability > 1)] <- 1
-  }
-  
+  # if (trunc == TRUE) {
+  #   viability[which(viability < 0)] <- 0
+  #   viability[which(viability > 1)] <- 1
+  # }
+  log_conc <- conc
   #FIT CURVE AND CALCULATE IC50
   pars <- unlist(logLogisticRegression(log_conc,
                                        viability,
@@ -211,8 +294,8 @@ trunc = FALSE) {
 #This function is being used in computeSlope 
 .optimizeRegression <- function(x, y, x0 = -3, y0 = 100)
 {
-    beta1 = (sum(x * y) - y0 * sum(x)) / (sum(x * x) - x0 * sum(x))
-    return(beta1)
+  beta1 = (sum(x * y) - y0 * sum(x)) / (sum(x * x) - x0 * sum(x))
+  return(beta1)
 }
 
 updateMaxConc <- function(pSet){

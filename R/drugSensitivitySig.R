@@ -31,7 +31,7 @@
 #' @examples
 #' data(GDSCsmall)
 #' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-#'              nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+#'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' print(drug.sensitivity)
 #' 
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
@@ -55,13 +55,21 @@
 #' @param sensitivity.cutoff Allows to provide upper and lower bounds to
 #'   sensitivity measures in the cases where the values exceed physical values
 #'   due to numerical or other errors.
+#' @param standardize [character] One of "SD", "rescale", or "none", for the form of standardization of
+#'   the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95%
+#'   interquantile range lies in [0,1]. If none no rescaling is done. 
 #' @param verbose [boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed
+#' @param ... additional arguments not currently fully supported by the function  
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' @export
 #' @import parallel
 
-drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.measure="auc_recomputed", molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), sensitivity.summary.stat=c("mean", "median", "first", "last"), returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, nthread=1, verbose=TRUE) {
+drugSensitivitySig <- function(pSet, mDataType, drugs, features, 
+                               sensitivity.measure="auc_recomputed", 
+                               molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), 
+                               sensitivity.summary.stat=c("mean", "median", "first", "last"), 
+                               returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, standardize=c("SD", "rescale", "none"), nthread=1, verbose=TRUE, ...) {
 	
 	### This function needs to: Get a table of AUC values per cell line / drug
 	### Be able to recompute those values on the fly from raw data if needed to change concentration
@@ -73,6 +81,10 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   #sensitivity.measure <- match.arg(sensitivity.measure)
   molecular.summary.stat <- match.arg(molecular.summary.stat)
   sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
+  standardize <- match.arg(standardize)
+  
+  dots <- list(...)
+  ndots <- length(dots)
   
   
   if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
@@ -137,11 +149,15 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
     features <- features[fix]
   }
   
+  if(is.null(dots[["sProfiles"]])){
 	drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
 
     return(t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose)))
 
-  })
+  })} else {
+    sProfiles <- dots[["sProfiles"]]
+    drugpheno.all <- list(t(sProfiles))
+  }
 
 	dix <- is.element(drugn, do.call(colnames,drugpheno.all))
   if (verbose && !all(dix)) {
@@ -152,8 +168,13 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   }
   drugn <- drugn[dix]
   
-	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)
+	pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)[features,]
 
+  if(!is.null(dots[["mProfiles"]])){
+    mProfiles <- dots[["mProfiles"]]
+    Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features,colnames(pSet@molecularProfiles[[mDataType]]),drop=FALSE]
+
+  }
 
 	drugpheno.all <- lapply(drugpheno.all, function(x) {
 
@@ -175,7 +196,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
   }
   splitix <- parallel::splitIndices(nx=length(drugn), ncl=1)
   splitix <- splitix[sapply(splitix, length) > 0]
-  mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, nthread) {
+  mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
   res <- NULL
   for(i in drugn[x]) {
   ## using a linear model (x ~ concentration + cell + batch)
@@ -184,12 +205,12 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
       if(!is.na(sensitivity.cutoff)) {
             dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, nthread=nthread, verbose=verbose)
+      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
       res <- c(res, list(rr$all))
     }
     names(res) <- drugn[x]
     return(res)
-  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread)
+  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
   drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
@@ -204,5 +225,5 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features, sensitivity.mea
 
 drug.sensitivity <- PharmacoSig(drug.sensitivity, PSetName = pSetName(pSet), Call ="as.character(match.call())", SigType='Sensitivity')
 
-    return(drug.sensitivity)
+	return(drug.sensitivity)
 }

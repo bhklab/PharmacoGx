@@ -5,7 +5,7 @@
 #' in the object, and the date of last update.
 #'
 #' @examples
-#' \dontrun{
+#' if (interactive()){
 #' availablePSets()
 #' }
 #' 
@@ -36,7 +36,7 @@ availablePSets <- function(saveDir=file.path(".", "PSets"), myfn="PSets.csv", ve
 #' \code{PharmacoGx}.
 #' 
 #' @examples
-#' \dontrun{
+#' if (interactive()){
 #' downloadPSet("CMAP")
 #' }
 #' 

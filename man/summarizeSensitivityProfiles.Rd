@@ -12,8 +12,11 @@ summarizeSensitivityProfiles(pSet, sensitivity.measure = "auc_recomputed",
 \arguments{
 \item{pSet}{[PharmacoSet] The PharmacoSet from which to extract the data}
 
-\item{sensitivity.measure}{[character] which sensitivity sensitivity.measure to use? Use the 
-sensitivityMeasures function to find out what measures are available for each PSet.}
+\item{sensitivity.measure}{[character] which sensitivity sensitivity.measure to use? The current
+choices are 'gi50_published', 'ic50_published', 'ic50_recomputed',
+'auc_published', auc_recomputed', 'auc_recomputed_star',
+ 'amax_published', 'amax_recomputed',
+ 'Synergy_score' and 'slope_recomputed'.}
 
 \item{cell.lines}{\code{character} The cell lines to be summarized. 
  If any cell lines has no data, it will be filled with
@@ -29,7 +32,7 @@ cell line-drug experiments? Choices are "mean", "median", "first", or "last"}
 \item{fill.missing}{\code{boolean} should the missing cell lines not in the
 molecular data object be filled in with missing values?}
 
-\item{verbose}{Should the function print progress messages?}
+\item{verbose}{\code{logical} Should extra info messages be printed}
 }
 \value{
 [matrix] A matrix with cell lines going down the rows, drugs across

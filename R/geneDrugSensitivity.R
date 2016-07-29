@@ -1,5 +1,5 @@
 ########################
-## Benjamin Haibe-Kains
+## Benjamin Haibe-Kains & Petr Smirnov
 ## October 23, 2013
 ########################
 
@@ -12,7 +12,7 @@
 #' @importFrom stats formula
 #' @importFrom stats var
 
-geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE, verbose=FALSE) {
+geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
 ## input:
 ##  x: numeric vector of gene expression values
 ##  type: vector of factors specifying the cell lines or type types
@@ -24,6 +24,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 ##
 ## output:
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
+
+  standardize <- match.arg(standardize)
 
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
@@ -45,7 +47,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
       rest <- do.call(c, rest)
       rest <- c(rest, n=nn, "fstat"=NA, "pvalue"=NA)
     } else {
-      rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, df=NA)
+      rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "df"=NA)
     }
   } else {
     rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
@@ -57,15 +59,22 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   }
 
   ## standardized coefficient in linear model 
-  if(length(table(drugpheno)) > 2) {
-    drugpheno <- apply(drugpheno, 2, function(x){
-      return(x[ccix]/sd(as.numeric(x[ccix])))
-    })
+  if(length(table(drugpheno)) > 2 & standardize!= "none") {
+    switch(standardize, 
+      "SD" = drugpheno <- apply(drugpheno, 2, function(x){
+      return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
+      "rescale" = drugpheno <- apply(drugpheno, 2, function(x){
+      return(rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE))    })
+      )
+
   }else{
     drugpheno <- drugpheno[ccix,,drop=FALSE]
   }
-  if(length(table(x)) > 2){
-    xx <- x[ccix] / sd(x[ccix], na.rm=TRUE)
+  if(length(table(x)) > 2  & standardize!= "none"){
+    switch(standardize, 
+      "SD" = xx <- x[ccix]/sd(as.numeric(x[ccix])) ,
+      "rescale" = xx <- rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
+      )
   }else{
     xx <- x[ccix]
   }

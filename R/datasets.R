@@ -12,7 +12,7 @@
 #' @docType data
 #' @name CMAPsmall
 #' @usage data(CMAPsmall)
-#' @keywords dataset
+#' @keywords datasets
 #' @format PharmacoSet object
 #'
 NULL
@@ -31,7 +31,7 @@ NULL
 #' @docType data
 #' @name GDSCsmall
 #' @usage data(GDSCsmall)
-#' @keywords dataset
+#' @keywords datasets
 #' @format PharmacoSet object
 #'
 NULL
@@ -50,7 +50,7 @@ NULL
 #' @docType data
 #' @name CCLEsmall
 #' @usage data(CCLEsmall)
-#' @keywords dataset
+#' @keywords datasets
 #' @format PharmacoSet object
 #'
 NULL
@@ -67,7 +67,7 @@ NULL
 #' @docType data
 #' @name HDAC_genes
 #' @usage data(HDAC_genes)
-#' @keywords dataset
+#' @keywords datasets
 #' @format a 13x2 data.frame with gene identifiers in the first column and
 #'   direction change in the second
 #'

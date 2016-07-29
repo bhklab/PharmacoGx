@@ -29,9 +29,13 @@
 #' @param upper_bounds [vector] is a vector of length 3 whose entries are the upper bounds on the HS, E_inf,
 #' and base-10 logarithm of the EC50 parameters, respectively.
 #' @param scale is a positive real number specifying the shape parameter of the Cauchy distribution.
-#' @param Cauchy_flag [logical], if true, uses MLE under an assumption of Cauchy-distributed errors
+#' @param family [character], if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
 #' instead of sum-of-squared-residuals as the objective function for assessing goodness-of-fit of
-#' dose-response curves to the data.
+#' dose-response curves to the data. Otherwise, if "normal", uses MLE with a gaussian assumption of errors
+#' @param median_n If the viability points being fit were medians of measurements, they are expected to follow a median of \code{family}
+#' distribution, which is in general quite different from the case of one measurement. Median_n is the number of measurements
+#' the median was taken of. If the measurements are means of values, then both the Normal and the Cauchy distributions are stable, so means of 
+#' Cauchy or Normal distributed variables are still Cauchy and normal respectively.
 #' @param conc_as_log [logical], if true, assumes that log10-concentration data has been given rather than concentration data,
 #' and that log10(EC50) should be returned instead of EC50.
 #' @param viability_as_pct [logical], if false, assumes that viability is given as a decimal rather
@@ -41,7 +45,8 @@
 #' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
 #' @return A vector containing estimates for HS, E_inf, and EC50
 #' @export
-#' @importFrom stats optim
+#' @importFrom stats optim dcauchy dnorm pcauchy rcauchy rnorm pnorm integrate
+
 logLogisticRegression <- function(conc,
                                   viability,
                                   density = c(2, 10, 2),
@@ -50,50 +55,30 @@ logLogisticRegression <- function(conc,
                                   lower_bounds = c(0, 0, -6),
                                   upper_bounds = c(4, 1, 6),
                                   scale = 0.07,
-                                  Cauchy_flag = FALSE,
+                                  family = c("normal", "Cauchy"),
+                                  median_n = 1,
                                   conc_as_log = FALSE,
                                   viability_as_pct = TRUE,
                                   trunc = TRUE,
                                   verbose = FALSE) {
-  guess <- .logLogisticRegressionRaw(conc, viability, density , step, precision, lower_bounds, upper_bounds, scale, Cauchy_flag, conc_as_log, viability_as_pct, trunc, verbose)
-  return(list("HS" = guess[1],
-              "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
-              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
-}
+  # guess <- .logLogisticRegressionRaw(conc, viability, density , step, precision, lower_bounds, upper_bounds, scale, Cauchy_flag, conc_as_log, viability_as_pct, trunc, verbose)
 
-.logLogisticRegressionRaw <- function(conc,
-                                  viability,
-                                  density = c(2, 10, 2),
-                                  step = .5 / density,
-                                  precision = 0.05,
-                                  lower_bounds = c(0, 0, -6),
-                                  upper_bounds = c(4, 1, 6),
-                                  scale = 0.07,
-                                  Cauchy_flag = FALSE,
-                                  conc_as_log = FALSE,
-                                  viability_as_pct = TRUE,
-                                  trunc = TRUE,
-                                  verbose = FALSE) {
 
-  conc <- as.numeric(conc[!is.na(conc)])
-  viability <- as.numeric(viability[!is.na(viability)])
-  ii <- which(conc == 0)
-  if(length(ii) > 0) {
-    conc <- conc[-ii]
-    viability <- viability[-ii]
-  }
+# .logLogisticRegressionRaw <- function(conc,
+#                                   viability,
+#                                   density = c(2, 10, 2),
+#                                   step = .5 / density,
+#                                   precision = 0.05,
+#                                   lower_bounds = c(0, 0, -6),
+#                                   upper_bounds = c(4, 1, 6),
+#                                   scale = 0.07,
+#                                   Cauchy_flag = FALSE,
+#                                   conc_as_log = FALSE,
+#                                   viability_as_pct = TRUE,
+#                                   trunc = TRUE,
+#                                   verbose = FALSE) {
+  family <- match.arg(family)
 
-  #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
-  if (prod(is.finite(conc)) != 1) {
-    print(conc)
-    stop("Concentration vector contains elements which are not real numbers.")
-  }
-  
-  if (prod(is.finite(viability)) != 1) {
-    print(viability)
-    stop("Viability vector contains elements which are not real numbers.")
-  }
-  
   if (prod(is.finite(step)) != 1) {
     print(step)
     stop("Step vector contains elements which are not positive real numbers.")
@@ -124,48 +109,19 @@ logLogisticRegression <- function(conc,
     stop("Scale is not a real number.")
   }
   
-  if (is.logical(Cauchy_flag) == FALSE) {
-    print(Cauchy_flag)
-    stop("Cauchy flag is not a logical.")
+  if (is.character(family) == FALSE) {
+    print(family)
+    stop("Cauchy flag is not a string.")
   }
   
-  if (is.logical(conc_as_log) == FALSE) {
-    print(conc_as_log)
-    stop("'conc_as_log' is not a logical.")
-  }
   
-  if (is.logical(viability_as_pct) == FALSE) {
-    print(viability_as_pct)
-    stop("'viability_as_pct' is not a logical.")
-  }
-  
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
-  }
   
   if (min(upper_bounds - lower_bounds) < 0) {
     print(rbind(lower_bounds, upper_bounds))
     stop("Upper bounds on parameters do not exceed lower bounds.")
   }
   
-  if (length(conc) != length(viability)) {
-    print(conc)
-    print(viability)
-    stop("Log concentration vector is not of same length as viability vector.")
-  }
   
-  if (min(viability) < 0) {
-    if (verbose == TRUE) {
-      warning("Warning: Negative viability data.")
-    }
-  }
-  
-  if (max(viability) > 100 / (1 + 99 * viability_as_pct)) {
-    if (verbose == TRUE) {
-      warning("Warning: Viability data exceeds negative control.")
-    }
-  }
   
   if (min(density) <= 0) {
     print(density)
@@ -187,80 +143,82 @@ logLogisticRegression <- function(conc,
     stop("Scale parameter is a nonpositive number.")
   }
   
-  if (conc_as_log == FALSE && min(conc) < 0) {
-    print(conc)
-    print(conc_as_log)
-    stop("Negative concentrations encountered. Concentration data may be inappropriate, or 'conc_as_log' flag may be set incorrectly.")
-  }
+  cleanData  <- sanitizeInput(conc=conc,
+            viability=viability,
+            conc_as_log = conc_as_log,
+            viability_as_pct = viability_as_pct,
+            trunc = trunc,
+            verbose=verbose)
+
+  log_conc <- cleanData[["log_conc"]]
+  viability <- cleanData[["viability"]]
   
-  if (viability_as_pct == TRUE && max(viability) < 5) {
-    print(viability)
-    print(viability_as_pct)
-    if (verbose == TRUE) {
-      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
-    }
-  }
   
-  if (viability_as_pct == FALSE && max(viability) > 5) {
-    print(viability)
-    print(viability_as_pct)
-    if (verbose == TRUE) {
-      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
-    }
-  }
+  #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
+  # tryCatch(
+  gritty_guess <- c(1,min(viability), log_conc[which.min(abs(viability - 1/2))])
+  guess <- tryCatch(optim(par=gritty_guess,#par = sieve_guess,
+                          fn = function(x) {.residual(log_conc,
+                                                      viability,
+                                                      pars = x,
+                                                      n = median_n,
+                                                      scale = scale,
+                                                      family = family,
+                                                      trunc = trunc)
+                          },
+                          lower = lower_bounds,
+                          upper = upper_bounds,
+                          method = "L-BFGS-B",
+                          #control=list(maxit=100000)
+                          ),#[[1]],
+                    error = function(e) {
+                      list("par"=gritty_guess, "convergence"=-1)
+                    })
+  # if(guess[["convergence"]]!=0)  print(guess[["message"]]); #print(results[["convergence"]])
+  failed = guess[["convergence"]]!=0
+  guess <- guess[["par"]]
   
-  #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
-  if (conc_as_log == FALSE) {
-    log_conc <- log10(conc)
-  } else {
-    log_conc <- conc
-  }
+  guess_residual <- .residual(log_conc,
+                              viability,
+                              pars = guess,
+                              n = median_n,
+                              scale = scale,
+                              family = family,
+                              trunc = trunc)
   
-  if (viability_as_pct == TRUE) {
-    viability <- viability / 100
-  }
-  
-  if (trunc == TRUE) {
-    viability[which(viability < 0)] <- 0
-    viability[which(viability > 1)] <- 1
-  }
-  
+
   #GENERATE INITIAL GUESS BY OBJECTIVE FUNCTION EVALUATION AT LATTICE POINTS
-  sieve_guess <- .meshEval(log_conc,
+
+  gritty_guess_residual <- .residual(log_conc,
+                                    viability,
+                                    pars = gritty_guess,
+                                    n = median_n,
+                                    scale = scale,
+                                    family = family,
+                                    trunc = trunc)
+  
+
+  #CHECK SUCCESS OF L-BFGS OPTIMIZAITON AND RE-OPTIMIZE WITH A PATTERN SEARCH IF NECESSARY
+  if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
+    #GENERATE INITIAL GUESS BY OBJECTIVE FUNCTION EVALUATION AT LATTICE POINTS
+    sieve_guess <- .meshEval(log_conc,
                            viability,
                            lower_bounds = lower_bounds,
                            upper_bounds = upper_bounds,
                            density = c(2, 10, 2),
+                           n=median_n,
                            scale = scale,
-                           Cauchy_flag = Cauchy_flag)
-  sieve_guess_residual <- .residual(log_conc,
+                           family = family,
+                           trunc = trunc)
+
+    sieve_guess_residual <- .residual(log_conc,
                                     viability,
                                     pars = sieve_guess,
+                                    n = median_n,
                                     scale = scale,
-                                    Cauchy_flag = Cauchy_flag)
-  
-  #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
-  guess <- tryCatch(optim(par = sieve_guess,
-                          fn = function(x) {.residual(log_conc,
-                                                      viability,
-                                                      pars = x,
-                                                      scale = scale,
-                                                      Cauchy_flag = Cauchy_flag)
-                          },
-                          lower = lower_bounds,
-                          upper = upper_bounds,
-                          method = "L-BFGS-B")[[1]],
-                    error = function(e) {
-                      c(NA, NA, NA)
-                    })
-  guess_residual <- .residual(log_conc,
-                              viability,
-                              pars = guess,
-                              scale = scale,
-                              Cauchy_flag = Cauchy_flag)
-  
-  #CHECK SUCCESS OF L-BFGS OPTIMIZAITON AND RE-OPTIMIZE WITH A PATTERN SEARCH IF NECESSARY
-  if (prod(is.na(guess)) == 1 || guess_residual >= sieve_guess_residual) {
+                                    family = family,
+                                    trunc = trunc)
+
     guess <- sieve_guess
     guess_residual <- sieve_guess_residual
     span <- 1
@@ -279,8 +237,10 @@ logLogisticRegression <- function(conc,
         neighbour_residuals[i] <- .residual(log_conc,
                                             viability,
                                             pars = neighbours[i, ],
+                                            n = median_n,
                                             scale = scale,
-                                            Cauchy_flag = Cauchy_flag)
+                                            family = family,
+                                            trunc = trunc)
       }
       
       if (min(neighbour_residuals) < guess_residual) {
@@ -292,6 +252,7 @@ logLogisticRegression <- function(conc,
     }
   }
 
-return(guess)
-
+  return(list("HS" = guess[1],
+              "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
+              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
 }

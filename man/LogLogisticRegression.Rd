@@ -7,9 +7,9 @@ and returns a vector containing estimates for HS, E_inf, and EC50.}
 \usage{
 logLogisticRegression(conc, viability, density = c(2, 10, 2),
   step = 0.5/density, precision = 0.05, lower_bounds = c(0, 0, -6),
-  upper_bounds = c(4, 1, 6), scale = 0.07, Cauchy_flag = FALSE,
-  conc_as_log = FALSE, viability_as_pct = TRUE, trunc = TRUE,
-  verbose = FALSE)
+  upper_bounds = c(4, 1, 6), scale = 0.07, family = c("normal", "Cauchy"),
+  median_n = 1, conc_as_log = FALSE, viability_as_pct = TRUE,
+  trunc = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{conc}{[vector] is a vector of drug concentrations.}
@@ -36,9 +36,14 @@ and base-10 logarithm of the EC50 parameters, respectively.}
 
 \item{scale}{is a positive real number specifying the shape parameter of the Cauchy distribution.}
 
-\item{Cauchy_flag}{[logical], if true, uses MLE under an assumption of Cauchy-distributed errors
+\item{family}{[character], if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
 instead of sum-of-squared-residuals as the objective function for assessing goodness-of-fit of
-dose-response curves to the data.}
+dose-response curves to the data. Otherwise, if "normal", uses MLE with a gaussian assumption of errors}
+
+\item{median_n}{If the viability points being fit were medians of measurements, they are expected to follow a median of \code{family}
+distribution, which is in general quite different from the case of one measurement. Median_n is the number of measurements
+the median was taken of. If the measurements are means of values, then both the Normal and the Cauchy distributions are stable, so means of 
+Cauchy or Normal distributed variables are still Cauchy and normal respectively.}
 
 \item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data,
 and that log10(EC50) should be returned instead of EC50.}

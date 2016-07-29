@@ -10,6 +10,9 @@ showSigAnnot(Sigs)
 \item{Sigs}{An object of the \code{PharmacoSig} Class, as
 returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}}
 }
+\value{
+Prints the PharmacoGx Signatures annotations to the output stream, and returns invisible NULL.
+}
 \description{
 This funtion prints out the information about the call used to compute the drug signatures, and the session info 
 for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures.
@@ -17,7 +20,7 @@ for the session in which the computation was done. Useful for determining the ex
 \examples{
 data(GDSCsmall)
 drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+             nthread=1, features = fNames(GDSCsmall, "rna")[1])
 showSigAnnot(drug.sensitivity)
 
 }

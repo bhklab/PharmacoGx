@@ -23,7 +23,7 @@ The table includes the names of the PharamcoSet, the types of data available
 in the object, and the date of last update.
 }
 \examples{
-\dontrun{
+if (interactive()){
 availablePSets()
 }
 

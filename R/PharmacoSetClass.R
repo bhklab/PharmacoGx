@@ -101,6 +101,7 @@
 #' @export
 #' @import methods
 #' @importFrom utils sessionInfo
+#' @importFrom stats na.omit
 PharmacoSet <-  function(name, 
                           molecularProfiles=list(), 
                           cell=data.frame(), 
@@ -580,21 +581,21 @@ setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="
 
 
     #### TODO:: set replace method for genenames
-#' featureNames Generic
+#' fNames Generic
 #' 
-#' A generic for the featureNames method
+#' A generic for the fNames method
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' featureNames(CCLEsmall, "rna")
+#' fNames(CCLEsmall, "rna")
 #' 
 #' @param pSet The \code{PharmacoSet} 
 #' @param mDataType The molecular data type to return feature names for
 #' @return A \code{character} vector of the feature names
-setGeneric("featureNames", function(pSet, mDataType) standardGeneric("featureNames"))
+setGeneric("fNames", function(pSet, mDataType) standardGeneric("fNames"))
 #' @describeIn PharmacoSet Return the feature names used in the dataset
 #' @export
-setMethod(featureNames, "PharmacoSet", function(pSet, mDataType){
+setMethod(fNames, "PharmacoSet", function(pSet, mDataType){
   if (mDataType %in% names(pSet@molecularProfiles)) {
     rownames(featureInfo(pSet, mDataType))
   } else {
@@ -732,6 +733,7 @@ setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value=
 #' data(CCLEsmall)
 #' CCLEsmall
 #' 
+#' @return Prints the PharmacoSet object to the output stream, and returns invisible NULL. 
 #' @export
 setMethod("show", signature=signature(object="PharmacoSet"), 
     function(object) {
@@ -771,11 +773,12 @@ mDataNames <- function(pSet){
 
 #'`[`
 #'
-#'@param x numeric
-#'@param i numeric
-#'@param j numeric
+#'@param x PSet
+#'@param i Cell lines to keep in PSet
+#'@param j Drugs to keep in PSet
 #'@param ... further arguments
 #'@param drop A boolean flag of whether to drop single dimensions or not
+#'@return Returns the subsetted PSet
 #'@export
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
@@ -1184,6 +1187,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 #' @param pSet A \code{PharmacoSet} to be verified
 #' @param plotDist Should the function also plot the distribution of molecular data?
 #' @param result.dir The path to the directory for saving the plots as a string
+#' @return Prints out messages whenever describing the errors found in the structure of the pset object passed in. 
 #' @export
 #' @importFrom graphics hist
 #' @importFrom grDevices dev.off pdf
@@ -1302,7 +1306,7 @@ checkPSetStructure <-
         warning("drugid does not exist in sensitivity info")
       }
       
-      if(!is.na(pSet@sensitivity$raw)) {
+      if(any(!is.na(pSet@sensitivity$raw))) {
         if(!all(dimnames(pSet@sensitivity$raw)[[1]] %in% rownames(pSet@sensitivity$info))) {
           warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
         }

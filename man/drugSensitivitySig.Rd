@@ -11,7 +11,8 @@ drugSensitivitySig(pSet, mDataType, drugs, features,
   "median", "first", "last", "or", "and"),
   sensitivity.summary.stat = c("mean", "median", "first", "last"),
   returnValues = c("estimate", "pvalue", "fdr"), sensitivity.cutoff,
-  nthread = 1, verbose = TRUE)
+  standardize = c("SD", "rescale", "none"), nthread = 1, verbose = TRUE,
+  ...)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] a PharmacoSet of the perturbation experiment type}
@@ -42,10 +43,16 @@ should the function return for each gene drug pair?}
 sensitivity measures in the cases where the values exceed physical values
 due to numerical or other errors.}
 
+\item{standardize}{[character] One of "SD", "rescale", or "none", for the form of standardization of
+the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95%
+interquantile range lies in [0,1]. If none no rescaling is done.}
+
 \item{nthread}{[numeric] if multiple cores are available, how many cores
 should the computation be parallelized over?}
 
 \item{verbose}{[boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed}
+
+\item{...}{additional arguments not currently fully supported by the function}
 }
 \value{
 [list] a 3D array with genes in the first dimension, drugs in the
@@ -62,7 +69,7 @@ drugs in the second, and the selected return values in the third.
 \examples{
 data(GDSCsmall)
 drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-             nthread=1, features = featureNames(GDSCsmall, "rna")[1])
+             nthread=1, features = fNames(GDSCsmall, "rna")[1])
 print(drug.sensitivity)
 
 }

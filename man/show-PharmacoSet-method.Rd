@@ -10,6 +10,9 @@
 \arguments{
 \item{object}{\code{PharmacoSet}}
 }
+\value{
+Prints the PharmacoSet object to the output stream, and returns invisible NULL.
+}
 \description{
 Show a PharamcoSet
 }

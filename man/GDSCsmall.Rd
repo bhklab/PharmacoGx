@@ -18,5 +18,5 @@ please download using the downloadPSet function.
 \references{
 Garnett et al. Systematic identification of genomic markers of drug sensitivity in cancer cells. Nature, 2012.
 }
-\keyword{dataset}
+\keyword{datasets}
 

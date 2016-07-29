@@ -85,7 +85,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 	inpumat[ , "type"] <- factor(inpumat[ , "type"], ordered=FALSE)
 	inpumat[ , "batch"] <- factor(inpumat[ , "batch"], ordered=FALSE)
 
-	if (nrow(inpumat) < 3 || length(sort(unique(inpumat[ , "concentration"]))) < 2 || length(unique(inpumat[ , "duration"])) < 2) {
+	if (nrow(inpumat) < 3 || length(sort(unique(inpumat[ , "concentration"]))) < 2 ) {
 ## not enough experiments in drug list
 		warning(sprintf("Not enough data for drug(s) %s", paste(drug, collapse=", ")))
 		return(list("all.type"=NULL, "single.type"=NULL))

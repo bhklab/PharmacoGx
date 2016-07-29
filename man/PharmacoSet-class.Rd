@@ -13,9 +13,9 @@
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{drugNames,PharmacoSet-method}
 \alias{drugNames<-,PharmacoSet,character-method}
+\alias{fNames,PharmacoSet-method}
 \alias{featureInfo,PharmacoSet-method}
 \alias{featureInfo<-,PharmacoSet,character,data.frame-method}
-\alias{featureNames,PharmacoSet-method}
 \alias{molecularProfiles,PharmacoSet-method}
 \alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
 \alias{pSetName,PharmacoSet-method}
@@ -73,7 +73,7 @@
 
 \S4method{cellNames}{PharmacoSet,character}(object) <- value
 
-\S4method{featureNames}{PharmacoSet}(pSet, mDataType)
+\S4method{fNames}{PharmacoSet}(pSet, mDataType)
 
 \S4method{dateCreated}{PharmacoSet}(pSet)
 
@@ -153,7 +153,7 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{cellNames<-}: Update the cell names used in the dataset
 
-\item \code{featureNames}: Return the feature names used in the dataset
+\item \code{fNames}: Return the feature names used in the dataset
 
 \item \code{dateCreated}: Return the date the PharmacoSet was created
 
