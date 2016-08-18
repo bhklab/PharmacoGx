@@ -1,0 +1,209 @@
+%\VignetteIndexEntry{Creating a PharmacoSet object}
+%\VignetteDepends{xtable}
+%\VignetteSuggests{}
+%\VignetteKeywords{}
+%\VignettePackage{PharmacoGx}
+
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+
+
+
+\newenvironment{myitemize}
+{ \begin{itemize}
+    \setlength{\itemsep}{0.5pt}
+    \setlength{\parskip}{0.5pt}
+    \setlength{\parsep}{0.5pt}     }
+{ \end{itemize}                  } 
+
+
+
+\title{Creating a PharmacoSet object}
+\author[1]{Petr Smirnov}
+\author[1,2]{Zhaleh Safikhani}
+\author[1,2,3]{Benjamin Haibe-Kains}
+\affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
+\affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
+
+\SweaveOpts{highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE}
+
+<<setup,echo=FALSE,results=hide,eval=FALSE>>=
+options(keep.source=TRUE)
+@
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+\tableofcontents
+
+
+\newpage
+%------------------------------------------------------------
+\section{Intro}
+%------------------------------------------------------------
+
+
+The PharmacoSet class is structured to contain several different types of genomic data, as well as drug dose response data. It is built upon base R data types and the ExpressionSet class. However, a PharmacoSet object requires the presence of specific annotations for the data to be able to function correctly with the function provided in PharmacoGx. The structure allows users to then interrogate the data on the basis of cells and drugs, removing the need for the user to deal with single experiments. We do not recommend creating PharmacoSet objects by the end users, rather we recommend contacting us to have the objects created for your dataset of interest. However, for completeness and power users the process and structure is documented below.
+
+%------------------------------------------------------------
+\section{PharamcoSet Structure}
+%------------------------------------------------------------
+
+The base PharmacoSet structure is as follows:
+
+\begin{myitemize}
+\item[@] \texttt{annotation}:
+\vspace{-0.2cm}
+    \begin{myitemize}
+  \item[\$] \texttt{name}: Acronym of the pharmacogenomic dataset.
+	\item[\$] \texttt{dateCreated}: When the object was created.
+	\item[\$] \texttt{sessionInfo}: Software environment used to create the object.
+	\item[\$] \texttt{call}: Set of parameters used to create the object.
+	\end{myitemize}
+\vspace{-0.2cm}
+\item[@] \texttt{datasetType}: Either 'sensitivity', 'perturbation', or 'both'
+\item[@] \texttt{cell}: data frame annotating all cell lines investigated in the study.
+\item[@] \texttt{drug}: data frame annotating all the drugs investigated in the study.
+\item[@] \texttt{molecularProfiles}: List of \texttt{ExpressionSet} objects containing the molecular profiles of the cell lines, such as mutations, gene expressions, or copy number variations.
+\item[@] \texttt{sensitivity}:
+	\vspace{-0.2cm}
+    \begin{myitemize}
+   	\item[\$] \texttt{n}: Number of experiments for each cell line treated with a given drug
+	\item[\$] \texttt{info}: Metadata for each pharmacological experiment.
+	\item[\$] \texttt{raw}: All cell viability measurements at each drug concentration from the drug dose-response curves.
+	\item[\$] \texttt{profiles}: Drug sensitivity values summarizing each dose-response curve (IC$_{50}$, AUC, etc.)
+	\end{myitemize}
+\vspace{-0.2cm}
+\item[@] \texttt{perturbation}:
+	\vspace{-0.2cm}
+    \begin{myitemize}
+   	\item[\$] \texttt{n}: Number of experiments for each cell line perturbed by a given drug, for each molecular data type
+	\item[\$] \texttt{info}: 'The metadata for the perturbation experiments is available for each molecular type by calling the appropriate info function'
+	\end{myitemize}
+\vspace{-0.2cm}
+\item[@] \texttt{curation}: list of data frames containing the mapping between original drug, cell line, and tissue names to standardized identifiers.
+\end{myitemize}
+
+
+
+%------------------------------------------------------------
+\subsection{annotation}
+%------------------------------------------------------------
+
+The \texttt{annotation} slot contains information pertaining to the PharmacoSet as a whole, including the full information on what packages were loaded into R when the PharmacoSet was created, as well as the date and call to the constructor. The only data that must be entered upon creation of the object is the name of the PharmacoSet, which is passed to the constructor. 
+
+%------------------------------------------------------------
+\subsection{datasetType}
+%------------------------------------------------------------
+
+The \texttt{datasetType} slot is a character string which signifies whether the PharmacoSet contains drug dose \texttt{sensitivity} data, genomic \texttt{perturbation} data, or \texttt{both}. This slot is necessary for the subsetting and intersecting function to be aware of what data types they should be looking for. 
+
+
+%------------------------------------------------------------
+\subsection{cell}
+%------------------------------------------------------------
+
+This slot contains a \texttt{data.frame} which contains information about all the cells profiles across all the data types in the PharamcoSet, including both perturbation and sensitivity experiments. It is crucial for the rownames of each entry in the data frame to be the \textbf{unique cell identifier} used across all the datatypes for each cell type. The content of this data frame will vary based on what information each dataset provides. One of the columns in this data frame must be \texttt{tissueid}, predictably 
+
+
+%------------------------------------------------------------
+\subsection{drug}
+%------------------------------------------------------------
+
+
+This slot contains a \texttt{data.frame} which contains information about all the drugs profiled across all the data types in the PharmacoSet, including both perturbation and sensitivity experiments. Similar to the \texttt{cell} slot, it is crucial for the rownames of each entry in the data frame to be the \textbf{unique compound identifier} used across all the datatypes for each compound. Once again, the content in this data frame will vary based on information provided by each dataset. 
+
+
+%------------------------------------------------------------
+\subsection{molecularProfiles}
+%------------------------------------------------------------
+
+The molecular profiles slot of a PharmacoSet object contains all the molecular expression data profiled in the dataset. Each type of data is kept in a separate ExpressionSet object, and they are all stored as a list. However, to insure coordination between data types, there are specific annotations that must be included in the ExpressionSet object. The annotations also differ slightly in the cases of \texttt{perturbation} and \texttt{sensitivity} datasets. 
+
+First of all, each ExpressionSet object must be labelled with the type of data included within the object. Currently only \texttt{mutation}, \texttt{fusion}, and \texttt{rna} molecular data types are recognized and handled differently by summarizing and signature generating functions. This labelling is done by calling, for example:
+<< eval=FALSE >>=
+Biobase::annotation(eset) <- "rna"
+@
+
+The phenoData in each expression set object also needs to contain specific columns labelling each experiment. For sensitivity type datasets, this has to include:  \\
+
+\texttt{cellid}: This column contains a cell identifier that matches \textbf{exactly} the rownames of the cell slot of the PSet.\\
+\texttt{batchid}: This column contains and id of the batch of each experiment. If such data is not available then it is customary to fill with NA, but this column must be present.\\
+
+Additionally, for the perturbation type datasets, there are several more columns of metadata that must be included to enable the modelling of differential gene expression. These are:\\
+
+\texttt{drugid}: The identifier of the drug used in each experiment when a compound was applied. For controls, it should be left as NA. These must match \textbf{exactly} to the rownames of the drug slot in the PharmacoSet.\\
+\texttt{duration}: If available, the length of the experiment. Should be 0 for controls.\\
+\texttt{concentration}: For experiments where compounds were applied, the concentration. Should be 0 for controls. \\
+\texttt{xptype}: A label of either \texttt{perturbation}, of \texttt{control} respectively.\\
+
+Otherwise each ExpressionSet object should be constructed as specified by the Biobase package. \\
+
+Once these ExpressionSet objects are created, they should be added to a list, with the name of each object in the list being descriptive of the type of data contained. 
+
+%------------------------------------------------------------
+\subsection{sensitivity}
+%------------------------------------------------------------
+This is a list containing all the data pertaining to drug dose response experiments, usually only present in \texttt{sensitivity} or \texttt{both} type datasets. This includes the names the following names slots in the list:\\
+
+\texttt{info}. Metadata for each pharmacological experiment stored in a \texttt{data.frame}. Each row of this data.frame should be labelled with a unique experiment identifier. This data.frame must also contain specific columns: \\
+
+\texttt{cellid}: Contains a cell identifier that matches \textbf{exactly} the rownames of the cell slot of the PSet.
+
+\texttt{drugid}: The identifier of the drug used in each experiment when a compound was applied. These must match \textbf{exactly} to the rownames of the drug slot in the PharmacoSet.\\
+
+\texttt{raw}: This is a 3-D \texttt{array} of raw drug dose response data. The first dimension is the experiments, with the names of each row in this dimension labelled exactly as the experiment ids used in the metadata data.frame \texttt{info} above. The second dimension is the doses, with each \"column\" labelled as \texttt{doses\#}, where the number is the column number. This is as long as there are different number of doses for each experiment. The third dimension is always fixed at 2, with names \texttt{Dose}, and \texttt{Viability}. \texttt{Dose} contains the actual dose used (usually in micro-molar), while viability contains the cell viability measurement at that dose. Therefore, for each experiment there are two vectors, one of doses and one of viabilities at each dose. \\
+
+\texttt{profiles} This is a data.frame containing down the rows, with \textbf{exactly} matching rownames, the experiments as labelled in the \texttt{info} data.frame, and each column being a summary of the drug dose sensitivity, such as \texttt{auc\_published} or \texttt{ic50\_published}, as published with the data. \\
+
+\texttt{n} This is a \texttt{matrix} containing cellids matching exactly the rownames of the cell slot of the PSet down the rows, and drugids matching exactly the rownames of the drug slot in the columns. This data.frame summaries how many experiments are in the data for each pair, allowing quick identification of what pairs were tested together. Note that this does not need to be generated before constructing the object, it is generated by the constructor.
+
+
+%------------------------------------------------------------
+\subsection{perturbation}
+%------------------------------------------------------------
+
+This slot is fully filled by the constructor, so nothing needs to be created for it.  \\
+
+\texttt{n} This is a 3-D \texttt{array} containing cellids matching exactly the rownames of the cell slot of the PSet down the rows, and drugids matching exactly the rownames of the drug slot in the columns, and the third dimension being the names of the different molecular profile types. This array summarizes how many perturbation experiments are in each molecular data type for each pair, allowing quick identification of what pairs were tested together.\\
+
+\texttt{info}: This is always exactly the string referring to each data type separately: 'The metadata for the perturbation experiments is available for each molecular type by calling the appropriate info function'
+
+
+%------------------------------------------------------------
+\subsection{curation}
+%------------------------------------------------------------
+
+This slot contains three data.frames, one for drugs, tissues, and cells. Each contains two columns, the first with the unique identifier that is used between all PharmacoSet objects for this drug, and the second with the identifier used within the dataset. At this time there is no set method to find the unique identifiers between all PharmacoSets for arbitrary drugs, as much labour intensive curation has gone into carefully matching identifiers between datasets. However, these tables are used only by the intersecting function, and all other functions will function without this data, therefore for PharmacoSet objects created by users, we recommend just filling both columns with the identifiers used in the datasets, to allow for at least some matching to be done. 
+
+%------------------------------------------------------------
+\section{Creating the PharmacoSet}
+%------------------------------------------------------------
+
+
+Once all the data is in the proper format, it can be passed to a the constructor function as below:
+<< eval=FALSE >>=
+PharmacoSet(name, 
+            molecularProfiles=list(), 
+            cell=data.frame(), 
+            drug=data.frame(), 
+            sensitivityInfo=data.frame(),
+            sensitivityRaw=array(dim=c(0,0,0)), 
+            sensitivityProfiles=matrix(), 
+            curationDrug=data.frame(), 
+            curationCell=data.frame(), 
+            curationTissue=data.frame(), 
+            datasetType=c("sensitivity", "perturbation", "both"),
+            verify = TRUE)
+@
+
+Here, \texttt{name} is the name of the PharmacoSet as described in annotations above, molecularProfiles is the list of ExpressionSet objects described above, cell and drug are the data.frames in the cell and drug slots. The sensitivityInfo, sensitivityRaw, sensitivityProfiles are the elements of the sensitivity slot, and curationDrug, curationCell, and curationTissue the contents of the curation slot. Finally, datasetType is a string to signify which type of data is included in the datset, and verify is a flag for running the verification of the pSet after its construction. Any data detailed above but missing from this constructor call will be created by the constructor, and the default empty values are as in the call above. Notice that none of the values should be set as NA, they should be ommited if the data is not being provided. 
+
+\end{document}
+
+
+
