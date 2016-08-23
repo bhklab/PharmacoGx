@@ -156,7 +156,9 @@ logLogisticRegression <- function(conc,
   
   #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
   # tryCatch(
-  gritty_guess <- c(1,min(viability), log_conc[which.min(abs(viability - 1/2))])
+  gritty_guess <- c(pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
+                    pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
+                    pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]), upper_bounds[3]))
   guess <- tryCatch(optim(par=gritty_guess,#par = sieve_guess,
                           fn = function(x) {.residual(log_conc,
                                                       viability,
