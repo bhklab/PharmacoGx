@@ -186,7 +186,9 @@
                     family = c("normal", "Cauchy"),
                     trunc = FALSE) {
   family <- match.arg(family)
-  guess <- c(1,min(viability), log_conc[which.min(abs(viability - 1/2))])   
+  guess <- c(pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
+                    pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
+                    pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]), upper_bounds[3]))
   guess_residual<- .residual(log_conc,
                              viability,
                              pars = guess,

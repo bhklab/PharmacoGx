@@ -49,10 +49,10 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
     }
   }
   
-	pp <- sensitivityInfo(pSet)
-  pp <- pp[which(pp$cellid %in% cell.lines & pp$drugid %in% drugs),]
+  pp <- sensitivityInfo(pSet)
+  ppRows <- which(pp$cellid %in% cell.lines & pp$drugid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
   if(sensitivity.measure != "max.conc") {
-	  dd <- sensitivityProfiles(pSet)[rownames(pp),]
+    dd <- sensitivityProfiles(pSet)
   } else {
 
     if(!"max.conc"%in% colnames(sensitivityInfo(pSet))){
@@ -60,105 +60,67 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
       pSet <- updateMaxConc(pSet)
 
     }
-    dd <- sensitivityInfo(pSet)[rownames(pp),]
+    dd <- sensitivityInfo(pSet)
 
   }
-	
-	if (!fill.missing) {
-	  cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "cellid"]), "cellid"]))
-	}
-	if (!fill.missing) {
-	  drugs <- intersect(drugs, unique(pp[!is.na(pp[ , "drugid"]), "drugid"]))
-	}
-	
-	
-	## select profiles with no replicates
-  # xps <- apply(pp[ , c("drugid", "cellid")], 1, function (x) {
-  #   if(any(is.na(x))) {
-  #     x <- NA
-  #   } else {
-  #     x <- paste(x, collapse="///")
-  #   }
-  #   return (x)
-  # })
-  # names(xps) <- rownames(pp)
-  
-  xps <- apply(pp[ , c("drugid", "cellid")], 1, paste, collapse="////")
-  xps[!complete.cases(pp[ , c("drugid", "cellid")])] <- NA
-  duplix <- unique(xps[!is.na(xps) & duplicated(xps)])
-  uniqix <- setdiff(xps[!is.na(xps)], duplix)
-  iix <- t(sapply(strsplit(uniqix, "////"), function (x) { return (x) }))
-  iix <- cbind(match(iix[ , 1], drugs), match(iix[ , 2], cell.lines))
-  iix2 <- match(uniqix, xps)
-  ## keep the non ambiguous cases
-  dd2 <- matrix(NA, nrow=length(drugs), ncol=length(cell.lines), dimnames=list(drugs, cell.lines))
-  for (ii in 1:nrow(iix)) {
-    dd2[iix[ii, 1], iix[ii, 2]] <- dd[iix2[ii], sensitivity.measure]
+
+  result <- matrix(NA_real_, nrow=length(drugs), ncol=length(cell.lines))
+  rownames(result) <- drugs
+  colnames(result) <- cell.lines
+
+  if(verbose){
+
+    message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, pSet@annotation$name))
+    total <- length(drugs)*length(cell.lines)
+    # create progress bar 
+    pb <- utils::txtProgressBar(min=0, max=total, style=3)
+    i <- 1
+
+
   }
-  # pp2 <- pp[match(uniqix, xps), , drop=FALSE]
-  # rownames(pp2) <- uniqix
-  
-  if (length(duplix) > 0) {
-    if (verbose) {
-      message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, pSet@annotation$name))
-      total <- length(duplix)
-      # create progress bar 
-      pb <- utils::txtProgressBar(min=0, max=total, style=3)
-      i <- 1
-    }
-    ## there are some replicates to collapse
-    for (x in duplix) {
-      myx <- which(!is.na(xps) & xps == x)
-      iix <- unlist(strsplit(x, "////"))
-			switch(summary.stat, 
+
+  for (drug in drugs){
+    for (cell in cell.lines){
+
+      myx <- which(pp$cellid == cell & pp$drugid == drug)
+
+      switch(summary.stat, 
         "mean" = {
-  				dd2[iix[1], iix[2]] <- mean(dd[myx, sensitivity.measure])
-  			},
-  			"median" = {
-  				dd2[iix[1], iix[2]] <- median(dd[myx, sensitivity.measure])
-  			}, 
-  			"first" = {
-  				dd2[iix[1], iix[2]] <- dd[myx[1], sensitivity.measure]
-  			},
-  			"last" = {
-  				dd2[iix[1], iix[2]] <- dd[myx[length(myx)], sensitivity.measure]
-  			},
+          result[drug, cell] <-  mean(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+        },
+        "median" = {
+          result[drug, cell] <-  median(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+        }, 
+        "first" = {
+          result[drug, cell] <-  as.numeric(dd[myx[1], sensitivity.measure])
+        },
+        "last" = {
+          result[drug, cell] <-  as.numeric(dd[myx[length(myx)], sensitivity.measure])
+        },
         "max"= {
-          dd2[iix[1], iix[2]] <- max(dd[myx, sensitivity.measure])
+          result[drug, cell] <-  max(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
         },
         "min" = {
-          dd2[iix[1], iix[2]] <- min(dd[myx, sensitivity.measure])
-        }
+          result[drug, cell] <-  min(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+        })
 
-      )
-      # ppt <- apply(pp[myx, , drop=FALSE], 2, function (x) {
-      #   x <- paste(unique(x), collapse="////")
-      #   return (x)
-      # })
-      # pp2 <- rbind(pp2, ppt)
       if (verbose){
         utils::setTxtProgressBar(pb, i)
         i <- i + 1
       }
+
     }
-    if (verbose) {
+
+  }
+  if (verbose) {
       close(pb)
-    }
   }
-  res <- dd2
-  ## TODO: return the collapsed sensitivty Info as well?
-  if(sensitivity.measure != "Synergy_score") {
-    return(res)
-  }else{
-    if(fill.missing){
-      dd <- drugNames(pSet)
-    } else {
-      dd <- unique(unlist(strsplit(drugs, split="///")))
-    }
-    tt <- array(NA, dim=c(length(dd), length(dd), length(cell.lines)), dimnames=list(dd, dd, cell.lines))
-    for(drug in dd) {
-      tt[drug, dd, cell.lines] <- res[match(sprintf("%s///%s", drug, dd), rownames(res)), cell.lines]
-    }
-    return(tt)
-  }
+
+	if (!fill.missing) {
+	  
+    myRows <- apply(result, 1, function(x) !all(is.na(x)))
+    myCols <- apply(result, 2, function(x) !all(is.na(x)))
+    result <- result[myRows, myCols]
+	}
+  return(result)
 }

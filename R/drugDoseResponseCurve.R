@@ -80,6 +80,10 @@ function(drug,
          title,
          plot.type=c("Fitted","Actual", "Both"), 
          summarize.replicates=TRUE,
+         lwd = 0.5,
+         cex = 0.7,
+         cex.main = 0.9, 
+         legend.loc = "topright",
          verbose=TRUE) {
   if(!missing(pSets)){
     if (class(pSets) != "list") {
@@ -286,7 +290,7 @@ function(drug,
     }
     
   }
-  plot(NA, xlab="Concentration (uM)", ylab="% Viability", axes =FALSE, main=title, log="x", ylim=viability.range, xlim=dose.range, cex=.7, cex.main=.9)
+  plot(NA, xlab="Concentration (uM)", ylab="% Viability", axes =FALSE, main=title, log="x", ylim=viability.range, xlim=dose.range, cex=cex, cex.main=cex.main)
   magicaxis::magaxis(side=1:2, frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
   legends <- NULL
   legends.col <- NULL
@@ -295,19 +299,19 @@ function(drug,
   }
 
   for (i in 1:length(doses)) {
-    points(doses[[i]],responses[[i]],pch=20,col = mycol[i])
+    points(doses[[i]],responses[[i]],pch=20,col = mycol[i], cex=cex)
 
     switch(plot.type , "Actual"={
-      lines(doses[[i]], responses[[i]], lty=1, lwd=.5, col=mycol[i])
+      lines(doses[[i]], responses[[i]], lty=1, lwd=lwd, col=mycol[i])
     }, "Fitted"={ 
       log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]])
       log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
-      lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=.5, col=mycol[i])
+      lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     },"Both"={
-      lines(doses[[i]],responses[[i]],lty=1,lwd=.5,col = mycol[i])
+      lines(doses[[i]],responses[[i]],lty=1,lwd=lwd,col = mycol[i])
       log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
       log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
-      lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=.5, col=mycol[i])
+      lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     })
     legends<- c(legends, sprintf("%s%s", pSetNames[[i]], legend.values[[i]]))
     legends.col <-  c(legends.col, mycol[i])
@@ -319,7 +323,7 @@ function(drug,
       }
     }
   }
-  legend("topright", legend=legends, col=legends.col, bty="n", cex=.7, pch=c(15,15))
+  legend(legend.loc, legend=legends, col=legends.col, bty="n", cex=cex, pch=c(15,15))
   return(invisible(NULL))
 }
 
