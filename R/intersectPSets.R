@@ -29,6 +29,7 @@
 #' @param strictIntersect [boolean] Should the intersection keep only the drugs 
 #'   and cell lines that have been tested on together?
 #' @param verbose [boolean] Should the function announce its key steps?
+#' @param nthread [numeric] The number of cores to use to run intersection on concentrations
 #' @return [list] a list of pSets, contatining only the intersection
 #' @export
 #' 
@@ -130,7 +131,7 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
       rownames(expMatch) <- common.exps
       colnames(expMatch) <- names(pSets)
       
-      pSets <- .calculateSensitivitiesStar(pSets, exps=expMatch, cap=100)
+      pSets <- .calculateSensitivitiesStar(pSets, exps=expMatch, cap=100, nthread=nthread)
     }
     if ("cell.lines" %in% intersectOn){
       molecular.types  <- NULL
