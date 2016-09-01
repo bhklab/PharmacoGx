@@ -26,7 +26,7 @@
       for(study in names(pSets)) {
         pSets[[study]]@sensitivity$profiles[exps[i,study], "auc_recomputed_star"] <- computeAUC(concentration=as.numeric(na.omit(ranges[[study]])), 
                                                                                                 viability=as.numeric(na.omit(pSets[[study]]@sensitivity$raw[exps[i, study],which(as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]),"Viability"])), 
-                                                                                                trunc, area.type)
+                                                                                                trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type)
       }
     }
     return(pSets)
