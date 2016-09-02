@@ -32,7 +32,6 @@
    	cl <- makeCluster(nthread)
     for(study in names(pSets)){
 
-    	cl <- makeCluster(nthread)
     	auc_recomputed_star <- unlist(parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), function(experiment, exps, study, dataset, area.type){
     		if(!experiment %in% exps[,study]){return(NA_numeric_)}
     		return(computeAUC(concentration=as.numeric(dataset[experiment,,1]), 
