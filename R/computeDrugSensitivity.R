@@ -33,7 +33,7 @@
     for(study in names(pSets)){
 
     	auc_recomputed_star <- unlist(parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), function(experiment, exps, study, dataset, area.type){
-    		if(!experiment %in% exps[,study]){return(NA_numeric_)}
+    		if(!experiment %in% exps[,study]){return(NA_real_)}
     		return(computeAUC(concentration=as.numeric(dataset[experiment,,1]), 
                         viability=as.numeric(dataset[experiment,,2]), 
  						trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type)/100)
