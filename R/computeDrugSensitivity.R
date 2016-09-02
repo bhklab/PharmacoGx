@@ -1,5 +1,5 @@
 .calculateSensitivitiesStar <-
-  function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual")) {
+  function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual"), nthread=1) {
     
     if (missing(area.type)) {
       area.type <- "Fitted"
