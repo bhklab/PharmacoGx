@@ -33,11 +33,11 @@
     for(study in names(pSets)){
 
     	cl <- makeCluster(nthread)
-    	auc_recomputed_star <- parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), 1, function(experiment, exps, study, dataset){
-    		if(!experiment %in% exps[,study]){return(NA_character_)}
+    	auc_recomputed_star <- parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), function(experiment, exps, study, dataset){
+    		if(!experiment %in% exps[,study]){return(NA_numeric_)}
     		return(computeAUC(concentration=as.numeric(dataset[experiment,,1]), 
                         viability=as.numeric(dataset[experiment,,2]), 
- 						trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type))
+ 						trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type)/100)
  
 
     		}, exps = exps, study = study, dataset = pSets[[study]]@sensitivity$raw, area.type=area.type)
