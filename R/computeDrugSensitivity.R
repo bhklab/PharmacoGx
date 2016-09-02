@@ -24,11 +24,27 @@
       ranges <- .getCommonConcentrationRange(ranges)
       names(ranges) <- names(pSets)
       for(study in names(pSets)) {
-        pSets[[study]]@sensitivity$profiles[exps[i,study], "auc_recomputed_star"] <- computeAUC(concentration=as.numeric(na.omit(ranges[[study]])), 
-                                                                                                viability=as.numeric(na.omit(pSets[[study]]@sensitivity$raw[exps[i, study],which(as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]),"Viability"])), 
-                                                                                                trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type)
-      }
+      	myx <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i, study],,"Dose"]) %in% ranges[[study]]
+      	pSets[[study]]@sensitivity$raw[exps[i,study],!myx, ] <- NA
+        
+       }
     }
+   	cl <- makeCluster(nthread)
+    for(study in names(pSets)){
+
+    	cl <- makeCluster(nthread)
+    	auc_recomputed_star <- parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), 1, function(experiment, exps, study, dataset){
+    		if(!experiment %in% exps[,study]){return(NA_character_)}
+    		return(computeAUC(concentration=as.numeric(dataset[experiment,,1]), 
+                        viability=as.numeric(dataset[experiment,,2]), 
+ 						trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE, area.type=area.type))
+ 
+
+    		}, exps = exps, study = study, dataset = pSets[[study]]@sensitivity$raw, area.type=area.type)
+    	
+    	pSets[[study]]@sensitivity$profiles$auc_recomputed_star <- auc_recomputed_star
+    }
+    stopCluster(cl)
     return(pSets)
   }
 

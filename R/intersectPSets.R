@@ -33,7 +33,7 @@
 #' @return [list] a list of pSets, contatining only the intersection
 #' @export
 #' 
-intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentrations"), cells, drugs, strictIntersect=FALSE, verbose=TRUE) {
+intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentrations"), cells, drugs, strictIntersect=FALSE, verbose=TRUE, nthread=1) {
   
   if (verbose) {
     message("Intersecting large PSets may take a long time ...")
