@@ -10,6 +10,7 @@ drugDoseResponseCurve(drug, cellline, pSets = list(),
   legends.label = c("ic50_published", "gi50_published", "auc_published",
   "auc_recomputed", "ic50_recomputed"), ylim = c(0, 100), xlim, mycol, title,
   plot.type = c("Fitted", "Actual", "Both"), summarize.replicates = TRUE,
+  lwd = 0.5, cex = 0.7, cex.main = 0.9, legend.loc = "topright",
   verbose = TRUE)
 }
 \arguments{
@@ -61,6 +62,14 @@ If this parameter is missed by default actual curve is plotted.}
 
 \item{summarize.replicates}{[character] If this parameter is set to true replicates 
 are summarized and replicates are plotted individually otherwise}
+
+\item{lwd}{[numeric] The line width to plot with}
+
+\item{cex}{[numeric] The cex parameter passed to plot}
+
+\item{cex.main}{[numeric] The cex.main parameter passed to plot, controls the size of the titles}
+
+\item{legend.loc}{And argument passable to xy.coords for the position to place the legend.}
 
 \item{verbose}{[boolean] Should warning messages about the data passed in be printed?}
 }
