@@ -6,7 +6,7 @@
 drugs and/or cell lines as selected by the user.}
 \usage{
 intersectPSet(pSets, intersectOn = c("drugs", "cell.lines", "concentrations"),
-  cells, drugs, strictIntersect = FALSE, verbose = TRUE)
+  cells, drugs, strictIntersect = FALSE, verbose = TRUE, nthread = 1)
 }
 \arguments{
 \item{pSets}{[list] a list of PharmacoSet objects, of which the function
@@ -27,6 +27,8 @@ they can provide their list of drugs.}
 and cell lines that have been tested on together?}
 
 \item{verbose}{[boolean] Should the function announce its key steps?}
+
+\item{nthread}{[numeric] The number of cores to use to run intersection on concentrations}
 }
 \value{
 [list] a list of pSets, contatining only the intersection
