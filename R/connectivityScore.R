@@ -89,7 +89,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=
             gset <- cbind("gene"=rownames(y), "set"=ifelse(as.numeric(y[ , 1]) >= 0, "UP", "DOWN")) 
             gset <- piano::loadGSC(gset)
             ## run enrichment analysis
-            nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="gsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, ...)
+            nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="gsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, adjMethod="none",...)
             ## merge p-values for negative and positive enrichment scores
             nes$pDistinctDir <- nes$pDistinctDirUp
             nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]

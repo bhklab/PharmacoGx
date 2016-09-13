@@ -163,20 +163,24 @@ We want to investigate the consistency of the data between the two datasets. The
   GDSC.auc <- summarizeSensitivityProfiles(
                 pSet=common$GDSC,
                 sensitivity.measure='auc_published', 
-                summary.stat="median")
+                summary.stat="median",
+                verbose=FALSE)
   CCLE.auc <- summarizeSensitivityProfiles(
                 pSet=common$CCLE,
                 sensitivity.measure='auc_published', 
-                summary.stat="median")
+                summary.stat="median",
+                verbose=FALSE)
   
   GDSC.ic50 <- summarizeSensitivityProfiles(
                 pSet=common$GDSC, 
                 sensitivity.measure='ic50_published', 
-                summary.stat="median")
+                summary.stat="median",
+                verbose=FALSE)
   CCLE.ic50 <- summarizeSensitivityProfiles(
                 pSet=common$CCLE, 
                 sensitivity.measure='ic50_published', 
-                summary.stat="median")
+                summary.stat="median",
+                verbose=FALSE)
   
   GDSCexpression <- summarizeMolecularProfiles(common$GDSC, 
                                         cellNames(common$GDSC),
@@ -250,7 +254,9 @@ Once again, we load the dataset, downloading it if needed using \textit{download
   library(PharmacoGx)
   require(xtable)
   data(CMAPsmall)
-  drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType="rna")
+  drug.perturbation <- drugPerturbationSig(CMAPsmall, 
+                                           mDataType="rna",
+                                           verbose=FALSE)
   data(HDAC_genes)
   
   res <- apply(drug.perturbation[,,c("tstat", "fdr")],
@@ -324,14 +330,16 @@ As an example of the efficacy of the modelling approach, we can model the signif
                             features=features, 
                             sensitivity.measure="auc_published", 
                             molecular.summary.stat="median", 
-                            sensitivity.summary.stat="median")
+                            sensitivity.summary.stat="median",
+                            verbose=FALSE)
   sig.mut <- drugSensitivitySig(pSet=CCLEsmall, 
                             mDataType="mutation", 
                             drugs=c("PD-0325901"), 
                             features="BRAF", 
                             sensitivity.measure="auc_published", 
                             molecular.summary.stat="and", 
-                            sensitivity.summary.stat="median")
+                            sensitivity.summary.stat="median",
+                            verbose=FALSE)
   sig <- rbind(sig.rna, sig.mut)
   rownames(sig) <- c("17-AAG + NQO1","PD-0325901 + BRAF")
   colnames(sig) <- dimnames(sig.mut)[[3]]
@@ -380,7 +388,7 @@ This correlation therefore takes into account not only the ranking of each featu
 %------------------------------------------------------------
 \section{Acknowledgements}
 %------------------------------------------------------------ 
-The authors of the package would like to thank the investigators of the Genomics of Drug Sensitivity in Cancer Project, the Cancer Cell Line Encyclopedia and the Connectivity Map Project who have made their invaluable data available to the scientific community. We would also like to thank Mark Freeman for contributing the code for fitting drug-dose response curves towards this package and his lucid documentation of this code. We are indebted to Nehme El-Hachem, Donald Wang and Adrian She for their contributions towards the accurate curation of the datasets. Finally, it is important to acknowledge all the members of the Benjamin Haibe-Kains lab for their contribution towards testing and feedback during the design of the package.\\
+The authors of the package would like to thank the investigators of the Genomics of Drug Sensitivity in Cancer Project, the Cancer Cell Line Encyclopedia and the Connectivity Map Project who have made their invaluable data available to the scientific community. We would also like to thank Mark Freeman for contributing the code for MLE fitting drug-dose response curves towards this package. We are indebted to Nehme El-Hachem, Donald Wang and Adrian She for their contributions towards the accurate curation of the datasets. Finally, it is important to acknowledge all the members of the Benjamin Haibe-Kains lab for their contribution towards testing and feedback during the design of the package.\\
 
 %------------------------------------------------------------
 \section*{Session Info}

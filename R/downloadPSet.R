@@ -44,40 +44,38 @@ availablePSets <- function(saveDir=file.path(".", "PSets"), myfn="PSets.csv", ve
 #' @param saveDir \code{Character} string with the folder path where the
 #'     PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
 #'     directory if it does not exist.
-#' @param myfn \code{character} string, the file name to save the dataset under
+#' @param pSetFileName \code{character} string, the file name to save the dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
 #' @return A PSet object with the dataset, downloaded from our server
 #' @export
 #' @import downloader 
 
-downloadPSet <- function(name, saveDir=file.path(".", "PSets"), myfn=NULL, verbose=TRUE) {
+downloadPSet <- function(name, saveDir=file.path(".", "PSets"), pSetFileName=NULL, verbose=TRUE) {
   
-  pSetTable <- availablePSets()
+  pSetTable <- availablePSets(saveDir=saveDir)
   
   whichx <- match(name, pSetTable[,1])
   if (is.na(whichx)){
-    stop('Unknown Dataset. Please use the availablePSet function for the table of available PharamcoSets.')
+    stop('Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.')
   }
   
   if(!file.exists(saveDir)) {
     dir.create(saveDir, recursive=TRUE)
   }  
   
-  if(is.null(myfn)){
-    
-    myfn <- paste(pSetTable[whichx,"PSet.Name"],".RData", sep="")
-    
+  if(is.null(pSetFileName)){
+    pSetFileName <- paste(pSetTable[whichx,"PSet.Name"], ".RData", sep="")
   }
-  if(!file.exists(file.path(saveDir, myfn))){
-    downloader::download(url = as.character(pSetTable[whichx,"URL"]), destfile=file.path(saveDir, myfn), quiet=!verbose)
+  if(!file.exists(file.path(saveDir, pSetFileName))){
+    downloader::download(url = as.character(pSetTable[whichx,"URL"]), destfile=file.path(saveDir, pSetFileName), quiet=!verbose)
   }
-  pSet <- load(file.path(saveDir, myfn))
+  pSet <- load(file.path(saveDir, pSetFileName))
   return(get(pSet))
 }
 
 #' @importFrom utils read.table write.table
-.createPSetEntry <- function(pSet, outfn){
+.createPSetEntry <- function(pSet, outfn) {
   
   if(file.exists(outfn)){
     pSetTable <- read.table(outfn, as.is=TRUE)

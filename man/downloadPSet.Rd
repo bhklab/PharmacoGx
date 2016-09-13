@@ -4,7 +4,7 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name, saveDir = file.path(".", "PSets"), myfn = NULL,
+downloadPSet(name, saveDir = file.path(".", "PSets"), pSetFileName = NULL,
   verbose = TRUE)
 }
 \arguments{
@@ -14,7 +14,7 @@ downloadPSet(name, saveDir = file.path(".", "PSets"), myfn = NULL,
 PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
 directory if it does not exist.}
 
-\item{myfn}{\code{character} string, the file name to save the dataset under}
+\item{pSetFileName}{\code{character} string, the file name to save the dataset under}
 
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
