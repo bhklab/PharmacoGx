@@ -46,7 +46,7 @@ computeAUC <- function (concentration,
 
     stop("The concentration values to integrate over must always be provided.")
 
-}
+  }
 if (missing(area.type)) {
     area.type <- "Fitted"
 } else {
