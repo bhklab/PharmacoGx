@@ -1080,7 +1080,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   if(pSet@datasetType=="perturbation"|pSet@datasetType=="both"){
       pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset){
           
-          myx <- match(Biobase::pData(eset)[["drugid"]],rownames(cellInfo(pSet)))
+          myx <- match(Biobase::pData(eset)[["drugid"]],rownames(drugInfo(pSet)))
           Biobase::pData(eset)[["drugid"]]  <- new.ids[myx]
           return(eset)
           })
