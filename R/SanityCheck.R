@@ -157,10 +157,7 @@ sanitizeInput <- function(conc,
 			return(list("Hill_fit"=Hill_fit))
 		} else {
 			conc <- as.numeric(conc[!is.na(conc)])
-			ii <- which(conc == 0)
-			if(length(ii) > 0) {
-				conc <- conc[-ii]
-			}
+			
 			
 			if (prod(is.finite(conc)) != 1) {
 				print(conc)
@@ -173,6 +170,10 @@ sanitizeInput <- function(conc,
 			}
 
 			if (conc_as_log == FALSE ) {
+				ii <- which(conc == 0)
+				if(length(ii) > 0) {
+					conc <- conc[-ii]
+				}
 				log_conc <- log10(conc)
 			} else {
 				log_conc <- conc
