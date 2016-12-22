@@ -52,7 +52,7 @@ if (missing(Hill_fit)) {
 
 
 
-# ic50 <- computeIC50(conc = concentration, Hill_fit = unlist(pars), conc_as_log = TRUE, viability_as_pct = FALSE)
+# ic50 <- computeIC50(concentration = concentration, Hill_fit = unlist(pars), conc_as_log = TRUE, viability_as_pct = FALSE)
 
 # if (!is.finite(ic50) | ic50 > max(concentration)){
 # 	return(0)
@@ -67,7 +67,7 @@ if(viability_as_pct){
 }
 
 x2 = max(concentration)
-x1 = computeICn(conc = concentration, Hill_fit = unlist(pars), n = t_param, conc_as_log = TRUE, viability_as_pct = FALSE)
+x1 = computeICn(concentration = concentration, Hill_fit = unlist(pars), n = t_param, conc_as_log = TRUE, viability_as_pct = FALSE)
 if(!is.finite(x1)){return(0)}
 
 x1 <- max(x1, min(concentration))

@@ -2,7 +2,7 @@
 #' vectors or lists
 #' 
 #' The function finds the symmetric set differnces between all the arguments, defined as
-#' Union(args)\Intersection(args)
+#' Union(args)-Intersection(args)
 #' 
 #' @examples 
 #' list1 <- list('a', 'b', 'c')

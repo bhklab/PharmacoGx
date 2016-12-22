@@ -30,6 +30,7 @@ computeIC50 <- function(concentration,
 #'  
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
+#' @noRd
 
 computeIC50_old <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   
