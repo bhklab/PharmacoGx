@@ -30,7 +30,7 @@ cosinePerm <- function(x, y, nperm=1000, alternative=c("two.sided", "less", "gre
   x <- as.numeric(x)
   y <- as.numeric(y)
   ## compute cosine
-  res["estimate"] <- drop(lsa::cosine(x, y))
+  res["estimate"] <- drop(lsa::cosine(x=x, y=y))
   ## compute significance of cosine using a permutation test
   if (nperm > 0) {
     splitix <- parallel::splitIndices(nx=nperm, ncl=nthread)

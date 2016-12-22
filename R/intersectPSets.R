@@ -120,6 +120,7 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
         expMatch <- lapply(expMatch, function(x){names(x) <- x; return(x)})
       }
     }
+
     if (("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn) & ("concentrations" %in% intersectOn)) {
       
       if(length(unique(sapply(expMatch, length)))>1){

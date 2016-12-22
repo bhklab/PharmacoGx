@@ -75,7 +75,7 @@ downloadPSet <- function(name, saveDir=file.path(".", "PSets"), pSetFileName=NUL
 }
 
 #' @importFrom utils read.table write.table
-.createPSetEntry <- function(pSet, outfn) {
+.createPSetEntry <- function(pSet, outfn){
   
   if(file.exists(outfn)){
     pSetTable <- read.table(outfn, as.is=TRUE)

@@ -10,7 +10,7 @@
 #' computeIC50(dose, viability)
 #' computeICn(dose, viability, n=10)
 #' 
-#' @param conc [vector] is a vector of drug concentrations.
+#' @param concentration [vector] is a vector of drug concentrations.
 #' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
 #' indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells. 
@@ -29,34 +29,34 @@
 #' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
 #' @return a numeric value for the concentration of the nth precentile viability reduction 
 #' @export
-computeICn <- function(conc,
+computeICn <- function(concentration,
                        viability,
                        Hill_fit,
                        n,
                        conc_as_log = FALSE,
                        viability_as_pct = TRUE, 
-                       verbose=TRUE,
-                       trunc=TRUE) {
+                       verbose = TRUE,
+                       trunc = TRUE) {
 
-  if (missing(Hill_fit) & !missing(conc) & !missing(viability)) {
+  if (missing(Hill_fit) & !missing(concentration) & !missing(viability)) {
 
-    Hill_fit <- logLogisticRegression(conc,
+    Hill_fit <- logLogisticRegression(conc = concentration,
       viability,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
       verbose = verbose)
-    cleanData <- sanitizeInput(conc=conc, 
+    cleanData <- sanitizeInput(conc=concentration, 
       Hill_fit=Hill_fit,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
       verbose = verbose)
     pars <- cleanData[["Hill_fit"]]
-    conc <- cleanData[["log_conc"]]
+    concentration <- cleanData[["log_conc"]]
   } else if (!missing(Hill_fit)){
 
-    cleanData <- sanitizeInput(conc = conc, 
+    cleanData <- sanitizeInput(conc = concentration, 
       viability = viability,
       Hill_fit = Hill_fit,
       conc_as_log = conc_as_log,
@@ -66,7 +66,7 @@ computeICn <- function(conc,
     pars <- cleanData[["Hill_fit"]]
   } else {
 
-    stop("Insufficient information to calculate ICn. Please enter conc and viability or Hill parameters.")
+    stop("Insufficient information to calculate ICn. Please enter concentration and viability or Hill parameters.")
 
   }
   if(viability_as_pct){

@@ -111,7 +111,6 @@
     }, pars=pars, trunc = trunc, mc.cores = nthread))
   }
   
-  
   names(AUC) <- dimnames(raw.sensitivity)[[1]]
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
   
@@ -247,7 +246,7 @@
 #'  Fits dose-response curves to data given by the user
 #'  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
 #'
-#'  @param conc [vector] is a vector of drug concentrations.
+#'  @param concentration [vector] is a vector of drug concentrations.
 #'
 #'  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
 #'  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
@@ -255,7 +254,7 @@
 #'
 #'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #'  curve-fitting is performed.
-.computeAUCUnderFittedCurve <- function(conc, viability, trunc=TRUE, verbose=FALSE) {
+.computeAUCUnderFittedCurve <- function(concentration, viability, trunc=TRUE, verbose=FALSE) {
   
   # #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   # if (prod(is.finite(conc)) != 1) {
@@ -299,7 +298,7 @@
   #   viability[which(viability < 0)] <- 0
   #   viability[which(viability > 1)] <- 1
   # }
-  log_conc <- conc
+  log_conc <- concentration
   #FIT CURVE AND CALCULATE IC50
   pars <- unlist(logLogisticRegression(log_conc,
                                        viability,
