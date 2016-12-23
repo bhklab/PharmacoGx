@@ -1,6 +1,10 @@
 #' Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
 #' to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
 #' 
+#' @examples
+#' data(GDSCsmall)
+#' filterNoiseCurves(GDSCsmall)
+#'
 #' @param pSet [PharmacoSet] a PharmacoSet object
 #' @param epsilon [numeric] a value indicates assumed threshold for the 
 #'   distance between to consecutive viability values on the drug-response curve
@@ -10,6 +14,8 @@
 #' @param mean.viablity [numeric] average expected viability value
 #' @param nthread [numeric] if multiple cores are available, how many cores
 #'   should the computation be parallelized over? 
+#' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
+#'   rownames of the non-noisy curves
 #' @export
  
 filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
