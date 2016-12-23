@@ -467,7 +467,7 @@ setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sen
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
 
     object@sensitivity$profiles <- value
     object
