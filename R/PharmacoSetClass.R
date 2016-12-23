@@ -461,7 +461,7 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(pSet){
 #' sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to update
-#' @param value A \code{data.frame} with the new sensitivity profiles
+#' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' @return Updated \code{PharmacoSet} 
 setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
@@ -470,6 +470,11 @@ setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sen
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
 
     object@sensitivity$profiles <- value
+    object
+})
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
+
+    object@sensitivity$profiles <- as.data.frame(value)
     object
 })
 #' sensitivityMeasures Generic
