@@ -9,7 +9,7 @@ citEntry(entry="article",
   pages = "",
   textVersion = paste("P Smirnov, Z Safikhani, N El-Hachem , D Wang, A She , C Olsen, M Freeman, H Selby, D Gendoo , P Grossman , A Beck , H Aerts , M Lupien, A Goldenberg ,B Haibe-Kains",
     "PharmacoGx: an R package for analysis of large pharmacogenomic datasets",
-    “Bioinformatics (2016)."))
+    "Bioinformatics (2016)."))
 
 citFooter("We have invested our time and effort in creating PharmacoGx,",
           "we would be grateful if you could cite it when using it in your analysis.")
