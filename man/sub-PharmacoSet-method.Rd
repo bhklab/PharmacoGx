@@ -24,4 +24,3 @@ Returns the subsetted PSet
 \description{
 `[`
 }
-

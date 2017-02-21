@@ -46,4 +46,3 @@ PSet <- subsetTo(CCLEsmall,drugs = CCLEdrugs[1], cells = CCLEcells[1])
 PSet
 
 }
-

@@ -27,6 +27,7 @@
 #'   the columns, with the selected sensitivity statistic for each pair.
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom stats median
+#' @importFrom reshape2 acast
 #' @export
 
 
@@ -68,53 +69,49 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
   rownames(result) <- drugs
   colnames(result) <- cell.lines
 
-  if(verbose){
+  # if(verbose){
 
-    message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, pSet@annotation$name))
-    total <- length(drugs)*length(cell.lines)
-    # create progress bar 
-    pb <- utils::txtProgressBar(min=0, max=total, style=3)
-    i <- 1
+  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, pSet@annotation$name))
+  #   total <- length(drugs)*length(cell.lines)
+  #   # create progress bar 
+  #   pb <- utils::txtProgressBar(min=0, max=total, style=3)
+  #   i <- 1
 
 
-  }
+  # }
 
-  for (drug in drugs){
-    for (cell in cell.lines){
+  pp_dd <- cbind(pp[,c("cellid", "drugid")], "sensitivity.measure"=dd[, sensitivity.measure])
 
-      myx <- which(pp$cellid == cell & pp$drugid == drug)
 
-      switch(summary.stat, 
+  summary.function <- function(x) {
+    if(all(is.na(x))){
+      return(NA_real_)
+    }
+    switch(summary.stat, 
         "mean" = {
-          result[drug, cell] <-  mean(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+          return(mean(as.numeric(x), na.rm=TRUE))
         },
         "median" = {
-          result[drug, cell] <-  median(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+          return(median(as.numeric(x), na.rm=TRUE))
         }, 
         "first" = {
-          result[drug, cell] <-  as.numeric(dd[myx[1], sensitivity.measure])
+          return(as.numeric(x)[[1]])
         },
         "last" = {
-          result[drug, cell] <-  as.numeric(dd[myx[length(myx)], sensitivity.measure])
+          return(as.numeric(x)[[length(x)]])
         },
         "max"= {
-          result[drug, cell] <-  max(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+          return(max(as.numeric(x), na.rm=TRUE))
         },
-        "min" = {
-          result[drug, cell] <-  min(as.numeric(dd[myx, sensitivity.measure]), na.rm=TRUE)
+        "min" = { 
+          return(min(as.numeric(x), na.rm=TRUE))
         })
 
-      if (verbose){
-        utils::setTxtProgressBar(pb, i)
-        i <- i + 1
-      }
-
-    }
-
   }
-  if (verbose) {
-      close(pb)
-  }
+
+  tt <- reshape2::acast(pp_dd, drugid~cellid, fun.aggregate=summary.function, value.var="sensitivity.measure")
+
+  result[rownames(tt), colnames(tt)] <- tt
 
 	if (!fill.missing) {
 	  

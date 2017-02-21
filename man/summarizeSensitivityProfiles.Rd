@@ -45,4 +45,3 @@ data(GDSCsmall)
 GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
 
 }
-

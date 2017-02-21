@@ -2,34 +2,34 @@
 % Please edit documentation in R/PharmacoSetClass.R
 \docType{class}
 \name{PharmacoSet-class}
-\alias{.PharmacoSet}
 \alias{PharmacoSet-class}
+\alias{.PharmacoSet}
 \alias{cellInfo,PharmacoSet-method}
 \alias{cellInfo<-,PharmacoSet,data.frame-method}
-\alias{cellNames,PharmacoSet-method}
-\alias{cellNames<-,PharmacoSet,character-method}
-\alias{dateCreated,PharmacoSet-method}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
-\alias{drugNames,PharmacoSet-method}
-\alias{drugNames<-,PharmacoSet,character-method}
-\alias{fNames,PharmacoSet-method}
-\alias{featureInfo,PharmacoSet-method}
-\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
-\alias{molecularProfiles,PharmacoSet-method}
-\alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
-\alias{pSetName,PharmacoSet-method}
-\alias{pertNumber,PharmacoSet-method}
-\alias{pertNumber<-,PharmacoSet,array-method}
 \alias{phenoInfo,PharmacoSet-method}
 \alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
-\alias{sensNumber,PharmacoSet-method}
-\alias{sensNumber<-,PharmacoSet,matrix-method}
+\alias{molecularProfiles,PharmacoSet-method}
+\alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
+\alias{featureInfo,PharmacoSet-method}
+\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
 \alias{sensitivityInfo,PharmacoSet-method}
 \alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
-\alias{sensitivityMeasures,PharmacoSet-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
-\alias{sensitivityProfiles<-,PharmacoSet,matrix-method}
+\alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
+\alias{sensitivityMeasures,PharmacoSet-method}
+\alias{drugNames,PharmacoSet-method}
+\alias{drugNames<-,PharmacoSet,character-method}
+\alias{cellNames,PharmacoSet-method}
+\alias{cellNames<-,PharmacoSet,character-method}
+\alias{fNames,PharmacoSet-method}
+\alias{dateCreated,PharmacoSet-method}
+\alias{pSetName,PharmacoSet-method}
+\alias{pertNumber,PharmacoSet-method}
+\alias{sensNumber,PharmacoSet-method}
+\alias{pertNumber<-,PharmacoSet,array-method}
+\alias{sensNumber<-,PharmacoSet,matrix-method}
 \title{A Class to Contain PharmacoGenomic datasets together with their curations}
 \usage{
 \S4method{cellInfo}{PharmacoSet}(pSet)
@@ -42,18 +42,18 @@
 
 \S4method{phenoInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <-
-  value
+\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object,
+  mDataType) <- value
 
 \S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
 
-\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object, mDataType) <-
-  value
+\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object,
+  mDataType) <- value
 
 \S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{featureInfo}{PharmacoSet,character,data.frame}(object, mDataType) <-
-  value
+\S4method{featureInfo}{PharmacoSet,character,data.frame}(object,
+  mDataType) <- value
 
 \S4method{sensitivityInfo}{PharmacoSet}(pSet)
 
@@ -61,7 +61,7 @@
 
 \S4method{sensitivityProfiles}{PharmacoSet}(pSet)
 
-\S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
+\S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
 
 \S4method{sensitivityMeasures}{PharmacoSet}(pSet)
 
@@ -171,6 +171,7 @@ experiments
 \item \code{sensNumber<-}: Update the summary of available sensitivity
 experiments
 }}
+
 \section{Slots}{
 
 \describe{

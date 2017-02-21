@@ -42,4 +42,3 @@ names(y_p) <- names(y)
 gwc(x,x_p,y,y_p, nperm=100)
 
 }
-
