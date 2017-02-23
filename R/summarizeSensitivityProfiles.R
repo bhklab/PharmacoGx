@@ -108,8 +108,13 @@ summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomput
         })
 
   }
+  
+  pp_dd <- pp_dd[pp_dd[,"cellid"]%in%cell.lines & pp_dd[,"drugid"]%in%drugs,]
 
   tt <- reshape2::acast(pp_dd, drugid~cellid, fun.aggregate=summary.function, value.var="sensitivity.measure")
+ # tt <- tt[drugs, cell.lines]
+  
+  
 
   result[rownames(tt), colnames(tt)] <- tt
 
