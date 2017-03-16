@@ -177,6 +177,7 @@ summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, su
   res <- ExpressionSet(dd2)
   #Biobase::exprs(res) <- dd2
   Biobase::pData(res) <- as.data.frame(pp2, stringsAsFactors=FALSE)
+  Biobase::featureData(res) <- featureInfo(pSet, mDataType)
   #Biobase::exprs(res) <- Biobase::exprs(res)[features,]
   #Biobase::fData(res) <- Biobase::fData(res)[features,]
   res <- res[features,]
