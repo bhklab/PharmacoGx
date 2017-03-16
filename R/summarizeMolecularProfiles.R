@@ -32,7 +32,7 @@
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
 #' @importFrom utils setTxtProgressBar txtProgressBar
-#' @importFrom Biobase ExpressionSet exprs pData AnnotatedDataFrame assayDataElement assayDataElement<-
+#' @importFrom Biobase ExpressionSet exprs pData AnnotatedDataFrame assayDataElement assayDataElement<- fData<-
 #' @export
 
 ##TODO:: Add features parameter
@@ -177,7 +177,7 @@ summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, su
   res <- ExpressionSet(dd2)
   #Biobase::exprs(res) <- dd2
   Biobase::pData(res) <- as.data.frame(pp2, stringsAsFactors=FALSE)
-  Biobase::featureData(res) <- featureInfo(pSet, mDataType)
+  Biobase::fData(res) <- featureInfo(pSet, mDataType)
   #Biobase::exprs(res) <- Biobase::exprs(res)[features,]
   #Biobase::fData(res) <- Biobase::fData(res)[features,]
   res <- res[features,]
