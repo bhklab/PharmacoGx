@@ -57,7 +57,7 @@
 
 
 
-connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
+connectivityScore <- function(x, y, method=c("fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
   
   method <- match.arg(method)
   if (class(x) != "matrix") {
@@ -70,7 +70,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=
     stop ("x and y should have 2 columns: effect size and corresponding p-values")
   }
   
-  if (method == "gsea" && nrow(y) >= nrow(x)) {
+  if (method == "fgsea" && nrow(y) >= nrow(x)) {
     warning("GSEA method: query gene set (y) larger than signature (x)")
   }
   
@@ -81,7 +81,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=
     stop ("The minimum number of permutations for permutation testing is 100")
   }
   switch (method,
-          "gsea" = {
+          "fgsea" = {
             ## remove missing values
             y <- y[!is.na(y[ ,1]), , drop=FALSE]
             x <- x[!is.na(x[ ,1]), , drop=FALSE]
@@ -89,7 +89,7 @@ connectivityScore <- function(x, y, method=c("gsea", "gwc"), nperm=1e4, nthread=
             gset <- cbind("gene"=rownames(y), "set"=ifelse(as.numeric(y[ , 1]) >= 0, "UP", "DOWN")) 
             gset <- piano::loadGSC(gset)
             ## run enrichment analysis
-            nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="gsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, adjMethod="none",...)
+            nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="fgsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, adjMethod="none",...)
             ## merge p-values for negative and positive enrichment scores
             nes$pDistinctDir <- nes$pDistinctDirUp
             nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]
