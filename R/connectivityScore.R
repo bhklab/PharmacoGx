@@ -57,9 +57,10 @@
 
 
 
-connectivityScore <- function(x, y, method=c("fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
+connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
   
   method <- match.arg(method)
+  gwc.method <- match.arg(gwc.method)
   if (class(x) != "matrix") {
       x <- as.matrix(x)
   }
@@ -69,7 +70,10 @@ connectivityScore <- function(x, y, method=c("fgsea", "gwc"), nperm=1e4, nthread
   if ((ncol(x) != 2 || ncol(y) != 2) && method=="gwc") {
     stop ("x and y should have 2 columns: effect size and corresponding p-values")
   }
-  
+  if(method=="gsea"){
+    method <- "fgsea"
+    warning("Using fGSEA method to calculate GSEA")
+  }
   if (method == "fgsea" && nrow(y) >= nrow(x)) {
     warning("GSEA method: query gene set (y) larger than signature (x)")
   }
