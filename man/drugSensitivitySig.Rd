@@ -73,4 +73,3 @@ drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
 print(drug.sensitivity)
 
 }
-

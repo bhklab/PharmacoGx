@@ -49,4 +49,3 @@ drug.perturbation <- drugPerturbationSig(CMAPsmall, mDataType="rna", nthread=1)
 print(drug.perturbation)
 
 }
-

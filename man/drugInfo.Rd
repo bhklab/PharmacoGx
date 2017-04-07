@@ -20,4 +20,3 @@ data(CCLEsmall)
 drugInfo(CCLEsmall)
 
 }
-

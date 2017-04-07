@@ -22,4 +22,3 @@ data(CCLEsmall)
 phenoInfo(CCLEsmall, mDataType="rna")
 
 }
-

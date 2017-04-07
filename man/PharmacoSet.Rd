@@ -63,4 +63,3 @@ see the "CreatingPharmacoSet" vignette.
 browseVignettes("PharmacoGx")
 
 }
-

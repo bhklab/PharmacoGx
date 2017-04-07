@@ -57,4 +57,3 @@ viability2 <- c("100.94","112.5","86","104.16","75","68","48","29")
 computeABC(dose1, dose2, viability1, viability2)
 
 }
-

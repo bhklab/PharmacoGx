@@ -19,4 +19,3 @@ please download using the downloadPSet function.
 Barretina et al. The Cancer Cell Line Encyclopedia enables predictive modelling of anticancer drug sensitivity. Nature, 2012
 }
 \keyword{datasets}
-

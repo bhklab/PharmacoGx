@@ -18,4 +18,3 @@ signature is mapped from the probe to gene level using
 Glaser et al. Gene expression profiling of multiple histone deacetylase (HDAC) inhibitors: defining a common gene set produced by HDAC inhibition in T24 and MDA carcinoma cell lines. Molecular cancer therapeutics, 2003.
 }
 \keyword{datasets}
-

@@ -3,7 +3,7 @@
 #' 
 #' @examples
 #' data(GDSCsmall)
-#' filterNoiseCurves(GDSCsmall)
+#' filterNoisyCurves(GDSCsmall)
 #'
 #' @param pSet [PharmacoSet] a PharmacoSet object
 #' @param epsilon [numeric] a value indicates assumed threshold for the 

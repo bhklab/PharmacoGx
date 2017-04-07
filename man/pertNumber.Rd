@@ -20,4 +20,3 @@ data(CCLEsmall)
 pertNumber(CCLEsmall)
 
 }
-

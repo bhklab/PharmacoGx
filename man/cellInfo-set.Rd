@@ -22,4 +22,3 @@ data(CCLEsmall)
 cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
 
 }
-

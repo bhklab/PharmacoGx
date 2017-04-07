@@ -52,4 +52,3 @@ GDSCsmall <- summarizeMolecularProfiles(GDSCsmall,
 GDSCsmall
 
 }
-

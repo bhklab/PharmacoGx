@@ -23,8 +23,16 @@ may violate epsilon rule for how many points on drug-response curve}
 \item{nthread}{[numeric] if multiple cores are available, how many cores
 should the computation be parallelized over?}
 }
+\value{
+a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
+  rownames of the non-noisy curves
+}
 \description{
 Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
 to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
 }
+\examples{
+data(GDSCsmall)
+filterNoisyCurves(GDSCsmall)
 
+}

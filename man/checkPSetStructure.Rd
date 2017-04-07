@@ -28,4 +28,3 @@ data(CCLEsmall)
 checkPSetStructure(CCLEsmall)
 
 }
-
