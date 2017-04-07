@@ -115,7 +115,7 @@
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
   
   
-  return(list("AUC"=AUC, "IC50"=IC50))
+  return(list("AUC"=AUC, "IC50"=IC50, "pars"=pars))
 }
 
 

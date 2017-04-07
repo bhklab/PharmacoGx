@@ -5,7 +5,7 @@
 \title{Creates a signature representing gene expression (or other molecular profile)
 change induced by administrating a drug, for use in drug effect analysis.}
 \usage{
-drugPerturbationSig(pSet, mDataType, drugs, features, nthread = 1,
+drugPerturbationSig(pSet, mDataType, drugs, cells, features, nthread = 1,
   returnValues = c("estimate", "tstat", "pvalue", "fdr"), verbose = FALSE)
 }
 \arguments{
@@ -15,6 +15,9 @@ drugPerturbationSig(pSet, mDataType, drugs, features, nthread = 1,
 in the analysis, out of dna, rna, rnaseq, snp, cnv}
 
 \item{drugs}{[character] a vector of drug names for which to compute the
+signatures. Should match the names used in the PharmacoSet.}
+
+\item{cells}{[character] a vector of cell names to use in computing the 
 signatures. Should match the names used in the PharmacoSet.}
 
 \item{features}{[character] a vector of features for which to compute the
