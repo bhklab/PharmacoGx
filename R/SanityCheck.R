@@ -158,7 +158,6 @@ sanitizeInput <- function(conc,
 		} else {
 			conc <- as.numeric(conc[!is.na(conc)])
 			
-			
 			if (prod(is.finite(conc)) != 1) {
 				print(conc)
 				stop("Concentration vector contains elements which are not real numbers.")

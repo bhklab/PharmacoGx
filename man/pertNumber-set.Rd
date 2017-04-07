@@ -22,4 +22,3 @@ data(CCLEsmall)
 pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
 
 }
-

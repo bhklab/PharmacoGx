@@ -1,14 +1,16 @@
 #' @describeIn computeICn Returns the IC50 of a Drug Dose response curve
 #' @export
-computeIC50 <- function(conc,
+computeIC50 <- function(concentration,
                        viability,
                        Hill_fit,
                        conc_as_log = FALSE,
                        viability_as_pct = TRUE, 
-                       verbose=TRUE,
-                       trunc=TRUE) {
+                       verbose = TRUE,
+                       trunc = TRUE) {
 
-  return(computeICn(conc, viability, Hill_fit,
+  return(computeICn(concentration = concentration, 
+                    viability = viability, 
+                    Hill_fit = Hill_fit,
                     n = ifelse(viability_as_pct, 50, .5),
                     conc_as_log = conc_as_log,
                     viability_as_pct = viability_as_pct, 
@@ -17,19 +19,22 @@ computeIC50 <- function(conc,
 }
 
 
-# Fits dose-response curves to data given by the user
-# and returns the IC50 of the fitted curve.
-# 
-# @param conc [vector] is a vector of drug concentrations.
-# @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
-# drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-# of viability in the absence of any drug.
-# @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
-# curve-fitting is performed.
+#'  Fits dose-response curves to data given by the user
+#'  and returns the IC50 of the fitted curve.
+#'  
+#'  @param concentration [vector] is a vector of drug concentrations.
+#'  
+#'  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#'  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
+#'  of viability in the absence of any drug.
+#'  
+#'  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#'  curve-fitting is performed.
+#' @noRd
 
-computeIC50_old <- function(conc, viability, trunc = TRUE, verbose=FALSE) {
+computeIC50_old <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   
-  conc <- as.numeric(conc[!is.na(conc)])
+  conc <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])
   ii <- which(conc == 0)
   if(length(ii) > 0) {

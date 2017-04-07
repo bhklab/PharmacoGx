@@ -24,4 +24,3 @@ data(CCLEsmall)
 molecularProfiles(CCLEsmall, "rna") <- molecularProfiles(CCLEsmall, "rna")
 
 }
-

@@ -22,4 +22,3 @@ data(CCLEsmall)
 sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 
 }
-

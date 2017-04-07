@@ -22,4 +22,3 @@ data(CCLEsmall)
 cellNames(CCLEsmall) <- cellNames(CCLEsmall)
 
 }
-

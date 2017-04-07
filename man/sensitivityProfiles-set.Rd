@@ -9,7 +9,7 @@ sensitivityProfiles(object) <- value
 \arguments{
 \item{object}{The \code{PharmacoSet} to update}
 
-\item{value}{A \code{data.frame} with the new sensitivity profiles}
+\item{value}{A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment}
 }
 \value{
 Updated \code{PharmacoSet}
@@ -22,4 +22,3 @@ data(CCLEsmall)
 sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
 
 }
-

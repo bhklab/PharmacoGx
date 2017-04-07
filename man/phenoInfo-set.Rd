@@ -25,4 +25,3 @@ data(CCLEsmall)
 phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
 
 }
-

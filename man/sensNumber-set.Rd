@@ -22,4 +22,3 @@ data(CCLEsmall)
 sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
 
 }
-
