@@ -93,4 +93,3 @@ drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
 }
 
 }
-

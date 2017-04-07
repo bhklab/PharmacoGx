@@ -33,4 +33,3 @@ viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 computeSlope(dose, viability)
 
 }
-

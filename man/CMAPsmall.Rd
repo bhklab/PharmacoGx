@@ -19,4 +19,3 @@ please download using the downloadPSet function.
 Lamb et al. The Connectivity Map: using gene-expression signatures to connect small molecules, genes, and disease. Science, 2006.
 }
 \keyword{datasets}
-

@@ -5,14 +5,14 @@
 \alias{computeICn}
 \title{Computes the ICn for any n in 0-100 for a Drug Dose Viability Curve}
 \usage{
-computeIC50(conc, viability, Hill_fit, conc_as_log = FALSE,
+computeIC50(concentration, viability, Hill_fit, conc_as_log = FALSE,
   viability_as_pct = TRUE, verbose = TRUE, trunc = TRUE)
 
-computeICn(conc, viability, Hill_fit, n, conc_as_log = FALSE,
+computeICn(concentration, viability, Hill_fit, n, conc_as_log = FALSE,
   viability_as_pct = TRUE, verbose = TRUE, trunc = TRUE)
 }
 \arguments{
-\item{conc}{[vector] is a vector of drug concentrations.}
+\item{concentration}{[vector] is a vector of drug concentrations.}
 
 \item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
@@ -49,6 +49,7 @@ of a Hill Slope returned by logLogisticRegression can be passed in if they alrea
 \itemize{
 \item \code{computeIC50}: Returns the IC50 of a Drug Dose response curve
 }}
+
 \examples{
 dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
 viability <- c("108.67","111","102.16","100.27","90","87","74","57")
@@ -56,4 +57,3 @@ computeIC50(dose, viability)
 computeICn(dose, viability, n=10)
 
 }
-

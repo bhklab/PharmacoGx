@@ -16,4 +16,3 @@ A named vector with the number of Cells and Drugs in the PharmacoSet
 \description{
 Get the dimensions of a PharmacoSet
 }
-

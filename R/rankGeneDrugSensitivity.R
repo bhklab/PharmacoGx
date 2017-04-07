@@ -70,7 +70,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
         return(nc)
 
       })
-      nc <- do.call(c, rest)
+      #nc <- do.call(c, rest)
       nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
     } else {
       nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
@@ -94,7 +94,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
         res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize)
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]

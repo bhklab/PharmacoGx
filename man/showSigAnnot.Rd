@@ -24,4 +24,3 @@ drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
 showSigAnnot(drug.sensitivity)
 
 }
-

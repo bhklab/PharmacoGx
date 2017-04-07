@@ -49,4 +49,3 @@ computeAUC(dose, viability)
 
 
 }
-

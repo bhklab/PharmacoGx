@@ -29,6 +29,8 @@
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
 #' @param drugs [character] a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
+#' @param cells [character] a vector of cell names to use in computing the 
+#'   signatures. Should match the names used in the PharmacoSet.
 #' @param features [character] a vector of features for which to compute the
 #'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
 #' @param nthread [numeric] if multiple cores are available, how many cores
@@ -40,13 +42,18 @@
 #'   second, and return values in the third.
 #' @export
 
-drugPerturbationSig <- function(pSet, mDataType, drugs, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
+drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
 	availcore <- parallel::detectCores()
 	if ( nthread > availcore) {
 	  nthread <- availcore
 	}
   options("mc.cores"=nthread)
-  
+  if(!missing(cells)){
+    if(!all(cells%in%cellNames(pSet))){
+      stop("The cell names should match to the names used in cellNames(pSet)")
+    }
+    pSet <- subsetTo(pSet, cells=cells)
+  }
   if (mDataType %in% names(pSet@molecularProfiles)) {
     #eset <- pSet@molecularProfiles[[mDataType]]
 		if(Biobase::annotation(pSet@molecularProfiles[[mDataType]])!="rna"){
