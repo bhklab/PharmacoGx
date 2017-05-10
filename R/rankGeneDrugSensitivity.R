@@ -57,7 +57,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
   nn <- sum(ccix)
 #  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
 #  nc <- c("estimate", "se", "n", "pvalue", "fdr")
-  if(!any(apply(drugpheno,2,is.factor))){
+  if(!any(unlist(lapply(drugpheno,is.factor)))){
      if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
       nc <- lapply(1:ncol(drugpheno), function(i){
