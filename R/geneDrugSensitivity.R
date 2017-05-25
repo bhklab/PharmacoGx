@@ -71,7 +71,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   }else{
     drugpheno <- apply(drugpheno, 2, function(x){
-      return(x[ccix][is.infinite(x[ccix])] <- NA)})
+      x[ccix][is.infinite(x[ccix])] <- NA
+      return(x)})
     drugpheno <- drugpheno[ccix,,drop=FALSE]
   }
   if(length(table(x)) > 2  & standardize!= "none"){
