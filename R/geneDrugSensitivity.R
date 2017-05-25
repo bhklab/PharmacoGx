@@ -61,7 +61,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   ## standardized coefficient in linear model 
   if(length(table(drugpheno)) > 2 & standardize!= "none") {
     drugpheno <- apply(drugpheno, 2, function(x){
-      return(x[ccix][is.infinite(x[ccix])] <- NA)})
+      x[ccix][is.infinite(x[ccix])] <- NA
+      return(x)})
     switch(standardize, 
       "SD" = drugpheno <- apply(drugpheno, 2, function(x){
       return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
