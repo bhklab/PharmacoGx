@@ -27,6 +27,11 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   standardize <- match.arg(standardize)
 
+  drugpheno <- apply(drugpheno, 2, function(x){
+      x[is.infinite(x)] <- NA
+      return(x)
+    })
+
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
 
@@ -60,9 +65,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   ## standardized coefficient in linear model 
   if(length(table(drugpheno)) > 2 & standardize!= "none") {
-    drugpheno <- apply(drugpheno, 2, function(x){
-      x[ccix][is.infinite(x[ccix])] <- NA
-      return(x)})
     switch(standardize, 
       "SD" = drugpheno <- apply(drugpheno, 2, function(x){
       return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
@@ -71,9 +73,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
       )
 
   }else{
-    drugpheno <- apply(drugpheno, 2, function(x){
-      x[ccix][is.infinite(x[ccix])] <- NA
-      return(x)})
     drugpheno <- drugpheno[ccix,,drop=FALSE]
   }
   if(length(table(x)) > 2  & standardize!= "none"){
