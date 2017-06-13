@@ -4,7 +4,7 @@ sanitizeInput <- function(conc,
 	conc_as_log = FALSE,
 	viability_as_pct = TRUE,
 	trunc = TRUE,
-	verbose=TRUE){
+	verbose = TRUE){
 
 
 	if (is.logical(conc_as_log) == FALSE) {
@@ -43,11 +43,7 @@ sanitizeInput <- function(conc,
 		}
 		conc <- as.numeric(conc[!is.na(conc)])
 		viability <- as.numeric(viability[!is.na(viability)])
-		ii <- which(conc == 0)
-		if(length(ii) > 0) {
-			conc <- conc[-ii]
-			viability <- viability[-ii]
-		}
+		
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
 		if (prod(is.finite(conc)) != 1) {
@@ -113,6 +109,11 @@ sanitizeInput <- function(conc,
 
   #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
 		if (conc_as_log == FALSE ) {
+		  ii <- which(conc == 0)
+		  if(length(ii) > 0) {
+		    conc <- conc[-ii]
+		    viability <- viability[-ii]
+		  }
 			log_conc <- log10(conc)
 		} else {
 			log_conc <- conc
