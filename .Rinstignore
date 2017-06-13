@@ -5,3 +5,4 @@ REVISIONS
 .DS_Store
 .git/*
 .docker/*
+.travis.yml
