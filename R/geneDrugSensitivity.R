@@ -28,8 +28,10 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   standardize <- match.arg(standardize)
 
   drugpheno <- apply(drugpheno, 2, function(x){
-      x[is.infinite(x)] <- NA
-      return(x)
+      if(!is.factor(x)) {
+        x[is.infinite(x)] <- NA
+        return(x)
+      }
     })
 
   ccix <- complete.cases(x, type, batch, drugpheno)
@@ -137,8 +139,8 @@ rr0 <- tryCatch(try(glm(formula(drugpheno ~ . - x), data=dd, model=FALSE, x=FALS
         tt <- table(dd[,"drugpheno"])
         print(ww)
         print(tt)
-        return(ww)
       }
+      return(ww)
     })
 
 
@@ -162,8 +164,8 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         tt <- table(dd[,"drugpheno"])
         print(ww)
         print(tt)
-        return(ww)
       }
+      return(ww)
     })
 
 

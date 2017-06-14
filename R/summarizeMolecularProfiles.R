@@ -26,7 +26,7 @@
 #'   In case molecular data type is mutation or fusion "and" and "or" choices are available 
 #' @param fill.missing \code{boolean} should the missing cell lines not in the
 #'   molecular data object be filled in with missing values?
-#' @param summarize A flag which when set to FALSE disables summarizing and
+#' @param summarize A flag which when set to FALSE (defaults to TRUE) disables summarizing and
 #'   returns the data unchanged as a ExpressionSet
 #' @param verbose \code{boolean} should messages be printed
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
@@ -39,7 +39,10 @@
 
 summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, summary.stat=c("mean", "median", "first", "last", "and", "or"), fill.missing=TRUE, summarize=TRUE, verbose=TRUE) {
   
-  if (!(mDataType %in% names(pSet@molecularProfiles))) {
+  
+  ### Placed here to make sure the pSet argument gets checked first by R. 
+  mDataTypes <- names(pSet@molecularProfiles)
+  if (!(mDataType %in% mDataTypes)) {
     stop (sprintf("Invalid mDataType, choose among: %s", paste(names(pSet@molecularProfiles), collapse=", ")))
   }
   
@@ -139,10 +142,10 @@ summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, su
           ddt <- dd[ , myx[length(myx)], drop=FALSE]
         },
         "and" = {
-          ddt <- apply(dd[ , myx, drop=FALSE], 1, "&")
+          ddt <- apply(dd[ , myx, drop=FALSE], 1, function(x) do.call(`&`, as.list(x)))
         },
         "or" = {
-          ddt <- apply(dd[ , myx, drop=FALSE], 1, "|")
+          ddt <- apply(dd[ , myx, drop=FALSE], 1, function(x) do.call(`|`, as.list(x)))
         }
       )
       ppt <- apply(pp[myx, , drop=FALSE], 2, function (x) {

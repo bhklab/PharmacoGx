@@ -28,7 +28,7 @@ In case molecular data type is mutation or fusion "and" and "or" choices are ava
 \item{fill.missing}{\code{boolean} should the missing cell lines not in the
 molecular data object be filled in with missing values?}
 
-\item{summarize}{A flag which when set to FALSE disables summarizing and
+\item{summarize}{A flag which when set to FALSE (defaults to TRUE) disables summarizing and
 returns the data unchanged as a ExpressionSet}
 
 \item{verbose}{\code{boolean} should messages be printed}
