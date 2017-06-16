@@ -16,5 +16,5 @@ test_that("Stuff works",{
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), scale = 0)) #should complain
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), lower_bounds = c(0, 0, 0), upper_bounds = c(1, 1, -1))) #should complain
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), family = "The Addams Family")) #should complain
-    logLogisticRegression(c(1, 2, 3), c(50, 60, 70)) #should run with no objections
+    expect_equal(logLogisticRegression(c(1, 2, 3), c(50, 60, 70)), list(HS = 1.22388251239748, E_inf = 59.9999882231278, EC50 = 1e-06)) #should run with no objections
 })

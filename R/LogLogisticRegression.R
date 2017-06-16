@@ -114,7 +114,13 @@ logLogisticRegression <- function(conc,
     stop("Cauchy flag is not a string.")
   }
   
-  
+  if (length(density) != 3){
+    stop("Density parameter needs to have length of 3, for HS, Einf, EC50")
+  }
+
+  if (!median_n==as.integer(median_n)){
+    stop("There can only be a integral number of samples to take a median of. Check your setting of median_n parameter, it is not an integer")
+  }
   
   if (min(upper_bounds - lower_bounds) < 0) {
     print(rbind(lower_bounds, upper_bounds))
@@ -207,7 +213,7 @@ logLogisticRegression <- function(conc,
                            viability,
                            lower_bounds = lower_bounds,
                            upper_bounds = upper_bounds,
-                           density = c(2, 10, 2),
+                           density = density,
                            n=median_n,
                            scale = scale,
                            family = family,
