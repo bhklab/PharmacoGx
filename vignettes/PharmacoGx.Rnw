@@ -263,7 +263,7 @@ Once again, we load the dataset, downloading it if needed using \textit{download
                2, function(x, HDAC){ 
 	    return(connectivityScore(x=x, 
 	                             y=HDAC[,2,drop=FALSE], 
-	                             method="gsea", nperm=100))
+	                             method="fgsea", nperm=100))
 	}, HDAC=HDAC_genes)
   
   rownames(res) <- c("Connectivity", "P Value")

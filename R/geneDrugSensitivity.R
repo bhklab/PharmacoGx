@@ -27,11 +27,11 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   standardize <- match.arg(standardize)
 
-  drugpheno <- data.frame(lapply(drugpheno, function(x){
+  drugpheno <- data.frame(lapply(drugpheno,function(x){
       if(!is.factor(x)) {
         x[is.infinite(x)] <- NA
       }
-      return(x)
+      return(list(x))
     }))
 
   ccix <- complete.cases(x, type, batch, drugpheno)
