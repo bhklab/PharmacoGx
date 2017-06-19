@@ -21,10 +21,10 @@ test_that("Function complains when given insensible input",{
 })
 
 test_that("Functions return right values",{
-
 	expect_equal(computeIC50(concentration = seq(-3,3), Hill_fit=c(1,0,0), conc_as_log=TRUE, viability_as_pct=FALSE), 0)
 	expect_equal(computeIC50(concentration = seq(1,3), Hill_fit=c(1,0,0), conc_as_log=TRUE, viability_as_pct=FALSE), 0)
 	expect_equal(computeIC50(concentration = seq(1,3), Hill_fit=c(1,.9,0), conc_as_log=TRUE, viability_as_pct=FALSE), NA_real_)
 	expect_equal(computeIC50(concentration = seq(1,3), Hill_fit=c(1,.5,0), conc_as_log=TRUE, viability_as_pct=FALSE), Inf)
 	expect_equal(.Hill(computeICn(concentration = seq(1,3), Hill_fit=c(1,0,0), n=.7, conc_as_log=TRUE, viability_as_pct=FALSE), c(1,0,0)), .3)
+	expect_equal(computeICn(concentration = seq(1,3), Hill_fit=c(1,0,0), n=0, conc_as_log=TRUE, viability_as_pct=FALSE), -Inf)
 })
