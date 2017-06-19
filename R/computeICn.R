@@ -78,7 +78,7 @@ computeICn <- function(concentration,
   
   if (n < pars[2] || n > 1) {
 
-    return(NA)
+    return(NA_real_)
 
   } else if (n == pars[2]) {
 

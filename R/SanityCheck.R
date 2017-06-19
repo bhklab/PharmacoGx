@@ -22,7 +22,9 @@ sanitizeInput <- function(conc,
 		print(trunc)
 		stop("'trunc' is not a logical.")
 	}
-
+	if(!is.finite(verbose)){
+		stop("'verbose' should be a logical (or numerical) argument.")
+	}
 	if(!missing(viability)&&!missing(conc)&&missing(Hill_fit))
 	{ 
 	  if (length(conc) != length(viability)) {
