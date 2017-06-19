@@ -5,5 +5,12 @@ cache: packages
 r_github_packages:
   - jimhester/covr
 
+install:
+- R -e 'devtools::install_deps(dep = T)'
+
+script:
+- R CMD build .
+- travis_wait 30 R CMD check *tar.gz
+
 after_success:
   - Rscript -e 'covr::codecov()'
