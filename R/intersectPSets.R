@@ -11,7 +11,7 @@
 #' data(GDSCsmall)
 #' data(CCLEsmall)
 #' common <- intersectPSet(list('GDSC'=GDSCsmall,
-#'   'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
+#'   'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines", "concentrations"))
 #' common$CGP
 #' common$CCLE
 #' 
