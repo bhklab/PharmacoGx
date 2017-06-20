@@ -5,3 +5,4 @@ REVISIONS
 .git/*
 .docker/*
 .travis.yml
+codecover.R
