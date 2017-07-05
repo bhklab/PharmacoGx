@@ -1,3 +1,5 @@
+os: 
+  - osx
 language: r
 r: bioc-devel
 cache: packages
@@ -6,4 +8,4 @@ r_github_packages:
   - jimhester/covr
 
 after_success:
-  - travis_wait 30 Rscript codecover.R
+  - travis_wait 50 Rscript codecover.R
