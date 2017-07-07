@@ -5,5 +5,5 @@ cache: packages
 r_github_packages:
   - jimhester/covr
 
-after_success:
-  - travis_wait 50 Rscript codecover.R
+# after_success:
+#   - travis_wait 50 Rscript codecover.R
