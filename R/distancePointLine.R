@@ -7,19 +7,19 @@
 ##  This is an R (http://www.r-project.org) implementation by Gregoire Thomas 7/11/08
 ##========================================================
 distancePointLine <-
-function (x, y, slope, intercept) {
- ## x, y is the point to test.
- ## slope, intercept is the line to check distance.
- ##
- ## Returns distance from the line.
- ##
- ## Returns 9999 on 0 denominator conditions.
- x1 <- x-10
- x2 <- x+10
- y1 <- x1*slope+intercept
- y2 <- x2*slope+intercept
- dd <- distancePointSegment(x, y, x1, y1, x2, y2)
- return(dd)
+function(x, #x-coordinate of point
+                       y, #y-coordinate of point
+                       a, #coefficient in line equation ax + by + c = 0
+                       b, #coefficient in line equation ax + by + c = 0
+                       c) { #coefficient in line equation ax + by + c = 0
+  
+  #Function calculates shortest distance between point and line in R^2.
+  
+  if (!(all(is.finite(c(x, y, a, b, c))))) {
+    stop("All inputs to linePtDist must be real numbers.")
+  }
+  
+  return(abs(a * x + b * y + c) / sqrt(a ^ 2 + b ^ 2))
 }
 
   ## end
