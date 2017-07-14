@@ -182,12 +182,16 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
     
   })
   
-  if(!is.null(dots[["cl"]])){
-    ncl = length(cl);
-    nthread = 1;
-  } else {
-    ncl = 1;
-    cl <- makeCluster(ncl)
+  if(!is.null(dots[["Rmpi"]])){
+    if(isTRUE(dots[["Rmpi"]])){
+      parallelLApply <- Rmpi::mpi.iparLapply
+      ncl = length(cl);
+      nthread = 1;
+    } else {
+      parallelLApply <- parallel::mclapply
+      ncl = 1;
+      cl <- makeCluster(ncl)
+    }
   }
   
   
@@ -204,7 +208,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   }
   splitix <- parallel::splitIndices(nx=length(drugn), ncl=ncl)
   splitix <- splitix[sapply(splitix, length) > 0]
-  mcres <-  parallel::parLapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+  mcres <-  parallelLApply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
     
     # library(PharmacoGx)
     
