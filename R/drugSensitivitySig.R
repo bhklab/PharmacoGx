@@ -185,13 +185,12 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   if(!is.null(dots[["Rmpi"]])){
     if(dots[["Rmpi"]]){
       parallelLApply <- Rmpi::mpi.iparLapply
-      ncl = length(cl);
+      ncl = nthread;
       nthread = 1;
     } 
   } else {
       parallelLApply <- parallel::mclapply
       ncl = 1;
-      cl <- makeCluster(ncl)
   }
   
   
@@ -226,7 +225,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
     }
     names(res) <- drugn[x]
     return(res)
-  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize, nthread=nthread)
+  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
   drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
