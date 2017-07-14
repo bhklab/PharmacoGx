@@ -209,7 +209,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   splitix <- splitix[sapply(splitix, length) > 0]
   mcres <-  parallelLApply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
     
-    # library(PharmacoGx)
+    library(PharmacoGx)
     
     res <- NULL
     for(i in drugn[x]) {
@@ -220,7 +220,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
       if(!is.na(sensitivity.cutoff)) {
         dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
+      rr <- PharmacoGx:::rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
       res <- c(res, list(rr$all))
     }
     names(res) <- drugn[x]
