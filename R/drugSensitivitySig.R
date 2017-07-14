@@ -187,11 +187,11 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
       parallelLApply <- Rmpi::mpi.iparLapply
       ncl = length(cl);
       nthread = 1;
-    } else {
+    } 
+  } else {
       parallelLApply <- parallel::mclapply
       ncl = 1;
       cl <- makeCluster(ncl)
-    }
   }
   
   
