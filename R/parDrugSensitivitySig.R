@@ -232,6 +232,9 @@ drugSensitivitySig <- function(pSet,
     xx <- PharmacoGx:::.distributeData(sensitivity.cutoff, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(sensitivity.cutoff <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(verbose, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(verbose <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
     
     mcres <- mpi.remote.exec(make_mc_res())
     
