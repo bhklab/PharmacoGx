@@ -202,31 +202,35 @@ drugSensitivitySig <- function(pSet,
   
   if (!is.null(dots[["Rmpi"]]) && isTRUE(dots[["Rmpi"]])){
     
-    xx <- PharmacoGx:::.distributeData(drugn, nslaves = nthreads, split = TRUE)
+    xx <- PharmacoGx:::.distributeData(drugn, nslaves = nthread, split = TRUE)
     mpi.bcast.cmd(drugn <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(expr, nslaves = nthreads, split = FALSE)
+    xx <- PharmacoGx:::.distributeData(expr, nslaves = nthread, split = FALSE)
     mpi.bcast.cmd(expr <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(drugpheno, nslaves = nthreads, split = TRUE, byRows = FALSE)
+    xx <- PharmacoGx:::.distributeData(drugpheno, nslaves = nthread, split = TRUE, byRows = FALSE)
     mpi.bcast.cmd(drugpheno <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(type, nslaves = nthreads, split = FALSE) #EVERYBODY
+    xx <- PharmacoGx:::.distributeData(type, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(type <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(batch, nslaves = nthreads, split = FALSE) #EVERYBODY
+    xx <- PharmacoGx:::.distributeData(batch, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(batch <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(standardize, nslaves = nthreads, split = FALSE) #EVERYBODY
+    xx <- PharmacoGx:::.distributeData(standardize, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(standardize <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(make_mc_res, nslaves = nthreads, split = FALSE) #EVERYBODY
+    xx <- PharmacoGx:::.distributeData(make_mc_res, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(make_mc_res <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
-    xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthreads, split = FALSE) #EVERYBODY
+    xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(rankGeneDrugSensitivity <- mpi.scatter.Robj())
-    mpi.scatter.Robj(obj = xx) <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthreads, split = FALSE) #EVERYBODY
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(geneDrugSensitivity <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(sensitivity.cutoff, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(sensitivity.cutoff <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
     
     mcres <- mpi.remote.exec(make_mc_res())
