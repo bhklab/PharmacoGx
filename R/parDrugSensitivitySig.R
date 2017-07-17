@@ -260,7 +260,6 @@ drugSensitivitySig <- function(pSet,
       names(res) <- drugn[x]
       return(res)
     },
-    cl = cl,
     drugn = drugn,
     expr = t(molecularProfiles(pSet, mDataType)[features, , drop = FALSE]),
     drugpheno = drugpheno.all,
