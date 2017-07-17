@@ -225,7 +225,7 @@ drugSensitivitySig <- function(pSet,
     mpi.scatter.Robj(obj = xx)
     xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthreads, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(rankGeneDrugSensitivity <- mpi.scatter.Robj())
-    mpi.scatter.Robj(obj = xx)xx <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthreads, split = FALSE) #EVERYBODY
+    mpi.scatter.Robj(obj = xx) <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthreads, split = FALSE) #EVERYBODY
     mpi.bcast.cmd(geneDrugSensitivity <- mpi.scatter.Robj())
     mpi.scatter.Robj(obj = xx)
     
