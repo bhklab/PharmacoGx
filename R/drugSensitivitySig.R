@@ -183,15 +183,14 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   })
   
   if(!is.null(dots[["Rmpi"]])){
-    if(isTRUE(dots[["Rmpi"]])){
+    if(dots[["Rmpi"]]){
       parallelLApply <- Rmpi::mpi.iparLapply
-      ncl = length(cl);
+      ncl = nthread;
       nthread = 1;
-    } else {
+    } 
+  } else {
       parallelLApply <- parallel::mclapply
       ncl = 1;
-      cl <- makeCluster(ncl)
-    }
   }
   
   
@@ -210,7 +209,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   splitix <- splitix[sapply(splitix, length) > 0]
   mcres <-  parallelLApply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
     
-    # library(PharmacoGx)
+    library(PharmacoGx)
     
     res <- NULL
     for(i in drugn[x]) {
@@ -221,12 +220,12 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
       if(!is.na(sensitivity.cutoff)) {
         dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }
-      rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
+      rr <- PharmacoGx:::rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
       res <- c(res, list(rr$all))
     }
     names(res) <- drugn[x]
     return(res)
-  }, cl = cl, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
+  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
   drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
