@@ -789,7 +789,12 @@ mDataNames <- function(pSet){
 #'@return Returns the subsetted PSet
 #'@export
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
-	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
+  if(is.character(i)&&is.character(j)){
+    return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
+  } 
+  else if(is.numeric(i) && is.numeric(j) && (as.integer(i)==i) && (as.integer(j)==j)){
+    return(subsetTo(x, cells=cellNames(x)[i], drugs=drugNames(x)[j],  molecular.data.cells=cellNames(x)[i]))
+  }
 })
 
 #' Get the dimensions of a PharmacoSet
