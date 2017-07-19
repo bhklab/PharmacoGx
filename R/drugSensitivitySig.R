@@ -3,7 +3,7 @@
 ##
 ## inputs:    
 ##      - data: gene expression data matrix
-##            - drugpheno: sensititivity values fo thr drug of interest
+##            - drugpheno: sensitivity values for the drug of interest
 ##            - type: cell or tissue type for each experiment
 ##            - duration: experiment duration in hours
 ##      - batch: experiment batches
@@ -65,11 +65,17 @@
 #' @export
 #' @import parallel
 
-drugSensitivitySig <- function(pSet, mDataType, drugs, features, 
-                               sensitivity.measure="auc_recomputed", 
-                               molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"), 
-                               sensitivity.summary.stat=c("mean", "median", "first", "last"), 
-                               returnValues=c("estimate", "pvalue", "fdr"), sensitivity.cutoff, standardize=c("SD", "rescale", "none"), nthread=1, verbose=TRUE, ...) {
+drugSensitivitySig <- function(pSet,
+                               mDataType,
+                               drugs,
+                               features, 
+                               sensitivity.measure = "auc_recomputed", 
+                               molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"), 
+                               sensitivity.summary.stat = c("mean", "median", "first", "last"), 
+                               returnValues = c("estimate", "pvalue", "fdr"),
+                               sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
+                               nthread = 1,
+                               verbose=TRUE, ...) {
   
   ### This function needs to: Get a table of AUC values per cell line / drug
   ### Be able to recompute those values on the fly from raw data if needed to change concentration
@@ -152,14 +158,17 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   if(is.null(dots[["sProfiles"]])){
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
       
-      return(t(summarizeSensitivityProfiles(pSet, sensitivity.measure=sensitivity.measure, summary.stat=sensitivity.summary.stat, verbose=verbose)))
+      return(t(summarizeSensitivityProfiles(pSet,
+                                            sensitivity.measure = sensitivity.measure,
+                                            summary.stat = sensitivity.summary.stat,
+                                            verbose = verbose)))
       
     })} else {
       sProfiles <- dots[["sProfiles"]]
       drugpheno.all <- list(t(sProfiles))
     }
   
-  dix <- is.element(drugn, do.call(colnames,drugpheno.all))
+  dix <- is.element(drugn, do.call(colnames, drugpheno.all))
   if (verbose && !all(dix)) {
     warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
@@ -168,31 +177,18 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   }
   drugn <- drugn[dix]
   
-  pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet=pSet, mDataType=mDataType, summary.stat=molecular.summary.stat, verbose=verbose)[features,]
+  pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
+                                                                    mDataType = mDataType,
+                                                                    summary.stat = molecular.summary.stat,
+                                                                    verbose = verbose)[features, ]
   
   if(!is.null(dots[["mProfiles"]])){
     mProfiles <- dots[["mProfiles"]]
-    Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features,colnames(pSet@molecularProfiles[[mDataType]]),drop=FALSE]
+    Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(pSet@molecularProfiles[[mDataType]]), drop = FALSE]
     
   }
   
-  drugpheno.all <- lapply(drugpheno.all, function(x) {
-    
-    x[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop=FALSE]
-    
-  })
-  
-  if(!is.null(dots[["Rmpi"]])){
-    if(dots[["Rmpi"]]){
-      parallelLApply <- Rmpi::mpi.iparLapply
-      ncl = nthread;
-      nthread = 1;
-    } 
-  } else {
-      parallelLApply <- parallel::mclapply
-      ncl = 1;
-  }
-  
+  drugpheno.all <- lapply(drugpheno.all, function(x) {x[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop = FALSE]})
   
   type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
   batch <- phenoInfo(pSet, mDataType)[, "batchid"]
@@ -200,42 +196,101 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   batch <- as.factor(batch)
   names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
   batch <- batch[rownames(drugpheno.all[[1]])]
-  # duration <- sensitivityInfo(pSet)[,"duration_h"]
-  ## compute drug sensitivity signatures
   if (verbose) {
-    message("Computation of drug sensitivity signatures...")
+    message("Computing drug sensitivity signatures...")
   }
-  splitix <- parallel::splitIndices(nx=length(drugn), ncl=ncl)
-  splitix <- splitix[sapply(splitix, length) > 0]
-  mcres <-  parallelLApply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+  
+  if (!is.null(dots[["Rmpi"]]) && isTRUE(dots[["Rmpi"]])){
     
-    library(PharmacoGx)
+    xx <- PharmacoGx:::.distributeData(drugn, nslaves = nthread, split = TRUE)
+    mpi.bcast.cmd(drugn <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(expr, nslaves = nthread, split = FALSE)
+    mpi.bcast.cmd(expr <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(drugpheno, nslaves = nthread, split = TRUE, byRows = FALSE)
+    mpi.bcast.cmd(drugpheno <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(type, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(type <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(batch, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(batch <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(standardize, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(standardize <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(make_mc_res, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(make_mc_res <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(rankGeneDrugSensitivity <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(geneDrugSensitivity <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(sensitivity.cutoff, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(sensitivity.cutoff <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
+    xx <- PharmacoGx:::.distributeData(verbose, nslaves = nthread, split = FALSE) #EVERYBODY
+    mpi.bcast.cmd(verbose <- mpi.scatter.Robj())
+    mpi.scatter.Robj(obj = xx)
     
-    res <- NULL
-    for(i in drugn[x]) {
-      ## using a linear model (x ~ concentration + cell + batch)
-      dd <- lapply(drugpheno, function(x) x[,i])
-      dd <- do.call(cbind, dd)
-      colnames(dd) <- seq_len(ncol(dd))
-      if(!is.na(sensitivity.cutoff)) {
-        dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
+    mcres <- mpi.remote.exec(make_mc_res())
+    
+  } else {
+    ncl = 1;
+    cl <- makeCluster(ncl)
+    splitix <- parallel::splitIndices(nx = length(drugn), ncl = ncl)
+    splitix <- splitix[sapply(splitix, length) > 0]
+    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+      
+      res <- NULL
+      for(i in drugn[x]) {
+        ## using a linear model (x ~ concentration + cell + batch)
+        dd <- lapply(drugpheno, function(x) x[ ,i])
+        dd <- do.call(cbind, dd)
+        colnames(dd) <- seq_len(ncol(dd))
+        if(!is.na(sensitivity.cutoff)) {
+          dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels = c(0, 1))
+        }
+        rr <- rankGeneDrugSensitivity(data = expr,
+                                      drugpheno = dd,
+                                      type = type,
+                                      batch = batch,
+                                      single.type = FALSE,
+                                      standardize = standardize,
+                                      nthread = nthread,
+                                      verbose = verbose)
+        res <- c(res, list(rr$all))
       }
-      rr <- PharmacoGx:::rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
-      res <- c(res, list(rr$all))
-    }
-    names(res) <- drugn[x]
-    return(res)
-  }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
+      names(res) <- drugn[x]
+      return(res)
+    },
+    drugn = drugn,
+    expr = t(molecularProfiles(pSet, mDataType)[features, , drop = FALSE]),
+    drugpheno = drugpheno.all,
+    type = type,
+    batch = batch,
+    nthread = nthread,
+    standardize = standardize)
+  }
+  
   res <- do.call(c, mcres)
   res <- res[!sapply(res, is.null)]
-  drug.sensitivity <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
+  drug.sensitivity <- array(NA,
+                            dim = c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]),
+                                    length(res), ncol(res[[1]])),
+                            dimnames = list(rownames(featureInfo(pSet, mDataType)[features,]), names(res), colnames(res[[1]])))
   for(j in 1:ncol(res[[1]])) {
     ttt <- sapply(res, function(x, j, k) {
-      xx <- array(NA, dim=length(k), dimnames=list(k))
+      xx <- array(NA, dim = length(k), dimnames = list(k))
       xx[rownames(x)] <- x[ , j, drop=FALSE]
       return (xx)
-    }, j=j, k=rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]))
-    drug.sensitivity[rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), j] <- ttt
+    },
+    j = j,
+    k = rownames(featureInfo(pSet, mDataType)[features,, drop = FALSE]))
+    drug.sensitivity[rownames(featureInfo(pSet, mDataType)[features,, drop = FALSE]), names(res), j] <- ttt
   }
   
   drug.sensitivity <- PharmacoSig(drug.sensitivity, PSetName = pSetName(pSet), Call ="as.character(match.call())", SigType='Sensitivity')
