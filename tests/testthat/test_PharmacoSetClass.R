@@ -68,4 +68,40 @@ test_that("pSetName result did not change since last time", {
 	expect_equal(pSetName(GDSCsmall), "GDSC")
 })
 
+### TODO:: DOES NOT WORK WITH DUPLICATES XXX
+test_that("updateCellId works without duplicates", {
+	data(GDSCsmall)
+	newNames <- c("Test","Test2",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
+
+
+	cellNames(GDSCsmall) <- newNames
+
+	expect_equal(sort(unique(sensitivityInfo(GDSCsmall)$cellid)), sort(newNames))
+	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(newNames))
+	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(newNames))
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

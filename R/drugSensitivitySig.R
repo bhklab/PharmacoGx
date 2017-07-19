@@ -239,9 +239,7 @@ drugSensitivitySig <- function(pSet,
       mcres <- mpi.remote.exec(make_mc_res())
       
     } else {
-      ncl = 1;
-      cl <- makeCluster(ncl)
-      splitix <- parallel::splitIndices(nx = length(drugn), ncl = ncl)
+      splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
       splitix <- splitix[sapply(splitix, length) > 0]
       mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
         res <- NULL
