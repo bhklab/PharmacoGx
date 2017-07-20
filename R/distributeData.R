@@ -43,7 +43,10 @@
           colIndex <- colIndex + colsPerSlave
         }
       }
-    } else if (is.vector(data) || is.list(data)) {
+    } else if (is.vector(data) ) { #|| is.list(data)) {
+      if(is.list(data)){
+        stop("Not sure what to do with lists.")
+      }
       if(length(data) < nslaves){
         stop(paste0("Not enough data for all slaves to be kept busy."))
       }
@@ -51,11 +54,11 @@
       extraElements <- length(data) %% nslaves
       elementIndex <- 1
       for (i in seq_len(extraElements)) {
-        xx[[i + 1]] <- data[[elementIndex:(elementIndex + elementsPerSlave)]]
+        xx[[i + 1]] <- data[elementIndex:(elementIndex + elementsPerSlave)]
         elementIndex <- elementIndex + elementsPerSlave + 1
       }
       for (i in (extraElements + 1):nslaves) {
-        xx[[i + 1]] <- data[[elementIndex:(elementIndex + elementsPerSlave - 1)]]
+        xx[[i + 1]] <- data[elementIndex:(elementIndex + elementsPerSlave - 1)]
         elementIndex <- elementIndex + elementsPerSlave
       }
     } else {
