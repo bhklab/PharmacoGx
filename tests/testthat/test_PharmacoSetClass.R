@@ -76,7 +76,7 @@ test_that("updateCellId works without duplicates", {
 
 	cellNames(GDSCsmall) <- newNames
 
-	expect_equal(sort(unique(sensitivityInfo(GDSCsmall)$cellid)), sort(newNames))
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
 	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(newNames))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(newNames))
 
