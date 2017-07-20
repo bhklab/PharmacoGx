@@ -1049,7 +1049,7 @@ updateCellId <- function(pSet, new.ids = vector("character")){
 
       if (ncol(sensNumber(pSet))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 1, sum)
+        sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 2, sum)
         sensNumber(pSet) <- sensNumber(pSet)[-myx[-1],]
         # sensMatch <- sensMatch[-myx[-1]]
       }
@@ -1191,7 +1191,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 
       if (ncol(sensNumber(pSet))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(pSet)[,myx[1]] <- apply(sensNumber(pSet)[,myx], 1, sum)
+        sensNumber(pSet)[,myx[1]] <- apply(sensNumber(pSet)[,myx], 2, sum)
         sensNumber(pSet) <- sensNumber(pSet)[,-myx[-1]]
         # sensMatch <- sensMatch[-myx[-1]]
       }

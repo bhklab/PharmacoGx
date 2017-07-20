@@ -68,7 +68,6 @@ test_that("pSetName result did not change since last time", {
 	expect_equal(pSetName(GDSCsmall), "GDSC")
 })
 
-### TODO:: DOES NOT WORK WITH DUPLICATES XXX
 test_that("updateCellId works without duplicates", {
 	data(GDSCsmall)
 	newNames <- c("Test","Test2",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
@@ -77,11 +76,54 @@ test_that("updateCellId works without duplicates", {
 	cellNames(GDSCsmall) <- newNames
 
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
 	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(newNames))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(newNames))
 
 })
 
+
+test_that("updateCellId works with duplicates", {
+	data(GDSCsmall)
+	newNames <- c("Test","Test",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
+
+
+	cellNames(GDSCsmall) <- newNames
+
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
+	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(unique(newNames)))
+	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(unique(newNames)))
+
+})
+
+
+
+test_that("updateDrugId works without duplicates", {
+	data(GDSCsmall)
+	newNames <- c("Test","Test2",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
+
+
+	drugNames(GDSCsmall) <- newNames
+
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$drugid) %in% newNames))
+	expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(newNames))
+	expect_equal(sort(colnames(sensNumber(GDSCsmall))), sort(newNames))
+
+})
+
+
+test_that("updateDrugId works without duplicates", {
+    data(GDSCsmall)
+    newNames <- c("Test","Test",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
+
+
+    drugNames(GDSCsmall) <- newNames
+
+    expect_true(all(unique(sensitivityInfo(GDSCsmall)$drugid) %in% newNames))
+    expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(unique(newNames)))
+    expect_equal(sort(colnames(sensNumber(GDSCsmall))), sort(unique(newNames)))
+
+})
 
 
 
