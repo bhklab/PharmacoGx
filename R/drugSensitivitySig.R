@@ -205,36 +205,55 @@ drugSensitivitySig <- function(pSet,
       xx <- PharmacoGx:::.distributeData(drugn, nslaves = nthread, split = TRUE)
       mpi.bcast.cmd(drugn <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("drugn distributed")
       xx <- PharmacoGx:::.distributeData(expr, nslaves = nthread, split = FALSE)
       mpi.bcast.cmd(expr <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("expr distributed")
       xx <- PharmacoGx:::.distributeData(drugpheno, nslaves = nthread, split = TRUE, byRows = FALSE)
       mpi.bcast.cmd(drugpheno <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("drugpheno distributed")      
       xx <- PharmacoGx:::.distributeData(type, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(type <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("type distributed")      
+
       xx <- PharmacoGx:::.distributeData(batch, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(batch <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("batch distributed")      
+
       xx <- PharmacoGx:::.distributeData(standardize, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(standardize <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("standardize distributed")      
+
       xx <- PharmacoGx:::.distributeData(make_mc_res, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(make_mc_res <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("make_mc_res distributed")      
+
       xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(rankGeneDrugSensitivity <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("PharmacoGx:::rankGeneDrugSensitivity distributed")      
+
       xx <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(geneDrugSensitivity <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("PharmacoGx:::geneDrugSensitivity distributed")      
+
       xx <- PharmacoGx:::.distributeData(sensitivity.cutoff, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(sensitivity.cutoff <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("sensitivity.cutoff distributed")      
+
       xx <- PharmacoGx:::.distributeData(verbose, nslaves = nthread, split = FALSE) #EVERYBODY
       mpi.bcast.cmd(verbose <- mpi.scatter.Robj())
       mpi.scatter.Robj(obj = xx)
+      warning("verbose distributed")      
+
       
       mcres <- mpi.remote.exec(make_mc_res())
       
