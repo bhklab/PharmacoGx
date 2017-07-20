@@ -31,9 +31,9 @@ A PharmacoSet with only the selected drugs and cells
 }
 \description{
 This is the prefered method of subsetting a PharmacoSet. This function allows
-abstraction of the data to the level of biologically relevant objects: drugs,
-genes and cells. The function will automatically go through all of the
-combined data in the PharmacoSet and ensure only the requested drugs, genes
+abstraction of the data to the level of biologically relevant objects: drugs
+and cells. The function will automatically go through all of the
+combined data in the PharmacoSet and ensure only the requested drugs
 and cell lines are found in any of the slots. This allows quickly picking out
 all the experiments for a drug or cell of interest, as well removes the need
 to keep track of all the metadata conventions between different datasets.
@@ -46,4 +46,3 @@ PSet <- subsetTo(CCLEsmall,drugs = CCLEdrugs[1], cells = CCLEcells[1])
 PSet
 
 }
-

@@ -32,6 +32,9 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
 
     drugpheno <- data.frame(drugpheno)
 
+  } else if(class(drugpheno)!="data.frame"){
+    drugpheno <- as.data.frame(drugpheno)
+
   }
 
   if (missing(type) || all(is.na(type))) {
@@ -57,7 +60,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
   nn <- sum(ccix)
 #  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
 #  nc <- c("estimate", "se", "n", "pvalue", "fdr")
-  if(!any(apply(drugpheno,2,is.factor))){
+  if(!any(unlist(lapply(drugpheno,is.factor)))){
      if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
       nc <- lapply(1:ncol(drugpheno), function(i){
@@ -70,7 +73,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
         return(nc)
 
       })
-      nc <- do.call(c, rest)
+      #nc <- do.call(c, rest)
       nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
     } else {
       nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
@@ -94,7 +97,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
         res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize)
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]

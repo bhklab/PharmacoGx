@@ -202,6 +202,7 @@ drugSensitivitySig <- function(pSet, mDataType, drugs, features,
   ## using a linear model (x ~ concentration + cell + batch)
       dd <- lapply(drugpheno, function(x) x[,i])
       dd <- do.call(cbind, dd)
+      colnames(dd) <- seq_len(ncol(dd))
       if(!is.na(sensitivity.cutoff)) {
             dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
       }

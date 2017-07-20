@@ -22,4 +22,3 @@ data(CCLEsmall)
 drugNames(CCLEsmall) <- drugNames(CCLEsmall)
 
 }
-

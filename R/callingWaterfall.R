@@ -76,7 +76,7 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   rr <- lm(y ~ x, data=data.frame(dd))
   ## compute distance from sensitivity values and the line between the two extreme sensitivity values
   ddi <- apply(cbind(1:length(oo), xx[oo]), 1, function(x, slope, intercept) {
-    return(distancePointLine(x=x[1], y=x[2], slope=slope, intercept=intercept))
+    return(distancePointLine(x=x[1], y=x[2], a=slope, b= -1, c=intercept))
   }, slope=rr$coefficients[2], intercept=rr$coefficients[1])
   if(cc$estimate > cor.min.linear){
     ## approximately linear waterfall

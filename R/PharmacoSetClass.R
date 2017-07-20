@@ -461,15 +461,23 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(pSet){
 #' sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to update
-#' @param value A \code{data.frame} with the new sensitivity profiles
+#' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' @return Updated \code{PharmacoSet} 
 setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
 
     object@sensitivity$profiles <- value
+    object
+})
+#' @describeIn PharmacoSet Update the phenotypic data for the drug dose
+#'   sensitivity
+#' @export
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
+
+    object@sensitivity$profiles <- as.data.frame(value)
     object
 })
 #' sensitivityMeasures Generic
@@ -800,9 +808,9 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' A function to subset a PharmacoSet to data containing only specified drugs, cells and genes
 #' 
 #' This is the prefered method of subsetting a PharmacoSet. This function allows
-#' abstraction of the data to the level of biologically relevant objects: drugs,
-#' genes and cells. The function will automatically go through all of the
-#' combined data in the PharmacoSet and ensure only the requested drugs, genes
+#' abstraction of the data to the level of biologically relevant objects: drugs
+#' and cells. The function will automatically go through all of the
+#' combined data in the PharmacoSet and ensure only the requested drugs
 #' and cell lines are found in any of the slots. This allows quickly picking out
 #' all the experiments for a drug or cell of interest, as well removes the need
 #' to keep track of all the metadata conventions between different datasets.
@@ -1015,18 +1023,93 @@ updateCellId <- function(pSet, new.ids = vector("character")){
       Biobase::pData(eset)[["cellid"]]  <- new.ids[myx]
       return(eset)
         })
-  myx <- match(rownames(pSet@curation$cell),rownames(cellInfo(pSet)))
-  rownames(pSet@curation$cell) <- new.ids[myx]
-  rownames(pSet@curation$tissue) <- new.ids[myx]
+
+
+
+
+
+  if(any(duplicated(new.ids))){
+    warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
+    
+    if(ncol(sensNumber(pSet))>0){
+      sensMatch <- match(rownames(sensNumber(pSet)), rownames(cellInfo(pSet)))
+    }
+    if(dim(pertNumber(pSet))[[2]]>0){
+      pertMatch <- match(dimnames(pertNumber(pSet))[[1]], rownames(cellInfo(pSet)))
+    }
+    curMatch <- match(rownames(pSet@curation$cell),rownames(cellInfo(pSet)))
+
+    duplId <- unique(new.ids[duplicated(new.ids)])
+    for(id in duplId){
+
+      if (ncol(sensNumber(pSet))>0){
+        myx <- which(new.ids[sensMatch] == id)
+        sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 1, sum)
+        sensNumber(pSet) <- sensNumber(pSet)[-myx[-1],]
+        # sensMatch <- sensMatch[-myx[-1]]
+      }
+      if (dim(pertNumber(pSet))[[1]]>0){
+        myx <- which(new.ids[pertMatch] == id)
+        pertNumber(pSet)[myx[1],,] <- apply(pertNumber(pSet)[myx,,], c(1,3), sum)
+        pertNumber(pSet) <- pertNumber(pSet)[-myx[-1],,]
+        # pertMatch <- pertMatch[-myx[-1]]
+      }
+
+      myx <- which(new.ids[curMatch] == id)
+      pSet@curation$cell[myx[1],] <- apply(pSet@curation$cell[myx,], 2, paste, collapse="///")
+      pSet@curation$cell <- pSet@curation$cell[-myx[-1],]
+      pSet@curation$tissue[myx[1],] <- apply(pSet@curation$tissue[myx,], 2, paste, collapse="///")
+      pSet@curation$tissue <- pSet@curation$tissue[-myx[-1],]
+      # curMatch <- curMatch[-myx[-1]]
+
+      myx <- which(new.ids == id)
+      cellInfo(pSet)[myx[1],] <- apply(cellInfo(pSet)[myx,], 2, paste, collapse="///")
+      cellInfo(pSet) <- cellInfo(pSet)[-myx[-1],]
+      new.ids <- new.ids[-myx[-1]]
+      if(ncol(sensNumber(pSet))>0){
+        sensMatch <- match(rownames(sensNumber(pSet)), rownames(cellInfo(pSet)))
+      }
+      if(dim(pertNumber(pSet))[[1]]>0){
+        pertMatch <- match(dimnames(pertNumber(pSet))[[1]], rownames(cellInfo(pSet)))
+      }
+      curMatch <- match(rownames(pSet@curation$cell),rownames(cellInfo(pSet)))
+    }
+  } else {
+    if (dim(pertNumber(pSet))[[1]]>0){
+      pertMatch <- match(dimnames(pertNumber(pSet))[[1]], rownames(cellInfo(pSet)))
+    }
+    if (ncol(sensNumber(pSet))>0){
+      sensMatch <- match(rownames(sensNumber(pSet)), rownames(cellInfo(pSet)))
+    }
+    curMatch <- match(rownames(pSet@curation$cell),rownames(cellInfo(pSet)))
+  }
+
   if (dim(pertNumber(pSet))[[1]]>0){
-    myx <- match(dimnames(pertNumber(pSet))[[1]], rownames(cellInfo(pSet)))
-    dimnames(pertNumber(pSet))[[1]] <- new.ids[myx]
+    dimnames(pertNumber(pSet))[[1]] <- new.ids[pertMatch]
   }
-  if (nrow(sensNumber(pSet))>0){
-    myx <- match(rownames(sensNumber(pSet)), rownames(cellInfo(pSet)))
-    rownames(sensNumber(pSet)) <- new.ids[myx]
+  if (ncol(sensNumber(pSet))>0){
+    rownames(sensNumber(pSet)) <- new.ids[sensMatch]
   }
+  rownames(pSet@curation$cell) <- new.ids[curMatch]
+  rownames(pSet@curation$tissue) <- new.ids[curMatch]
   rownames(cellInfo(pSet)) <- new.ids
+
+
+
+
+
+  # myx <- match(rownames(pSet@curation$cell),rownames(cellInfo(pSet)))
+  # rownames(pSet@curation$cell) <- new.ids[myx]
+  # rownames(pSet@curation$tissue) <- new.ids[myx]
+  # if (dim(pertNumber(pSet))[[1]]>0){
+  #   myx <- match(dimnames(pertNumber(pSet))[[1]], rownames(cellInfo(pSet)))
+  #   dimnames(pertNumber(pSet))[[1]] <- new.ids[myx]
+  # }
+  # if (nrow(sensNumber(pSet))>0){
+  #   myx <- match(rownames(sensNumber(pSet)), rownames(cellInfo(pSet)))
+  #   rownames(sensNumber(pSet)) <- new.ids[myx]
+  # }
+  # rownames(cellInfo(pSet)) <- new.ids
   return(pSet)
 
 }
@@ -1078,24 +1161,79 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 
   }
   if(pSet@datasetType=="perturbation"|pSet@datasetType=="both"){
-      pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset){
-          
-          myx <- match(Biobase::pData(eset)[["drugid"]],rownames(drugInfo(pSet)))
-          Biobase::pData(eset)[["drugid"]]  <- new.ids[myx]
-          return(eset)
-          })
+    pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset){
+
+      myx <- match(Biobase::pData(eset)[["drugid"]],rownames(drugInfo(pSet)))
+      Biobase::pData(eset)[["drugid"]]  <- new.ids[myx]
+      return(eset)
+    })
   }
-  myx <- match(rownames(pSet@curation$drug),rownames(drugInfo(pSet)))
-  rownames(pSet@curation$drug) <- new.ids[myx]
+  
+
+  if(any(duplicated(new.ids))){
+    warning("Duplicated ids passed to updateDrugId. Merging old ids into the same identifier")
+    
+    if(ncol(sensNumber(pSet))>0){
+      sensMatch <- match(colnames(sensNumber(pSet)), rownames(drugInfo(pSet)))
+    }
+    if(dim(pertNumber(pSet))[[2]]>0){
+      pertMatch <- match(dimnames(pertNumber(pSet))[[2]], rownames(drugInfo(pSet)))
+    }
+    curMatch <- match(rownames(pSet@curation$drug),rownames(drugInfo(pSet)))
+
+    duplId <- unique(new.ids[duplicated(new.ids)])
+    for(id in duplId){
+
+      if (ncol(sensNumber(pSet))>0){
+        myx <- which(new.ids[sensMatch] == id)
+        sensNumber(pSet)[,myx[1]] <- apply(sensNumber(pSet)[,myx], 1, sum)
+        sensNumber(pSet) <- sensNumber(pSet)[,-myx[-1]]
+        # sensMatch <- sensMatch[-myx[-1]]
+      }
+      if (dim(pertNumber(pSet))[[2]]>0){
+        myx <- which(new.ids[pertMatch] == id)
+        pertNumber(pSet)[,myx[1],] <- apply(pertNumber(pSet)[,myx,], c(1,3), sum)
+        pertNumber(pSet) <- pertNumber(pSet)[,-myx[-1],]
+        # pertMatch <- pertMatch[-myx[-1]]
+      }
+
+      myx <- which(new.ids[curMatch] == id)
+      pSet@curation$drug[myx[1],] <- apply(pSet@curation$drug[myx,], 2, paste, collapse="///")
+      pSet@curation$drug <- pSet@curation$drug[-myx[-1],]
+      # curMatch <- curMatch[-myx[-1]]
+
+      myx <- which(new.ids == id)
+      drugInfo(pSet)[myx[1],] <- apply(drugInfo(pSet)[myx,], 2, paste, collapse="///")
+      drugInfo(pSet) <- drugInfo(pSet)[-myx[-1],]
+      new.ids <- new.ids[-myx[-1]]
+      if(ncol(sensNumber(pSet))>0){
+        sensMatch <- match(colnames(sensNumber(pSet)), rownames(drugInfo(pSet)))
+      }
+      if(dim(pertNumber(pSet))[[2]]>0){
+        pertMatch <- match(dimnames(pertNumber(pSet))[[2]], rownames(drugInfo(pSet)))
+      }
+      curMatch <- match(rownames(pSet@curation$drug),rownames(drugInfo(pSet)))
+    }
+  } else {
+    if (dim(pertNumber(pSet))[[2]]>0){
+      pertMatch <- match(dimnames(pertNumber(pSet))[[2]], rownames(drugInfo(pSet)))
+    }
+    if (ncol(sensNumber(pSet))>0){
+      sensMatch <- match(colnames(sensNumber(pSet)), rownames(drugInfo(pSet)))
+    }
+    curMatch <- match(rownames(pSet@curation$drug),rownames(drugInfo(pSet)))
+  }
+
   if (dim(pertNumber(pSet))[[2]]>0){
-    myx <- match(dimnames(pertNumber(pSet))[[2]], rownames(drugInfo(pSet)))
-    dimnames(pertNumber(pSet))[[2]] <- new.ids[myx]
+    dimnames(pertNumber(pSet))[[2]] <- new.ids[pertMatch]
   }
   if (ncol(sensNumber(pSet))>0){
-    myx <- match(colnames(sensNumber(pSet)), rownames(drugInfo(pSet)))
-    colnames(sensNumber(pSet)) <- new.ids[myx]
+    colnames(sensNumber(pSet)) <- new.ids[sensMatch]
   }
+  rownames(pSet@curation$drug) <- new.ids[curMatch]
   rownames(drugInfo(pSet)) <- new.ids
+
+
   return(pSet)
 }
 
@@ -1230,10 +1368,12 @@ checkPSetStructure <-
           if(length(intersect(pSet@cell$tissueid, pSet@curation$tissue$unique.tissueid)) != length(table(pSet@cell$tissueid))){
             message("tissueid should be the same as unique tissue id from tissue curation slot")
           }
-          message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]))]), collapse=" "))
         }
       } else {
         message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
+      }
+      if(any(is.na(pSet@cell[,"tissueid"]) | pSet@cell[,"tissueid"]=="", na.rm=TRUE)){
+        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(pSet@cell)[which(is.na(pSet@cell[,"tissueid"]) | pSet@cell[,"tissueid"]=="")], collapse=" ")))
       }
     } else {
       warning("tissueid does not exist in cell slot")

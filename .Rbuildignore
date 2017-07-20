@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 .git
 .docker
+.travis.yml
+codecover.R
+^appveyor\.yml$

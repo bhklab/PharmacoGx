@@ -19,22 +19,29 @@
 
 
 
+# unionList <-
+# function(...) {
+#    args <- list(...)
+#    nargs <- length(args)
+#    if(nargs == 0) {
+#      return(unlist(args))
+#    }
+#    if (nargs == 1) {
+#      if (nargs == 1 && is.list(args[[1]])) {
+#        do.call("unionList", args[[1]])
+#      } else {
+#        return(unique(args[[1]]))
+#      }
+#    } else if (nargs == 2) {
+#      return(union(args[[1]], args[[2]]))
+#    } else {
+#      return(union(args[[1]], unionList(args[-1])))
+#    }
+# }
+
 unionList <-
 function(...) {
-   args <- list(...)
-   nargs <- length(args)
-   if(nargs == 0) {
-     return(args)
-   }
-   if (nargs == 1) {
-     if (nargs == 1 && is.list(args[[1]])) {
-       do.call("unionList", args[[1]])
-     } else {
-       return(unique(args[[1]]))
-     }
-   } else if (nargs == 2) {
-     return(union(args[[1]], args[[2]]))
-   } else {
-     return(union(args[[1]], unionList(args[-1])))
-   }
+  args <- list(...)
+  nargs <- length(args)
+  return(unique(unlist(do.call(c, args))))
 }

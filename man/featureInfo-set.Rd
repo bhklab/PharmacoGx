@@ -24,4 +24,3 @@ data(CCLEsmall)
 featureInfo(CCLEsmall, "rna") <- featureInfo(CCLEsmall, "rna")
 
 }
-

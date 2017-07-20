@@ -4,7 +4,7 @@
 \alias{connectivityScore}
 \title{Function computing connectivity scores between two signatures}
 \usage{
-connectivityScore(x, y, method = c("gsea", "gwc"), nperm = 10000,
+connectivityScore(x, y, method = c("gsea", "fgsea", "gwc"), nperm = 10000,
   nthread = 1, gwc.method = c("spearman", "pearson"), ...)
 }
 \arguments{
@@ -62,4 +62,3 @@ Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set
    expression and combining statistical hypotheses and methods. Nucleic
    Acids Research. 41 (8), 4378-4391. doi: 10.1093/nar/gkt111
 }
-
