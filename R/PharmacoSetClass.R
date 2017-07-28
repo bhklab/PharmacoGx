@@ -789,7 +789,12 @@ mDataNames <- function(pSet){
 #'@return Returns the subsetted PSet
 #'@export
 setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
-	return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
+  if(is.character(i)&&is.character(j)){
+    return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
+  } 
+  else if(is.numeric(i) && is.numeric(j) && (as.integer(i)==i) && (as.integer(j)==j)){
+    return(subsetTo(x, cells=cellNames(x)[i], drugs=drugNames(x)[j],  molecular.data.cells=cellNames(x)[i]))
+  }
 })
 
 #' Get the dimensions of a PharmacoSet
@@ -1044,7 +1049,7 @@ updateCellId <- function(pSet, new.ids = vector("character")){
 
       if (ncol(sensNumber(pSet))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 1, sum)
+        sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 2, sum)
         sensNumber(pSet) <- sensNumber(pSet)[-myx[-1],]
         # sensMatch <- sensMatch[-myx[-1]]
       }
@@ -1186,7 +1191,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 
       if (ncol(sensNumber(pSet))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(pSet)[,myx[1]] <- apply(sensNumber(pSet)[,myx], 1, sum)
+        sensNumber(pSet)[,myx[1]] <- apply(sensNumber(pSet)[,myx], 2, sum)
         sensNumber(pSet) <- sensNumber(pSet)[,-myx[-1]]
         # sensMatch <- sensMatch[-myx[-1]]
       }
