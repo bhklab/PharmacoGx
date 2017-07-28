@@ -26,7 +26,9 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
 
   standardize <- match.arg(standardize)
-
+  
+  colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")  
+  
   drugpheno <- data.frame(sapply(drugpheno, function(x) {
     if (!is.factor(x)) {
       x[is.infinite(x)] <- NA
@@ -88,7 +90,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(ncol(drugpheno)>1){
     ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
   } else {
-    ff0 <- sprintf("drugpheno")
+    ff0 <- sprintf("drugpheno.1")
   }
 
   # ff1 <- sprintf("%s + x", ff0)
@@ -121,7 +123,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   # }
 if(any(unlist(lapply(drugpheno,is.factor)))){
 
-rr0 <- tryCatch(try(glm(formula(drugpheno ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
     warning=function(w) {
       if(verbose) {
         ww <- "Null model did not convrge"
@@ -132,7 +134,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno ~ . - x), data=dd, model=FALSE, x=FALS
         }
       }
     })
-  rr1 <- tryCatch(try(glm(formula(drugpheno ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+  rr1 <- tryCatch(try(glm(formula(drugpheno.1 ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
     warning=function(w) {
       if(verbose) {
         ww <- "Model did not converge"
