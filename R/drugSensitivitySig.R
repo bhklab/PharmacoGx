@@ -200,84 +200,24 @@ drugSensitivitySig <- function(pSet,
       message("Computing drug sensitivity signatures...")
     }
     
-    if (!is.null(dots[["Rmpi"]]) && isTRUE(dots[["Rmpi"]])){
-      
-      xx <- PharmacoGx:::.distributeData(drugn, nslaves = nthread, split = TRUE)
-      mpi.bcast.cmd(drugn <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("drugn distributed")
-      xx <- PharmacoGx:::.distributeData(expr, nslaves = nthread, split = FALSE)
-      mpi.bcast.cmd(expr <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("expr distributed")
-      xx <- PharmacoGx:::.distributeData(drugpheno, nslaves = nthread, split = TRUE, byRows = FALSE)
-      mpi.bcast.cmd(drugpheno <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("drugpheno distributed")      
-      xx <- PharmacoGx:::.distributeData(type, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(type <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("type distributed")      
-
-      xx <- PharmacoGx:::.distributeData(batch, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(batch <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("batch distributed")      
-
-      xx <- PharmacoGx:::.distributeData(standardize, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(standardize <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("standardize distributed")      
-
-      xx <- PharmacoGx:::.distributeData(make_mc_res, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(make_mc_res <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("make_mc_res distributed")      
-
-      xx <- PharmacoGx:::.distributeData(PharmacoGx:::rankGeneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(rankGeneDrugSensitivity <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("PharmacoGx:::rankGeneDrugSensitivity distributed")      
-
-      xx <- PharmacoGx:::.distributeData(PharmacoGx:::geneDrugSensitivity, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(geneDrugSensitivity <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("PharmacoGx:::geneDrugSensitivity distributed")      
-
-      xx <- PharmacoGx:::.distributeData(sensitivity.cutoff, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(sensitivity.cutoff <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("sensitivity.cutoff distributed")      
-
-      xx <- PharmacoGx:::.distributeData(verbose, nslaves = nthread, split = FALSE) #EVERYBODY
-      mpi.bcast.cmd(verbose <- mpi.scatter.Robj())
-      mpi.scatter.Robj(obj = xx)
-      warning("verbose distributed")      
-
-      
-      mcres <- mpi.remote.exec(make_mc_res())
-      
-    } else {
-      splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
-      splitix <- splitix[sapply(splitix, length) > 0]
-      mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
-        res <- NULL
-        for(i in drugn[x]) {
-  ## using a linear model (x ~ concentration + cell + batch)
-          dd <- lapply(drugpheno, function(x) x[,i])
-          dd <- do.call(cbind, dd)
-          colnames(dd) <- seq_len(ncol(dd))
-          if(!is.na(sensitivity.cutoff)) {
-            dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
-          }
-          rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
-          res <- c(res, list(rr$all))
+    splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
+    splitix <- splitix[sapply(splitix, length) > 0]
+    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+      res <- NULL
+      for(i in drugn[x]) {
+        ## using a linear model (x ~ concentration + cell + batch)
+        dd <- lapply(drugpheno, function(x) x[,i])
+        dd <- do.call(cbind, dd)
+        colnames(dd) <- seq_len(ncol(dd))
+        if(!is.na(sensitivity.cutoff)) {
+          dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
         }
-        names(res) <- drugn[x]
-        return(res)
-      }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
-
-    }
+        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
+        res <- c(res, list(rr$all))
+      }
+      names(res) <- drugn[x]
+      return(res)
+    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
     
     res <- do.call(c, mcres)
     res <- res[!sapply(res, is.null)]
