@@ -95,7 +95,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   # ff1 <- sprintf("%s + x", ff0)
 
-  dd <- data.frame("drugpheno"=drugpheno, "x"=xx)
+  dd <- data.frame(drugpheno, "x"=xx)
   # , "x"=xx, "type"=type[ccix], "batch"=batch[ccix])
   
   ## control for tissue type
@@ -138,7 +138,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FA
     warning=function(w) {
       if(verbose) {
         ww <- "Model did not converge"
-        tt <- table(dd[,"drugpheno"])
+        tt <- table(dd[,"drugpheno.1"])
         print(ww)
         print(tt)
       }
@@ -163,7 +163,7 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
     warning=function(w) {
       if(verbose) {
         ww <- "Model did not converge"
-        tt <- table(dd[,"drugpheno"])
+        tt <- table(dd[,"drugpheno.1"])
         print(ww)
         print(tt)
       }
