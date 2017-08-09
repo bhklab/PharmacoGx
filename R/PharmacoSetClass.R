@@ -1273,6 +1273,26 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
+
+.summarizeMolecularNumbers <- function(pSet) {
+  
+  ## consider all molecular types
+  mDT <- mDataNames(pSet)
+  
+  ## consider all cell lines
+  celln <- rownames(pSet@cell)
+  
+  molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), dimnames=list(celln, mDT))
+  
+  for(mDataType in mDT) {
+    tt <- table(phenoInfo(pSet, mDataType)$cellid)
+    molecular.info[names(tt), mDataType] <- tt
+
+  }
+  return(molecular.info)
+}
+
+
 .summarizePerturbationNumbers <- function(pSet) {
 
   if (pSet@datasetType != "perturbation" && pSet@datasetType != "both") {
