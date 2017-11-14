@@ -59,7 +59,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
       rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "df"=NA)
     }
   } else {
-    rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
+    # rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
+    rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
   }  
   
   if(nn < 3 || var(x[ccix], na.rm=TRUE) == 0) {

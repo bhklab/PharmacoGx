@@ -79,7 +79,8 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
     }
   } else {
-    nc  <- c("estimate", "se", "n", "pvalue", "fdr")
+    # nc  <- c("estimate", "se", "n", "pvalue", "fdr")
+    nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
   }  
     
 
@@ -98,6 +99,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       ## not enough experiments
       rest <- list(matrix(NA, nrow=ncol(data), ncol=length(nc), dimnames=list(colnames(data), nc)))
       res <- c(res, rest)
+      browser()
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[sapply(splitix, length) > 0]
