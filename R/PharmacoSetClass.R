@@ -1273,7 +1273,6 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
-
 .summarizeMolecularNumbers <- function(pSet) {
   
   ## consider all molecular types
@@ -1291,7 +1290,6 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   }
   return(molecular.info)
 }
-
 
 .summarizePerturbationNumbers <- function(pSet) {
 

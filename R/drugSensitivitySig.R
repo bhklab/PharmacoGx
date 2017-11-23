@@ -64,7 +64,6 @@
 #'   second, and return values in the third.
 #' @export
 #' @import parallel
-
 drugSensitivitySig <- function(pSet,
  mDataType,
  drugs,
@@ -244,3 +243,4 @@ drugSensitivitySig <- function(pSet,
     
     return(drug.sensitivity)
   }
+

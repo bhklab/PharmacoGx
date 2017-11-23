@@ -1,0 +1,9 @@
+PharmacoGx
+==========
+
+R package to analyze large-scale pharmacogenomic datasets.
+
+
+Dependencies:
+
+All dependencies are available from CRAN or Bioconductor.

@@ -5,7 +5,8 @@ sanitizeInput <- function(conc,
 	viability_as_pct = TRUE,
 	trunc = TRUE,
 	verbose = TRUE # Set to 2 to see debug printouts
-	){
+	) {
+
 
 
 	if (is.logical(conc_as_log) == FALSE) {
@@ -43,9 +44,8 @@ sanitizeInput <- function(conc,
 
 		} 
 		if(any((!is.na(conc))&is.na(viability))){
-
+			
 			warning("Missing viability with non-missing concentrations values encountered. Removing concentrations values correspoding to those viabilities")
-
 			myx <- !is.na(viability)
 			conc <- as.numeric(conc[myx])
 			viability <- as.numeric(viability[myx])
@@ -53,7 +53,6 @@ sanitizeInput <- function(conc,
 		}
 		conc <- as.numeric(conc[!is.na(conc)])
 		viability <- as.numeric(viability[!is.na(viability)])
-		
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
 		if (prod(is.finite(conc)) != 1) {
@@ -69,6 +68,7 @@ sanitizeInput <- function(conc,
 
 		if (min(viability) < 0) {
 			if (verbose) {
+
 				warning("Warning: Negative viability data.")
 			}
 		}
@@ -91,6 +91,7 @@ sanitizeInput <- function(conc,
 		if (viability_as_pct == TRUE && max(viability) < 5) {
 			warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
 			if (verbose == 2) {
+
 				print(viability)
 				print(viability_as_pct)
 			}
@@ -118,6 +119,7 @@ sanitizeInput <- function(conc,
 		    conc <- conc[-ii]
 		    viability <- viability[-ii]
 		  }
+
 			log_conc <- log10(conc)
 		} else {
 			log_conc <- conc

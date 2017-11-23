@@ -112,7 +112,7 @@ test_that("updateDrugId works without duplicates", {
 })
 
 
-test_that("updateDrugId works without duplicates", {
+test_that("updateDrugId works with duplicates", {
     data(GDSCsmall)
     newNames <- c("Test","Test",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
 

@@ -36,6 +36,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     return(list(x))
   }, USE.NAMES=FALSE), check.names=FALSE)
 
+
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
 
@@ -60,7 +61,11 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     }
   } else {
     # rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
-    rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
+    if (is.factor(drugpheno[,1])){
+      rest <- c("estimate"=NA_real_, "se"=NA_real_, "n"=nn, "pvalue"=NA_real_, df=NA_real_)
+    } else {
+      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
+    }
   }  
   
   if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
@@ -180,8 +185,8 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
 
     if(any(unlist(lapply(drugpheno,is.factor)))){
       rrc <- stats::anova(rr0, rr1, test="Chisq")
-      rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"], "n"=nn, "pvalue"=rrc$'Pr(>Chi)'[2])
-      names(rest) <- c("estimate", "se", "n", "pvalue")
+      rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"], "n"=nn, "pvalue"=rrc$'Pr(>Chi)'[2], "df"=rr1$df.residual)
+      names(rest) <- c("estimate", "se", "n", "pvalue", "df")
 
     } else {
       if(ncol(drugpheno)>1){

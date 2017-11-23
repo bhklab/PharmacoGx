@@ -121,6 +121,7 @@ logLogisticRegression <- function(conc,
   if (!median_n==as.integer(median_n)){
     stop("There can only be a integral number of samples to take a median of. Check your setting of median_n parameter, it is not an integer")
   }
+
   
   if (min(upper_bounds - lower_bounds) < 0) {
     print(rbind(lower_bounds, upper_bounds))

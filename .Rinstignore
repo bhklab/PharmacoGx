@@ -1,4 +1,5 @@
 inst/doc/.*[.]bib$
+test/*
 TODO
 REVISIONS
 .DS_Store
