@@ -26,7 +26,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
 
   standardize <- match.arg(standardize)
-  
+
   colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")  
   
   drugpheno <- data.frame(sapply(drugpheno, function(x) {
@@ -63,7 +63,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
   }  
   
-  if(nn < 3 || var(x[ccix], na.rm=TRUE) == 0) {
+  if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
@@ -198,6 +198,9 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         rest <- c(rest,"n"=nn, "fstat"=rrc$stats[grep("^x", rownames(rrc$stats)), "approx F"], "pvalue"=rrc$stats[grep("^x", rownames(rrc$stats)), "Pr(>F)"])
       } else {
         rrc <- stats::anova(rr0, rr1, test = "F") 
+        if(!length(rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"])){
+          stop("A model failed to converge even with sufficient data. Please investigate further")
+        }
         rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"],"n"=nn, "tstat"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2], "df"=rr1$df.residual)
         names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df")
       }

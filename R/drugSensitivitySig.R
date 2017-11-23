@@ -124,9 +124,13 @@ drugSensitivitySig <- function(pSet,
     "rnaseq" = {
       if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
         stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
-      }},
-      stop (sprintf("No summary statistic for %s has been implemented yet", Biobase::annotation(pSet@molecularProfiles[[mDataType]])))
-      )
+    }},
+    "isoform" = {
+      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+    }},
+    stop (sprintf("No summary statistic for %s has been implemented yet", Biobase::annotation(pSet@molecularProfiles[[mDataType]])))
+  )
   
   if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
     stop ("Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'")
