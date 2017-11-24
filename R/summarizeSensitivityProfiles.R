@@ -31,7 +31,12 @@
 #' @export
 
 
-summarizeSensitivityProfiles <- function(pSet, sensitivity.measure="auc_recomputed", cell.lines, drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"), fill.missing=TRUE, verbose=TRUE){
+summarizeSensitivityProfiles <- function(pSet, 
+                                         sensitivity.measure="auc_recomputed", 
+                                         cell.lines, 
+                                         drugs, 
+                                         summary.stat=c("mean", "median", "first", "last", "max", "min"), 
+                                         fill.missing=TRUE, verbose=TRUE) {
   
 	summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)

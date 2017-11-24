@@ -73,6 +73,8 @@ drugSensitivitySig <- function(pSet,
  sensitivity.summary.stat = c("mean", "median", "first", "last"), 
  returnValues = c("estimate", "pvalue", "fdr"),
  sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
+ molecular.cutoff = NA,
+ molecular.cutoff.direction = c("less", "greater"),
  nthread = 1,
  verbose=TRUE, ...) {
   
@@ -87,7 +89,7 @@ drugSensitivitySig <- function(pSet,
   molecular.summary.stat <- match.arg(molecular.summary.stat)
   sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
   standardize <- match.arg(standardize)
-  
+  molecular.cutoff.direction <- match.arg(molecular.cutoff.direction)
   dots <- list(...)
   ndots <- length(dots)
   
@@ -183,6 +185,8 @@ drugSensitivitySig <- function(pSet,
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
       mDataType = mDataType,
       summary.stat = molecular.summary.stat,
+      discretize.threshold = molecular.cutoff,
+      discretize.direction = molecular.cutoff.direction,
       verbose = verbose)[features, ]
     
     if(!is.null(dots[["mProfiles"]])){

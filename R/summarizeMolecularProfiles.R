@@ -37,7 +37,17 @@
 
 ##TODO:: Add features parameter
 
-summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, summary.stat=c("mean", "median", "first", "last", "and", "or"), fill.missing=TRUE, summarize=TRUE, verbose=TRUE) {
+summarizeMolecularProfiles <- function(pSet, 
+                                       mDataType, 
+                                       cell.lines, 
+                                       features, 
+                                       summary.stat = c("mean", "median", "first", "last", "and", "or"), 
+                                       fill.missing = TRUE, 
+                                       summarize = TRUE, 
+                                       verbose = TRUE,
+                                       discretize.threshold = NA, 
+                                       discretize.direction = c("less", "greater")
+                                       ) {
   
   
   ### Placed here to make sure the pSet argument gets checked first by R. 
@@ -61,6 +71,8 @@ summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, su
   }
   
   summary.stat <- match.arg(summary.stat)
+  discretize.direction <- match.arg(discretize.direction)
+  
   if((!Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
     stop ("Invalid summary.stat, choose among: mean, median, first, last" )
   }
@@ -87,6 +99,19 @@ summarizeMolecularProfiles <- function(pSet, mDataType, cell.lines, features, su
     tt <- dd
     tt[which(!is.na(dd) & dd =="0")] <- FALSE
     tt[which(!is.na(dd) & dd !="0")] <- TRUE
+    tt <- apply(tt, 2, as.logical)
+    dimnames(tt) <- dimnames(dd)
+    dd <- tt
+  }
+  if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) == "cnv" && !is.na(discretize.threshold)) {
+    tt <- dd
+    switch(discretize.direction, "less" = {
+          tt[which(!is.na(dd) & dd < discretize.threshold)] <- TRUE
+          tt[which(!is.na(dd) & dd >= discretize.threshold)] <- FALSE
+    }, "greater" = {
+          tt[which(!is.na(dd) & dd > discretize.threshold)] <- TRUE
+          tt[which(!is.na(dd) & dd <= discretize.threshold)] <- FALSE
+    })
     tt <- apply(tt, 2, as.logical)
     dimnames(tt) <- dimnames(dd)
     dd <- tt
