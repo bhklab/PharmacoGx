@@ -108,14 +108,14 @@ summarizeMolecularProfiles <- function(pSet,
     dd <- tt
   }
   if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("cnv", "rna", "rnaseq", "isoform") 
-     && !is.na(discretize.threshold)) {
+     && !is.na(binarize.threshold)) {
     tt <- dd
     switch(binarize.direction, "less" = {
-          tt[which(!is.na(dd) & dd < discretize.threshold)] <- TRUE
-          tt[which(!is.na(dd) & dd >= discretize.threshold)] <- FALSE
+          tt[which(!is.na(dd) & dd < binarize.threshold)] <- TRUE
+          tt[which(!is.na(dd) & dd >= binarize.threshold)] <- FALSE
     }, "greater" = {
-          tt[which(!is.na(dd) & dd > discretize.threshold)] <- TRUE
-          tt[which(!is.na(dd) & dd <= discretize.threshold)] <- FALSE
+          tt[which(!is.na(dd) & dd > binarize.threshold)] <- TRUE
+          tt[which(!is.na(dd) & dd <= binarize.threshold)] <- FALSE
     })
     tt <- apply(tt, 2, as.logical)
     dimnames(tt) <- dimnames(dd)
