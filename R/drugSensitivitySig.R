@@ -52,12 +52,12 @@
 #'   summarize duplicates for cell line molecular profile measurements? 
 #' @param sensitivity.summary.stat What summary statistic should be used to
 #'   summarize duplicates for cell line sensitivity measurements? 
-#' @param sensitivity.cutoff Allows to provide upper and lower bounds to
-#'   sensitivity measures in the cases where the values exceed physical values
-#'   due to numerical or other errors.
+#' @param sensitivity.cutoff [numeric] Allows the user to binarize the sensitivity data using this threshold.
 #' @param standardize [character] One of "SD", "rescale", or "none", for the form of standardization of
 #'   the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95%
 #'   interquantile range lies in [0,1]. If none no rescaling is done. 
+#' @param molecular.cutoff Allows the user to binarize the sensitivity data using this threshold. 
+#' @param molecular.cutoff.direction [character] One of "less" or "greater", allows to set direction of binarization. 
 #' @param verbose [boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed
 #' @param ... additional arguments not currently fully supported by the function  
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
@@ -185,8 +185,8 @@ drugSensitivitySig <- function(pSet,
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
       mDataType = mDataType,
       summary.stat = molecular.summary.stat,
-      discretize.threshold = molecular.cutoff,
-      discretize.direction = molecular.cutoff.direction,
+      binarize.threshold = molecular.cutoff,
+      binarize.direction = molecular.cutoff.direction,
       verbose = verbose)[features, ]
     
     if(!is.null(dots[["mProfiles"]])){

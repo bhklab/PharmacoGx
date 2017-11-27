@@ -29,6 +29,10 @@
 #' @param summarize A flag which when set to FALSE (defaults to TRUE) disables summarizing and
 #'   returns the data unchanged as a ExpressionSet
 #' @param verbose \code{boolean} should messages be printed
+#' @param binarize.threshold \code{numeric} A value on which the molecular data is binarized. 
+#'   If NA, no binarization is done.
+#' @param binarize.direction \code{character} One of "less" or "greater", the direction of binarization on 
+#'   binarize.threshold, if it is not NA. 
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
 #' @importFrom utils setTxtProgressBar txtProgressBar
@@ -45,8 +49,8 @@ summarizeMolecularProfiles <- function(pSet,
                                        fill.missing = TRUE, 
                                        summarize = TRUE, 
                                        verbose = TRUE,
-                                       discretize.threshold = NA, 
-                                       discretize.direction = c("less", "greater")
+                                       binarize.threshold = NA, 
+                                       binarize.direction = c("less", "greater")
                                        ) {
   
   

@@ -7,7 +7,8 @@ into one entry per drug}
 \usage{
 summarizeMolecularProfiles(pSet, mDataType, cell.lines, features,
   summary.stat = c("mean", "median", "first", "last", "and", "or"),
-  fill.missing = TRUE, summarize = TRUE, verbose = TRUE)
+  fill.missing = TRUE, summarize = TRUE, verbose = TRUE,
+  binarize.threshold = NA, binarize.direction = c("less", "greater"))
 }
 \arguments{
 \item{pSet}{\code{PharmacoSet} The PharmacoSet to summarize}
@@ -32,6 +33,12 @@ molecular data object be filled in with missing values?}
 returns the data unchanged as a ExpressionSet}
 
 \item{verbose}{\code{boolean} should messages be printed}
+
+\item{binarize.threshold}{\code{numeric} A value on which the molecular data is binarized. 
+If NA, no binarization is done.}
+
+\item{binarize.direction}{\code{character} One of "less" or "greater", the direction of binarization on 
+binarize.threshold, if it is not NA.}
 }
 \value{
 \code{matrix} An updated PharmacoSet with the molecular data summarized
