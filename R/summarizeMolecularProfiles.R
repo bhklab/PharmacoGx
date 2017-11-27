@@ -75,7 +75,7 @@ summarizeMolecularProfiles <- function(pSet,
   }
   
   summary.stat <- match.arg(summary.stat)
-  discretize.direction <- match.arg(discretize.direction)
+  binarize.direction <- match.arg(binarize.direction)
   
   if((!Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
     stop ("Invalid summary.stat, choose among: mean, median, first, last" )
@@ -110,7 +110,7 @@ summarizeMolecularProfiles <- function(pSet,
   if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("cnv", "rna", "rnaseq", "isoform") 
      && !is.na(discretize.threshold)) {
     tt <- dd
-    switch(discretize.direction, "less" = {
+    switch(binarize.direction, "less" = {
           tt[which(!is.na(dd) & dd < discretize.threshold)] <- TRUE
           tt[which(!is.na(dd) & dd >= discretize.threshold)] <- FALSE
     }, "greater" = {
