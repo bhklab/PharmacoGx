@@ -191,7 +191,7 @@ drugSensitivitySig <- function(pSet,
     }
     drugn <- drugn[dix]
 
-    cix <- is.element(celln, do.call(rownames, cellpheno.all))
+    cix <- is.element(celln, do.call(rownames, drugpheno.all))
     if (verbose && !all(cix)) {
       warning (sprintf("%i/%i cells can be found", sum(cix), length(celln)))
     }
@@ -203,7 +203,7 @@ drugSensitivitySig <- function(pSet,
     if(!missing(tissues)){
       celln <- celln[cellInfo(pSet)[celln,tissueid] %in% tissues]
     }
-    
+
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
       mDataType = mDataType,
       summary.stat = molecular.summary.stat,
