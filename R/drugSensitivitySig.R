@@ -219,11 +219,13 @@ drugSensitivitySig <- function(pSet,
     
     drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
     
-    type <- as.factor(cellInfo(pSet)[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), "tissueid"]) 
-    batch <- phenoInfo(pSet, mDataType)[, "batchid"]
+    molcellx <- phenoInfo(pSet, mDataType)[ ,"cellid"] %in% celln
+
+    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[molcellx,"cellid"], "tissueid"]) 
+    batch <- phenoInfo(pSet, mDataType)[molcellx, "batchid"]
     batch[!is.na(batch) & batch == "NA"] <- NA
     batch <- as.factor(batch)
-    names(batch) <- phenoInfo(pSet, mDataType)[ , "cellid"]
+    names(batch) <- phenoInfo(pSet, mDataType)[molcellx, "cellid"]
     batch <- batch[rownames(drugpheno.all[[1]])]
     if (verbose) {
       message("Computing drug sensitivity signatures...")
@@ -246,7 +248,7 @@ drugSensitivitySig <- function(pSet,
       }
       names(res) <- drugn[x]
       return(res)
-    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
+    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
     
     res <- do.call(c, mcres)
     res <- res[!sapply(res, is.null)]
