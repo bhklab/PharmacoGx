@@ -219,7 +219,7 @@ drugSensitivitySig <- function(pSet,
     
     drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
     
-    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
+    type <- as.factor(cellInfo(pSet)[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), "tissueid"]) 
     batch <- phenoInfo(pSet, mDataType)[, "batchid"]
     batch[!is.na(batch) & batch == "NA"] <- NA
     batch <- as.factor(batch)
