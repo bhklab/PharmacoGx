@@ -201,7 +201,7 @@ drugSensitivitySig <- function(pSet,
     celln <- celln[cix]
     
     if(!missing(tissues)){
-      celln <- celln[cellInfo(pSet)[celln,tissueid] %in% tissues]
+      celln <- celln[cellInfo(pSet)[celln,"tissueid"] %in% tissues]
     }
 
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
