@@ -67,7 +67,9 @@
 drugSensitivitySig <- function(pSet,
  mDataType,
  drugs,
- features, 
+ features,
+ cells, 
+ tissues,
  sensitivity.measure = "auc_recomputed", 
  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"), 
  sensitivity.summary.stat = c("mean", "median", "first", "last"), 
@@ -145,6 +147,13 @@ drugSensitivitySig <- function(pSet,
   } else {
     drugn <- drugs
   }
+
+  if (missing(cells)){
+    celln <- cellNames(pSet)
+  } else {
+    celln <- cells
+  }
+
   availcore <- parallel::detectCores()
   if ( nthread > availcore) {
     nthread <- availcore
@@ -181,6 +190,19 @@ drugSensitivitySig <- function(pSet,
       stop("None of the drugs were found in the dataset")
     }
     drugn <- drugn[dix]
+
+    cix <- is.element(celln, do.call(rownames, cellpheno.all))
+    if (verbose && !all(cix)) {
+      warning (sprintf("%i/%i cells can be found", sum(cix), length(celln)))
+    }
+    if (!any(cix)) {
+      stop("None of the cells were found in the dataset")
+    }
+    celln <- celln[cix]
+    
+    if(!missing(tissues)){
+      celln <- celln[cellInfo(pSet)[celln,tissueid] %in% tissues]
+    }
     
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
       mDataType = mDataType,
@@ -195,7 +217,7 @@ drugSensitivitySig <- function(pSet,
       
     }
     
-    drugpheno.all <- lapply(drugpheno.all, function(x) {x[phenoInfo(pSet, mDataType)[ ,"cellid"], , drop = FALSE]})
+    drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
     
     type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[ ,"cellid"], "tissueid"]) 
     batch <- phenoInfo(pSet, mDataType)[, "batchid"]
