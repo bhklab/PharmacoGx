@@ -143,13 +143,13 @@ drugSensitivitySig <- function(pSet,
     sensitivity.cutoff <- NA
   }
   if (missing(drugs)){
-    drugn <- drugNames(pSet)
+    drugn <- drugs <- drugNames(pSet)
   } else {
     drugn <- drugs
   }
 
   if (missing(cells)){
-    celln <- cellNames(pSet)
+    celln <- cells <- cellNames(pSet)
   } else {
     celln <- cells
   }
@@ -202,6 +202,8 @@ drugSensitivitySig <- function(pSet,
     
     if(!missing(tissues)){
       celln <- celln[cellInfo(pSet)[celln,"tissueid"] %in% tissues]
+    } else {
+      tissues <- unique(cellInfo(pSet)$tissueid)
     }
 
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
@@ -267,7 +269,26 @@ drugSensitivitySig <- function(pSet,
       drug.sensitivity[rownames(featureInfo(pSet, mDataType)[features,, drop = FALSE]), names(res), j] <- ttt
     }
     
-    drug.sensitivity <- PharmacoSig(drug.sensitivity, PSetName = pSetName(pSet), Call ="as.character(match.call())", SigType='Sensitivity')
+    drug.sensitivity <- PharmacoSig(drug.sensitivity, 
+                                    PSetName = pSetName(pSet), 
+                                    Call = as.character(match.call()), 
+                                    SigType='Sensitivity',
+                                    Arguments = list(
+                                      "mDataType" = mDataType,
+                                      "drugs" = drugs,
+                                      "features" = features,
+                                      "cells" = cells, 
+                                      "tissues" = tissues,
+                                      "sensitivity.measure" = sensitivity.measure, 
+                                      "molecular.summary.stat" = molecular.summary.stat, 
+                                      "sensitivity.summary.stat" = sensitivity.summary.stat, 
+                                      "returnValues" = returnValues,
+                                      "sensitivity.cutoff" = sensitivity.cutoff,
+                                      "standardize" = standardize,
+                                      "molecular.cutoff" = molecular.cutoff,
+                                      "molecular.cutoff.direction" = molecular.cutoff.direction,
+                                      "nthread" = nthread,
+                                      "verbose" = verbose))
     
     return(drug.sensitivity)
   }

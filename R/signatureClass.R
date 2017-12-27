@@ -2,18 +2,18 @@ setOldClass('sessionInfo', sessionInfo())
 
 #' @importFrom utils sessionInfo
 .PharmacoSig <- setClass('PharmacoSig', slots=list(
-            
+            Arguments = "list",
             PSetName='character',
             DateCreated = 'character',
             SigType = 'character',
             SessionInfo = 'sessionInfo',
             Call = 'character'), contains='array')
 
-PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity', SessionInfo=sessionInfo(), Call='No Call Recorded'){
+PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity', SessionInfo=sessionInfo(), Call='No Call Recorded', Arguments = list()){
 
 #attr(SessionInfo, 'class') <- NULL
 
-return(.PharmacoSig(Data, PSetName=PSetName, DateCreated=DateCreated, SigType=SigType, SessionInfo=SessionInfo, Call=Call))}
+return(.PharmacoSig(Data, Arguments = Arguments, PSetName=PSetName, DateCreated=DateCreated, SigType=SigType, SessionInfo=SessionInfo, Call=Call))}
 
 
 #' Show PharmacoGx Signatures  
