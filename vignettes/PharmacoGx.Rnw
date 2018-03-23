@@ -349,11 +349,11 @@ As an example of the efficacy of the modelling approach, we can model the signif
 %------------------------------------------------------------
 \subsection{Perturbation Modelling}
 %------------------------------------------------------------ 
-The molecular response profile of a given drug is modelled as a linear regression model adjusted experimental batch effects, cell specific differences, and duration of experiment to isolate the effect of the concentration of the drug applied.: 
+The molecular response profile of a given drug is modelled as a linear regression model adjusted experimental batch effects, cell specific differences, and duration of experiment to isolate the effect of the concentration of the drug applied: 
 $$G = \beta_{0} + \beta_{i}C_i + \beta_{t}T + \beta_{d}D + \beta_{b}B$$
 where $G$ denotes the molecular feature expression (gene), $C_i$ denotes the concentration of the compound applied, $T$ the cell line identity, $D$ denotes the duration of the experiment,  $B$ denotes the experimental batch, and $\beta$s are the regression coefficients. The strength of feature response is quantified by $\beta_i$. 
 Unlike the sensitivity signatures, the $G$ and $C$ variables are unscaled. 
-Significance of the gene-drug association is estimated by the statistical significance of $\beta_i$ (two-sided t test). P-values are then corrected for multiple testing using the false discovery rate (FDR) approach.
+Significance of the gene-drug association is estimated by the statistical significance of $\beta_i$, calculated using an F-test on the improvement in fit after the inclusion of the term. P-values are then corrected for multiple testing using the false discovery rate (FDR) approach.
 
 
 %------------------------------------------------------------
