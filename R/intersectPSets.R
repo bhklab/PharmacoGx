@@ -38,6 +38,10 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
   if (verbose) {
     message("Intersecting large PSets may take a long time ...")
   }
+
+  if("concentrations" %in% intersectOn && anyNA(sapply(pSets, funciton(x) return(x@sensitivity$raw)))) {
+    stop("Intersecting on concentrations requires all PSets to have raw data included.")
+  }
   ## TODO: Fix the strict intersection!!!!!!
   if (length(pSets) == 1) {
     return(pSets) 
