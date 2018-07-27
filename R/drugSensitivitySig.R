@@ -41,6 +41,10 @@
 #'   signatures. Should match the names used in the PharmacoSet.
 #' @param features [character] a vector of features for which to compute the
 #'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
+#' @param cells [character] allows choosing exactly which cell lines to include for the signature fitting. 
+#'   Should be a subset of cellNames(pSet)
+#' @param tissues [character] a vector of which tissue types to include in the signature fitting. 
+#'   Should be a subset of cellInfo(pSet)$tissueid
 #' @param nthread [numeric] if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
 #' @param returnValues [character] Which of estimate, t-stat, p-value and fdr

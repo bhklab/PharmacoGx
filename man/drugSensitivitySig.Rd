@@ -6,7 +6,7 @@
 other molecular profile) and drug dose response, for use in drug sensitivity
 analysis.}
 \usage{
-drugSensitivitySig(pSet, mDataType, drugs, features,
+drugSensitivitySig(pSet, mDataType, drugs, features, cells, tissues,
   sensitivity.measure = "auc_recomputed", molecular.summary.stat = c("mean",
   "median", "first", "last", "or", "and"),
   sensitivity.summary.stat = c("mean", "median", "first", "last"),
@@ -26,6 +26,12 @@ signatures. Should match the names used in the PharmacoSet.}
 
 \item{features}{[character] a vector of features for which to compute the
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
+
+\item{cells}{[character] allows choosing exactly which cell lines to include for the signature fitting. 
+Should be a subset of cellNames(pSet)}
+
+\item{tissues}{[character] a vector of which tissue types to include in the signature fitting. 
+Should be a subset of cellInfo(pSet)$tissueid}
 
 \item{sensitivity.measure}{[character] which measure of the drug dose 
 sensitivity should the function use for its computations? Use the 
