@@ -95,8 +95,9 @@ with them will likely be meaningless.\\
 \textit{PharmacoGx} requires that several packages are installed. However, all dependencies are available from CRAN or Bioconductor.
 
 <<install-pkg,eval=FALSE>>=
-source('http://bioconductor.org/biocLite.R')
-biocLite('PharmacoGx')
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install('PharmacoGx')
 @
 
 Load \textit{PharamacoGx} into your current workspace:
