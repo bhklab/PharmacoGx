@@ -125,6 +125,7 @@ PharmacoSet <-  function(name,
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
     
+    ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     for (i in 1:length(molecularProfiles)){
         if (class(molecularProfiles[[i]]) != "ExpressionSet"){
