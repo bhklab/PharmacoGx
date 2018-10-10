@@ -12,7 +12,7 @@
 #' @importFrom stats formula
 #' @importFrom stats var
 
-geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
+geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE,  standardize=c("rescale", "SD", "none"), verbose=FALSE, mCI=TRUE, alpha = 0.05, n.tests = 1e6, p.confidence = 0.5) {
 ## input:
 ##  x: numeric vector of gene expression values
 ##  type: vector of factors specifying the cell lines or type types
@@ -210,8 +210,34 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df")
       }
     }
-    
-    
+    if(mCI){
+      model.preds <- predict(rr1)
+      mCI.value <- paired.concordance.index(observations = dd[,"drugpheno.1"], predictions = model.preds, delta.obs = 0.2, delta.pred = 0, outx = TRUE)$cindex
+      permutation_done <- FALSE
+      b.perm.par <- choose_b(alpha/n.tests, p.confidence)
+      r.perm.par <- choose_r(alpha/n.tests, p.confidence)
+      cur.i <- 1
+      cur.stat.better <- 0
+      while(!permutation_done){
+        dd[,"x"] <- sample(dd[,"x"], NROW(dd))
+        rr.perm <- lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)
+        mCI.perm <- paired.concordance.index(observations = dd[,"drugpheno.1"], predictions = predict(rr.perm), delta.obs = 0.2, delta.pred = 0, outx = TRUE)$cindex
+        if(abs(mCI.perm - 0.5) > abs(mCI.value - 0.5)){
+          cur.stat.better <- cur.stat.better + 1
+        }
+        if(cur.stat.better >= r.perm.par){
+          mCI.p.val <- cur.stat.better / cur.i
+          permutation_done <- TRUE
+        }
+        if(cur.i >= b.perm.par){
+          mCI.p.val <- cur.stat.better / cur.i
+          permutation_done <- TRUE
+        }
+        cur.i <- cur.i + 1
+      }
+      rest.mCI <- c("mCI" = mCI.value, "mCI.perm.p" = mCI.p.val)
+      rest <- c(rest, rest.mCI)
+    }
 #    rest <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
     
 #   names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")

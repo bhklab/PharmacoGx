@@ -17,10 +17,9 @@
 ## outputs:
 ## list of datafraes with the statistics for each gene, for each type
 ##
-## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
-rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, standardize = "SD", nthread=1, verbose=FALSE) {
+rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, standardize = "rescale", nthread=1, verbose=FALSE, n.tests = 1e6) {
   if (nthread != 1) {
     availcore <- parallel::detectCores()
     if (missing(nthread) || nthread < 1 || nthread > availcore) {
@@ -76,11 +75,11 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       #nc <- do.call(c, rest)
       nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
     } else {
-      nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
+      nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr", "mCI", "mCI.perm.p")
     }
   } else {
     # nc  <- c("estimate", "se", "n", "pvalue", "fdr")
-    nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
+    nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr", "mCI", "mCI.perm.p")
   }  
     
 
@@ -102,10 +101,10 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[sapply(splitix, length) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
-        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
+      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize, n.tests) {
+        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize, n.tests = n.tests))
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread)
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, n.tests=n.tests, mc.cores=nthread)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]

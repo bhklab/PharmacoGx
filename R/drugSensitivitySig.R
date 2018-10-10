@@ -78,7 +78,7 @@ drugSensitivitySig <- function(pSet,
  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"), 
  sensitivity.summary.stat = c("mean", "median", "first", "last"), 
  returnValues = c("estimate", "pvalue", "fdr"),
- sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
+ sensitivity.cutoff, standardize = c("rescale", "SD", "none"),
  molecular.cutoff = NA,
  molecular.cutoff.direction = c("less", "greater"),
  nthread = 1,
@@ -163,15 +163,7 @@ drugSensitivitySig <- function(pSet,
     nthread <- availcore
   }
   
-  if (missing(features)) {
-    features <- rownames(featureInfo(pSet, mDataType))
-  } else {
-    fix <- is.element(features, rownames(featureInfo(pSet, mDataType)))
-    if (verbose && !all(fix)) {
-      warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
-    }
-    features <- features[fix]
-  }
+
   
   if(is.null(dots[["sProfiles"]])){
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
@@ -210,19 +202,29 @@ drugSensitivitySig <- function(pSet,
       tissues <- unique(cellInfo(pSet)$tissueid)
     }
 
+    
+    if (missing(features)) {
+      features <- rownames(featureInfo(pSet, mDataType))
+    } else {
+      fix <- is.element(features, rownames(featureInfo(pSet, mDataType)))
+      if (verbose && !all(fix)) {
+        warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
+      }
+      features <- features[fix]
+    }
+
+    if(!is.null(dots[["mProfiles"]])){
+      mProfiles <- dots[["mProfiles"]]
+      Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(pSet@molecularProfiles[[mDataType]]), drop = FALSE]
+      
+    }
     pSet@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(pSet = pSet,
       mDataType = mDataType,
       summary.stat = molecular.summary.stat,
       binarize.threshold = molecular.cutoff,
       binarize.direction = molecular.cutoff.direction,
       verbose = verbose)[features, ]
-    
-    if(!is.null(dots[["mProfiles"]])){
-      mProfiles <- dots[["mProfiles"]]
-      Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(pSet@molecularProfiles[[mDataType]]), drop = FALSE]
-      
-    }
-    
+
     drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(pSet, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
     
     molcellx <- phenoInfo(pSet, mDataType)[ ,"cellid"] %in% celln
@@ -237,9 +239,11 @@ drugSensitivitySig <- function(pSet,
       message("Computing drug sensitivity signatures...")
     }
     
+    n.tests <- length(drugn) * length(features)
+
     splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
     splitix <- splitix[sapply(splitix, length) > 0]
-    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, n.tests) {
       res <- NULL
       for(i in drugn[x]) {
         ## using a linear model (x ~ concentration + cell + batch)
@@ -249,12 +253,12 @@ drugSensitivitySig <- function(pSet,
         if(!is.na(sensitivity.cutoff)) {
           dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
         }
-        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
+        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose, n.tests = n.tests)
         res <- c(res, list(rr$all))
       }
       names(res) <- drugn[x]
       return(res)
-    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
+    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize, n.tests = n.tests)
     
     res <- do.call(c, mcres)
     res <- res[!sapply(res, is.null)]
