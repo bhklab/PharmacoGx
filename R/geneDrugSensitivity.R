@@ -135,8 +135,8 @@ if(length(table(drugpheno)) > 2){
     }
     cur.i <- cur.i + 1
   }
-  if(CI.perm.p == 0){
-    CI.perm.p <- 1/(b.perm.par + 1)
+  if(CI.p.val == 0){
+    CI.p.val <- 1/(b.perm.par + 1)
   }
   rest.CI <- c("CI" = CI.value, "CI.perm.p" = CI.p.val)
   rest <- rest.mCI

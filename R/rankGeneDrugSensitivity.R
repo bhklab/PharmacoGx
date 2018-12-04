@@ -106,7 +106,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
         return(res)
       }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, n.tests=n.tests, mc.cores=nthread)
       rest <- do.call(rbind, mcres)
-      rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
+      rest <- cbind(rest, "fdr"=p.adjust(rest[ , "CI.perm.p"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
       res <- c(res, list(rest))
     }
