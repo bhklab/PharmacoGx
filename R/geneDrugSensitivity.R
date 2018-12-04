@@ -235,6 +235,9 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         }
         cur.i <- cur.i + 1
       }
+      if(mCI.perm.p == 0){
+        mCI.perm.p <- 1/(b.perm.par + 1)
+      }
       rest.mCI <- c("mCI" = mCI.value, "mCI.perm.p" = mCI.p.val)
       rest <- c(rest, rest.mCI)
     }
