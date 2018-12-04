@@ -139,7 +139,7 @@ if(length(table(drugpheno)) > 2){
     CI.p.val <- 1/(b.perm.par + 1)
   }
   rest.CI <- c("CI" = CI.value, "CI.perm.p" = CI.p.val)
-  rest <- rest.mCI
+  rest <- rest.CI
   if(length(rest) != 2){
     rest <- c("CI" = NA_real_, "CI.perm.p" = NA_real_)
   } 
