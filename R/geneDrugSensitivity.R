@@ -25,23 +25,23 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 ## output:
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
 
-  standardize <- match.arg(standardize)
+standardize <- match.arg(standardize)
 
-  colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")  
-  
-  drugpheno <- data.frame(sapply(drugpheno, function(x) {
-    if (!is.factor(x)) {
-      x[is.infinite(x)] <- NA
-    }
-    return(list(x))
+colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")  
+
+drugpheno <- data.frame(sapply(drugpheno, function(x) {
+  if (!is.factor(x)) {
+    x[is.infinite(x)] <- NA
+  }
+  return(list(x))
   }, USE.NAMES=FALSE), check.names=FALSE)
 
 
-  ccix <- complete.cases(x, type, batch, drugpheno)
-  nn <- sum(ccix)
+ccix <- complete.cases(x, type, batch, drugpheno)
+nn <- sum(ccix)
 
-  if(length(table(drugpheno)) > 2){
-     if(ncol(drugpheno)>1){
+if(length(table(drugpheno)) > 2){
+ if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
       rest <- lapply(1:ncol(drugpheno), function(i){
 
@@ -53,22 +53,22 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
         names(rest) <- c(est, se, tstat)
         return(rest)
 
-      })
+        })
       rest <- do.call(c, rest)
       rest <- c(rest, n=nn, "fstat"=NA, "pvalue"=NA)
-    } else {
-      rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "df"=NA)
-    }
-  } else {
+      } else {
+        rest <- c("estimate"=NA, "se"=NA, "n"=nn, "tstat"=NA, "fstat"=NA, "pvalue"=NA, "df"=NA)
+      }
+      } else {
     # rest <- c("estimate"=NA, "se"=NA, "n"=nn, "pvalue"=NA)
     if (is.factor(drugpheno[,1])){
       rest <- c("estimate"=NA_real_, "se"=NA_real_, "n"=nn, "pvalue"=NA_real_, df=NA_real_)
-    } else {
-      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
-    }
-  }  
-  
-  if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
+      } else {
+        rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
+      }
+    }  
+
+    if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
@@ -77,27 +77,27 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(length(table(drugpheno)) > 2 & standardize!= "none") {
     switch(standardize, 
       "SD" = drugpheno <- apply(drugpheno, 2, function(x){
-      return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
+        return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
       "rescale" = drugpheno <- apply(drugpheno, 2, function(x){
-      return(rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE))    })
+        return(rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE))    })
       )
 
-  }else{
-    drugpheno <- drugpheno[ccix,,drop=FALSE]
-  }
-  if(length(table(x)) > 2  & standardize!= "none"){
-    switch(standardize, 
-      "SD" = xx <- x[ccix]/sd(as.numeric(x[ccix])) ,
-      "rescale" = xx <- rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
-      )
-  }else{
-    xx <- x[ccix]
-  }
-  if(ncol(drugpheno)>1){
-    ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
-  } else {
-    ff0 <- sprintf("drugpheno.1")
-  }
+    }else{
+      drugpheno <- drugpheno[ccix,,drop=FALSE]
+    }
+    if(length(table(x)) > 2  & standardize!= "none"){
+      switch(standardize, 
+        "SD" = xx <- x[ccix]/sd(as.numeric(x[ccix])) ,
+        "rescale" = xx <- rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
+        )
+      }else{
+        xx <- x[ccix]
+      }
+      if(ncol(drugpheno)>1){
+        ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
+        } else {
+          ff0 <- sprintf("drugpheno.1")
+        }
 
   # ff1 <- sprintf("%s + x", ff0)
 
@@ -112,149 +112,37 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(length(sort(unique(batch))) > 1) {
         dd <- cbind(dd, batch=batch[ccix])
   }
-  ## control for duration
-  # if(length(sort(unique(duration))) > 1){
-  #   ff0 <- sprintf("%s + duration", ff0)
-  #   ff <- sprintf("%s + duration", ff)
-  # }
-  
-  # if(is.factor(drugpheno[,1])){
 
-  #   drugpheno <- drugpheno[,1]
-
-  # } else {
-
-  #   drugpheno <- as.matrix(drugpheno)
-
-  # }
-if(any(unlist(lapply(drugpheno,is.factor)))){
-
-rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
-    warning=function(w) {
-      if(verbose) {
-        ww <- "Null model did not convrge"
-        print(ww)
-        if("type" %in% colnames(dd)) {
-          tt <- table(dd[,"type"])
-          print(tt)
-        }
-      }
-    })
-  rr1 <- tryCatch(try(glm(formula(drugpheno.1 ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
-    warning=function(w) {
-      if(verbose) {
-        ww <- "Model did not converge"
-        tt <- table(dd[,"drugpheno.1"])
-        print(ww)
-        print(tt)
-      }
-      return(ww)
-    })
-
-
-} else{
-
-rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)), 
-    warning=function(w) {
-      if(verbose) {
-        ww <- "Null model did not converge"
-        print(ww)
-        if("type" %in% colnames(dd)) {
-          tt <- table(dd[,"type"])
-          print(tt)
-        }      
-      }
-    })
-  rr1 <- tryCatch(try(lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)), 
-    warning=function(w) {
-      if(verbose) {
-        ww <- "Model did not converge"
-        tt <- table(dd[,"drugpheno.1"])
-        print(ww)
-        print(tt)
-      }
-      return(ww)
-    })
-
-
-}
-  
-  
-  if (class(rr0) != "try-error" && class(rr1) != "try-error" & class(rr0) != "character" && class(rr1) != "character") {
-    rr <- summary(rr1)
-
-    if(any(unlist(lapply(drugpheno,is.factor)))){
-      rrc <- stats::anova(rr0, rr1, test="Chisq")
-      rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"], "n"=nn, "pvalue"=rrc$'Pr(>Chi)'[2], "df"=rr1$df.residual)
-      names(rest) <- c("estimate", "se", "n", "pvalue", "df")
-
-    } else {
-      if(ncol(drugpheno)>1){
-        rrc <- summary(stats::manova(rr1))
-        rest <- lapply(1:ncol(drugpheno), function(i) {
-          est <- paste("estimate", i, sep=".")
-          se <-  paste("se", i, sep=".")
-          tstat <- paste("tstat", i, sep=".")
-          rest <- c(rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "Estimate"], rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "Std. Error"], rr[[i]]$coefficients[grep("^x", rownames(rr[[i]]$coefficients)), "t value"])
-          names(rest) <- c(est, se, tstat)
-          return(rest)
-        })
-        rest <- do.call(c, rest)
-        rest <- c(rest,"n"=nn, "fstat"=rrc$stats[grep("^x", rownames(rrc$stats)), "approx F"], "pvalue"=rrc$stats[grep("^x", rownames(rrc$stats)), "Pr(>F)"])
-      } else {
-        rrc <- stats::anova(rr0, rr1, test = "F") 
-        if(!length(rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"])){
-          stop("A model failed to converge even with sufficient data. Please investigate further")
-        }
-        rest <- c("estimate"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"], "se"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "Std. Error"],"n"=nn, "tstat"=rr$coefficients[grep("^x", rownames(rr$coefficients)), "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2], "df"=rr1$df.residual)
-        names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df")
-      }
+  CI.value <- fastCI(observations = dd[,"x"], predictions = dd[,"drugpheno.1"], outx = FALSE)$cindex
+  permutation_done <- FALSE
+  b.perm.par <- choose_b(alpha/n.tests, p.confidence)
+  r.perm.par <- choose_r(alpha/n.tests, p.confidence)
+  cur.i <- 1
+  cur.stat.better <- 0
+  while(!permutation_done){
+    dd[,"x"] <- sample(dd[,"x"], NROW(dd))
+    CI.perm <- fastCI(observations = dd[,"drugpheno.1"], predictions = dd[,"x"], outx = FALSE)$cindex
+    if(abs(CI.perm - 0.5) > abs(CI.value - 0.5)){
+      cur.stat.better <- cur.stat.better + 1
     }
-    if(mCI){
-      model.preds <- predict(rr1)
-      mCI.value <- paired.concordance.index(observations = dd[,"drugpheno.1"], predictions = model.preds, delta.obs = 0.2, delta.pred = 0, outx = TRUE)$cindex
-      permutation_done <- FALSE
-      b.perm.par <- choose_b(alpha/n.tests, p.confidence)
-      r.perm.par <- choose_r(alpha/n.tests, p.confidence)
-      cur.i <- 1
-      cur.stat.better <- 0
-      while(!permutation_done){
-        dd[,"x"] <- sample(dd[,"x"], NROW(dd))
-        rr.perm <- lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)
-        mCI.perm <- paired.concordance.index(observations = dd[,"drugpheno.1"], predictions = predict(rr.perm), delta.obs = 0.2, delta.pred = 0, outx = TRUE)$cindex
-        if(abs(mCI.perm - 0.5) > abs(mCI.value - 0.5)){
-          cur.stat.better <- cur.stat.better + 1
-        }
-        if(cur.stat.better >= r.perm.par){
-          mCI.p.val <- cur.stat.better / cur.i
-          permutation_done <- TRUE
-        }
-        if(cur.i >= b.perm.par){
-          mCI.p.val <- cur.stat.better / cur.i
-          permutation_done <- TRUE
-        }
-        cur.i <- cur.i + 1
-      }
-      if(mCI.perm.p == 0){
-        mCI.perm.p <- 1/(b.perm.par + 1)
-      }
-      rest.mCI <- c("mCI" = mCI.value, "mCI.perm.p" = mCI.p.val)
-      rest <- c(rest, rest.mCI)
+    if(cur.stat.better >= r.perm.par){
+      CI.p.val <- cur.stat.better / cur.i
+      permutation_done <- TRUE
     }
-#    rest <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
-    
-#   names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
-
-## add tissue type/cell line statistics
-#     if(length(sort(unique(type))) > 1) {
-#       rr <- summary(rr0)
-#       ttype <- c("type.fstat"=rr$fstatistic["value"], "type.pvalue"=pf(q=rr$fstatistic["value"], df1=rr$fstatistic["numdf"], df2=rr$fstatistic["dendf"], lower.tail=FALSE))
-#       names(ttype) <- c("type.fstat", "type.pvalue")
-#     } else { ttype <- c("type.fstat"=NA, "type.pvalue"=NA) }
-#     rest <- c(rest, ttype)
-    ## add model
-    if(model) { rest <- list("stats"=rest, "model"=rr1) }
+    if(cur.i >= b.perm.par){
+      CI.p.val <- cur.stat.better / cur.i
+      permutation_done <- TRUE
+    }
+    cur.i <- cur.i + 1
   }
+  if(CI.perm.p == 0){
+    CI.perm.p <- 1/(b.perm.par + 1)
+  }
+  rest.CI <- c("CI" = CI.value, "CI.perm.p" = CI.p.val)
+  rest <- rest.mCI
+  if(length(rest) != 2){
+    rest <- c("CI" = NA_real_, "CI.perm.p" = NA_real_)
+  } 
   return(rest)
 }
 
