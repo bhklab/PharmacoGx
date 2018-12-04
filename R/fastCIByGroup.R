@@ -1,4 +1,4 @@
-source("~/Code/fastCI.R")
+# source("~/Code/fastCI.R")
 
 fastCIByGroup <- function(observations, predictions, groups, outx = TRUE, alpha = 0.05, alternative = c("two.sided", "greater", "less")){
   
