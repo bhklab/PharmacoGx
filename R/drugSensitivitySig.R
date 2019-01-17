@@ -239,7 +239,9 @@ drugSensitivitySig <- function(pSet,
       message("Computing drug sensitivity signatures...")
     }
     
-    n.tests <- length(drugn) * length(features)
+    if(missing(n.tests)){
+      n.tests <- length(drugn) * length(features)
+    }
 
     splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
     splitix <- splitix[sapply(splitix, length) > 0]
