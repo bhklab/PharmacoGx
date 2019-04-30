@@ -6,7 +6,8 @@
 change induced by administrating a drug, for use in drug effect analysis.}
 \usage{
 drugPerturbationSig(pSet, mDataType, drugs, cells, features, nthread = 1,
-  returnValues = c("estimate", "tstat", "pvalue", "fdr"), verbose = FALSE)
+  returnValues = c("estimate", "tstat", "pvalue", "fdr"),
+  verbose = FALSE)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] a PharmacoSet of the perturbation experiment type}

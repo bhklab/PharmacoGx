@@ -5,15 +5,16 @@
 \title{Intersects objects of the PharmacoSet class, subsetting them to the common
 drugs and/or cell lines as selected by the user.}
 \usage{
-intersectPSet(pSets, intersectOn = c("drugs", "cell.lines", "concentrations"),
-  cells, drugs, strictIntersect = FALSE, verbose = TRUE, nthread = 1)
+intersectPSet(pSets, intersectOn = c("drugs", "cell.lines",
+  "concentrations"), cells, drugs, strictIntersect = FALSE,
+  verbose = TRUE, nthread = 1)
 }
 \arguments{
 \item{pSets}{[list] a list of PharmacoSet objects, of which the function
 should find the intersection}
 
 \item{intersectOn}{[character] which identifiers to intersect on, 
-drugs or cell lines}
+drugs, cell lines, or concentrations}
 
 \item{cells}{a vector of common cell lines between pSets.
 In case user is intersted on getting intersection on certain cell lines,
@@ -44,7 +45,7 @@ PharmacoSet object's internal curation slot
 data(GDSCsmall)
 data(CCLEsmall)
 common <- intersectPSet(list('GDSC'=GDSCsmall,
-  'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines", "concentrations"))
+  'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
 common$CGP
 common$CCLE
 

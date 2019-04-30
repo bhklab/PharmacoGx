@@ -11,7 +11,7 @@
 #' data(GDSCsmall)
 #' data(CCLEsmall)
 #' common <- intersectPSet(list('GDSC'=GDSCsmall,
-#'   'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines", "concentrations"))
+#'   'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
 #' common$CGP
 #' common$CCLE
 #' 
@@ -19,7 +19,7 @@
 #' @param pSets [list] a list of PharmacoSet objects, of which the function
 #'   should find the intersection
 #' @param intersectOn [character] which identifiers to intersect on, 
-#'   drugs or cell lines
+#'   drugs, cell lines, or concentrations
 #' @param drugs a vector of common drugs between pSets.
 #' In case user is intersted on getting intersection on certain drugs,
 #' they can provide their list of drugs.
