@@ -127,7 +127,7 @@ PharmacoSet <-  function(name,
     
     ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
-    for (i in 1:length(molecularProfiles)){
+    for (i in seq_along(molecularProfiles)){
         if (class(molecularProfiles[[i]]) != "ExpressionSet"){
             stop(sprintf("Please provide the %s data as an ExpressionSet", names(molecularProfiles[i])))
         }else{
