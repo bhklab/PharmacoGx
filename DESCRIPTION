@@ -11,7 +11,9 @@ Suggests: xtable,
     testthat
 Encoding: UTF-8
 Imports: Biobase, piano, magicaxis, RColorBrewer, parallel, caTools, methods, downloader, stats, utils, graphics, grDevices, lsa, reshape2
-Depends: R (>= 3.4)
+Depends: R (>= 3.4) 
 RoxygenNote: 6.1.1
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
+Suggests: knitr, rmarkdown, devtools
+VignetteBuilder: knitr

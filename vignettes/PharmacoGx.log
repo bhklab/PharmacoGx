@@ -1,0 +1,708 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.7.9)  29 JUL 2019 17:11
+entering extended mode
+**\nonstopmode \input ./PharmacoGx.tex
+(PharmacoGx.tex (/home/chris/.miktex/texmfs/install/tex/latex/base/article.cls
+Document Class: article 2018/09/03 v1.4i Standard LaTeX document class
+(/home/chris/.miktex/texmfs/install/tex/latex/base/size11.clo
+File: size11.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/base/inputenc.sty
+Package: inputenc 2018/08/11 v1.3c Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/preprint/authblk.sty
+Package: authblk 2001/02/27 1.3 (PWD)
+\affilsep=\skip43
+\@affilsep=\skip44
+\c@Maxaffil=\count88
+\c@authors=\count89
+\c@affil=\count90
+)
+(/usr/share/R/share/texmf/tex/latex/Sweave.sty
+Package: Sweave 
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/home/chris/.miktex/texmfs/install/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2019/01/15
+
+Style option: `fancyvrb' v3.2a <2019/01/15> (tvz)
+\FV@CodeLineNo=\count91
+\FV@InFile=\read1
+\FV@TabBox=\box27
+\c@FancyVerbLine=\count92
+\FV@StepNumber=\count93
+\FV@OutFile=\write3
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/base/textcomp.sty
+Package: textcomp 2018/08/11 v2.0j Standard LaTeX package
+Package textcomp Info: Sub-encoding information:
+(textcomp)               5 = only ISO-Adobe without \textcurrency
+(textcomp)               4 = 5 + \texteuro
+(textcomp)               3 = 4 + \textohm
+(textcomp)               2 = 3 + \textestimated + \textcurrency
+(textcomp)               1 = TS1 - \textcircled - \t
+(textcomp)               0 = TS1 (full)
+(textcomp)             Font families with sub-encoding setting implement
+(textcomp)             only a restricted character set as indicated.
+(textcomp)             Family '?' is the default used for unknown fonts.
+(textcomp)             See the documentation for details.
+Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 79.
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/ts1enc.def
+File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
+Now handling font encoding TS1 ...
+... processing UTF-8 mapping file for font encoding TS1
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/ts1enc.dfu
+File: ts1enc.dfu 2018/10/05 v1.2f UTF-8 support for inputenc
+   defining Unicode char U+00A2 (decimal 162)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00A4 (decimal 164)
+   defining Unicode char U+00A5 (decimal 165)
+   defining Unicode char U+00A6 (decimal 166)
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00A8 (decimal 168)
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AC (decimal 172)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00AF (decimal 175)
+   defining Unicode char U+00B0 (decimal 176)
+   defining Unicode char U+00B1 (decimal 177)
+   defining Unicode char U+00B2 (decimal 178)
+   defining Unicode char U+00B3 (decimal 179)
+   defining Unicode char U+00B4 (decimal 180)
+   defining Unicode char U+00B5 (decimal 181)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+00B9 (decimal 185)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+00BC (decimal 188)
+   defining Unicode char U+00BD (decimal 189)
+   defining Unicode char U+00BE (decimal 190)
+   defining Unicode char U+00D7 (decimal 215)
+   defining Unicode char U+00F7 (decimal 247)
+   defining Unicode char U+0192 (decimal 402)
+   defining Unicode char U+02C7 (decimal 711)
+   defining Unicode char U+02D8 (decimal 728)
+   defining Unicode char U+02DD (decimal 733)
+   defining Unicode char U+0E3F (decimal 3647)
+   defining Unicode char U+2016 (decimal 8214)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+203B (decimal 8251)
+   defining Unicode char U+203D (decimal 8253)
+   defining Unicode char U+2044 (decimal 8260)
+   defining Unicode char U+204E (decimal 8270)
+   defining Unicode char U+2052 (decimal 8274)
+   defining Unicode char U+20A1 (decimal 8353)
+   defining Unicode char U+20A4 (decimal 8356)
+   defining Unicode char U+20A6 (decimal 8358)
+   defining Unicode char U+20A9 (decimal 8361)
+   defining Unicode char U+20AB (decimal 8363)
+   defining Unicode char U+20AC (decimal 8364)
+   defining Unicode char U+20B1 (decimal 8369)
+   defining Unicode char U+2103 (decimal 8451)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2117 (decimal 8471)
+   defining Unicode char U+211E (decimal 8478)
+   defining Unicode char U+2120 (decimal 8480)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2126 (decimal 8486)
+   defining Unicode char U+2127 (decimal 8487)
+   defining Unicode char U+212E (decimal 8494)
+   defining Unicode char U+2190 (decimal 8592)
+   defining Unicode char U+2191 (decimal 8593)
+   defining Unicode char U+2192 (decimal 8594)
+   defining Unicode char U+2193 (decimal 8595)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+2422 (decimal 9250)
+   defining Unicode char U+25E6 (decimal 9702)
+   defining Unicode char U+25EF (decimal 9711)
+   defining Unicode char U+266A (decimal 9834)
+   defining Unicode char U+FEFF (decimal 65279)
+))
+LaTeX Info: Redefining \oldstylenums on input line 334.
+Package textcomp Info: Setting cmr sub-encoding to TS1/0 on input line 349.
+Package textcomp Info: Setting cmss sub-encoding to TS1/0 on input line 350.
+Package textcomp Info: Setting cmtt sub-encoding to TS1/0 on input line 351.
+Package textcomp Info: Setting cmvtt sub-encoding to TS1/0 on input line 352.
+Package textcomp Info: Setting cmbr sub-encoding to TS1/0 on input line 353.
+Package textcomp Info: Setting cmtl sub-encoding to TS1/0 on input line 354.
+Package textcomp Info: Setting ccr sub-encoding to TS1/0 on input line 355.
+Package textcomp Info: Setting ptm sub-encoding to TS1/4 on input line 356.
+Package textcomp Info: Setting pcr sub-encoding to TS1/4 on input line 357.
+Package textcomp Info: Setting phv sub-encoding to TS1/4 on input line 358.
+Package textcomp Info: Setting ppl sub-encoding to TS1/3 on input line 359.
+Package textcomp Info: Setting pag sub-encoding to TS1/4 on input line 360.
+Package textcomp Info: Setting pbk sub-encoding to TS1/4 on input line 361.
+Package textcomp Info: Setting pnc sub-encoding to TS1/4 on input line 362.
+Package textcomp Info: Setting pzc sub-encoding to TS1/4 on input line 363.
+Package textcomp Info: Setting bch sub-encoding to TS1/4 on input line 364.
+Package textcomp Info: Setting put sub-encoding to TS1/5 on input line 365.
+Package textcomp Info: Setting uag sub-encoding to TS1/5 on input line 366.
+Package textcomp Info: Setting ugq sub-encoding to TS1/5 on input line 367.
+Package textcomp Info: Setting ul8 sub-encoding to TS1/4 on input line 368.
+Package textcomp Info: Setting ul9 sub-encoding to TS1/4 on input line 369.
+Package textcomp Info: Setting augie sub-encoding to TS1/5 on input line 370.
+Package textcomp Info: Setting dayrom sub-encoding to TS1/3 on input line 371.
+Package textcomp Info: Setting dayroms sub-encoding to TS1/3 on input line 372.
+
+Package textcomp Info: Setting pxr sub-encoding to TS1/0 on input line 373.
+Package textcomp Info: Setting pxss sub-encoding to TS1/0 on input line 374.
+Package textcomp Info: Setting pxtt sub-encoding to TS1/0 on input line 375.
+Package textcomp Info: Setting txr sub-encoding to TS1/0 on input line 376.
+Package textcomp Info: Setting txss sub-encoding to TS1/0 on input line 377.
+Package textcomp Info: Setting txtt sub-encoding to TS1/0 on input line 378.
+Package textcomp Info: Setting lmr sub-encoding to TS1/0 on input line 379.
+Package textcomp Info: Setting lmdh sub-encoding to TS1/0 on input line 380.
+Package textcomp Info: Setting lmss sub-encoding to TS1/0 on input line 381.
+Package textcomp Info: Setting lmssq sub-encoding to TS1/0 on input line 382.
+Package textcomp Info: Setting lmvtt sub-encoding to TS1/0 on input line 383.
+Package textcomp Info: Setting lmtt sub-encoding to TS1/0 on input line 384.
+Package textcomp Info: Setting qhv sub-encoding to TS1/0 on input line 385.
+Package textcomp Info: Setting qag sub-encoding to TS1/0 on input line 386.
+Package textcomp Info: Setting qbk sub-encoding to TS1/0 on input line 387.
+Package textcomp Info: Setting qcr sub-encoding to TS1/0 on input line 388.
+Package textcomp Info: Setting qcs sub-encoding to TS1/0 on input line 389.
+Package textcomp Info: Setting qpl sub-encoding to TS1/0 on input line 390.
+Package textcomp Info: Setting qtm sub-encoding to TS1/0 on input line 391.
+Package textcomp Info: Setting qzc sub-encoding to TS1/0 on input line 392.
+Package textcomp Info: Setting qhvc sub-encoding to TS1/0 on input line 393.
+Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 394.
+Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 395.
+Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 396.
+Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 397.
+Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 398.
+Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 399.
+Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 400.
+Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 401.
+Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 402.
+Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 403.
+Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 404.
+Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 405.
+Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
+Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
+Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
+Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/base/fontenc.sty
+Package: fontenc 2018/08/11 v2.0j Standard LaTeX package
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/t1enc.def
+File: t1enc.def 2018/08/11 v2.0j Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
+))
+(/home/chris/.miktex/texmfs/install/tex/latex/ae/ae.sty
+Package: ae 2001/02/12 1.3 Almost European Computer Modern
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/fontenc.sty
+Package: fontenc 2018/08/11 v2.0j Standard LaTeX package
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/t1enc.def
+File: t1enc.def 2018/08/11 v2.0j Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
+)
+LaTeX Font Info:    Try loading font information for T1+aer on input line 105.
+
+(/home/chris/.miktex/texmfs/install/tex/latex/ae/t1aer.fd
+File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
+))))
+(/home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx.aux)
+\openout1 = `PharmacoGx.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 25.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 25.
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/ts1cmr.fd
+File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 25.
+
+(/home/chris/.miktex/texmfs/install/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count94
+\scratchdimen=\dimen105
+\scratchbox=\box28
+\nofMPsegments=\count95
+\nofMParguments=\count96
+\everyMPshowfont=\toks17
+\MPscratchCnt=\count97
+\MPscratchDim=\dimen106
+\MPnumerator=\count98
+\makeMPintoPDFobject=\count99
+\everyMPtoPDFconversion=\toks18
+) (/home/chris/.miktex/texmfs/install/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/home/chris/.miktex/texmfs/install/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)))
+(/home/chris/.miktex/texmfs/install/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+))))
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2018/09/10 v0.29 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/home/chris/.miktex/texmfs/install/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2018/09/07 v3.3 Provides the ifpdf switch
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+)
+(/home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx-concordance.tex)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 28.
+
+(/home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 2.
+ [1
+
+{/home/chris/.miktex/texmfs/data/pdftex/config/pdftex.map}])
+\tf@toc=\write4
+\openout4 = `PharmacoGx.toc'.
+
+
+Overfull \hbox (16.04123pt too wide) in paragraph at lines 35--43
+\T1/aer/m/n/10.95 Several large experiments have been conducted, both to molecu
+larly characterize
+ []
+
+
+Overfull \hbox (24.10057pt too wide) in paragraph at lines 35--43
+\T1/aer/m/n/10.95 response to drug administration. However, the experiments lac
+k a standardization
+ []
+
+
+Overfull \hbox (20.08176pt too wide) in paragraph at lines 35--43
+\T1/aer/m/n/10.95 of protocols and annotations, hindering meta-analysis across 
+several experiments. 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--43
+
+ []
+
+
+Overfull \hbox (9.35312pt too wide) in paragraph at lines 44--52
+\T1/aer/m/n/10.95 interface and, in combination with unified curation, simplifi
+es analyses between
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 44--52
+
+ []
+
+
+Overfull \hbox (1.3334pt too wide) in paragraph at lines 53--64
+\T1/aer/m/n/10.95 also versatile in its ability to deal with two distinct types
+ of pharmacogenomic
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--64
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 65--72
+
+ []
+
+[2]
+Overfull \hbox (22.95074pt too wide) in paragraph at lines 73--82
+\T1/aer/m/n/10.95 facilitate drug response biomarker discovery, and molecular d
+rug characterization.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 73--82
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--87
+
+ []
+
+LaTeX Font Info:    Try loading font information for T1+aett on input line 96.
+(/home/chris/.miktex/texmfs/install/tex/latex/ae/t1aett.fd
+File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
+)
+LaTeX Font Info:    Try loading font information for TS1+aett on input line 99.
+
+
+(/usr/share/R/share/texmf/tex/latex/ts1aett.fd
+File: ts1aett.fd 
+)
+LaTeX Font Info:    Try loading font information for TS1+cmtt on input line 99.
+
+
+(/home/chris/.miktex/texmfs/install/tex/latex/base/ts1cmtt.fd
+File: ts1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `TS1/aett/m/sl' in size <10.95> not available
+(Font)              Font shape `TS1/cmtt/m/sl' tried instead on input line 99.
+ [3]
+Overfull \hbox (4.40393pt too wide) in paragraph at lines 133--134
+\T1/aer/m/n/10.95 signatures, as explained below. However, the computation of t
+he perturbation
+ []
+
+
+Overfull \hbox (7.25795pt too wide) in paragraph at lines 149--150
+\T1/aer/m/n/10.95 GDSC and CCLE datasets, recreating the analysis similar to ou
+r \T1/aer/m/it/10.95 Inconsistency
+ []
+
+
+Overfull \hbox (11.85876pt too wide) in paragraph at lines 149--150
+\T1/aer/m/n/10.95 various compounds, and form this the IC50 and AUC were comput
+ed. However,
+ []
+
+
+Overfull \hbox (29.33794pt too wide) in paragraph at lines 149--150
+\T1/aer/m/n/10.95 Furthermore, two different microarray platforms were used. Ho
+wever, \T1/aer/m/it/10.95 PharmacoGx
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 149--150
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
+
+ []
+
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
+
+ []
+
+[5] [6]
+<PharmacoGx-fig2.pdf, id=30, 433.62pt x 433.62pt>
+File: PharmacoGx-fig2.pdf Graphic file (type pdf)
+<use PharmacoGx-fig2.pdf>
+Package pdftex.def Info: PharmacoGx-fig2.pdf  used on input line 236.
+(pdftex.def)             Requested size: 288.0011pt x 288.01624pt.
+
+Overfull \hbox (0.65395pt too wide) in paragraph at lines 245--246
+\T1/aer/m/n/10.95 The second case study illustrates the analysis of a perturbat
+ion type datasets,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
+
+ []
+
+[7 </home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx-fig2.pdf>]
+Overfull \hbox (22.79535pt too wide) in paragraph at lines 249--250
+[]\T1/aer/m/n/10.95 Once again, we load the dataset, downloading it if needed u
+sing \T1/aer/m/it/10.95 downloadPSet\T1/aer/m/n/10.95 .
+ []
+
+
+Overfull \hbox (41.94716pt too wide) in paragraph at lines 249--250
+\T1/aer/m/n/10.95 We then recreate drug signatures for each drug using the func
+tion \T1/aer/m/it/10.95 drugPerturbationSig
+ []
+
+
+Overfull \hbox (15.96182pt too wide) in paragraph at lines 249--250
+\T1/aer/m/n/10.95 to preform statistical modelling of the transcriptomic respon
+se to the application
+ []
+
+
+Overfull \hbox (5.39668pt too wide) in paragraph at lines 249--250
+\T1/aer/m/n/10.95 of each drug. We then compare the observed up-regulated and d
+own-regulated
+ []
+
+[8]
+Overfull \hbox (3.45047pt too wide) in paragraph at lines 297--303
+\T1/aer/m/it/10.95 auc_published\T1/aer/m/n/10.95 , while the recomputed measur
+es are labelled as \T1/aer/m/it/10.95 auc_recomputed\T1/aer/m/n/10.95 ,
+ []
+
+[9]
+Overfull \hbox (1.0912pt too wide) in paragraph at lines 310--312
+\T1/aer/m/n/10.95 binding, and $\OML/cmm/m/it/10.95 HS > \OT1/cmr/m/n/10.95 1$ 
+\T1/aer/m/n/10.95 denotes positive binding cooperativity. The parameters
+ []
+
+
+Overfull \hbox (35.07063pt too wide) in paragraph at lines 310--312
+\T1/aer/m/n/10.95 fitting of these curves to arbitrary points is implemented by
+ the \T1/aer/m/it/10.95 logLogisticRegression
+ []
+
+
+Overfull \hbox (23.9338pt too wide) in paragraph at lines 316--317
+\T1/aer/m/n/10.95 Drug-Dose response data included in the PharmacoSet objects c
+an be conviniently
+ []
+
+
+Overfull \hbox (24.83267pt too wide) in paragraph at lines 316--317
+\T1/aer/m/n/10.95 plotted using the \T1/aer/m/it/10.95 drugDoseResponseCurve \T
+1/aer/m/n/10.95 function. Given a list of PharmacoSets,
+ []
+
+
+Overfull \hbox (1.86191pt too wide) in paragraph at lines 321--323
+\T1/aer/m/n/10.95 molecular data such as transcriptomics, genomics and proteomi
+cs. \T1/aer/m/it/10.95 Sensitivity
+ []
+
+
+Overfull \hbox (10.84924pt too wide) in paragraph at lines 321--323
+\T1/aer/m/n/10.95 between the expression of the feature and the response toward
+s each compound.
+ []
+
+
+Overfull \hbox (11.60486pt too wide) in paragraph at lines 321--323
+\T1/aer/m/n/10.95 on the expressed known sensitivity biomarkers. The function \
+T1/aer/m/it/10.95 drugSensitivitySig
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 321--323
+
+ []
+
+[10]
+Overfull \hbox (3.17458pt too wide) in paragraph at lines 330--332
+\T1/aer/m/n/10.95 expression of gene i, the tissue source and the experimental 
+batch respectively,
+ []
+
+
+Overfull \hbox (5.32771pt too wide) in paragraph at lines 330--332
+\T1/aer/m/n/10.95 is quantified by $\OML/cmm/m/it/10.95 []$\T1/aer/m/n/10.95 ,
+ above and beyond the relationship between drug sensitivity
+ []
+
+
+Overfull \hbox (23.88985pt too wide) in paragraph at lines 330--332
+\T1/aer/m/n/10.95 Significance of the gene-drug association is estimated by the
+ statistical significance
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 330--332
+
+ []
+
+
+Overfull \hbox (17.55077pt too wide) in paragraph at lines 333--334
+\T1/aer/m/n/10.95 the significance of the association between two drugs and the
+ir known biomarkers
+ []
+
+[11]
+Overfull \hbox (78.3699pt too wide) in paragraph at lines 366--374
+ [][] 
+ []
+
+
+Overfull \hbox (23.88985pt too wide) in paragraph at lines 381--385
+\T1/aer/m/n/10.95 Significance of the gene-drug association is estimated by the
+ statistical significance
+ []
+
+
+Overfull \hbox (1.66258pt too wide) in paragraph at lines 390--392
+\T1/aer/m/n/10.95 The package also provides two methods for quantifying the sim
+ilarity between
+ []
+
+
+Overfull \hbox (10.9376pt too wide) in paragraph at lines 390--392
+\T1/aer/m/n/10.95 correlation coefficient. Both methods are implemented by the 
+\T1/aer/m/it/10.95 connectivityScore
+ []
+
+[12] [13]
+Overfull \hbox (28.85228pt too wide) in paragraph at lines 420--421
+\T1/aer/m/n/10.95 Genomics of Drug Sensitivity in Cancer Project, the Cancer Ce
+ll Line Encyclopedia
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 420--421
+
+ []
+
+LaTeX Font Info:    Try loading font information for TS1+aer on input line 429.
+
+(/usr/share/R/share/texmf/tex/latex/ts1aer.fd
+File: ts1aer.fd 
+)
+LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10.95> not available
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 429.
+ [14]
+(/home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx.bbl
+Underfull \hbox (badness 2158) in paragraph at lines 4--21
+[]\T1/aer/m/n/10.95 Jordi Barretina, Giordano Caponigro, Nicolas Stransky, Kavi
+tha
+ []
+
+[15]
+Underfull \hbox (badness 1571) in paragraph at lines 48--52
+[]\T1/aer/m/n/10.95 Benjamin Haibe-Kains, Nehme El-Hachem, Nicolai Juul Birkbak
+,
+ []
+
+
+Underfull \hbox (badness 2521) in paragraph at lines 54--62
+\T1/aer/m/n/10.95 Aravind Subramanian, Kenneth N. Ross, Michael Reich, Haley
+ []
+
+[16]
+Underfull \hbox (badness 2027) in paragraph at lines 64--68
+[]\T1/aer/m/n/10.95 Chiara Sabatti, Stanislav L Karsten, and Daniel H Geschwind
+.
+ []
+
+
+Underfull \hbox (badness 1584) in paragraph at lines 70--77
+[]\T1/aer/m/n/10.95 Aravind Subramanian, Pablo Tamayo, Vamsi K. Mootha, Sayan
+ []
+
+
+Underfull \hbox (badness 1168) in paragraph at lines 70--77
+\T1/aer/m/n/10.95 Scott L. Pomeroy, Todd R. Golub, Eric S. Lander, and Jill P.
+ []
+
+) [17] (/home/chris/rPackages/PharmacoGx/vignettes/PharmacoGx.aux) ) 
+Here is how much of TeX's memory you used:
+ 2886 strings out of 494857
+ 42120 string characters out of 3178233
+ 94885 words of memory out of 3000000
+ 6450 multiletter control sequences out of 15000+200000
+ 32915 words of font info for 71 fonts, out of 3000000 for 9000
+ 0 hyphenation exceptions out of 8191
+ 41i,7n,25p,909b,280s stack positions out of 5000i,500n,10000p,200000b,50000s
+ </home/chr
+is/.miktex/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1095.pk> </home/c
+hris/.miktex/texmfs/data/fonts/pk/ljfour/jknappen/ec/dpi600/tcst1095.pk></home/
+chris/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmbx10.pfb></home/c
+hris/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmbx12.pfb></home/ch
+ris/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmex10.pfb></home/chr
+is/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb></home/chri
+s/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi6.pfb></home/chris/
+.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi8.pfb></home/chris/.m
+iktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></home/chris/.mik
+tex/texmfs/install/fonts/type1/public/amsfonts/cm/cmr12.pfb></home/chris/.mikte
+x/texmfs/install/fonts/type1/public/amsfonts/cm/cmr17.pfb></home/chris/.miktex/
+texmfs/install/fonts/type1/public/amsfonts/cm/cmr6.pfb></home/chris/.miktex/tex
+mfs/install/fonts/type1/public/amsfonts/cm/cmr8.pfb></home/chris/.miktex/texmfs
+/install/fonts/type1/public/amsfonts/cm/cmsltt10.pfb></home/chris/.miktex/texmf
+s/install/fonts/type1/public/amsfonts/cm/cmsy10.pfb></home/chris/.miktex/texmfs
+/install/fonts/type1/public/amsfonts/cm/cmsy8.pfb></home/chris/.miktex/texmfs/i
+nstall/fonts/type1/public/amsfonts/cm/cmti10.pfb></home/chris/.miktex/texmfs/in
+stall/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on PharmacoGx.pdf (17 pages, 264528 bytes).
+PDF statistics:
+ 139 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 10 words of extra memory for PDF output out of 10000 (max. 10000000)
+

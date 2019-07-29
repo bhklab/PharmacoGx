@@ -96,7 +96,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(ncol(drugpheno)>1){
     ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
   } else {
-    ff0 <- sprintf("drugpheno.1")
+    ff0 <- "drugpheno.1"
   }
 
   # ff1 <- sprintf("%s + x", ff0)
@@ -141,6 +141,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FA
           tt <- table(dd[,"type"])
           print(tt)
         }
+        return(ww)
       }
     })
   rr1 <- tryCatch(try(glm(formula(drugpheno.1 ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
@@ -165,7 +166,8 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         if("type" %in% colnames(dd)) {
           tt <- table(dd[,"type"])
           print(tt)
-        }      
+        }
+      return(ww)  
       }
     })
   rr1 <- tryCatch(try(lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)), 
