@@ -1,17 +1,18 @@
-language: r
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
 addons:
   apt:
     packages:
       - tcl8.5-dev
       - tk8.5-dev
+
+language: r
+
 r: bioc-devel
 cache: packages
 r_github_packages:
 - jimhester/covr
-
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
 
 notifications:
   slack:
