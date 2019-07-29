@@ -15,5 +15,4 @@ Depends: R (>= 3.4)
 RoxygenNote: 6.1.1
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Suggests: devtools
 VignetteBuilder: knitr
