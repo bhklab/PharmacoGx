@@ -2,6 +2,7 @@ library(PharmacoGx)
 require(parallel)
 context("Checking intersectPSet.")
 
+##TO-DO:: This test takes forever to run; consider making the intersections smaller
 test_that("Intersection result did not change since last time", {
 	data(GDSCsmall)
 	data(CCLEsmall)

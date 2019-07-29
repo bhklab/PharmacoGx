@@ -129,6 +129,9 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   # }
 if(any(unlist(lapply(drugpheno,is.factor)))){
 
+## Added default '' value to ww to fix function if it is passed verbose = FALSE  
+ww = ''
+
 rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
     warning=function(w) {
       if(verbose) {

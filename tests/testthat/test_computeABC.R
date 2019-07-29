@@ -24,11 +24,12 @@ test_that("Function complains when given insensible input",{
 		viability1 = c(50, 60, 70),
 		viability2 = c(40, 90, 10),
 		conc_as_log = FALSE)) #should complain
-	expect_error(computeABC(conc1 = c(NA, "cat", 3),
+	##TO-DO::Add warning string to expect_warning call
+	expect_warning(expect_error(computeABC(conc1 = c(NA, "cat", 3),
 		conc2 = c(1, -2, 3),
 		viability1 = c(50, 60, 70),
 		viability2 = c(40, 90, 10),
-		conc_as_log = FALSE)) #should complain
+		conc_as_log = FALSE))) #should complain
 	expect_error(computeABC(conc1 = c(1, 2, 3),
 		conc2 = c(1, -2, 3),
 		viability1 = c(50, 60, 70),
@@ -41,11 +42,12 @@ test_that("Function complains when given insensible input",{
 		conc2 = c(1, -2, 3),
 		viability1 = c(50, 60, 70),
 		viability2 = c(40, 90, 10))) #should complain
-	expect_error(computeABC(conc1 = c(1, 2, 3),
+	##TO-DO::Add warning string to expect_warning call
+	expect_warning(expect_error(computeABC(conc1 = c(1, 2, 3),
 		conc2 = c(1, -2, 3),
 		viability1 = c(.50, .60, .70),
 		viability2 = c(.40, .90, .10),
-		viability_as_pct = TRUE)) #should complain
+		viability_as_pct = TRUE))) #should complain
 	expect_warning(computeABC(conc1 = c(1, 2, 3),
 		conc2 = c(1, 2, 3),
 		viability1 = c(.50, .60, .70),

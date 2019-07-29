@@ -88,7 +88,7 @@ test_that("updateCellId works with duplicates", {
 	newNames <- c("Test","Test",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
 
 
-	cellNames(GDSCsmall) <- newNames
+	expect_warning(cellNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
 
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
 	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(unique(newNames)))
@@ -116,8 +116,7 @@ test_that("updateDrugId works with duplicates", {
     data(GDSCsmall)
     newNames <- c("Test","Test",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
 
-
-    drugNames(GDSCsmall) <- newNames
+    expect_warning(drugNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateDrugId. Merging old ids into the same identifier")
 
     expect_true(all(unique(sensitivityInfo(GDSCsmall)$drugid) %in% newNames))
     expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(unique(newNames)))

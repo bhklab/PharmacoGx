@@ -2,13 +2,15 @@ library(PharmacoGx)
 
 context("Testing LogLogisticRegression.")
 
+##TO-DO::Supress print to console from this test file
 
 test_that("Errors are checked.",{
 	
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60))) #should complain
     expect_warning(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), viability_as_pct = FALSE)) #should complain
     expect_error(logLogisticRegression(c(-1, 2, 3), c(50, 60, 70), conc_as_log = FALSE)) #should complain
-    expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), median_n = 0)) #should complain
+    ##TO-DO::Add warning string to expect_warning call
+    expect_warning(expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), median_n = 0))) #should complain
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), median_n = 3/2)) #should complain
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), density = c(1, 1))) #should complain
     expect_error(logLogisticRegression(c(1, 2, 3), c(50, 60, 70), density = c(1, 1, -1))) #should complain
