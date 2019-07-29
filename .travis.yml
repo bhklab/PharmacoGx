@@ -1,7 +1,9 @@
 dist: xenial
 addons:
   apt:
+    update: true
     packages:
+      - x11proto-xf86vidmode-dev
       - tcl8.5-dev
       - tk8.5-dev
 services:
