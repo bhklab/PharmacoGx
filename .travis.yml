@@ -6,8 +6,7 @@ addons:
       - x11proto-xf86vidmode-dev
       - tcl8.5-dev
       - tk8.5-dev
-services:
-  - xvfb
+      - xvfb
   
 language: r
 
