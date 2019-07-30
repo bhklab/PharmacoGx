@@ -17,7 +17,7 @@ r_github_packages:
 
 script:
 - R CMD build . --resave-data --compact-vignettes=gs+qpdf
-- xvfb-run R CMD check *.tar.gz --no-build-vignettes
+- travis-wait 30 xvfb-run R CMD check *.tar.gz --no-build-vignettes
 
 notifications:
   slack:
