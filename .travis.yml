@@ -17,8 +17,8 @@ r_github_packages:
 - jimhester/covr
 
 script:
-  - R CMD build . --resave-data --compact-vignettes=gs+qpdf
-  - xvfb-run R CDM check *.tar.gz --no-build-vignettes
+- R CMD build . --resave-data --compact-vignettes=gs+qpdf
+- xvfb-run R CMD check *.tar.gz --no-build-vignettes
 
 notifications:
   slack:
