@@ -13,7 +13,7 @@ language: r
 r: bioc-devel
 cache: packages
 r_github_packages:
-- jimhester/c
+- jimhester/covr
 
 script:
 - R CMD build . --resave-data --compact-vignettes=gs+qpdf
