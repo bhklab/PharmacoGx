@@ -9,15 +9,13 @@ init:
 
 install:
   ps: Bootstrap
-  ps: choco install -y miktex
-  cmd: refreshenv
 
 cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
 
-platform: x64
+platform: x
 
 environment:
   R_ARCH: x64
@@ -31,11 +29,13 @@ build_script:
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc piano
 
-before_test:
-  # Install pandoc
-  - cinst pandoc
-  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\;C:\Program Files\Pandoc\"
-  - pandoc -v
+#before_test:
+#  # Install pandoc
+#  - cinst pandoc
+#  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\;C:\Program Files\Pandoc\"
+#  - pandoc -v
+#  # Install miktex
+#  - ps: choco install -y miktex
 
 
 test_script:
