@@ -14,13 +14,14 @@ before_install:
   - brew cask reinstall xquartz
   - brew install tcl-tk
   - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
+  - brew cask install basictex
         
 before_script:
   - "export DISPLAY=:99.0"
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
         
 script:
-  - R CMD build . --resave-data
+  - R CMD build . --resave-data --no-build-vignettes
   - travis_wait 30 R CMD check *.tar.gz
 
 after_success:
