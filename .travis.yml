@@ -5,31 +5,22 @@ cache: packages
 r_github_packages:
 - jimhester/covr
 
-matrix:
-  include:
-    - r: bioc-devel
-      os: linux
-        apt:
-          update: true
-          packages:
-            - x11proto-xf86vidmode-dev
-            - tcl8.5-dev
-            - tk8.5-dev
-            - xvfb
-        script:
-          - R CMD build . --resave-data --compact-vignettes=gs+qpdf
-          - travis_wait 30 xvfb-run R CMD check *.tar.gz
-    - r: bioc-devel
-      os: osx
-        osx+image: xcode11
+
+r: bioc-devel
+
+os: osx
+  osx+image: xcode11
+        
         before_install:
           - brew update
           - brew cask reinstall xquartz
           - brew install tcl-tk --with-tk
           - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
+        
         before_script:
           - "export DISPLAY=:99.0"
           - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
+        
         script:
           - R CMD build . --resave-data --compact-vignettes=gs+qpdf
           - travis_wait 30 R CMD check *.tar.gz
