@@ -20,16 +20,15 @@ environment:
   GCC_PATH: mingw_64
   USE_RTOOLS: yes
   PKG_TYPE: both
-  R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
-  R_CHECK_ARGS:
+#  R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
+#  R_CHECK_ARGS:
   global:
     WARNINGS_ARE_ERRORS:
 
 
 build_script:
-  - travis-tool.sh install_r devtools
-  - travis-tool.sh install_bioc BiocParallel
-  - travis-tool.sh install_bioc_deps
+  - travis-tool.sh install_devtools
+  - travis-tool.sh install_bioc_deps  
 
 test_script:
   - travis-tool.sh run_tests
