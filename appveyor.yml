@@ -24,8 +24,8 @@ environment:
 
 
 build_script:
+  - travis-tool.sh install_bioc piano BiocParallel
   - travis-tool.sh install_deps
-  - travis-tool.sh install_bioc piano
 
 #before_test:
 #  # Install pandoc
