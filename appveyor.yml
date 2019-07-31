@@ -9,13 +9,18 @@ init:
 
 install:
   ps: Bootstrap
+  ps: choco install -y miktex
+  cmd: refreshenv
 
 cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
 
+platform: x64
+
 environment:
+  R_ARCH: x64
   NO_CRAN: true
   global:
     R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -24,15 +29,14 @@ environment:
 
 build_script:
   - travis-tool.sh install_deps
-  - travis-tool.sh install_bioc piano BiocParallel
+  - travis-tool.sh install_bioc piano
 
 before_test:
   # Install pandoc
   - cinst pandoc
   - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\;C:\Program Files\Pandoc\"
   - pandoc -v
-  # Install miktex to get pdflatex, if we don't get it from the cache
-  - ps: choco install -y miktex
+
 
 test_script:
   - travis-tool.sh run_tests
