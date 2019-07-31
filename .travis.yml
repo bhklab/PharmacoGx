@@ -1,6 +1,6 @@
   
 os: osx
-osx_image: xcode7.2
+osx_image: xcode11
 
 language: r
 
@@ -12,7 +12,7 @@ r_github_packages:
 before_install:
   - brew update
   - brew cask reinstall xquartz
-  - brew install tcl-tk --with-tk
+  - brew install tcl-tk
   - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
         
 before_script:
@@ -21,7 +21,7 @@ before_script:
         
 script:
   - R CMD build . --resave-data --compact-vignettes=gs+qpdf
-  - R CMD check *.tar.gz
+  - travis_wait 30 R CMD check *.tar.gz
 
 after_success:
 - travis_wait 30 Rscript -e 'library(covr);codecov()'
