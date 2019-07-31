@@ -3,7 +3,7 @@
 # Download script file from GitHub
 init:
   ps: |
-        $ErrorActionPreference = "Stop"
+        $ErrorActionPreference = "Continue"
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 
@@ -24,7 +24,6 @@ environment:
   R_BUILD_ARGS: --no-manual --no-build-vignettes
   R_CHECK_ARGS: --no-vignettes --no-build-vignettes
   NO_CRAN: true
-  global: ErrorActionPreference = "Continue"
 
 build_script:
   - travis-tool.sh install_bioc piano BiocParallel
