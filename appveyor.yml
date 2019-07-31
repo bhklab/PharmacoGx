@@ -24,6 +24,7 @@ environment:
   R_BUILD_ARGS: --no-manual --no-build-vignettes
   R_CHECK_ARGS: --no-vignettes --no-build-vignettes
   NO_CRAN: true
+  global: ErrorActionPreference = "Continue"
 
 build_script:
   - travis-tool.sh install_bioc piano BiocParallel
