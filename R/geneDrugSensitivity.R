@@ -152,7 +152,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FA
         print(ww)
         print(tt)
       }
-      #return(ww)
+      return(ww)
     })
 
 
