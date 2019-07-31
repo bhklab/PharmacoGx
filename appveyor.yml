@@ -1,29 +1,31 @@
+
 # DO NOT CHANGE the "init" and "install" sections below
 
 # Download script file from GitHub
 init:
   ps: |
-        $ErrorActionPreference = "Continue"
-        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+        $ErrorActionPreference = "Stop"
+        Invoke-WebRequest http://raw.githubusercontent.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
-
 install:
   ps: Bootstrap
 
-cache:
-  - C:\RLibrary
-
 # Adapt as necessary starting from here
 
-platform: x
+platform: x64
 
 environment:
+  R_VERSION: devel
   R_ARCH: x64
-  NO_CRAN: true
-  global:
-    R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-    USE_RTOOLS: true
-    WARNINGS_ARE_ERRORS:
+  GCC_PATH: mingw_64
+  PKG_TYPE: both
+  USE_RTOOLS: yes
+  R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
+  R_CHECK_ARGS:
+  NOT_CRAN: true
+  
+
+  
 
 build_script:
   - travis-tool.sh install_deps
@@ -36,7 +38,6 @@ build_script:
 #  - pandoc -v
 #  # Install miktex
 #  - ps: choco install -y miktex
-
 
 test_script:
   - travis-tool.sh run_tests
