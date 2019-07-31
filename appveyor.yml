@@ -31,11 +31,11 @@ build_script:
 before_test:
   # Install pandoc
   - cinst pandoc
-  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
+  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\;C:\Program Files\Pandoc\"
   - pandoc -v
   # Install miktex to get pdflatex, if we don't get it from the cache
-  - cinst miktex
-  - ps: $env:Path += ";C:\Program Files (x86)\Miktex 2.9\"
+  - cinst miktex-portable
+  - ps: $env:Path += ";C:\Program Files (x86)\Miktex 2.9\;C:\Program Files\Miktex 2.9\"
   - pdflatex -v
 
 test_script:
