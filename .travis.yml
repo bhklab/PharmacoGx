@@ -1,14 +1,14 @@
   
 language: r
 
-r: bioc-devel
 cache: packages
 r_github_packages:
 - jimhester/covr
 
 matrix:
   include:
-    - os: linux
+    - r: bioc-devel
+      os: linux
         dist: xenial
         addons:
         apt:
@@ -21,7 +21,8 @@ matrix:
         script:
           - R CMD build . --resave-data --compact-vignettes=gs+qpdf
           - travis_wait 30 xvfb-run R CMD check *.tar.gz
-    - os: osx
+    - r: bioc-devel
+      os: osx
         osx+image: xcode11
         before_install:
           - brew update
@@ -35,7 +36,6 @@ matrix:
           - R CMD build . --resave-data --compact-vignettes=gs+qpdf
           - travis_wait 30 R CMD check *.tar.gz
 
-# Trigger build
 after_success:
 - travis_wait 30 Rscript -e 'library(covr);codecov()'
 
