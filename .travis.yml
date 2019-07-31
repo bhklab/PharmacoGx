@@ -20,7 +20,7 @@ before_script:
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
         
 script:
-  - R CMD build . --resave-data --compact-vignettes=gs+qpdf
+  - R CMD build . --resave-data
   - travis_wait 30 R CMD check *.tar.gz
 
 after_success:
