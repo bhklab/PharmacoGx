@@ -20,10 +20,13 @@ platform: x64
 environment:
   R_VERSION: devel
   R_ARCH: x64
-  USE_RTOOLS: true
   R_BUILD_ARGS: --no-manual --no-build-vignettes
   R_CHECK_ARGS: --no-vignettes --no-build-vignettes
   NO_CRAN: true
+  global:
+    R_REMOTES_NO_ERRORS_FROM_WARNINGS: false
+    USE_RTOOLS: true
+    WARNINGS_ARE_ERRORS: false
 
 build_script:
   - travis-tool.sh install_bioc piano BiocParallel
