@@ -4,7 +4,7 @@
 # Download script file from GitHub
 init:
   ps: |
-        $ErrorActionPreference = "Stop"
+        $ErrorActionPreference = "Continue"
         Invoke-WebRequest http://raw.githubusercontent.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 install:
