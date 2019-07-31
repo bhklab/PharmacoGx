@@ -16,8 +16,6 @@ cache:
 # Adapt as necessary starting from here
 
 environment:
-  R_BUILD_ARGS: --no-manual --no-build-vignettes
-  R_CHECK_ARGS: --no-vignettes --no-build-vignettes
   NO_CRAN: true
   global:
     R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -35,7 +33,6 @@ before_test:
   - pandoc -v
   # Install miktex to get pdflatex, if we don't get it from the cache
   - ps: choco install -y miktex
-  - cmd: refreshenv
 
 test_script:
   - travis-tool.sh run_tests
