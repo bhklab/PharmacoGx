@@ -1,4 +1,9 @@
   
+###########
+# Travis CI configuration file
+###########
+
+
 os: osx
 osx_image: xcode11
 
@@ -6,9 +11,9 @@ language: r
 
 r: bioc-devel
 cache: packages
-# Add the covr package to calculate code coverage for your tests
+
 r_github_packages:
-- jimhester/covr
+- jimhester/covr # Add the covr package to calculate code coverage for your tests
 
 # These dependencies are needed to create the virtual GUI in the next comment
 # Also installs basictex for generating documentation in R
@@ -17,7 +22,7 @@ before_install:
   - brew cask reinstall xquartz
   - brew install tcl-tk
   - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
-  - brew install basictex
+#  - brew cask install basictex
 
 # This creates a virtual GUI for R the render to, preventing errors from rurnning on a headless server
 before_script:
