@@ -4,7 +4,7 @@
 # Download script file from GitHub
 init:
   ps: |
-        $ErrorActionPreference = "Continue"
+        $ErrorActionPreference = "Stop"
         Invoke-WebRequest http://raw.githubusercontent.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 install:
@@ -24,8 +24,8 @@ environment:
 
 
 build_script:
-  - travis-tool.sh install_bioc piano BiocParallel
-  - travis-tool.sh install_deps
+  - travis-tool.sh install_r devtools
+  - travis-tool.sh install_bioc_deps
 
 #before_test:
 #  # Install pandoc
