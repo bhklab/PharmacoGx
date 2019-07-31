@@ -19,6 +19,7 @@ environment:
   R_ARCH: x64
   GCC_PATH: mingw_64
   USE_RTOOLS: yes
+  PKG_TYPE: both
   R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
   R_CHECK_ARGS:
   global:
@@ -27,6 +28,7 @@ environment:
 
 build_script:
   - travis-tool.sh install_r devtools
+  - travis-tool.sh install_bioc BiocParallel
   - travis-tool.sh install_bioc_deps
 
 test_script:
