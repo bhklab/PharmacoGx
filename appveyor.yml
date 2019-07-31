@@ -35,6 +35,8 @@ before_test:
   - pandoc -v
   # Install miktex to get pdflatex, if we don't get it from the cache
   - cinst miktex
+  - ps: $env:Path += ";C:\Program Files (x86)\Miktex 2.9\"
+  - pdflatex -v
 
 test_script:
   - travis-tool.sh run_tests
