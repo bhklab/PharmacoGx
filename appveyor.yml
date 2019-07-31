@@ -16,6 +16,7 @@ platform: x64
 
 environment:
   R_ARCH: x64
+  NOT_CRAN: true
 
 build_script:
   - travis-tool.sh install_deps
@@ -26,8 +27,7 @@ test_script:
 on_failure:
   - travis-tool.sh dump_logs
 
-environment:
-  NOT_CRAN: true
+
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
