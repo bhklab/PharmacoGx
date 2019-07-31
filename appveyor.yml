@@ -18,14 +18,10 @@ environment:
   R_VERSION: devel
   R_ARCH: x64
   GCC_PATH: mingw_64
-  PKG_TYPE: both
   USE_RTOOLS: yes
   R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
   R_CHECK_ARGS:
-  NOT_CRAN: true
-  
 
-  
 
 build_script:
   - travis-tool.sh install_deps
