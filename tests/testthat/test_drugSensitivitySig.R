@@ -8,8 +8,7 @@ test_that("Sensitivity result did not change since last time", {
   drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", nthread=1, features = fNames(GDSCsmall, "rna")[1:50])	
 	expect_equal_to_reference(drug.sensitivity@.Data, "drug.sensitivityGDSCSmall.rds")
 	
-	##TO-DO:: Fix this test so it doesn't print 'model doesn't converge' repeatedly
-	# - Added verbose = FALSE argument to correct printing issues
+	# Added verbose = FALSE argument to correct printing issues
 	drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", nthread=1, features = fNames(GDSCsmall, "rna")[1:50], sensitivity.cutoff = 0.2, sensitivity.measure="auc_recomputed", verbose = FALSE)
 	expect_equal_to_reference(drug.sensitivity@.Data, "drug.sensitivity.discreteGDSCSmall.rds", tolerance = 0.2)
 	
