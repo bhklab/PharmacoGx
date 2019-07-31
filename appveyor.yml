@@ -21,19 +21,13 @@ environment:
   USE_RTOOLS: yes
   R_BUILD_ARGS: --resave-data --compact-vignettes=gs+qpdf
   R_CHECK_ARGS:
+  global:
+    WARNINGS_ARE_ERRORS:
 
 
 build_script:
   - travis-tool.sh install_r devtools
   - travis-tool.sh install_bioc_deps
-
-#before_test:
-#  # Install pandoc
-#  - cinst pandoc
-#  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\;C:\Program Files\Pandoc\"
-#  - pandoc -v
-#  # Install miktex
-#  - ps: choco install -y miktex
 
 test_script:
   - travis-tool.sh run_tests
