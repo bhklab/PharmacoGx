@@ -9,15 +9,13 @@ matrix:
   include:
     - r: bioc-devel
       os: linux
-        dist: xenial
-        addons:
         apt:
           update: true
-        packages:
-          - x11proto-xf86vidmode-dev
-          - tcl8.5-dev
-          - tk8.5-dev
-          - xvfb
+          packages:
+            - x11proto-xf86vidmode-dev
+            - tcl8.5-dev
+            - tk8.5-dev
+            - xvfb
         script:
           - R CMD build . --resave-data --compact-vignettes=gs+qpdf
           - travis_wait 30 xvfb-run R CMD check *.tar.gz
