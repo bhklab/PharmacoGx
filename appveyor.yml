@@ -36,7 +36,6 @@ before_test:
   # Install miktex to get pdflatex, if we don't get it from the cache
   - ps: choco install -y miktex
   - cmd: refreshenv
-  - cmd: pdflatex -v
 
 test_script:
   - travis-tool.sh run_tests
