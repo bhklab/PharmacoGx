@@ -6,23 +6,29 @@ language: r
 
 r: bioc-devel
 cache: packages
+# Add the covr package to calculate code coverage for your tests
 r_github_packages:
 - jimhester/covr
-      
+
+# These dependencies are needed to create the virtual GUI in the next comment
+# Also installs basictex for generating documentation in R
 before_install:
   - brew update
   - brew cask reinstall xquartz
   - brew install tcl-tk
   - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
-  - brew cask install basictex
-        
+  - brew install basictex
+
+# This creates a virtual GUI for R the render to, preventing errors from rurnning on a headless server
 before_script:
   - "export DISPLAY=:99.0"
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
-        
+
+# travis_wait enables commands to run for more than 10 minutes without printing something to log
+# It does not, however, get around the 50 minute time limit for Travis CI test execution
 script:
   - R CMD build . --resave-data --no-build-vignettes
-  - travis_wait 30 R CMD check *.tar.gz
+  - travis_wait 30 R CMD check *.tar.gz --no-build-vignettes
 
 after_success:
 - travis_wait 30 Rscript -e 'library(covr);codecov()'
