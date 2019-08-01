@@ -54,12 +54,13 @@ matrix:
       - R CMD build . --resave-data --no-build-vignettes # V
       - travis_wait 30 R CMD check *.tar.gz --no-build-vignettes # `travis_wait 30` increases the maximum time without printing to log from 10 to 30 minutes
 
-## POST TEST COMMANDS
-#after_success:
-#- travis_wait 30 Rscript -e 'library(covr);codecov()' # Calculating code coverage
+# POST TEST COMMANDS
+after_success:
+- travis_wait 30 Rscript -e 'library(covr);codecov()' # Calculating code coverage
 
-## NOTIFICATION SETTINGS
+## TODO:: Determine if this still does anything
+# NOTIFICATION SETTINGS
 #notifications:
 #  slack:
 #    rooms:
-#      secure: FslsSEU2U/Erx3upc42cvyU5c9EFfmMGDIWrHR13IltjJr0EeBJ/wYN51CRszVtO0QHPwiyNizrtdobHGq8rc6F0Tdr0a967Kb1Yu+sJDMpZV5zQoaeO2Vb8yitEuG6Vrcn8EnQlKGsQLWaIkk/gOK1QMYpShACQzzUqBdiOjGpkcT0l2hVV4EuViiZAv1exH7wh84dKIEw45Msss60nZZGpwj3XL/V1RtD3vufMgtF0/VCCdCqIyC0D9WdioiF3A57UhFVp0lVE/HlIG4Ji0sQlqYVzZE+caaZ2VQxPZkGBJ8R23lMH0nL7LPb7v/rB0haEAFZQSUpNYQMQRucTN8ZFp/7045BFAVTBu0Qb5CcuD0tFXNJg3dXJ/mUfOrIbh46UIOHwZnq/WjAuo95JS/mY1k7b8FkIAC+uSMUbAjWgOl6GdyhSNbbBhh2vPGtFlT8WQ0d/A4zDzhXcgTHpjSYTigVo3gis7UNngRCyIUB3ojVDi2C/JcFvNJSMjYoFZqJiNTbkBAljT9OIutUY4nWnpuZxTsbfUdmXFOQKIHqRNJ6HRwPbS5Zhu9hfelj6hdy9f78cn8Np2kNtoTTG/EaHmjhBXVHfJ5Ga9sOxJufbljIZI85HxGKVZzsmPR7319STlUsH4An+CnrzOXlV/uCztjzmwVfBBwv1ZJKRc3M=
+#      secure: FslsSEU2U/Erx3upc42cvyU5c9EFfmMGDIWrHR13IltjJr0EeBJ/wYN51CRszVtO0QHPwiyNizrtdobHGq8rc6F0Tdr0a967Kb1Yu+sJDMpZV5zQoaeO2Vb8yitEuG6Vrcn8EnQlKGsQLWaIkk/gOK1QMYpShACQzzUqBdiOjGpkcT0l2hVV4EuViiZAv1exH7wh84dKIEw45Msss60nZZGpwj3XL/V1RtD3vufMgtF0/VCCdCqIyC0D9WdioiF3A57UhFVp0lVE/HlIG4Ji0sQlqYVzZE+caaZ2VQxPZkGBJ8R23lMH0nL7LPb7v/rB0haEAFZQSUpNYQMQRucTN8ZFp/7045BFAVTBu0Qb5CcuD0tFXNJg3dXJ/mUfOrIbh46UIOHwZnq/WjAuo95JS/mY1k7b8FkIAC+uSMUbAjWgOl6GdyhSNbbBhh2vPGtFlT8WQ0d/A4zDzhXcgTHpjSYTigVo3gis7UNngRCyIUB3ojVDi2C/JcFvNJSMjYoFZqJiNTbkBAljT9OIutUY4nWnpuZxTsbfUdmXFOQKIHqRNJ6HRwPbS5Zhu9hfelj6hdy9f78cn8Np2kNtoTTG/EaHmjhBXVHfJ5Ga9sOxJufbljIZI85HxGKVZzsmPR7319STlUsH4An+CnrzOXlV/uCztjzmwVfBBwv1ZJKRc3M=test
