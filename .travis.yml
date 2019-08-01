@@ -17,6 +17,7 @@ cache: packages
 ## PARALLEL OS TEST SETTINGS
 # - This enables parallel testing of osx and linux on push to GitHub
 matrix:
+  include:
   ## LINUX SETTINGS
   - os: linux
     dist: xenial
@@ -24,11 +25,11 @@ matrix:
     addons:
       apt:
         update: true
-          packages:
-            - x11proto-xf86vidmode-dev
-            - tcl8.5-dev
-            - tk8.5-dev
-            - xvfb
+        packages:
+          - x11proto-xf86vidmode-dev
+          - tcl8.5-dev
+          - tk8.5-dev
+          - xvfb
     ## TESTING COMMANDS
     script:
       - R CMD build . --resave-data --compact-vignettes=gs+qpdf
