@@ -5,9 +5,8 @@
 # - Tests activate on push to GitHub
 ###########
 
-## CONFIGURE R VERSION
+## CONFIGURE PROGRAMMING LANGUAGE FOR TESTS 
 language: r
-r: bioc-devel
 
 ## R PACKAGE SETTINGS
 r_github_packages:
@@ -15,27 +14,30 @@ r_github_packages:
 cache: packages
 
 ## PARALLEL OS TEST SETTINGS
-# - This enables parallel testing of osx and linux on push to
+# - This enables parallel testing of osx and linux on push to GitHub
 matrix:
   include:
     ## LINUX SETTINGS
-    - os: linux
-    dist: xenial
-    addons:
-      apt:
-        update: true
-          packages:
-            - x11proto-xf86vidmode-dev
-            - tcl8.5-dev
-            - tk8.5-dev
-            - xvfb
-    ## TESTING COMMANDS
-    script:
-      - R CMD build . --resave-data --compact-vignettes=gs+qpdf
-      - travis_wait 30 xvfb-run R CMD check *.tar.gz # `xvfb-run` executes the command inside the xvfb virtual GUI to catch any renders
+    - r: bioc-devel 
+      os: linux
+      dist: xenial
+      ## APT PACKAGE SETTINGS
+      addons:
+        apt:
+          update: true
+            packages:
+              - x11proto-xf86vidmode-dev
+              - tcl8.5-dev
+              - tk8.5-dev
+              - xvfb
+      ## TESTING COMMANDS
+      script:
+        - R CMD build . --resave-data --compact-vignettes=gs+qpdf
+        - travis_wait 30 xvfb-run R CMD check *.tar.gz # `xvfb-run` executes the command inside the xvfb virtual GUI to catch any renders
 
     ## OSX SETTINGS
-    - os: osx
+    - r: bioc-devel 
+      os: osx
       osx_image: xcode11
       ## OSX HOMEBREW PACKAGES
       # - Dependencies for virtual GUI
