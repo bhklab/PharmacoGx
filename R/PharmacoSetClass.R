@@ -331,8 +331,8 @@ setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
 setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
 #' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet 
 #' @export
-setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="DataFrame"), function(object, mDataType, value){
-
+setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
+  ##TODO:: Fix the examples and unit tests so that they pass the correct type to this setter method
   if(mDataType %in% names(object@molecularProfiles)){
     colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
   }
@@ -553,6 +553,8 @@ setMethod(sensitivityMeasures, "PharmacoSet", function(pSet){
     return(colnames(sensitivityProfiles(pSet)))
     
 })
+
+##TODO:: Arrange slot accessors to be together!
 
 #' drugNames Generic
 #' 
@@ -1423,7 +1425,7 @@ checkPSetStructure <-
       nn <- names(pSet@molecularProfiles)[i]
       
       # Testing plot rendering for rna and rnaseq
-      if((Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq") & plotDist)
+      if((metadata(profile)$annotation == "rna" | metadata(profile)$annotation == "rnaseq") & plotDist)
       {
         pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
         hist(assays(profile)$exprs, breaks = 100)
