@@ -12,18 +12,19 @@
 #' respecitively as sensitivity and perturbation datasets.
 #' 
 #' @param pSet A \code{PharmacoSet} object
-#' @param mDataType A \code{character} with the type of molecular data to return/update
+#' @param mDataType A \code{character} with the type of molecular data to 
+#'   return/update
 #' @param object A \code{PharmacoSet} object
 #' @param value A replacement value
 #' 
 #' @slot annotation A \code{list} of annotation data about the PharmacoSet,
 #'    including the \code{$name} and the session information for how the object
 #'    was creating, detailing the exact versions of R and all the packages used
-#' @slot molecularProfiles A \code{list} containing 4 \code{Biobase::ExpressionSet} 
+#' @slot molecularProfiles A \code{list} containing 4 \code{SummarizedExperiment} 
 #'   type object for holding data for RNA, DNA, SNP and Copy Number Variation 
 #'   measurements respectively, with associated \code{fData} and \code{pData} 
 #'   containing the row and column metadata
-#' @slot cell A \code{data.frame} containg the annotations for all the cell 
+#' @slot cell A \code{data.frame} containing the annotations for all the cell 
 #'   lines profiled in the data set, across all data types
 #' @slot drug A \code{data.frame} containg the annotations for all the drugs 
 #'   profiled in the data set, across all data types
@@ -57,10 +58,11 @@
                                                      ))
 
 
-# The default constructor above does a poor job of explaining the required structure of a PharmacoSet. 
-# The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
-# and hides the annotation slot which the user does not need to manually fill. 
-# This also follows the design of the Expression Set class.
+# The default constructor above does a poor job of explaining the required 
+# structure of a PharmacoSet. The constructor function defined below guides the 
+# user into providing the required components of the curation and senstivity 
+# lists and hides the annotation slot which the user does not need to manually 
+# fill. This also follows the design of the Expression Set class.
 
 #' PharmacoSet constructor
 #' 
@@ -102,7 +104,8 @@
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
-PharmacoSet <-  function(name, 
+#' @importFrom SummarizedExperiment rowData colData assays assayNames
+PharmacoSet <-  function(name,
                           molecularProfiles=list(), 
                           cell=data.frame(), 
                           drug=data.frame(), 
@@ -115,7 +118,8 @@ PharmacoSet <-  function(name,
                           curationCell = data.frame(), 
                           curationTissue = data.frame(), 
                           datasetType=c("sensitivity", "perturbation", "both"),
-                          verify = TRUE)
+                          verify = TRUE
+                         )
 {
     datasetType <- match.arg(datasetType)
     
@@ -128,11 +132,14 @@ PharmacoSet <-  function(name,
     ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     for (i in seq_along(molecularProfiles)){
-        if (class(molecularProfiles[[i]]) != "ExpressionSet"){
-            stop(sprintf("Please provide the %s data as an ExpressionSet", names(molecularProfiles[i])))
+        if (class(molecularProfiles[[i]]) != "SummarizedExperiment"){
+            stop(sprintf("Please provide the %s data as a SummarizedExperiment", 
+                         names(molecularProfiles[i])))
         }else{
-      Biobase::fData(molecularProfiles[[i]]) <- Biobase::fData(molecularProfiles[[i]])[rownames(Biobase::exprs(molecularProfiles[[i]])), , drop=FALSE]
-      Biobase::pData(molecularProfiles[[i]]) <- Biobase::pData(molecularProfiles[[i]])[colnames(Biobase::exprs(molecularProfiles[[i]])), , drop=FALSE]
+      rowData(molecularProfiles[[i]]) <- 
+        rowData(molecularProfiles[[i]])[rownames(assays(molecularProfiles[[i]])$exprs), , drop=FALSE]
+      colData(molecularProfiles[[i]]) <- 
+        colData(molecularProfiles[[i]])[colnames(assays(molecularProfiles[[i]])$exprs), , drop=FALSE]
         }
     
     }
@@ -145,7 +152,8 @@ PharmacoSet <-  function(name,
     
     sensitivity <- list()
     
-    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])){
+    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & 
+             rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])){
         stop("Please ensure all the row names match between the sensitivity data.")
     }
     
@@ -164,13 +172,16 @@ PharmacoSet <-  function(name,
     perturbation <- list()
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
-        perturbation$info <- "The metadata for the perturbation experiments is available for each molecular type by calling the appropriate info function. \n For example, for RNA transcriptome perturbations, the metadata can be accessed using rnaInfo(pSet)."
+        perturbation$info <- "The metadata for the perturbation experiments is 
+          available for each molecular type by calling the appropriate info 
+          function. \n For example, for RNA transcriptome perturbations, 
+          the metadata can be accessed using rnaInfo(pSet)."
     } else {
         perturbation$info <- "Not a perturbation dataset."
     }
     
     pSet  <- .PharmacoSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), drug=as.data.frame(drug), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
-    if (verify) { checkPSetStructure(pSet)}
+    if (verify) { checkPSetStructure(pSet) }
   if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
     pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
   }
@@ -179,7 +190,6 @@ PharmacoSet <-  function(name,
     }
   return(pSet)
 }
-    
 
 #' cellInfo Generic
 #' 
@@ -320,7 +330,7 @@ setGeneric("molecularProfiles", function(pSet, mDataType) standardGeneric("molec
 setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
-    return(Biobase::exprs(pSet@molecularProfiles[[mDataType]]))}else{
+    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]]))}else{
       return(NULL)
     }
     
