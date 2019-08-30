@@ -19,11 +19,11 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
   eSets <- pSet@molecularProfiles # Extract eSet data
   
   pSet@molecularProfiles <- 
-    mclapply(eSets,
+    lapply(eSets,
            FUN=function(eSet){
              
              # Change rownames from probes to EnsemblGeneId
-             if (Biobase::annotation(eSet) == "rna") {
+             if (Biobase::annotation(eSet) == "rna" | Biobase::annotation(eSet) == "rna2" ) {
                rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
              }
              

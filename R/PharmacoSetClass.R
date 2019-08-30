@@ -439,7 +439,7 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
       S4Vectors::DataFrame(value, rownames = rownames(value))
   }
   object
-
+  
 })
 
 #####
