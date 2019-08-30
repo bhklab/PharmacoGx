@@ -64,6 +64,11 @@
 # lists and hides the annotation slot which the user does not need to manually 
 # fill. This also follows the design of the Expression Set class.
 
+
+#####
+# CONSTRUCTOR
+#####
+
 #' PharmacoSet constructor
 #' 
 #' A constructor that simplifies the process of creating PharmacoSets, as well 
@@ -191,6 +196,11 @@ PharmacoSet <-  function(name,
   return(pSet)
 }
 
+
+#####
+# CELL SLOT GETTERS/SETTERS
+#####
+
 #' cellInfo Generic
 #' 
 #' Generic for cellInfo method 
@@ -231,6 +241,12 @@ setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet",value="d
   object@cell <- value
   object
 })
+
+
+#####
+# DRUG SLOT GETTERS/SETTERS
+#####
+
 #' drugInfo Generic
 #' 
 #' Generic for drugInfo method 
@@ -256,17 +272,24 @@ setGeneric("drugInfo", function(pSet) standardGeneric("drugInfo"))
 #' @return Updated \code{PharmacoSet}
 setGeneric("drugInfo<-", function(object, value) standardGeneric("drugInfo<-"))
 #' @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
+#' 
 #' @export
+#' 
 setMethod(drugInfo, "PharmacoSet", function(pSet){
-
   pSet@drug
 })
 #' @describeIn PharmacoSet Update the drug annotations
+#' 
 #' @export
 setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
   object@drug <- value
   object
 })
+
+
+#####
+# MOLECULAR PROFILES SLOT GETTERS/SETTERS
+#####
 
 #' phenoInfo Generic
 #' 
@@ -284,33 +307,36 @@ setGeneric("phenoInfo", function(pSet, mDataType) standardGeneric("phenoInfo"))
 #' @export
 setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
     
-  if(mDataType %in% names(pSet@molecularProfiles)){
-    return(Biobase::pData(pSet@molecularProfiles[[mDataType]]))}else{
-      return(NULL)
-    }
-    
+  if(mDataType %in% names(pSet@molecularProfiles)){ # Columns = Samples
+    return(colData(pSet@molecularProfiles[[mDataType]]))
+  }else{
+    return(NULL)
+  }
 })
 
 #' phenoInfo<- Generic
 #' 
-#' Generic for phenoInfo replace method 
+#' Generic for phenoInfo replace method
 #' 
 #' @examples
-#' 
 #' data(CCLEsmall)
 #' phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
 #' 
 #' @param object The \code{PharmacoSet} to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data 
-#' @param value a \code{data.frame} with the new experiment annotations
+#' @param value a \code{DataFrame} with the new experiment annotations
+#' 
 #' @return The updated \code{PharmacoSet}
+#' 
 setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
-#' @describeIn PharmacoSet Update the the given type of molecular data experiment info in the PharmacoSet 
+#' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet 
 #' @export
-setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
+setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="DataFrame"), function(object, mDataType, value){
 
-  if(mDataType %in% names(object@molecularProfiles)){Biobase::pData(object@molecularProfiles[[mDataType]]) <- value}
-    object
+  if(mDataType %in% names(object@molecularProfiles)){
+    colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
+  }
+  object
 })
 
 #' molecularProfiles Generic
@@ -330,10 +356,12 @@ setGeneric("molecularProfiles", function(pSet, mDataType) standardGeneric("molec
 setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
-    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]]))}else{
-      return(NULL)
-    }
-    
+    ##NOTE:: This assumes only one assay will be stored per SummarizedExperiment, which may not be true
+    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]])$exprs)
+  }else{
+    return(NULL)
+  }
+
 })
 
 #' molecularProfiles<- Generic
@@ -354,9 +382,11 @@ setGeneric("molecularProfiles<-", function(object, mDataType, value) standardGen
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character",value="matrix"), function(object, mDataType, value){
 
   if (mDataType %in% names(object@molecularProfiles)) {
-    Biobase::exprs(object@molecularProfiles[[mDataType]]) <- value
+    ##TODO:: Assays is now a SimpleList from the S4Vectors class, we need to fix assignmet to reflect this
+    ##NOTE:: This does not update se.exprs?
+    SummarizedExperiment::assays(object@molecularProfiles[[mDataType]])$exprs <- value
   }
-    object
+  object
 })
 
 #' featureInfo Generic
@@ -371,13 +401,16 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
 #' @param mDataType the type of molecular data 
 #' @return a \code{data.frame} with the experiment info
 setGeneric("featureInfo", function(pSet, mDataType) standardGeneric("featureInfo"))
-#' @describeIn PharmacoSet Return the feature info for the given molecular data 
+#' @describeIn PharmacoSet Return the feature info for the given molecular data
+#' 
 #' @export
 setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
+  
   if(mDataType %in% names(pSet@molecularProfiles)){
-    return(Biobase::fData(pSet@molecularProfiles[[mDataType]]))}else{
-      return(NULL)
-    }
+    return(rowData(pSet@molecularProfiles[[mDataType]]))
+  }else{
+    return(NULL)
+  }
   
 })
 
@@ -392,16 +425,26 @@ setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
 #' @param object The \code{PharmacoSet} to replace gene annotations in
 #' @param mDataType The type of molecular data to be updated
 #' @param value A \code{data.frame} with the new feature annotations
+#' 
 #' @return Updated \code{PharmacoSet}
+#' 
 setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("featureInfo<-"))
 #' @describeIn PharmacoSet Replace the gene info for the molecular data
+#' 
 #' @export
 setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
   
-  if(mDataType %in% names(object@molecularProfiles)){Biobase::fData(object@molecularProfiles[[mDataType]]) <- value}
-  
+  if(mDataType %in% names(object@molecularProfiles)){
+    rowData(object@molecularProfiles[[mDataType]]) <- 
+      S4Vectors::DataFrame(value, rownames = rownames(value))
+  }
   object
+
 })
+
+#####
+# SENSITIVITY SLOT GETTERS/SETTERS
+#####
 
 #' sensitivityInfo Generic
 #' 
@@ -1353,46 +1396,70 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' 
 #' checkPSetStructure(CCLEsmall)
 #' 
 #' @param pSet A \code{PharmacoSet} to be verified
 #' @param plotDist Should the function also plot the distribution of molecular data?
 #' @param result.dir The path to the directory for saving the plots as a string
-#' @return Prints out messages whenever describing the errors found in the structure of the pset object passed in. 
-#' @export
+#' 
+#' @return Prints out messages whenever describing the errors found in the structure of the pset object passed in.
+#' 
 #' @importFrom graphics hist
 #' @importFrom grDevices dev.off pdf
-
+#' 
+#' @export
 checkPSetStructure <-
   function(pSet, plotDist=FALSE, result.dir=".") {
+    
+    # Make directory to store results if it doesn't exist
     if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
+    
+    #####
+    # Checking molecularProfiles
+    #####
+    # Can this be parallelized or does it mess with the order of printing warnings?
     for( i in 1:length(pSet@molecularProfiles)) {
       profile <- pSet@molecularProfiles[[i]]
       nn <- names(pSet@molecularProfiles)[i]
+      
+      # Testing plot rendering for rna and rnaseq
       if((Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq") & plotDist)
       {
         pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
-        hist(Biobase::exprs(profile), breaks = 100)
+        hist(assays(profile)$exprs, breaks = 100)
         dev.off()
       }
-      warning(ifelse(nrow(Biobase::fData(profile)) != nrow(Biobase::exprs(profile)), sprintf("%s: number of features in fData is different from expression slots", nn), sprintf("%s: fData dimension is OK", nn)))
-      warning(ifelse(nrow(Biobase::pData(profile)) != ncol(Biobase::exprs(profile)), sprintf("%s: number of cell lines in pData is different from expression slots", nn), sprintf("%s: pData dimension is OK", nn)))
-      warning(ifelse("cellid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: cellid does not exist in pData columns", nn)))
-      warning(ifelse("batchid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: batchid does not exist in pData columns", nn)))
-      if(Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq")
+      
+      
+      ## TODO:: Confirm the above and modify warnings accordingly
+      #warning(ifelse(nrow(rowData(profile)) != nrow(assays(profile)$exprs), sprintf("%s: number of features in fData is different from SummarizedExperiment slots", nn), sprintf("%s: rowData dimension is OK", nn)))
+      #warning(ifelse(nrow(Biobase::pData(profile)) != ncol(Biobase::exprs(profile)), sprintf("%s: number of cell lines in pData is different from expression slots", nn), sprintf("%s: colData dimension is OK", nn)))
+      
+      
+      # Checking sample metadata for required columns
+      warning(ifelse("cellid" %in% colnames(colData(profile)), "", sprintf("%s: cellid does not exist in colData (samples) columns", nn)))
+      warning(ifelse("batchid" %in% colnames(colData(profile)), "", sprintf("%s: batchid does not exist in colData (samples) columns", nn)))
+      
+      # Checking mDataType of the SummarizedExperiment for required columns
+      if(metadata(profile)$annotation == "rna" | metadata(profile)$annotation == "rnaseq")
       {
-        warning(ifelse("BEST" %in% colnames(Biobase::fData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in fData columns", nn)))
-        warning(ifelse("Symbol" %in% colnames(Biobase::fData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in fData columns", nn)))
+        warning(ifelse("BEST" %in% colnames(rowData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in rowData (features) columns", nn)))
+        warning(ifelse("Symbol" %in% colnames(rowData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in rowData (features) columns", nn)))
       }
-      if("cellid" %in% colnames(Biobase::pData(profile))) {
-        if(!all(Biobase::pData(profile)[,"cellid"] %in% rownames(pSet@cell))) {
+      
+      # 
+      if("cellid" %in% colnames(rowData(profile))) {
+        if(!all(colData(profile)[,"cellid"] %in% rownames(pSet@cell))) {
           warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
         }
       }else {
-        warning(sprintf("%s: cellid does not exist in pData", nn))
+        warning(sprintf("%s: cellid does not exist in colData (samples)", nn))
       }
     }
+    
+    #####
+    # Checking cell
+    #####
     if("tissueid" %in% colnames(pSet@cell)) {
       if("unique.tissueid" %in% colnames(pSet@curation$tissue))
       {

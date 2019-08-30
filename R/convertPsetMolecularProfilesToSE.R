@@ -11,7 +11,7 @@
 #' @importFrom PharmacoGx PharmacoSetClass
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom Biobase exprs fData pData annotation protocolData
-#' @improtFrom S4Vectors SimpleList
+#' @improtFrom S4Vectors SimpleList DataFrame
 #' 
 #' @export
 convertPsetMolecularProfilesToSE <- function(pSet) {
@@ -22,13 +22,13 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
     mclapply(eSets,
            FUN=function(eSet){
              
-             # Change rownames form probes to EnsembleGeneId
+             # Change rownames from probes to EnsemblGeneId
              if (Biobase::annotation(eSet) == "rna") {
-               rownames(eSet) <- fData(eSet)$EnsemblGeneId
+               rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
              }
              
              # Build summarized experiment from eSet
-             SE <- SummarizedExperiment(
+             SE <- SummarizedExperiment::SummarizedExperiment(
                # Convert to SimpleList class to meet SE requirements
                assays = S4Vectors::SimpleList(as.list(eSet@assayData)),
                # Switch rearrange columns so that IDs are first, probes second
