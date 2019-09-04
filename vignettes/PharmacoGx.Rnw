@@ -150,7 +150,7 @@ To begin, you would load the datasets from disk or download them using the \text
 We want to investigate the consistency of the data between the two datasets. The common intersection between the datasets can then be found using \textit{intersectPSet}. We create a summary of the gene expression and drug sensitivity measures for both datasets, so we are left with one gene expression profile and one sensitivity profile per cell line within each dataset. We can then compare the gene expression and sensitivity measures between the datasets using a standard correlation coefficient. 
 
 <<inconsistencies,eval=FALSE, include=FALSE>>=
-  library(Biobase)
+  library(SummarizedExperiment)
   library(PharmacoGx)
   data("GDSCsmall")
   data("CCLEsmall")

@@ -11,7 +11,8 @@ Suggests: xtable,
     testthat
 Encoding: UTF-8
 Imports: 
-    Biobase, 
+    Biobase,
+    SummarizedExperiment,
     piano, 
     magicaxis, 
     RColorBrewer, 
