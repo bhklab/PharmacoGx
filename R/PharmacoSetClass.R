@@ -334,7 +334,7 @@ setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("ph
 setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
   ##TODO:: Fix the examples and unit tests so that they pass the correct type to this setter method
   if(mDataType %in% names(object@molecularProfiles)){
-    colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
+    SummarizedExperiment::colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
   }
   object
 })
@@ -927,23 +927,25 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   }
   
     ### TODO:: implement strict subsetting at this level!!!!
+    ### TODO:: refactor this monstrosity of a function into helpers
   
     ### the function missing does not work as expected in the context below, because the arguments are passed to the anonymous
     ### function in lapply, so it does not recognize them as missing
   
-  pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset, cells, drugs, molecular.data.cells){
+  pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
-    molecular.data.type <- ifelse(length(grep("rna", Biobase::annotation(eset)) > 0), "rna", Biobase::annotation(eset))
+    ### TODO:: Figure out what this is supposed to check?
+    molecular.data.type <- ifelse(length(grep("rna", metadata(SE)$annotation) > 0), "rna", metadata(SE)$annotation)
     if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
       cells <- molecular.data.cells[[molecular.data.type]]
     }
       column_indices <- NULL
   
       if (length(cells)==0 && length(drugs)==0) {
-          column_indices <- 0:ncol(eset)
+          column_indices <- 0:ncol(SE) # This still returns the number of samples in an SE, but without a label
       }
       if(length(cells)==0 && pSet@datasetType=="sensitivity") {
-        column_indices <- 0:ncol(eset)
+        column_indices <- 0:ncol(SE) 
       }
   
       cell_line_index <- NULL
@@ -951,7 +953,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
         if (!all(cells %in% cellNames(pSet))) {
               stop("Some of the cell names passed to function did not match to names in the PharmacoSet. Please ensure you are using cell names as returned by the cellNames function")
         }
-          cell_line_index <- which(Biobase::pData(eset)[["cellid"]] %in% cells)
+          cell_line_index <- which(SummarizedExperiment::colData(SE)[["cellid"]] %in% cells)
         # if (length(na.omit(cell_line_index))==0){
     #       stop("No cell lines matched")
     #     }
@@ -962,12 +964,12 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
             if (!all(drugs %in% drugNames(pSet))){
                   stop("Some of the drug names passed to function did not match to names in the PharmacoSet. Please ensure you are using drug names as returned by the drugNames function")
             }
-          drugs_index <- which(Biobase::pData(eset)[["drugid"]] %in% drugs)
+          drugs_index <- which(SummarizedExperiment::colData(SE)[["drugid"]] %in% drugs)
           # if (length(drugs_index)==0){
     #         stop("No drugs matched")
     #       }
           if(keep.controls) {
-            control_indices <- which(Biobase::pData(eset)[["xptype"]]=="control")
+            control_indices <- which(SummarizedExperiment::colData(SE)[["xptype"]]=="control")
             drugs_index <- c(drugs_index, control_indices)
           }
         }
@@ -1042,11 +1044,11 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
 			drugs <- unique(sensitivityInfo(pSet)[["drugid"]])
 		}
 		if(pSet@datasetType == "perturbation" | pSet@datasetType == "both"){
-			drugs <- union(drugs, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["drugid"]])}))))
+			drugs <- union(drugs, na.omit(unionList(lapply(pSet@molecularProfiles, function(SE){unique(colData(SE)[["drugid"]])}))))
 		}
 	}
 	if (length(cells)==0) {
-		cells <- union(cells, na.omit(unionList(lapply(pSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["cellid"]])}))))
+		cells <- union(cells, na.omit(unionList(lapply(pSet@molecularProfiles, function(SE){unique(colData(SE)[["cellid"]])}))))
         if (pSet@datasetType =="sensitivity" | pSet@datasetType == "both"){
             cells <- union(cells, sensitivityInfo(pSet)[["cellid"]])
         }
@@ -1078,11 +1080,11 @@ updateCellId <- function(pSet, new.ids = vector("character")){
   }
   
   
-  pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset){
+  pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE){
           
-      myx <- match(Biobase::pData(eset)[["cellid"]],rownames(cellInfo(pSet)))
-      Biobase::pData(eset)[["cellid"]]  <- new.ids[myx]
-      return(eset)
+      myx <- match(SummarizedExperiment::colData(SE)[["cellid"]],rownames(cellInfo(pSet)))
+      SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
+      return(SE)
         })
 
 
@@ -1222,11 +1224,11 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 
   }
   if(pSet@datasetType=="perturbation"|pSet@datasetType=="both"){
-    pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(eset){
+    pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE){
 
-      myx <- match(Biobase::pData(eset)[["drugid"]],rownames(drugInfo(pSet)))
-      Biobase::pData(eset)[["drugid"]]  <- new.ids[myx]
-      return(eset)
+      myx <- match(SummarizedExperiment::colData(SE)[["drugid"]],rownames(drugInfo(pSet)))
+      SummarizedExperiment::colData(SE)[["drugid"]]  <- new.ids[myx]
+      return(SE)
     })
   }
   
@@ -1380,8 +1382,8 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(pSet@molecularProfiles)), dimnames=list(celln, drugn, names((pSet@molecularProfiles))))
 
     for (i in 1:length(pSet@molecularProfiles)) {
-      if (nrow(Biobase::pData(pSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(Biobase::pData(pSet@molecularProfiles[[i]]))))) {
-      tt <- table(Biobase::pData(pSet@molecularProfiles[[i]])[ , "cellid"], Biobase::pData(pSet@molecularProfiles[[i]])[ , "drugid"])
+      if (nrow(Biobase::pData(pSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(SummarizedExperiment::colData(pSet@molecularProfiles[[i]]))))) {
+      tt <- table(SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "cellid"], SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "drugid"])
         perturbation.info[rownames(tt), colnames(tt), names(pSet@molecularProfiles)[i]] <- tt
       }
     }
