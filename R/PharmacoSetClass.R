@@ -989,10 +989,10 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
       }
       }
   
-      row_indices <- 0:nrow(Biobase::exprs(eset))
+      row_indices <- 0:nrow(assays(SE)$exprs)
   
-      eset <- eset[row_indices,column_indices]
-      return(eset)
+      SE <- SE[row_indices,column_indices]
+      return(SE)
 
   }, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells)  
   
