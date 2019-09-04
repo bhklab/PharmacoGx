@@ -107,7 +107,7 @@ drugSensitivitySig <- function(pSet,
   if (!(mDataType %in% names(pSet@molecularProfiles))) {
     stop (sprintf("Invalid mDataType for %s, choose among: %s", pSet@annotation$name, paste(names(pSet@molecularProfiles), collapse=", ")))
   }
-  switch (Biobase::annotation(pSet@molecularProfiles[[mDataType]]),
+  switch (S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation,
     "mutation" = {
       if (!is.element(molecular.summary.stat, c("or", "and"))) {
         stop ("Molecular summary statistic for mutation must be either 'or' or 'and'")
@@ -136,7 +136,7 @@ drugSensitivitySig <- function(pSet,
       if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
         stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
     }},
-    stop (sprintf("No summary statistic for %s has been implemented yet", Biobase::annotation(pSet@molecularProfiles[[mDataType]])))
+    stop (sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation))
   )
   
   if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {

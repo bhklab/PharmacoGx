@@ -77,10 +77,10 @@ summarizeMolecularProfiles <- function(pSet,
   summary.stat <- match.arg(summary.stat)
   binarize.direction <- match.arg(binarize.direction)
   
-  if((!Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
+  if((!S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
     stop ("Invalid summary.stat, choose among: mean, median, first, last" )
   }
-  if((Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("mutation","fusion")) & (!summary.stat %in% c("and", "or"))) {
+  if((S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("and", "or"))) {
     stop ("Invalid summary.stat, choose among: and, or" )
   }
   
@@ -91,7 +91,7 @@ summarizeMolecularProfiles <- function(pSet,
   dd <- molecularProfiles(pSet, mDataType)
   pp <- phenoInfo(pSet, mDataType)
   
-  if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) == "mutation") {
+  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation == "mutation") {
     tt <- dd
     tt[which(!is.na(dd) & dd =="wt")] <- FALSE
     tt[which(!is.na(dd) & dd !="wt")] <- TRUE
@@ -99,7 +99,7 @@ summarizeMolecularProfiles <- function(pSet,
     dimnames(tt) <- dimnames(dd)
     dd <- tt
   }
-  if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) == "fusion") {
+  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation == "fusion") {
     tt <- dd
     tt[which(!is.na(dd) & dd =="0")] <- FALSE
     tt[which(!is.na(dd) & dd !="0")] <- TRUE
@@ -107,7 +107,7 @@ summarizeMolecularProfiles <- function(pSet,
     dimnames(tt) <- dimnames(dd)
     dd <- tt
   }
-  if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("cnv", "rna", "rnaseq", "isoform") 
+  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("cnv", "rna", "rnaseq", "isoform") 
      && !is.na(binarize.threshold)) {
     tt <- dd
     switch(binarize.direction, "less" = {
@@ -201,7 +201,7 @@ summarizeMolecularProfiles <- function(pSet,
   pp2 <- pp2[cell.lines, , drop=FALSE]
   pp2[ , "cellid"] <- cell.lines
   res <- pSet@molecularProfiles[[mDataType]]
-  if(Biobase::annotation(pSet@molecularProfiles[[mDataType]]) %in% c("mutation", "fusion")) {
+  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation", "fusion")) {
     tt <- dd2
     tt[which(!is.na(dd2) & dd2)] <- "1"
     tt[which(!is.na(dd2) & !dd2)] <- "0"

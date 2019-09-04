@@ -56,7 +56,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread
   }
   if (mDataType %in% names(pSet@molecularProfiles)) {
     #eset <- pSet@molecularProfiles[[mDataType]]
-		if(Biobase::annotation(pSet@molecularProfiles[[mDataType]])!="rna"){
+		if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation != "rna"){
 			stop(sprintf("Only rna data type perturbations are currently implemented"))
 		}
   } else {
