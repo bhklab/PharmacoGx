@@ -12,6 +12,7 @@ Suggests: xtable,
 Encoding: UTF-8
 Imports: 
     Biobase,
+    S4Vectors,
     SummarizedExperiment,
     piano, 
     magicaxis, 

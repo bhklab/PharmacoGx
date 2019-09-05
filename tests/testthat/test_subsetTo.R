@@ -8,4 +8,3 @@ test_that("Intersection result did not change since last time", {
 	CMAPsmaller <- subsetTo(CMAPsmall, drugs=drugNames(CMAPsmall), cells=cellNames(CMAPsmall))
 	expect_equal(CMAPsmaller, CMAPsmall)
 })
-
