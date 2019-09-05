@@ -36,7 +36,8 @@
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
 #' @importFrom utils setTxtProgressBar txtProgressBar
-#' @importFrom Biobase ExpressionSet exprs pData AnnotatedDataFrame assayDataElement assayDataElement<- fData<-
+#' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- colData colData<- assays assays<-
+#' @importFrom Biobase AnnotatedDataFrame
 #' @export
 
 ##TODO:: Add features parameter
@@ -207,16 +208,16 @@ summarizeMolecularProfiles <- function(pSet,
     tt[which(!is.na(dd2) & !dd2)] <- "0"
     dd2 <- tt
   }
-  res <- ExpressionSet(dd2)
+  res <- SummarizedExperiment::SummarizedExperiment(dd2)
   #Biobase::exprs(res) <- dd2
-  pp2 <- as.data.frame(pp2, stringsAsFactors=FALSE)
+  pp2 <- S4Vectors::DataFrame(pp2, row.names=rownames(pp2))
   pp2$tissueid <- cellInfo(pSet)[pp2$cellid, "tissueid"]
-  Biobase::pData(res) <- pp2
-  Biobase::fData(res) <- featureInfo(pSet, mDataType)
+  SummarizedExperiment::colData(res) <- pp2
+  SummarizedExperiment::rowData(res) <- featureInfo(pSet, mDataType)
   #Biobase::exprs(res) <- Biobase::exprs(res)[features,]
   #Biobase::fData(res) <- Biobase::fData(res)[features,]
   res <- res[features,]
-  Biobase::protocolData(res) <- Biobase::AnnotatedDataFrame()
-  if(!is.null(assayDataElement(res, "se.exprs"))) assayDataElement(res,"se.exprs") <- NULL
+  S4Vectors::metadata(res) <- S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])
+  if(!is.null(SummarizedExperiment::assays(res)$exprs)) SummarizedExperiment::assays(res)$se.exprs <- NULL
   return(res)
 }

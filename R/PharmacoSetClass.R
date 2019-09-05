@@ -935,7 +935,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
     ### TODO:: Figure out what this is supposed to check?
-    molecular.data.type <- ifelse(length(grep("rna", metadata(SE)$annotation) > 0), "rna", metadata(SE)$annotation)
+    molecular.data.type <- ifelse(length(grep("rna", S4Vectors::metadata(SE)$annotation) > 0), "rna", S4Vectors::metadata(SE)$annotation)
     if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
       cells <- molecular.data.cells[[molecular.data.type]]
     }
@@ -989,7 +989,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
       }
       }
   
-      row_indices <- 0:nrow(assays(SE)$exprs)
+      row_indices <- 0:nrow(SummarizedExperiment::assays(SE)$exprs)
   
       SE <- SE[row_indices,column_indices]
       return(SE)
