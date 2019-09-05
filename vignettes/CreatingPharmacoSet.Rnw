@@ -126,7 +126,7 @@ The molecular profiles slot of a PharmacoSet object contains all the molecular e
 
 First of all, each ExpressionSet object must be labelled with the type of data included within the object. Currently only \texttt{mutation}, \texttt{fusion}, and \texttt{rna} molecular data types are recognized and handled differently by summarizing and signature generating functions. This labelling is done by calling, for example:
 << eval=FALSE >>=
-Biobase::annotation(eset) <- "rna"
+S4Vectors::metadata(SE)$annotation <- "rna"
 @
 
 The phenoData in each expression set object also needs to contain specific columns labelling each experiment. For sensitivity type datasets, this has to include:  \\
