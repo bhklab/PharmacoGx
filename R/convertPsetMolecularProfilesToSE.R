@@ -24,9 +24,9 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
            FUN=function(eSet){
              
              # Change rownames from probes to EnsemblGeneId
-             if (grepl("^rna$", Biobase::annotation(eSet))) {
-               rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
-             }
+             #if (grepl("^rna$", Biobase::annotation(eSet))) {
+             #  rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
+             #}
              
              # Build summarized experiment from eSet
              SE <- SummarizedExperiment::SummarizedExperiment(

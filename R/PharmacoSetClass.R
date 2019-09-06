@@ -936,7 +936,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
     
     ### TODO:: Figure out what this is supposed to check?
     molecular.data.type <- ifelse(grepl("rna", S4Vectors::metadata(SE)$annotation), "rna", S4Vectors::metadata(SE)$annotation)
-    if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
+    if (grepl(molecular.data.type, names(molecular.data.cells))) {
       cells <- molecular.data.cells[[molecular.data.type]]
     }
       column_indices <- NULL
@@ -1082,7 +1082,7 @@ updateCellId <- function(pSet, new.ids = vector("character")){
   
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE){
           
-      myx <- match(SummarizedExperiment::colData(SE)[["cellid"]],rownames(cellInfo(pSet)))
+      myx <- match(SummarizedExperiment::colData(SE)[["cellid"]], rownames(cellInfo(pSet)))
       SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
       return(SE)
         })
