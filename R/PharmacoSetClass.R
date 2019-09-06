@@ -935,17 +935,17 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
     ### TODO:: Figure out what this is supposed to check?
-    molecular.data.type <- ifelse(length(grep("rna", S4Vectors::metadata(SE)$annotation) > 0), "rna", S4Vectors::metadata(SE)$annotation)
+    molecular.data.type <- ifelse(grepl("rna", S4Vectors::metadata(SE)$annotation), "rna", S4Vectors::metadata(SE)$annotation)
     if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
       cells <- molecular.data.cells[[molecular.data.type]]
     }
       column_indices <- NULL
   
       if (length(cells)==0 && length(drugs)==0) {
-          column_indices <- 0:ncol(SE) # This still returns the number of samples in an SE, but without a label
+          column_indices <- seq_len(ncol(SE)) # This still returns the number of samples in an SE, but without a label
       }
       if(length(cells)==0 && pSet@datasetType=="sensitivity") {
-        column_indices <- 0:ncol(SE) 
+        column_indices <- seq_len(ncol(SE))
       }
   
       cell_line_index <- NULL
@@ -989,9 +989,9 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
       }
       }
   
-      row_indices <- seq_len(nrow(SummarizedExperiment::assays(SE)[[1]]))
+      row_indices <- seq_len(nrow(SummarizedExperiment::assay(SE, 1)))
   
-      SE <- SE[row_indices,column_indices]
+      SE <- SE[row_indices, column_indices]
       return(SE)
 
   }, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells)  
