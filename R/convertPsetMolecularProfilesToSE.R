@@ -19,18 +19,19 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
   eSets <- pSet@molecularProfiles # Extract eSet data
   
   pSet@molecularProfiles <- 
+    #parallel::mc
     lapply(eSets,
            FUN=function(eSet){
              
              # Change rownames from probes to EnsemblGeneId
-             if (Biobase::annotation(eSet) == "rna"  ) {
+             if (grepl("rna.*", Biobase::annotation(eSet))) {
                rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
              }
              
              # Build summarized experiment from eSet
              SE <- SummarizedExperiment::SummarizedExperiment(
                # Convert to SimpleList class to meet SE requirements
-               assays = S4Vectors::SimpleList(as.list(eSet@assayData)),
+               assays = S4Vectors::SimpleList(Biobase::exprs(eSet)),
                # Switch rearrange columns so that IDs are first, probes second
                rowData = S4Vectors::DataFrame(Biobase::fData(eSet),
                                               rownames=rownames(eSet) 

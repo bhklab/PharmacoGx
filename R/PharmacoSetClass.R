@@ -989,7 +989,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
       }
       }
   
-      row_indices <- 0:nrow(SummarizedExperiment::assays(SE)$exprs)
+      row_indices <- seq_len(nrow(SummarizedExperiment::assays(SE)[[1]]))
   
       SE <- SE[row_indices,column_indices]
       return(SE)
