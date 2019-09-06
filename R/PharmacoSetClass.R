@@ -142,9 +142,9 @@ PharmacoSet <-  function(name,
                          names(molecularProfiles[i])))
         }else{
       rowData(molecularProfiles[[i]]) <- 
-        rowData(molecularProfiles[[i]])[rownames(assays(molecularProfiles[[i]])$exprs), , drop=FALSE]
+        rowData(molecularProfiles[[i]])[rownames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE]
       colData(molecularProfiles[[i]]) <- 
-        colData(molecularProfiles[[i]])[colnames(assays(molecularProfiles[[i]])$exprs), , drop=FALSE]
+        colData(molecularProfiles[[i]])[colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE]
         }
     
     }
@@ -357,7 +357,7 @@ setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
     ##NOTE:: This assumes only one assay will be stored per SummarizedExperiment, which may not be true
-    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]])$exprs)
+    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]])[[1]])
   }else{
     return(NULL)
   }
@@ -384,7 +384,7 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
   if (mDataType %in% names(object@molecularProfiles)) {
     ##TODO:: Assays is now a SimpleList from the S4Vectors class, we need to fix assignmet to reflect this
     ##NOTE:: This does not update se.exprs?
-    SummarizedExperiment::assays(object@molecularProfiles[[mDataType]])$exprs <- value
+    SummarizedExperiment::assays(object@molecularProfiles[[mDataType]])[[1]] <- value
   }
   object
 })
@@ -1430,7 +1430,7 @@ checkPSetStructure <-
       if((metadata(profile)$annotation == "rna" | metadata(profile)$annotation == "rnaseq") & plotDist)
       {
         pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
-        hist(assays(profile)$exprs, breaks = 100)
+        hist(assays(profile)[[1]], breaks = 100)
         dev.off()
       }
       

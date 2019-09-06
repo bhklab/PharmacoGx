@@ -13,25 +13,25 @@ test_that("Summarize Molecular Profiles fails gracefully.",{
 test_that("Summarize Molecular Profiles function outputs data with right dimensions and dimnames, class", {
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna")
   expect_equal(colnames(testSummary), cellNames(GDSCsmall))
-  expect_equivalent(class(testSummary), "ExpressionSet")
+  expect_equivalent(class(testSummary), "SummarizedExperiment")
   expect_length(rownames(testSummary), 300)
 })
 
 test_that("Summarize Molecular Profiles correctly summarizes replicates", {
-  myx <- "647-V" == Biobase::pData(GDSCsmall@molecularProfiles$rna)$cellid
-  testCells <- Biobase::exprs(GDSCsmall@molecularProfiles$rna)[,myx]
+  myx <- "647-V" == colData(GDSCsmall@molecularProfiles$rna)$cellid
+  testCells <- SummarizedExperiment::assays(GDSCsmall@molecularProfiles$rna)[[1]][,myx]
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna", summary.stat = "median")
-  expect_equal(Biobase::exprs(testSummary)[,"647-V"], apply(testCells, 1, median))
+  expect_equal(SummarizedExperiment::assays(testSummary)[[1]][,"647-V"], apply(testCells, 1, median))
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna", summary.stat = "mean")
-  expect_equal(Biobase::exprs(testSummary)[,"647-V"], apply(testCells, 1, mean))
+  expect_equal(SummarizedExperiment::assays(testSummary)[[1]][,"647-V"], apply(testCells, 1, mean))
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna", summary.stat = "first")
-  expect_equal(Biobase::exprs(testSummary)[,"647-V"], testCells[,1])
+  expect_equal(SummarizedExperiment::assays(testSummary)[[1]][,"647-V"], testCells[,1])
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna", summary.stat = "last")
-  expect_equal(Biobase::exprs(testSummary)[,"647-V"], testCells[,-1])
+  expect_equal(SummarizedExperiment::assays(testSummary)[[1]][,"647-V"], testCells[,-1])
   
   GDSCsmall2 <- subsetTo(GDSCsmall, cells = c("22RV1", "23132-87"))
-  Biobase::pData(GDSCsmall2@molecularProfiles$mutation)$cellid <- "22RV1"
-  testCells <- Biobase::exprs(GDSCsmall2@molecularProfiles$mutation)
+  colData(GDSCsmall2@molecularProfiles$mutation)$cellid <- "22RV1"
+  testCells <- assays(GDSCsmall2@molecularProfiles$mutation)[[1]]
   
   testSummary <- summarizeMolecularProfiles(GDSCsmall2, "mutation", summary.stat = "or")
   expect_equal(sum(as.numeric(exprs(testSummary)), na.rm=TRUE), 2)

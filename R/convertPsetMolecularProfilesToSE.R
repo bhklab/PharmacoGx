@@ -19,8 +19,7 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
   eSets <- pSet@molecularProfiles # Extract eSet data
   
   pSet@molecularProfiles <- 
-    #parallel::mc
-    lapply(eSets,
+    parallel::mclapply(eSets,
            FUN=function(eSet){
              
              # Change rownames from probes to EnsemblGeneId

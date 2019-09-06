@@ -218,6 +218,7 @@ summarizeMolecularProfiles <- function(pSet,
   #Biobase::fData(res) <- Biobase::fData(res)[features,]
   res <- res[features,]
   S4Vectors::metadata(res) <- S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])
-  if(!is.null(SummarizedExperiment::assays(res)$exprs)) SummarizedExperiment::assays(res)$se.exprs <- NULL
+  ####NOTE:: Removed se.exprs from assays in conversion to SE
+  #if(!is.null(SummarizedExperiment::assays(res)$exprs)) SummarizedExperiment::assays(res)$se.exprs <- NULL
   return(res)
 }
