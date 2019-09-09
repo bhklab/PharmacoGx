@@ -97,7 +97,8 @@
 
 \item{value}{A replacement value}
 
-\item{mDataType}{A \code{character} with the type of molecular data to return/update}
+\item{mDataType}{A \code{character} with the type of molecular data to 
+return/update}
 }
 \value{
 An object of the PharmacoSet class
@@ -126,7 +127,7 @@ respecitively as sensitivity and perturbation datasets.
 
 \item \code{phenoInfo}: Return the experiment info from the given type of molecular data in PharmacoSet
 
-\item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the PharmacoSet
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the PharmacoSet
 
 \item \code{molecularProfiles}: Return the given type of molecular data from the PharmacoSet
 
@@ -185,12 +186,12 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{Biobase::ExpressionSet} 
+\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{SummarizedExperiment} 
 type object for holding data for RNA, DNA, SNP and Copy Number Variation 
 measurements respectively, with associated \code{fData} and \code{pData} 
 containing the row and column metadata}
 
-\item{\code{cell}}{A \code{data.frame} containg the annotations for all the cell 
+\item{\code{cell}}{A \code{data.frame} containing the annotations for all the cell 
 lines profiled in the data set, across all data types}
 
 \item{\code{drug}}{A \code{data.frame} containg the annotations for all the drugs 

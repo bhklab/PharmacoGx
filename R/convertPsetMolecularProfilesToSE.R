@@ -8,10 +8,9 @@
 #' @return \code{S4} A PharmacoSet containing molecular data in a SummarizedExperiments
 #' 
 #' @importFrom parallel mclapply
-#' @importFrom PharmacoGx PharmacoSetClass
-#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom SummarizedExperiment SummarizedExperiment Assays
 #' @importFrom Biobase exprs fData pData annotation protocolData
-#' @improtFrom S4Vectors SimpleList DataFrame
+#' @importFrom S4Vectors SimpleList DataFrame
 #' 
 #' @export
 convertPsetMolecularProfilesToSE <- function(pSet) {
@@ -23,21 +22,22 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
     lapply(eSets,
            FUN=function(eSet){
              
-             # Change rownames from probes to EnsemblGeneId
-             #if (grepl("^rna$", Biobase::annotation(eSet))) {
-             #  rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
-             #}
+             # Change rownames from probes to EnsemblGeneId for rna data type
+             if (grepl("^rna$", Biobase::annotation(eSet))) {
+               rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
+             }
              
              # Build summarized experiment from eSet
              SE <- SummarizedExperiment::SummarizedExperiment(
                # Convert to SimpleList class to meet SE requirements
-               assays = S4Vectors::SimpleList(Biobase::exprs(eSet)),
+               assays = SummarizedExperiment::Assays(S4Vectors::SimpleList(as.matrix(eSet@assayData$exprs))
+                                              ),
                # Switch rearrange columns so that IDs are first, probes second
                rowData = S4Vectors::DataFrame(Biobase::fData(eSet),
-                                              rownames=rownames(eSet) 
+                                              rownames=rownames(Biobase::fData(eSet)) 
                                               ),
                colData = S4Vectors::DataFrame(Biobase::pData(eSet),
-                                              rownames=colnames(eSet)
+                                              rownames=rownames(Biobase::pData(eSet))
                                               ),
                metadata = list("experimentData" = eSet@experimentData, 
                                "annotation" = Biobase::annotation(eSet), 
