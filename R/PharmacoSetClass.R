@@ -934,12 +934,12 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
-    ### TODO:: Figure out what this is supposed to check?
     molecular.data.type <- ifelse(grepl("rna", S4Vectors::metadata(SE)$annotation), "rna", S4Vectors::metadata(SE)$annotation)
-    if (grepl(molecular.data.type, names(molecular.data.cells))) {
-      cells <- molecular.data.cells[[molecular.data.type]]
-    }
-      column_indices <- NULL
+      if ( !is.null(molecular.data.cells) && grepl(molecular.data.type, names(molecular.data.cells)) ) {
+        cells <- molecular.data.cells[[molecular.data.type]]
+      }
+  
+        column_indices <- NULL
   
       if (length(cells)==0 && length(drugs)==0) {
           column_indices <- seq_len(ncol(SE)) # This still returns the number of samples in an SE, but without a label
