@@ -105,11 +105,14 @@
 #' @param verify \code{boolean} Should the function verify the PharmacoSet and
 #'   print out any errors it finds after construction?
 #' @return An object of class PharmacoSet
-#' @export
+#
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
-#' @importFrom SummarizedExperiment rowData colData assays assayNames
+#' @importFrom SummarizedExperiment rowData colData assays assayNames Assays
+#' @importFrom S4Vectors DataFrame SimpleList
+#' 
+#' @export
 PharmacoSet <-  function(name,
                           molecularProfiles=list(), 
                           cell=data.frame(), 
@@ -136,6 +139,7 @@ PharmacoSet <-  function(name,
     
     ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
+    ## TODO:: Determine if I should use SummarizedExperiment construtor here?
     for (i in seq_along(molecularProfiles)){
         if (class(molecularProfiles[[i]]) != "SummarizedExperiment"){
             stop(sprintf("Please provide the %s data as a SummarizedExperiment", 
@@ -880,7 +884,7 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' data(CCLEsmall)
 #' CCLEdrugs  <- drugNames(CCLEsmall)
 #' CCLEcells <- cellNames(CCLEsmall)
-#' PSet <- subsetTo(CCLEsmall,drugs = CCLEdrugs[1], cells = CCLEcells[1])
+#' PSet <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
 #' PSet
 #' 
 #' @param pSet A \code{PharmacoSet} to be subsetted
@@ -935,9 +939,11 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
     molecular.data.type <- ifelse(grepl("rna", S4Vectors::metadata(SE)$annotation), "rna", S4Vectors::metadata(SE)$annotation)
-      if ( !is.null(molecular.data.cells) && grepl(molecular.data.type, names(molecular.data.cells)) ) {
+    if( !is.null(names(molecular.data.cells)) ) {  
+      if( grepl(molecular.data.type, names(molecular.data.cells)) ) {
         cells <- molecular.data.cells[[molecular.data.type]]
       }
+    }
   
         column_indices <- NULL
   

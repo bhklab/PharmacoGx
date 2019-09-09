@@ -119,7 +119,7 @@ We have made the PharmacoSet objects of the curated datasets available for downl
 
 <<download-example, results=hide,eval=FALSE>>=
 ## Example
-availablePSets()
+# availablePSets()
 GDSC <- downloadPSet("GDSC") 
 @
 %------------------------------------------------------------
@@ -199,7 +199,7 @@ We want to investigate the consistency of the data between the two datasets. The
   ge.cor <- sapply(cc, function (x, d1, d2) {
     return (stats::cor(d1[ , x], d2[ , x], method="spearman",
                 use="pairwise.complete.obs"))
-  }, d1=exprs(GDSCexpression), d2=exprs(CCLEexpression))
+  }, d1=assay(GDSCexpression, 1), d2=assay(CCLEexpression, 1))
   ic50.cor <- sapply(cc, function (x, d1, d2) {
     return (stats::cor(d1[, x], d2[ , x], method="spearman",
                 use="pairwise.complete.obs"))
