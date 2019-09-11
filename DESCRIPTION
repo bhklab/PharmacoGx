@@ -7,7 +7,9 @@ Author: Petr Smirnov, Zhaleh Safikhani, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
-Suggests: xtable,
+Suggests: pander,
+    rmarkdown,
+    knitr,
     testthat
 Encoding: UTF-8
 Imports: 

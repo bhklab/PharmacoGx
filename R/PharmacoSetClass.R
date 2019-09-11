@@ -109,8 +109,8 @@
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
-#' @importFrom SummarizedExperiment rowData colData assays assayNames Assays
-#' @importFrom S4Vectors DataFrame SimpleList
+#' @importFrom SummarizedExperiment rowData colData assay assays assayNames Assays
+#' @importFrom S4Vectors DataFrame SimpleList metadata
 #' 
 #' @export
 PharmacoSet <-  function(name,
@@ -428,7 +428,7 @@ setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @param object The \code{PharmacoSet} to replace gene annotations in
 #' @param mDataType The type of molecular data to be updated
-#' @param value A \code{data.frame} with the new feature annotations
+#' @param value A \code{DataFrame} with the new feature annotations
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
@@ -436,7 +436,7 @@ setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("
 #' @describeIn PharmacoSet Replace the gene info for the molecular data
 #' 
 #' @export
-setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
+setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
   
   if(mDataType %in% names(object@molecularProfiles)){
     rowData(object@molecularProfiles[[mDataType]]) <- 
@@ -459,7 +459,7 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
 #' sensitivityInfo(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve sensitivity experiment annotations from
-#' @return a \code{data.frame} with the experiment info
+#' @return a \code{DataFrame} with the experiment info
 setGeneric("sensitivityInfo", function(pSet) standardGeneric("sensitivityInfo"))
 #' @describeIn PharmacoSet Return the drug dose sensitivity experiment info
 #' @export
@@ -479,7 +479,7 @@ setMethod(sensitivityInfo, "PharmacoSet", function(pSet){
 #' sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to update
-#' @param value A \code{data.frame} with the new sensitivity annotations
+#' @param value A \code{DataFrame} with the new sensitivity annotations
 #' @return Updated \code{PharmacoSet} 
 setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
 #' @describeIn PharmacoSet Update the sensitivity experiment info
@@ -1433,7 +1433,7 @@ checkPSetStructure <-
       nn <- names(pSet@molecularProfiles)[i]
       
       # Testing plot rendering for rna and rnaseq
-      if((metadata(profile)$annotation == "rna" | metadata(profile)$annotation == "rnaseq") & plotDist)
+      if((S4Vectors::metadata(profile)$annotation == "rna" | S4Vectors::metadata(profile)$annotation == "rnaseq") & plotDist)
       {
         pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
         hist(assays(profile)[[1]], breaks = 100)
@@ -1451,13 +1451,13 @@ checkPSetStructure <-
       warning(ifelse("batchid" %in% colnames(colData(profile)), "", sprintf("%s: batchid does not exist in colData (samples) columns", nn)))
       
       # Checking mDataType of the SummarizedExperiment for required columns
-      if(metadata(profile)$annotation == "rna" | metadata(profile)$annotation == "rnaseq")
+      if(S4Vectors::metadata(profile)$annotation == "rna" | S4Vectors::metadata(profile)$annotation == "rnaseq")
       {
         warning(ifelse("BEST" %in% colnames(rowData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in rowData (features) columns", nn)))
         warning(ifelse("Symbol" %in% colnames(rowData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in rowData (features) columns", nn)))
       }
       
-      # 
+      # Check that all cellids from the PSet are included in molecularProfiles
       if("cellid" %in% colnames(rowData(profile))) {
         if(!all(colData(profile)[,"cellid"] %in% rownames(pSet@cell))) {
           warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))

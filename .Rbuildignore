@@ -5,3 +5,5 @@
 .travis.yml
 codecover.R
 ^appveyor\.yml$
+.RData
+^PSets.*$

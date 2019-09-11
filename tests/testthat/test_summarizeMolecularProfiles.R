@@ -1,4 +1,6 @@
 library(PharmacoGx)
+library(SummarizedExperiment)
+library(S4Vectors)
 
 context("Checking summarizeMolecularProfiles function.")
 
@@ -31,7 +33,7 @@ test_that("Summarize Molecular Profiles correctly summarizes replicates", {
   
   GDSCsmall2 <- subsetTo(GDSCsmall, cells = c("22RV1", "23132-87"))
   colData(GDSCsmall2@molecularProfiles$mutation)$cellid <- "22RV1"
-  testCells <- assay(GDSCsmall2@molecularProfiles$mutation, 1)
+  testCells <- SummarizedExperiment::assay(GDSCsmall2@molecularProfiles$mutation, 1)
   
   testSummary <- summarizeMolecularProfiles(GDSCsmall2, "mutation", summary.stat = "or")
   expect_equal(sum(as.numeric(SummarizedExperiment::assay(testSummary, 1)), na.rm=TRUE), 2)

@@ -30,7 +30,12 @@
 #'   and cell lines that have been tested on together?
 #' @param verbose [boolean] Should the function announce its key steps?
 #' @param nthread [numeric] The number of cores to use to run intersection on concentrations
+#' 
 #' @return [list] a list of pSets, contatining only the intersection
+#' 
+#' @importFrom S4Vectors metadata
+#' @importFrom SummarizedExperiment colData
+#' 
 #' @export
 #' 
 intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentrations"), cells, drugs, strictIntersect=FALSE, verbose=TRUE, nthread=1) {
@@ -166,7 +171,7 @@ intersectPSet <- function (pSets, intersectOn=c("drugs", "cell.lines", "concentr
                                                                              return(unionList(sapply(SEs, 
                                                                                                      function(SE) {
                                                                                                        if (length(grep(molecular.type, S4Vectors::metadata(pSet@molecularProfiles[[SE]])$annotation)) > 0) {
-                                                                                                         intersect(S4Vectors::colData(pSet@molecularProfiles[[SE]])$cellid, common.cells)
+                                                                                                         intersect(SummarizedExperiment::colData(pSet@molecularProfiles[[SE]])$cellid, common.cells)
                                                                                                        }
                                                                                                      })))
                                                                            }))

@@ -3,7 +3,7 @@
 #' Converts all ExpressionSet objects within the molecularProfiles slot of a 
 #'   PharmacoSet to SummarizedExperiments
 #'
-#' @param \code{S4} A PharmacoSet containing molecular data in ExpressionSets
+#' @param pSet \code{S4} A PharmacoSet containing molecular data in ExpressionSets
 #'
 #' @return \code{S4} A PharmacoSet containing molecular data in a SummarizedExperiments
 #' 
