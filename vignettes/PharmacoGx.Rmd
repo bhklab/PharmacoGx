@@ -28,7 +28,7 @@ output:
     fig_caption: yes
     fig_width: 7
     fig_height: 7
-    keep_tex: yes
+    keep_tex: no
     number_sections: no
     template: manuscript.latex
 
@@ -46,6 +46,12 @@ spacing: singlespacing
 footerdate: no
 bibliography: 
   - pharmacogx.bib
+  
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[UTF-8]{inputenc}
+  %\VignetteIndexEntry{PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets}
 
 ---
 

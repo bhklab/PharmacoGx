@@ -1,5 +1,5 @@
 ---
-title: 'PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets'
+title: 'Creating a PharmacoSet Object'
 
 author:  
 - name: Petr Smirnov
@@ -28,7 +28,7 @@ output:
     fig_caption: yes
     fig_width: 7
     fig_height: 7
-    keep_tex: yes
+    keep_tex: no
     number_sections: yes
     template: manuscript.latex
 
@@ -44,6 +44,12 @@ geometry: margin=1in
 fontsize: 11pt
 spacing: singlespacing
 footerdate: no
+
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[UTF-8]{inputenc}
+  %\VignetteIndexEntry{Creating a PharmacoSet Object}
 
 ---
 
