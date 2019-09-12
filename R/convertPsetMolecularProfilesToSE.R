@@ -30,7 +30,7 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
              # Build summarized experiment from eSet
              SE <- SummarizedExperiment::SummarizedExperiment(
                # Convert to SimpleList class to meet SE requirements
-               assays = SummarizedExperiment::Assays(S4Vectors::SimpleList(as.matrix(eSet@assayData$exprs))
+               assays = S4Vectors::SimpleList(eSet@assayData$exprs
                                               ),
                # Switch rearrange columns so that IDs are first, probes second
                rowData = S4Vectors::DataFrame(Biobase::fData(eSet),

@@ -324,7 +324,7 @@ For this case study, we will recreate an analysis from the paper by Lamb et al.,
 in which a known signature for HDAC inhibitors [@glaser_gene_2003] is used to 
 recover drugs in the CMAP dataset that are also known HDAC inhibitors. For this 
 example, the package includes this signature, already mapped to the gene level, 
-and it can be loaded by calling `data(HDAC_genes)`.
+and it can be loaded by calling `data(HDAC\_genes)`.
 
 Once again, we load the dataset, downloading it if needed using `downloadPSet`
 . We then recreate drug signatures for each drug using the function 
@@ -380,8 +380,8 @@ measure cell viability after applications of varying concentrations of drug.
 Additionally, these measures are recomputed for every *sensitivity*
 `PharmacoSet` we create and included alongside any measures published
 with the original data. The AUC measures originally published are labelled as 
-*auc_published, while the recomputed measures are labelled as 
-*auc_recomputed*, and likewise for the IC50.
+*auc\_published*, while the recomputed measures are labelled as 
+*auc\_recomputed*, and likewise for the IC50.
 
 While the *PharmacoSets* already contain the recomputed data, the AUC and
 IC50 can be calculated for arbitrary data using the *computeIC50* and 

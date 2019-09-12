@@ -8,10 +8,41 @@
 ##' 
 ##' @return [string] Any slots which are not the same
 ##' 
-##' @importFrom 
+##' @importFrom testthat expect_equal context
 ##' 
 ##' @export
 ##' 
-#validatePsetMolecularProfilesToSEConversion <- function() {
-  
-#}
+#
+#validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) 
+#{
+#  test_that::context("Checking pSet names are unchanged.") {
+#    expect_equal(pSet_old@names, pSet_new@annotation)
+#    
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#  
+#  test_that::context("Checking cellInfo is unchanged.") {
+#    testthat::expect_equal()
+#  }
+#}#

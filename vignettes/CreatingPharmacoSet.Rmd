@@ -244,7 +244,7 @@ one of doses and one of viabilities at each dose.
 `profiles` This is a data.frame containing down the rows, with **exactly** 
 matching rownames, the experiments as labelled in the `info` data.frame, and 
 each column being a summary of the drug dose sensitivity, such as
-`auc_published` or `ic50_published`, as published with the data.
+`auc\_published` or `ic50\_published`, as published with the data.
 
 `n` This is a `matrix` containing cellids matching exactly the rownames of the 
 cell slot of the PSet down the rows, and drugids matching exactly the rownames 

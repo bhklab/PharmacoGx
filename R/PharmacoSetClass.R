@@ -328,17 +328,24 @@ setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @param object The \code{PharmacoSet} to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data 
-#' @param value a \code{DataFrame} with the new experiment annotations
+#' @param value a \code{dataframe}  with the new experiment annotations
 #' 
 #' @return The updated \code{PharmacoSet}
 #' 
 setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
 #' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet 
 #' @export
-setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
-  ##TODO:: Fix the examples and unit tests so that they pass the correct type to this setter method
+setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="data.frame"), function(object, mDataType, value){
   if(mDataType %in% names(object@molecularProfiles)){
     SummarizedExperiment::colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
+  }
+  object
+})
+#' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet
+#' @export 
+setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
+  if(mDataType %in% names(object@molecularProfiles)){
+    SummarizedExperiment::colData(object@molecularProfiles[[mDataType]]) <- value
   }
   object
 })
@@ -938,11 +945,9 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   
   pSet@molecularProfiles <- lapply(pSet@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
     
-    molecular.data.type <- ifelse(grepl("rna", S4Vectors::metadata(SE)$annotation), "rna", S4Vectors::metadata(SE)$annotation)
-    if( !is.null(names(molecular.data.cells)) ) {  
-      if( grepl(molecular.data.type, names(molecular.data.cells)) ) {
-        cells <- molecular.data.cells[[molecular.data.type]]
-      }
+    molecular.data.type <- ifelse(length(grep("rna", S4Vectors::metadata(SE)$annotation) > 0), "rna", S4Vectors::metadata(SE)$annotation)
+    if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
+      cells <- molecular.data.cells[[molecular.data.type]]
     }
   
         column_indices <- NULL
@@ -1065,10 +1070,10 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
 	pSet@curation$cell <- pSet@curation$cell[cells , , drop=drop]
 	pSet@curation$tissue <- pSet@curation$tissue[cells , , drop=drop]
 	if (pSet@datasetType == "sensitivity" | pSet@datasetType == "both"  & length(exps) == 0) {
-	  pSet@sensitivity$n <- pSet@sensitivity$n[cells, drugs , drop=drop]
+	  pSet@sensitivity$n <- pSet@sensitivity$n[cells, drugs, drop=drop]
 	}
 	if (pSet@datasetType == "perturbation" | pSet@datasetType == "both") {
-	    pSet@perturbation$n <- pSet@perturbation$n[cells,drugs, , drop=drop]
+	  pSet@perturbation$n <- pSet@perturbation$n[cells, drugs, , drop=drop]
     }
       return(pSet)
 }
@@ -1308,6 +1313,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 
 .summarizeSensitivityNumbers <- function(pSet) {
 
+  assign("PSet_sumSenNum", pSet, envir = .GlobalEnv)
   if (pSet@datasetType != "sensitivity" && pSet@datasetType != "both") {
     stop ("Data type must be either sensitivity or both")
   }
