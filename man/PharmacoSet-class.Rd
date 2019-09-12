@@ -10,10 +10,11 @@
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{phenoInfo,PharmacoSet-method}
 \alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
+\alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{molecularProfiles,PharmacoSet-method}
 \alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
 \alias{featureInfo,PharmacoSet-method}
-\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
+\alias{featureInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{sensitivityInfo,PharmacoSet-method}
 \alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
@@ -46,6 +47,9 @@
 \S4method{phenoInfo}{PharmacoSet,character,data.frame}(object,
   mDataType) <- value
 
+\S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object,
+  mDataType) <- value
+
 \S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
 
 \S4method{molecularProfiles}{PharmacoSet,character,matrix}(object,
@@ -53,7 +57,7 @@
 
 \S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{featureInfo}{PharmacoSet,character,data.frame}(object,
+\S4method{featureInfo}{PharmacoSet,character,DataFrame}(object,
   mDataType) <- value
 
 \S4method{sensitivityInfo}{PharmacoSet}(pSet)
@@ -126,6 +130,8 @@ respecitively as sensitivity and perturbation datasets.
 \item \code{drugInfo<-}: Update the drug annotations
 
 \item \code{phenoInfo}: Return the experiment info from the given type of molecular data in PharmacoSet
+
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the PharmacoSet
 
 \item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the PharmacoSet
 

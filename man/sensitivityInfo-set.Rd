@@ -9,7 +9,7 @@ sensitivityInfo(object) <- value
 \arguments{
 \item{object}{The \code{PharmacoSet} to update}
 
-\item{value}{A \code{data.frame} with the new sensitivity annotations}
+\item{value}{A \code{DataFrame} with the new sensitivity annotations}
 }
 \value{
 Updated \code{PharmacoSet}

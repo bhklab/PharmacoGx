@@ -7,7 +7,7 @@
 convertPsetMolecularProfilesToSE(pSet)
 }
 \arguments{
-\item{\code{S4}}{A PharmacoSet containing molecular data in ExpressionSets}
+\item{pSet}{\code{S4} A PharmacoSet containing molecular data in ExpressionSets}
 }
 \value{
 \code{S4} A PharmacoSet containing molecular data in a SummarizedExperiments

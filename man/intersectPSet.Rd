@@ -44,8 +44,7 @@ PharmacoSet object's internal curation slot
 \examples{
 data(GDSCsmall)
 data(CCLEsmall)
-common <- intersectPSet(list('GDSC'=GDSCsmall,
-  'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
+common <- intersectPSet(list('GDSC'=GDSCsmall,'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines") )
 common$CGP
 common$CCLE
 

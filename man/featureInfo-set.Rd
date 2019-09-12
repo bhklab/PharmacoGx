@@ -11,7 +11,7 @@ featureInfo(object, mDataType) <- value
 
 \item{mDataType}{The type of molecular data to be updated}
 
-\item{value}{A \code{data.frame} with the new feature annotations}
+\item{value}{A \code{DataFrame} with the new feature annotations}
 }
 \value{
 Updated \code{PharmacoSet}

@@ -42,7 +42,7 @@ to keep track of all the metadata conventions between different datasets.
 data(CCLEsmall)
 CCLEdrugs  <- drugNames(CCLEsmall)
 CCLEcells <- cellNames(CCLEsmall)
-PSet <- subsetTo(CCLEsmall,drugs = CCLEdrugs[1], cells = CCLEcells[1])
+PSet <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
 PSet
 
 }

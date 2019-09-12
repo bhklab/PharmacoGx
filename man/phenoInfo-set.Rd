@@ -11,7 +11,7 @@ phenoInfo(object, mDataType) <- value
 
 \item{mDataType}{the type of molecular data}
 
-\item{value}{a \code{DataFrame} with the new experiment annotations}
+\item{value}{a \code{dataframe}  with the new experiment annotations}
 }
 \value{
 The updated \code{PharmacoSet}

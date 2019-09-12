@@ -10,7 +10,7 @@ sensitivityInfo(pSet)
 \item{pSet}{The \code{PharmacoSet} to retrieve sensitivity experiment annotations from}
 }
 \value{
-a \code{data.frame} with the experiment info
+a \code{DataFrame} with the experiment info
 }
 \description{
 Generic for sensitivityInfo method
