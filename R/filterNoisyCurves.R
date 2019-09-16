@@ -60,8 +60,8 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
     if(trunc) {
         xx <- pmin(xx, 100)
     }
-    tt <- t(combn(1:length(xx), 2 , simplify = TRUE))
+    tt <- t(combn(seq_len(length(xx)), 2 , simplify = TRUE))
     tt <- tt[which(((tt[,2] - tt[,1]) >= 2) == TRUE),]
-    cum.sum <- unlist(lapply(1:nrow(tt), function(x){xx[tt[x,2]]-xx[tt[x,1]]}))
+    cum.sum <- unlist(lapply(seq_len(nrow(tt)), function(x){xx[tt[x,2]]-xx[tt[x,1]]}))
     return(max(cum.sum))
 }

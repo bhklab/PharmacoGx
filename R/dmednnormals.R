@@ -1,7 +1,7 @@
 
 .multinom<-function(x, y) {
   coeff <- 1
-  for (i in 1:length(y)) {
+  for (i in seq_len(length(y))) {
     coeff <- coeff * choose(x, y[i])
     x <- x - y[i]
   }
@@ -10,7 +10,7 @@
 
 .rmednnormals = function(N, n, scale) {
   x <- matrix(NA, nrow = 1, ncol = N)
-  for (i in 1:N) {
+  for (i in seq_len(N)) {
     x[i] <- median(rnorm(n, sd = scale))
   }
   return(x)

@@ -262,7 +262,7 @@ drugSensitivitySig <- function(pSet,
       dim = c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]),
         length(res), ncol(res[[1]])),
       dimnames = list(rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), colnames(res[[1]])))
-    for(j in 1:ncol(res[[1]])) {
+    for(j in seq_len(ncol(res[[1]]))) {
       ttt <- sapply(res, function(x, j, k) {
         xx <- array(NA, dim = length(k), dimnames = list(k))
         xx[rownames(x)] <- x[ , j, drop=FALSE]

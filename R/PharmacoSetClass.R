@@ -1393,7 +1393,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   
   perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(pSet@molecularProfiles)), dimnames=list(celln, drugn, names((pSet@molecularProfiles))))
 
-    for (i in 1:length(pSet@molecularProfiles)) {
+    for (i in seq_len(length(pSet@molecularProfiles))) {
       if (nrow(Biobase::pData(pSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(SummarizedExperiment::colData(pSet@molecularProfiles[[i]]))))) {
       tt <- table(SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "cellid"], SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "drugid"])
         perturbation.info[rownames(tt), colnames(tt), names(pSet@molecularProfiles)[i]] <- tt
@@ -1434,7 +1434,7 @@ checkPSetStructure <-
     # Checking molecularProfiles
     #####
     # Can this be parallelized or does it mess with the order of printing warnings?
-    for( i in 1:length(pSet@molecularProfiles)) {
+    for( i in seq_len(length(pSet@molecularProfiles))) {
       profile <- pSet@molecularProfiles[[i]]
       nn <- names(pSet@molecularProfiles)[i]
       

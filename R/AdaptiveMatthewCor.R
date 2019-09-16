@@ -33,7 +33,7 @@ amcc <-
       x2 <- rank(-x[ccix], ties.method="first")
       y2 <- rank(-y[ccix], ties.method="first")
       ## compute mcc for each rank
-      iix <- 1:(min(max(x2), max(y2)) - 1)
+      iix <- seq_len((min(max(x2), max(y2)) - 1))
       if (step.prct > 0) {
         iix <- round(quantile(iix, probs=seq(0, 1, by=step.prct)))
       }
@@ -51,7 +51,7 @@ amcc <-
       mm <- do.call(rbind, mcres)
       mode(mm) <- "numeric"
       ## remove extreme indices
-      rmix <- c(1:(min.cat - 1), (nrow(mm) - min.cat + 2):nrow(mm))
+      rmix <- c(seq_len((min.cat - 1)), (nrow(mm) - min.cat + 2):nrow(mm))
       mccix <- max(which(mm[-rmix, "estimate", drop=FALSE] == max(mm[-rmix, "estimate", drop=FALSE], na.rm=TRUE))) + (min.cat - 1)
       ## compute significance only for the AMCC
       x3 <- factor(ifelse (x2 <= mccix, "1", "0"))

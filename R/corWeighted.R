@@ -60,8 +60,8 @@ function (x, y, w, method=c("pearson", "spearman"), alternative=c("two.sided", "
     mcres <- parallel::mclapply(splitix, function(x, xx, yy, ww) {
       pres <- sapply(x, function(x, xx, yy, ww) {
         ## permute the data and the weights
-        d2 <- cbind(xx[sample(1:length(xx))], yy[sample(1:length(yy))])
-        w2 <- ww[sample(1:length(ww))]
+        d2 <- cbind(xx[sample(seq_len(length(xx)))], yy[sample(1:length(yy))])
+        w2 <- ww[sample(seq_len(length(ww)))]
         return(wcor(d=d2, w=w2))
       }, xx=xx, yy=yy, ww=ww)
       return(pres)

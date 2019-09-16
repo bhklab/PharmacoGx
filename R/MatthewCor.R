@@ -58,30 +58,30 @@ mcc <-
     diag(myx) <- FALSE
     if(sum(ct[myx]) == 0) { return(1) }
     myperf <- 0
-    for(k in 1:nbcat) {
-      for(m in 1:nbcat) {
+    for(k in seq_len(nbcat)) {
+      for(m in seq_len(nbcat)) {
         for(l in 1:nbcat) {
           myperf <- myperf + ((ct[k, k] * ct[m, l]) - (ct[l, k] * ct[k, m]))
         }
       }
     }
     aa <- 0
-    for(k in 1:nbcat) {
+    for(k in seq_len(nbcat)) {
       cc <- 0
-      for(l in 1:nbcat) { cc <- cc + ct[l, k] }
+      for(l in seq_len(nbcat)) { cc <- cc + ct[l, k] }
       dd <- 0
       for(f in 1:nbcat) {
-        for(g in 1:nbcat) { if(f != k) { dd <- dd + ct[g, f] } }
+        for(g in seq_len(nbcat)) { if(f != k) { dd <- dd + ct[g, f] } }
       }
       aa <- aa + (cc * dd)
     }
     bb <- 0
-    for(k in 1:nbcat) {
+    for(k in seq_len(nbcat)) {
       cc <- 0
-      for(l in 1:nbcat) { cc <- cc + ct[k, l] }
+      for(l in seq_len(nbcat)) { cc <- cc + ct[k, l] }
       dd <- 0
-      for(f in 1:nbcat) {
-        for(g in 1:nbcat) { if(f != k) { dd <- dd + ct[f, g] } }
+      for(f in seq_len(nbcat)) {
+        for(g in seq_len(nbcat)) { if(f != k) { dd <- dd + ct[f, g] } }
       }
       bb <- bb + (cc * dd)
     }

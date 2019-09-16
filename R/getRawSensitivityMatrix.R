@@ -23,7 +23,7 @@ getRawSensitivityMatrix <-
     
     sensitivity.raw.matrix <- list()
     if(length(exp.id) > 0) {
-      for(i in 1:length(exp.id)){
+      for(i in seq_len(length(exp.id))){
         if(length(grep("///", drug.id)) > 0) {
           all.exp.id <- which(pSet@sensitivity$info$combination.exp.id == pSet@sensitivity$info[exp.id[i], "combination.exp.id"])
           drug.1 <- which(pSet@sensitivity$info[all.exp.id, "drugid"] == unlist(strsplit(drug.id, split="///"))[1])
@@ -32,10 +32,10 @@ getRawSensitivityMatrix <-
           drug.2.doses <- length(which(!is.na(pSet@sensitivity$raw[all.exp.id[drug.2], , "Dose"])))
           
           tt <- matrix(NA, ncol=drug.2.doses, nrow=drug.1.doses)
-          colnames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.2], 1:drug.2.doses, "Dose"]
-          rownames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.1], 1:drug.1.doses, "Dose"]
-          tt[ ,1] <- pSet@sensitivity$raw[all.exp.id[drug.1], 1:drug.1.doses, "Viability"]
-          tt[1, ] <- pSet@sensitivity$raw[all.exp.id[drug.2], 1:drug.2.doses, "Viability"]
+          colnames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.2], seq_len(drug.2.doses), "Dose"]
+          rownames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.1], seq_len(drug.1.doses), "Dose"]
+          tt[ ,1] <- pSet@sensitivity$raw[all.exp.id[drug.1], seq_len(drug.1.doses), "Viability"]
+          tt[1, ] <- pSet@sensitivity$raw[all.exp.id[drug.2], seq_len(drug.2.doses), "Viability"]
           tt[2:nrow(tt), 2:ncol(tt)] <- pSet@sensitivity$raw[exp.id[i], , "Viability"]
           sensitivity.raw.matrix[[rownames(pSet@sensitivity$info)[exp.id[i]]]] <- tt
         }else{

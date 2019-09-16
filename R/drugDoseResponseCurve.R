@@ -139,9 +139,9 @@ function(drug,
         stop("The number of concentration and viability vectors passed in differs")
       }
       if(is.null(names(concentrations))){
-        names(concentrations) <- paste("Exp", 1:length(concentrations))
+        names(concentrations) <- paste("Exp", seq_len(length(concentrations)))
       }
-      for(i in 1:length(concentrations)){
+      for(i in seq_len(length(concentrations))){
 
         if (mode(concentrations[[i]]) == "numeric") {
           if(mode(viabilities[[i]])!="numeric"){
@@ -172,7 +172,7 @@ function(drug,
 
   doses <- list(); responses <- list(); legend.values <- list(); j <- 0; pSetNames <- list()
   if(!missing(pSets)){
-    for(i in 1:length(pSets)) {
+    for(i in seq_len(length(pSets))) {
       exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"cellid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"drugid"] == drug)
       if(length(exp_i) > 0) {
         if (summarize.replicates) {
@@ -188,7 +188,7 @@ function(drug,
           }
           doses[[i]] <- drug.responses$Dose
           responses[[i]] <- drug.responses$Viability
-          names(doses[[i]]) <- names(responses[[i]]) <- 1:length(doses[[i]])
+          names(doses[[i]]) <- names(responses[[i]]) <- seq_len(length(doses[[i]]))
           if (!missing(legends.label)) {
             if (length(legends.label) > 1) {
               legend.values[[i]] <- paste(unlist(lapply(legends.label, function(x){
@@ -210,7 +210,7 @@ function(drug,
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
             doses[[j]] <- drug.responses$Dose
             responses[[j]] <- drug.responses$Viability
-            names(doses[[j]]) <- names(responses[[j]]) <- 1:length(doses[[j]])
+            names(doses[[j]]) <- names(responses[[j]]) <- seq_len(length(doses[[j]]))
             if (!missing(legends.label)) {
               if (length(legends.label) > 1) {
                 legend.values[[j]] <- paste(unlist(lapply(legends.label, function(x){
@@ -238,7 +238,7 @@ function(drug,
 
   if(!missing(concentrations)){
     doses2 <- list(); responses2 <- list(); legend.values2 <- list(); j <- 0; pSetNames2 <- list();
-    for (i in 1:length(concentrations)){
+    for (i in seq_len(length(concentrations))){
       doses2[[i]] <- concentrations[[i]]
       responses2[[i]] <- viabilities[[i]]
       if(length(legends.label)>0){
@@ -266,7 +266,7 @@ function(drug,
 
   dose.range <- c(10^100 , 0)
   viability.range <- c(0 , 10)
-  for(i in 1:length(doses)) {
+  for(i in seq_len(length(doses))) {
     dose.range <- c(min(dose.range[1], min(doses[[i]], na.rm=TRUE), na.rm=TRUE), max(dose.range[2], max(doses[[i]], na.rm=TRUE), na.rm=TRUE))
     viability.range <- c(0, max(viability.range[2], max(responses[[i]], na.rm=TRUE), na.rm=TRUE))
   }
@@ -275,7 +275,7 @@ function(drug,
   if(length(doses) > 1) {
     common.ranges <- .getCommonConcentrationRange(doses)
 
-    for(i in 1:length(doses)) {
+    for(i in seq_len(length(doses))) {
       x1 <- min(x1, min(common.ranges[[i]]))
       x2 <- max(x2, max(common.ranges[[i]]))
     }
@@ -295,14 +295,14 @@ function(drug,
     
   }
   plot(NA, xlab="Concentration (uM)", ylab="% Viability", axes =FALSE, main=title, log="x", ylim=viability.range, xlim=dose.range, cex=cex, cex.main=cex.main)
-  magicaxis::magaxis(side=1:2, frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
+  magicaxis::magaxis(side=seq_len(2), frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
   legends <- NULL
   legends.col <- NULL
   if (length(doses) > 1) {
     rect(xleft=x1, xright=x2, ybottom=viability.range[1] , ytop=viability.range[2] , col=rgb(240, 240, 240, maxColorValue = 255), border=FALSE)
   }
 
-  for (i in 1:length(doses)) {
+  for (i in seq_len(length(doses))) {
     points(doses[[i]],responses[[i]],pch=20,col = mycol[i], cex=cex)
 
     switch(plot.type , "Actual"={
@@ -322,7 +322,7 @@ function(drug,
   }
   if (common.range.star) {
     if (length(doses) > 1) {
-      for (i in 1:length(doses)) {
+      for (i in seq_len(length(doses))) {
         points(common.ranges[[i]], responses[[i]][names(common.ranges[[i]])], pch=8, col=mycol[i])
       }
     }

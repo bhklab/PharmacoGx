@@ -16,7 +16,7 @@
       trunc <- FALSE
     }
     
-    for(i in 1:nrow(exps)) {
+    for(i in seq_len(nrow(exps))) {
       ranges <- list()
       for (study in names(pSets)) {
         ranges[[study]] <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i,study], ,"Dose"])
@@ -124,14 +124,14 @@
 {
   min.dose <- 0
   max.dose <- 10^100
-  for(i in 1:length(doses))
+  for(i in seq_len(length(doses)))
   {
     min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
     max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
   }
   
   common.ranges <- list()
-  for(i in 1:length(doses))
+  for(i in seq_len(length(doses)))
   {
     common.ranges[[i]] <- doses[[i]][
       which.min(abs(as.numeric(doses[[i]])-min.dose)):max(

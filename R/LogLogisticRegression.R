@@ -242,7 +242,7 @@ logLogisticRegression <- function(conc,
       neighbours[5, 3] <- pmin(neighbours[5, 3] + span * step[3], upper_bounds[3])
       neighbours[6, 3] <- pmax(neighbours[6, 3] - span * step[3], lower_bounds[3])
       
-      for (i in 1:nrow(neighbours)) {
+      for (i in seq_len(nrow(neighbours))) {
         neighbour_residuals[i] <- .residual(log_conc,
                                             viability,
                                             pars = neighbours[i, ],
