@@ -56,7 +56,7 @@ matrix:
 
 # POST TEST COMMANDS
 after_success:
-- travis_wait 30 Rscript -e 'library(covr);codecov()' # Calculating code coverage
+- travis_wait 30 Rscript -e 'library(covr);codecov(type="all")' # Calculating code coverage
 
 
 ## NOTIFICATION SETTINGS
