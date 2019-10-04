@@ -40,7 +40,7 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
         info = "The assay data is not equivalent"
       )
     }
-
+    ## TODO:: Rewrite this as an apply statement
     for (i in seq_len(length(pSet_old@molecularProfiles))) { # Have to compare like this due to NAs in data
       # Checking phenoData
       testthat::expect_true(
@@ -51,7 +51,7 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
           na.rm = TRUE),
         info = "The phenoData is not equivalent",
       )
-      #
+      # Chechking featureData
       testthat::expect_true(
         all(
           as(pSet_old@molecularProfiles[[i]]@featureData, "data.frame") == 
@@ -60,7 +60,7 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
           na.rm = TRUE),
         info = "The featureData is not equivalent",
       )
-      # 
+      # Checking protocolData
       testthat::expect_true(
         all(
           as(pSet_old@molecularProfiles[[i]]@protocolData, "data.frame") ==
@@ -118,12 +118,5 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   testthat::test_that("Checking pSet@curation slot is unchanged.", {
     testthat::expect_equal(pSet_old@curation, pSet_new@curation)
   })
-  
-  ## Testing accessor functions for pSet slots
-  #print("Testing that accessor functions return the same")
-  #
-  #testthat::test_that(""
-  #  
-  #)
   
 }
