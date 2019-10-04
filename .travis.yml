@@ -12,7 +12,6 @@ r: bioc-release
 ## R PACKAGE SETTINGS
 r_github_packages:
 - jimhester/covr # Add the covr package to calculate code coverage for your tests
-cache: packages
 
 ## PARALLEL OS TEST SETTINGS
 # - This enables parallel testing of osx and linux on push to GitHub
