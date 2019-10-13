@@ -180,7 +180,7 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
 }
   
   
-  if (class(rr0) != "try-error" && class(rr1) != "try-error" & class(rr0) != "character" && class(rr1) != "character") {
+  if (!is(rr0,"try-error") && !is(rr1, "try-error") & !is(rr, "character") && !is(rr1, "character")) {
     rr <- summary(rr1)
 
     if(any(unlist(lapply(drugpheno,is.factor)))){

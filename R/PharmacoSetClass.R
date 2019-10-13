@@ -128,7 +128,7 @@ PharmacoSet <-  function(name,
     ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     for (i in seq_along(molecularProfiles)){
-        if (class(molecularProfiles[[i]]) != "ExpressionSet"){
+        if (!is(molecularProfiles[[i]], "ExpressionSet")) {
             stop(sprintf("Please provide the %s data as an ExpressionSet", names(molecularProfiles[i])))
         }else{
       Biobase::fData(molecularProfiles[[i]]) <- Biobase::fData(molecularProfiles[[i]])[rownames(Biobase::exprs(molecularProfiles[[i]])), , drop=FALSE]
@@ -136,10 +136,10 @@ PharmacoSet <-  function(name,
         }
     
     }
-    #if (class(cell)!="data.frame"){
+    #if (!is(cell, "data.frame")){
     #    stop("Please provide the cell line annotations as a data frame.")
     #}
-    #if (class(drug)!="data.frame"){
+    #if (is(drug)!="data.frame")){
     #    stop("Please provide the drug annotations as a data frame.")
     #}
     
@@ -849,7 +849,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
   	exps <- adArgs[["exps"]]
-  	if(class(exps)=="data.frame"){
+  	if(is(exps, "data.frame")){
   		exps2 <- exps[[pSetName(pSet)]]
   		names(exps2) <- rownames(exps)
   		exps <- exps2
@@ -1442,15 +1442,15 @@ checkPSetStructure <-
       print("rownames of curation drug slot should be the same as drug slot (curated drug ids)")
     }
     
-    if(class(pSet@cell) != "data.frame") {
+    if(!is(pSet@cell, "data.frame")) {
       warning("cell slot class type should be dataframe")
     }
-    if(class(pSet@drug) != "data.frame") {
+    if(!is(pSet@drug, "data.frame")) {
       warning("drug slot class type should be dataframe")
     }
     if(pSet@datasetType %in% c("sensitivity", "both"))
     {
-      if(class(pSet@sensitivity$info) != "data.frame") {
+      if(!is(pSet@sensitivity$info, "data.frame")) {
         warning("sensitivity info slot class type should be dataframe")
       }
       if("cellid" %in% colnames(pSet@sensitivity$info)) {
