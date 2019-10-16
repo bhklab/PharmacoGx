@@ -1,0 +1,455 @@
+Hmm ... looks like a package
+
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2019-10-01>
+(./Rd2.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2019/08/27 v1.4j Standard LaTeX document class
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/longtable.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/bm.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/alltt.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/verbatim.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/url/url.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/textcomp.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.dfu)))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/keyval.tex)))
+)) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics/color.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def
+))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-hyper
+ref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-gener
+ic.sty))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/auxhook.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/latexconfig/hyperref.cf
+g))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/rerunfilecheck
+.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/makeidx.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+No file Rd2.aux.
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/gettitlestri
+ng.sty))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ot1zi4.fd)
+
+LaTeX Font Warning: Font shape `OML/zi4/m/n' undefined
+(Font)              using `OML/cmm/m/it' instead
+(Font)              for symbol `textless' on input line 22.
+
+[1{/Users/erinbrooks/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.m
+ap}] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11]
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+[12]
+Overfull \hbox (9.66258pt too wide) in paragraph at lines 707--712
+[]\OT1/cmr/m/n/10 [string] in-di-cates the al-ter-na-tive hy-poth-e-sis and mus
+t be one of `"two.sided"',
+[13]
+Overfull \hbox (7.58696pt too wide) in paragraph at lines 791--796
+\OT1/cmr/m/n/10 com-puted by the \OT1/zi4/m/n/10 drugPerturbationSig \OT1/cmr/m
+/n/10 func-tion, for the avail-able per-tur-ba-tion \OT1/zi4/m/n/10 PharmacoSet
+s\OT1/cmr/m/n/10 .
+[14] [15] [16]
+Overfull \hbox (47.13498pt too wide) in paragraph at lines 929--934
+\OT1/cmr/m/n/10 bi-na-tion of ic50[]published, auc[]published, auc[]recomputed 
+and auc[]recomputed[]star.
+[17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27]
+Underfull \hbox (badness 1325) in paragraph at lines 1598--1598
+[]\OT1/cmr/m/it/10 Fits curves of the form E = E[]inf + (1 - E[]inf)/(1 +
+[28]
+Overfull \hbox (16.49483pt too wide) in paragraph at lines 1644--1647
+[]\OT1/cmr/m/n/10 [character], if "cauchy", uses MLE un-der an as-sump-tion of 
+Cauchy-distributed
+[29] [30] [31] [32] [33] [34] [35]
+Underfull \vbox (badness 10000) has occurred while \output is active [36]
+[37] [38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48]
+No file Rd2.ind.
+[49] (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information){/Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc} </Users/erinbrooks/.
+TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk>{/Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ot1-0.enc}</Users/er
+inbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-
+zi4r.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmbx10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmbx12.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmi10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/erinbrooks/Library/TinyTeX/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></Users/e
+rinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+
+Output written on Rd2.pdf (49 pages, 226182 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.15 [TeX Live 2019] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (97 entries accepted, 0 rejected).
+Sorting entries....done (781 comparisons).
+Generating output file Rd2.ind....done (167 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2019-10-01>
+(./Rd2.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2019/08/27 v1.4j Standard LaTeX document class
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/longtable.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/bm.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/alltt.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/verbatim.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/url/url.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/textcomp.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.dfu)))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/keyval.tex)))
+)) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics/color.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def
+))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-hyper
+ref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-gener
+ic.sty))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/auxhook.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/latexconfig/hyperref.cf
+g))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/rerunfilecheck
+.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/makeidx.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+(./Rd2.aux)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/gettitlestri
+ng.sty)) (./Rd2.out) (./Rd2.out)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ot1zi4.fd)
+
+LaTeX Font Warning: Font shape `OML/zi4/m/n' undefined
+(Font)              using `OML/cmm/m/it' instead
+(Font)              for symbol `textless' on input line 22.
+
+(./Rd2.toc [1{/Users/erinbrooks/Library/TinyTeX/texmf-var/fonts/map/pdftex/updm
+ap/pdftex.map}]) [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13]
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+Overfull \hbox (9.66258pt too wide) in paragraph at lines 707--712
+[]\OT1/cmr/m/n/10 [string] in-di-cates the al-ter-na-tive hy-poth-e-sis and mus
+t be one of `"two.sided"',
+[14]
+Overfull \hbox (7.58696pt too wide) in paragraph at lines 791--796
+\OT1/cmr/m/n/10 com-puted by the \OT1/zi4/m/n/10 drugPerturbationSig \OT1/cmr/m
+/n/10 func-tion, for the avail-able per-tur-ba-tion \OT1/zi4/m/n/10 PharmacoSet
+s\OT1/cmr/m/n/10 .
+[15] [16] [17]
+Overfull \hbox (47.13498pt too wide) in paragraph at lines 929--934
+\OT1/cmr/m/n/10 bi-na-tion of ic50[]published, auc[]published, auc[]recomputed 
+and auc[]recomputed[]star.
+[18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28]
+Underfull \hbox (badness 1325) in paragraph at lines 1598--1598
+[]\OT1/cmr/m/it/10 Fits curves of the form E = E[]inf + (1 - E[]inf)/(1 +
+[29]
+Overfull \hbox (16.49483pt too wide) in paragraph at lines 1644--1647
+[]\OT1/cmr/m/n/10 [character], if "cauchy", uses MLE un-der an as-sump-tion of 
+Cauchy-distributed
+[30] [31] [32] [33] [34] [35] [36]
+Underfull \vbox (badness 10000) has occurred while \output is active [37]
+[38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] (./Rd2.ind [50]
+
+LaTeX Font Warning: Font shape `OT1/zi4/m/it' undefined
+(Font)              using `OT1/zi4/m/n' instead on input line 8.
+
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 24--26
+[]\OT1/zi4/m/it/10 cellInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 30--32
+[]\OT1/zi4/m/it/10 cellNames<-,PharmacoSet,character-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 57--59
+[]\OT1/zi4/m/it/10 drugInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 63--65
+[]\OT1/zi4/m/it/10 drugNames<-,PharmacoSet,character-method 
+
+Overfull \hbox (75.8567pt too wide) in paragraph at lines 74--76
+[]\OT1/zi4/m/it/10 featureInfo<-,PharmacoSet,character,data.frame-method 
+
+Overfull \hbox (85.8567pt too wide) in paragraph at lines 107--109
+[]\OT1/zi4/m/it/10 molecularProfiles<-,PharmacoSet,character,matrix-method 
+[51]
+Overfull \hbox (65.8567pt too wide) in paragraph at lines 124--126
+[]\OT1/zi4/m/it/10 phenoInfo<-,PharmacoSet,character,data.frame-method 
+
+Overfull \hbox (45.8567pt too wide) in paragraph at lines 136--138
+[]\OT1/zi4/m/it/10 sensitivityInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 139--141
+[]\OT1/zi4/m/it/10 sensitivityMeasures,PharmacoSet-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 142--144
+[]\OT1/zi4/m/it/10 sensitivityProfiles,PharmacoSet-method 
+
+Overfull \hbox (65.8567pt too wide) in paragraph at lines 145--147
+[]\OT1/zi4/m/it/10 sensitivityProfiles<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (45.8567pt too wide) in paragraph at lines 147--149
+[]\OT1/zi4/m/it/10 sensitivityProfiles<-,PharmacoSet,matrix-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 153--155
+[]\OT1/zi4/m/it/10 sensNumber<-,PharmacoSet,matrix-method 
+[52]) (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information){/Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc} </Users/erinbrooks/.
+TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk>{/Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ot1-0.enc}</Users/er
+inbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-
+zi4r.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmbx10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmbx12.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmi10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/erinbrooks/Library/TinyTeX/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></Users/e
+rinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb>
+</Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+sy10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmti10.pfb>
+Output written on Rd2.pdf (52 pages, 254131 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.15 [TeX Live 2019] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (97 entries accepted, 0 rejected).
+Sorting entries....done (781 comparisons).
+Generating output file Rd2.ind....done (167 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2019-10-01>
+(./Rd2.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2019/08/27 v1.4j Standard LaTeX document class
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/longtable.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/bm.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/alltt.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/tools/verbatim.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/url/url.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/textcomp.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1enc.dfu)))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/keyval.tex)))
+)) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics/color.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def
+))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-hyper
+ref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/hobsub-gener
+ic.sty))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/auxhook.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/latexconfig/hyperref.cf
+g))
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/oberdiek/rerunfilecheck
+.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 377.
+
+) (/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/makeidx.sty)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+(./Rd2.aux)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/generic/oberdiek/gettitlestri
+ng.sty)) (./Rd2.out) (./Rd2.out)
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ot1zi4.fd)
+
+LaTeX Font Warning: Font shape `OML/zi4/m/n' undefined
+(Font)              using `OML/cmm/m/it' instead
+(Font)              for symbol `textless' on input line 22.
+
+(./Rd2.toc [1{/Users/erinbrooks/Library/TinyTeX/texmf-var/fonts/map/pdftex/updm
+ap/pdftex.map}]) [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13]
+(/Users/erinbrooks/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+Overfull \hbox (9.66258pt too wide) in paragraph at lines 707--712
+[]\OT1/cmr/m/n/10 [string] in-di-cates the al-ter-na-tive hy-poth-e-sis and mus
+t be one of `"two.sided"',
+[14]
+Overfull \hbox (7.58696pt too wide) in paragraph at lines 791--796
+\OT1/cmr/m/n/10 com-puted by the \OT1/zi4/m/n/10 drugPerturbationSig \OT1/cmr/m
+/n/10 func-tion, for the avail-able per-tur-ba-tion \OT1/zi4/m/n/10 PharmacoSet
+s\OT1/cmr/m/n/10 .
+[15] [16] [17]
+Overfull \hbox (47.13498pt too wide) in paragraph at lines 929--934
+\OT1/cmr/m/n/10 bi-na-tion of ic50[]published, auc[]published, auc[]recomputed 
+and auc[]recomputed[]star.
+[18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28]
+Underfull \hbox (badness 1325) in paragraph at lines 1598--1598
+[]\OT1/cmr/m/it/10 Fits curves of the form E = E[]inf + (1 - E[]inf)/(1 +
+[29]
+Overfull \hbox (16.49483pt too wide) in paragraph at lines 1644--1647
+[]\OT1/cmr/m/n/10 [character], if "cauchy", uses MLE un-der an as-sump-tion of 
+Cauchy-distributed
+[30] [31] [32] [33] [34] [35] [36]
+Underfull \vbox (badness 10000) has occurred while \output is active [37]
+[38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] (./Rd2.ind [50]
+
+LaTeX Font Warning: Font shape `OT1/zi4/m/it' undefined
+(Font)              using `OT1/zi4/m/n' instead on input line 8.
+
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 24--26
+[]\OT1/zi4/m/it/10 cellInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 30--32
+[]\OT1/zi4/m/it/10 cellNames<-,PharmacoSet,character-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 57--59
+[]\OT1/zi4/m/it/10 drugInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (10.8567pt too wide) in paragraph at lines 63--65
+[]\OT1/zi4/m/it/10 drugNames<-,PharmacoSet,character-method 
+
+Overfull \hbox (75.8567pt too wide) in paragraph at lines 74--76
+[]\OT1/zi4/m/it/10 featureInfo<-,PharmacoSet,character,data.frame-method 
+
+Overfull \hbox (85.8567pt too wide) in paragraph at lines 107--109
+[]\OT1/zi4/m/it/10 molecularProfiles<-,PharmacoSet,character,matrix-method 
+[51]
+Overfull \hbox (65.8567pt too wide) in paragraph at lines 124--126
+[]\OT1/zi4/m/it/10 phenoInfo<-,PharmacoSet,character,data.frame-method 
+
+Overfull \hbox (45.8567pt too wide) in paragraph at lines 136--138
+[]\OT1/zi4/m/it/10 sensitivityInfo<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 139--141
+[]\OT1/zi4/m/it/10 sensitivityMeasures,PharmacoSet-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 142--144
+[]\OT1/zi4/m/it/10 sensitivityProfiles,PharmacoSet-method 
+
+Overfull \hbox (65.8567pt too wide) in paragraph at lines 145--147
+[]\OT1/zi4/m/it/10 sensitivityProfiles<-,PharmacoSet,data.frame-method 
+
+Overfull \hbox (45.8567pt too wide) in paragraph at lines 147--149
+[]\OT1/zi4/m/it/10 sensitivityProfiles<-,PharmacoSet,matrix-method 
+
+Overfull \hbox (0.8567pt too wide) in paragraph at lines 153--155
+[]\OT1/zi4/m/it/10 sensNumber<-,PharmacoSet,matrix-method 
+[52]) (./Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information){/Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc} </Users/erinbrooks/.
+TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk>{/Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ot1-0.enc}</Users/er
+inbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-
+zi4r.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmbx10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmbx12.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmi10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/erinbrooks/Library/TinyTeX/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></Users/erinbrooks/Library/
+TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></Users/erinbrooks
+/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></Users/e
+rinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb>
+</Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+sy10.pfb></Users/erinbrooks/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmti10.pfb>
+Output written on Rd2.pdf (52 pages, 254595 bytes).
+Transcript written on Rd2.log.
+Saving output to ‘PharmacoGx-manual.pdf’ ...
+Done
+You may want to clean up by 'rm -Rf /var/folders/kc/yqfxn0qn46g8fc6ll3pmdq6m0000gn/T//Rtmpt5Ur9M/Rd2pdf7c737976b712'

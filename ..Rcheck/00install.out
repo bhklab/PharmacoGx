@@ -1,0 +1,20 @@
+* installing *source* package ‘PharmacoGx’ ...
+** using staged installation
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+Warning in fun(libname, pkgname) :
+  no display name and no $DISPLAY environment variable
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+Warning in fun(libname, pkgname) :
+  no display name and no $DISPLAY environment variable
+** testing if installed package can be loaded from final location
+Warning in fun(libname, pkgname) :
+  no display name and no $DISPLAY environment variable
+** testing if installed package keeps a record of temporary installation path
+* DONE (PharmacoGx)
