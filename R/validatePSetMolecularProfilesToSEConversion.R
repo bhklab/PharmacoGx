@@ -30,7 +30,7 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   # Comparing molecularProfiles slot data  
   print("Checking molecularProfiles slots hold equivalent data.")
   
-    for ( i in seq_len(length(pSet_old@molecularProfiles))) {
+    for (i in seq_len(length(pSet_old@molecularProfiles))) {
       testthat::expect_true(
         all(
           pSet_old@molecularProfiles[[i]]@assayData$exprs == 
