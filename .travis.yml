@@ -11,7 +11,7 @@ r: bioc-devel
 
 ## R PACKAGE SETTINGS
 r_github_packages:
-- jimhester/covr # Add the covr package to calculate code coverage for your tests
+- r-lib/covr # Add the covr package to calculate code coverage for your tests
 cache: packages
 
 ## PARALLEL OS TEST SETTINGS
