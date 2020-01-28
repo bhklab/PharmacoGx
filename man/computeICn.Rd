@@ -5,11 +5,26 @@
 \alias{computeICn}
 \title{Computes the ICn for any n in 0-100 for a Drug Dose Viability Curve}
 \usage{
-computeIC50(concentration, viability, Hill_fit, conc_as_log = FALSE,
-  viability_as_pct = TRUE, verbose = TRUE, trunc = TRUE)
+computeIC50(
+  concentration,
+  viability,
+  Hill_fit,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  verbose = TRUE,
+  trunc = TRUE
+)
 
-computeICn(concentration, viability, Hill_fit, n, conc_as_log = FALSE,
-  viability_as_pct = TRUE, verbose = TRUE, trunc = TRUE)
+computeICn(
+  concentration,
+  viability,
+  Hill_fit,
+  n,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  verbose = TRUE,
+  trunc = TRUE
+)
 }
 \arguments{
 \item{concentration}{[vector] is a vector of drug concentrations.}

@@ -4,8 +4,12 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name, saveDir = file.path(".", "PSets"),
-  pSetFileName = NULL, verbose = TRUE)
+downloadPSet(
+  name,
+  saveDir = file.path(".", "PSets"),
+  pSetFileName = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PhamracoSet to download.}

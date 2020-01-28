@@ -4,14 +4,29 @@
 \alias{drugDoseResponseCurve}
 \title{Plot drug response curve of a given drug and a given cell for a list of pSets (objects of the PharmacoSet class).}
 \usage{
-drugDoseResponseCurve(drug, cellline, pSets = list(),
-  concentrations = list(), viabilities = list(), conc_as_log = FALSE,
-  viability_as_pct = TRUE, trunc = TRUE,
+drugDoseResponseCurve(
+  drug,
+  cellline,
+  pSets = list(),
+  concentrations = list(),
+  viabilities = list(),
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
   legends.label = c("ic50_published", "gi50_published", "auc_published",
-  "auc_recomputed", "ic50_recomputed"), ylim = c(0, 100), xlim, mycol,
-  title, plot.type = c("Fitted", "Actual", "Both"),
-  summarize.replicates = TRUE, lwd = 0.5, cex = 0.7,
-  cex.main = 0.9, legend.loc = "topright", verbose = TRUE)
+    "auc_recomputed", "ic50_recomputed"),
+  ylim = c(0, 100),
+  xlim,
+  mycol,
+  title,
+  plot.type = c("Fitted", "Actual", "Both"),
+  summarize.replicates = TRUE,
+  lwd = 0.5,
+  cex = 0.7,
+  cex.main = 0.9,
+  legend.loc = "topright",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{drug}{[string] A drug name for which the drug response curve should be 

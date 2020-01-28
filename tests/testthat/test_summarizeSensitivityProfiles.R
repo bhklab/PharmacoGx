@@ -14,7 +14,7 @@ test_that("Summarize Sensitivity Profiles function outputs data with right dimen
   testSummary <- summarizeSensitivityProfiles(GDSCsmall)
   expect_equal(colnames(testSummary), cellNames(GDSCsmall))
   expect_equal(rownames(testSummary), drugNames(GDSCsmall))
-  expect_equivalent(class(testSummary), "matrix")
+  expect_equivalent(is(testSummary, "matrix"), TRUE)
 })
 
 test_that("summarizeSensitivityProfiles produces correct values.",{

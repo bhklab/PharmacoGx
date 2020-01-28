@@ -4,8 +4,15 @@
 \alias{amcc}
 \title{Calculate an Adaptive Matthews Correlation Coefficient}
 \usage{
-amcc(x, y, step.prct = 0, min.cat = 3, nperm = 1000,
-  setseed = 12345, nthread = 1)
+amcc(
+  x,
+  y,
+  step.prct = 0,
+  min.cat = 3,
+  nperm = 1000,
+  setseed = 12345,
+  nthread = 1
+)
 }
 \arguments{
 \item{x, y}{Two paired vectors of values. Could be replicates of observations for the same experiments for example.}

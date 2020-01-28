@@ -5,8 +5,13 @@
 \title{Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
 to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.}
 \usage{
-filterNoisyCurves(pSet, epsilon = 25, positive.cutoff.percent = 0.8,
-  mean.viablity = 200, nthread = 1)
+filterNoisyCurves(
+  pSet,
+  epsilon = 25,
+  positive.cutoff.percent = 0.8,
+  mean.viablity = 200,
+  nthread = 1
+)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] a PharmacoSet object}

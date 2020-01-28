@@ -32,7 +32,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
 
     drugpheno <- data.frame(drugpheno)
 
-  } else if(class(drugpheno)!="data.frame"){
+  } else if(!is(drugpheno, "data.frame")){
     drugpheno <- as.data.frame(drugpheno)
 
   }
