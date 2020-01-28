@@ -849,11 +849,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
   	exps <- adArgs[["exps"]]
-<<<<<<< HEAD
   	if(is(exps, "data.frame")) {
-=======
-  	if(is(exps, "data.frame")){
->>>>>>> 9e7c488d6268305b87ec62be8cb7000b4646c130
   		exps2 <- exps[[pSetName(pSet)]]
   		names(exps2) <- rownames(exps)
   		exps <- exps2
