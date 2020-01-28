@@ -91,7 +91,7 @@ function(drug,
          verbose=TRUE) {
   if(!missing(pSets)){
     if (!is(pSets, "list")) {
-      if (!is(pSets, "PharmacoSet")) {
+      if (is(pSets, "PharmacoSet")) {
         temp <- pSetName(pSets)
         pSets <- list(pSets)
         names(pSets) <- temp
