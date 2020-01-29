@@ -793,7 +793,7 @@ setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
   if(is.character(i)&&is.character(j)){
     return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
   } 
-  else if(is.numeric(i) && is.numeric(j) && (as.integer(i)==i) && (as.integer(j)==j)){
+  else if(is.numeric(i) && is.numeric(j) && all(as.integer(i)==i) && all(as.integer(j)==j)){
     return(subsetTo(x, cells=cellNames(x)[i], drugs=drugNames(x)[j],  molecular.data.cells=cellNames(x)[i]))
   }
 })
