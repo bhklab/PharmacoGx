@@ -16,6 +16,7 @@ platform: x64
 
 environment:
   R_ARCH: x64
+  R_VERSION: devel
   NOT_CRAN: true
 
 build_script:
