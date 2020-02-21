@@ -4,8 +4,14 @@
 \alias{subsetTo}
 \title{A function to subset a PharmacoSet to data containing only specified drugs, cells and genes}
 \usage{
-subsetTo(pSet, cells = NULL, drugs = NULL,
-  molecular.data.cells = NULL, keep.controls = TRUE, ...)
+subsetTo(
+  pSet,
+  cells = NULL,
+  drugs = NULL,
+  molecular.data.cells = NULL,
+  keep.controls = TRUE,
+  ...
+)
 }
 \arguments{
 \item{pSet}{A \code{PharmacoSet} to be subsetted}

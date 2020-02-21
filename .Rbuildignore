@@ -7,3 +7,4 @@ codecover.R
 ^appveyor\.yml$
 .RData
 ^PSets.*$
+^Scripts.*$

@@ -44,21 +44,17 @@
 
 \S4method{phenoInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object,
-  mDataType) <- value
+\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
 
-\S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object,
-  mDataType) <- value
+\S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
 
 \S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
 
-\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object,
-  mDataType) <- value
+\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object, mDataType) <- value
 
 \S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
 
-\S4method{featureInfo}{PharmacoSet,character,DataFrame}(object,
-  mDataType) <- value
+\S4method{featureInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
 
 \S4method{sensitivityInfo}{PharmacoSet}(pSet)
 

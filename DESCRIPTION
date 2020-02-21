@@ -30,7 +30,7 @@ Imports:
     lsa, 
     reshape2
 Depends: R (>= 3.6) 
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
