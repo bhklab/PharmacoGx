@@ -82,8 +82,8 @@
 #' browseVignettes("PharmacoGx")
 #' 
 #' @param name A \code{character} string detailing the name of the dataset
-#' @param molecularProfiles A \code{list} of ExpressionSet objects containing
-#'   molecular profiles 
+#' @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
+#'   molecular profiles for each data type.
 #' @param cell A \code{data.frame} containg the annotations for all the cell
 #'   lines profiled in the data set, across all data types
 #' @param drug A \code{data.frame} containg the annotations for all the drugs
@@ -290,10 +290,10 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="d
   object
 })
 
+#####
+# MOLECULAR PROFILES SLOT GETTERS/SETTERS ---------------------------------
+#####
 
-#####
-# MOLECULAR PROFILES SLOT GETTERS/SETTERS
-#####
 
 #' phenoInfo Generic
 #' 
@@ -367,7 +367,7 @@ setGeneric("molecularProfiles", function(pSet, mDataType) standardGeneric("molec
 setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
-    ##NOTE:: This assumes only one assay will be stored per SummarizedExperiment, which may not be true
+    ##FIX-ME:: This assumes only one assay will be stored per SummarizedExperiment, which may not be true
     return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]])[[1]])
   }else{
     return(NULL)
@@ -450,7 +450,6 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
       S4Vectors::DataFrame(value, rownames = rownames(value))
   }
   object
-  
 })
 
 #####
@@ -459,7 +458,7 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
 
 #' sensitivityInfo Generic
 #' 
-#' Generic for sensitivityInfo method 
+#' Generic for sensitivityInfo method
 #' 
 #' @examples
 #' data(CCLEsmall)
@@ -471,9 +470,7 @@ setGeneric("sensitivityInfo", function(pSet) standardGeneric("sensitivityInfo"))
 #' @describeIn PharmacoSet Return the drug dose sensitivity experiment info
 #' @export
 setMethod(sensitivityInfo, "PharmacoSet", function(pSet){
-    
     return(pSet@sensitivity$info)
-    
 })
 
 #' sensitivityInfo<- Generic
@@ -816,7 +813,7 @@ setMethod("show", signature=signature(object="PharmacoSet"),
         cat("Date Created: ", dateCreated(object), "\n")
     cat("Number of cell lines: ", nrow(cellInfo(object)), "\n")
     cat("Number of drug compounds: ", nrow(drugInfo(object)), "\n")
-        if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")}
+      if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")}
       if("rna" %in% names(object@molecularProfiles)){cat("RNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rna")), "\n")}
       if("rnaseq" %in% names(object@molecularProfiles)){cat("RNASeq: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rnaseq")), "\n")}
       if("snp" %in% names(object@molecularProfiles)){cat("SNP: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="snp")), "\n")}

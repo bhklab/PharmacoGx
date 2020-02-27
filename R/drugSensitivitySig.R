@@ -219,7 +219,7 @@ drugSensitivitySig <- function(pSet,
     
     if(!is.null(dots[["mProfiles"]])){
       mProfiles <- dots[["mProfiles"]]
-      Biobase::exprs(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(pSet@molecularProfiles[[mDataType]]), drop = FALSE]
+      SummarizedExperiment::assay(pSet@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(pSet@molecularProfiles[[mDataType]]), drop = FALSE]
       
     }
     

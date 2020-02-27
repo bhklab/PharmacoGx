@@ -9,8 +9,7 @@ Description: Contains a set of functions to perform large-scale analysis of phar
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
-    knitr,
-    testthat
+    knitr
 Encoding: UTF-8
 Imports: 
     Biobase,
@@ -28,7 +27,8 @@ Imports:
     graphics, 
     grDevices, 
     lsa, 
-    reshape2
+    reshape2,
+    testthat
 Depends: R (>= 3.6) 
 RoxygenNote: 7.0.2
 VignetteBuilder: knitr

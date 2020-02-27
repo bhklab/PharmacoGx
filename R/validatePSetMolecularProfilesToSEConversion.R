@@ -33,8 +33,8 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
     for (i in seq_len(length(pSet_old@molecularProfiles))) {
       testthat::expect_true(
         all(
-          pSet_old@molecularProfiles[[i]]@assayData$exprs == 
-          pSet_new@molecularProfiles[[i]]@assays[[1]],
+          exprs(pSet_old@molecularProfiles[[i]]) == 
+          assays(pSet_new@molecularProfiles[[i]])[[1]],
           na.rm = TRUE
         ),
         info = "The assay data is not equivalent"
@@ -44,20 +44,24 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
     for (i in seq_len(length(pSet_old@molecularProfiles))) { # Have to compare like this due to NAs in data
       # Checking phenoData
       testthat::expect_true(
+      if (nrow(pData(pSet_old@molecularProfiles[[i]])) > 0) {
         all(
           as(pSet_old@molecularProfiles[[i]]@phenoData, "data.frame") == 
             as.data.frame(pSet_new@molecularProfiles[[i]]@colData[
               seq_len(length(pSet_new@molecularProfiles[[i]]@colData) -1)]),
-          na.rm = TRUE),
-        info = "The phenoData is not equivalent",
-      )
-      # Chechking featureData
+          na.rm = TRUE)
+      } else { TRUE },
+          info = "The phenoData is not equivalent",
+        )
+      # Checking featureData
       testthat::expect_true(
-        all(
-          as(pSet_old@molecularProfiles[[i]]@featureData, "data.frame") == 
-            as.data.frame(pSet_new@molecularProfiles[[i]]@elementMetadata[
-              seq_len(length(pSet_new@molecularProfiles[[i]]@elementMetadata) -1)]),
-          na.rm = TRUE),
+        if (nrow(fData(pSet_old@molecularProfiles[[i]])) > 0) {
+          all(
+            as(pSet_old@molecularProfiles[[i]]@featureData, "data.frame") == 
+              as.data.frame(pSet_new@molecularProfiles[[i]]@elementMetadata[
+                seq_len(length(pSet_new@molecularProfiles[[i]]@elementMetadata) -1)]),
+            na.rm = TRUE)
+        } else { TRUE },
         info = "The featureData is not equivalent",
       )
       # Checking protocolData
@@ -118,5 +122,4 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   testthat::test_that("Checking pSet@curation slot is unchanged.", {
     testthat::expect_equal(pSet_old@curation, pSet_new@curation)
   })
-  
 }

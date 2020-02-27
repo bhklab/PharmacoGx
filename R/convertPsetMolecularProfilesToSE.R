@@ -48,5 +48,6 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
                mDataType <- Biobase::annotation(eSet)
                pSet@molecularProfiles[[mDataType]] <- SE
           })
+  setNames(pSet@molecularProfiles, names(eSets))
   pSet
 }

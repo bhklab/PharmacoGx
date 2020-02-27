@@ -24,8 +24,8 @@ PharmacoSet(
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset}
 
-\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing
-molecular profiles}
+\item{molecularProfiles}{A \code{list} of SummarizedExperiment objects containing
+molecular profiles for each data type.}
 
 \item{cell}{A \code{data.frame} containg the annotations for all the cell
 lines profiled in the data set, across all data types}
