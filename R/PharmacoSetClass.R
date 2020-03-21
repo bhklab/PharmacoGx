@@ -294,7 +294,6 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="d
 # MOLECULAR PROFILES SLOT GETTERS/SETTERS ---------------------------------
 #####
 
-
 #' phenoInfo Generic
 #' 
 #' Generic for phenoInfo method 
@@ -359,20 +358,30 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' molecularProfiles(CCLEsmall, "rna")
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve molecular profiles from
-#' @param mDataType the type of molecular data 
-#' @return a \code{data.frame} with the experiment info
-setGeneric("molecularProfiles", function(pSet, mDataType) standardGeneric("molecularProfiles"))
+#' @param mDataType \code{character} The type of molecular data
+#' @param assay \code{character} Name of the desired assay; if excluded defaults to first assay
+#'   in the SummarizedExperiment for the given mDataType
+#' 
+#' @return a \code{matrix} of data for the given mDataType and assay
+#' 
+setGeneric("molecularProfiles", function(pSet, mDataType, assay, ...) standardGeneric("molecularProfiles"))
 #' @describeIn PharmacoSet Return the given type of molecular data from the PharmacoSet 
 #' @export
-setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
+setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType, assay){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
-    ##FIX-ME:: This assumes only one assay will be stored per SummarizedExperiment, which may not be true
-    return(SummarizedExperiment::assays(pSet@molecularProfiles[[mDataType]])[[1]])
-  }else{
-    return(NULL)
+    if (!missing(assay)) {
+      if (assay %in% assayNames(pSet@molecularProfiles[[mDataType]])) {
+        return(SummarizedExperiment::assay(pSet@molecularProfiles[[mDataType]], assay))
+      } else {
+        stop(paste('Assay', assay, 'not found in the SummarizedExperiment object!'))
+      }
+    } else {
+      return(SummarizedExperiment::assay(pSet@molecularProfiles[[mDataType]], 1))
+    }
+  } else {
+    stop(paste0('mDataType ', mDataType, ' not found the pSet!'))
   }
-
 })
 
 #' molecularProfiles<- Generic
@@ -385,17 +394,17 @@ setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @param object The \code{PharmacoSet} to replace molecular profiles in
 #' @param mDataType The type of molecular data to be updated
+#' @param assay \code{character} Name or index of the assay data to return
 #' @param value A \code{matrix} with the new profiles
+#' 
 #' @return Updated \code{PharmacoSet}
-setGeneric("molecularProfiles<-", function(object, mDataType, value) standardGeneric("molecularProfiles<-"))
+#' 
+setGeneric("molecularProfiles<-", function(object, mDataType, assay, value, ...) standardGeneric("molecularProfiles<-"))
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
 #' @export
-setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character",value="matrix"), function(object, mDataType, value){
-
+setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
-    ##TODO:: Assays is now a SimpleList from the S4Vectors class, we need to fix assignmet to reflect this
-    ##NOTE:: This does not update se.exprs?
-    SummarizedExperiment::assays(object@molecularProfiles[[mDataType]])[[1]] <- value
+    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
   }
   object
 })
@@ -418,7 +427,7 @@ setGeneric("featureInfo", function(pSet, mDataType) standardGeneric("featureInfo
 setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
   
   if(mDataType %in% names(pSet@molecularProfiles)){
-    return(rowData(pSet@molecularProfiles[[mDataType]]))
+    return(SummarizedExperiment::rowData(pSet@molecularProfiles[[mDataType]]))
   }else{
     return(NULL)
   }
@@ -446,7 +455,7 @@ setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("
 setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
   
   if(mDataType %in% names(object@molecularProfiles)){
-    rowData(object@molecularProfiles[[mDataType]]) <- 
+    SummarizedExperiment::rowData(object@molecularProfiles[[mDataType]]) <- 
       S4Vectors::DataFrame(value, rownames = rownames(value))
   }
   object
@@ -553,7 +562,7 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSe
 #' @param pSet The \code{PharmacoSet} 
 #' @return A \code{character} vector of all the available sensitivity measures
 setGeneric("sensitivityMeasures", function(pSet) standardGeneric("sensitivityMeasures"))
-#' @describeIn PharmacoSet Returns the available sensitivity profile
+#' @describeIn PharmacoSet returns the available sensitivity profile
 #'   summaries, for example, whether there are IC50 values available
 #' @export
 setMethod(sensitivityMeasures, "PharmacoSet", function(pSet){
@@ -579,14 +588,7 @@ setGeneric("drugNames", function(pSet) standardGeneric("drugNames"))
 #' @export
 setMethod(drugNames, "PharmacoSet", function(pSet){
   
-  # if (unique){
-#     unique(pData(pSet)[["drugid"]])
-#   } else {
-#     pData(pSet)[["drugid"]]
-#   
-#  }
   rownames(drugInfo(pSet))
-
 })
 
 #' drugNames<- Generic
@@ -610,8 +612,6 @@ setReplaceMethod("drugNames", signature = signature(object="PharmacoSet",value="
     return(object)
     })
 
-
-
 #' cellNames Generic
 #' 
 #' A generic for the cellNames method
@@ -628,7 +628,6 @@ setGeneric("cellNames", function(pSet) standardGeneric("cellNames"))
 setMethod(cellNames, "PharmacoSet", function(pSet){
   
   rownames(cellInfo(pSet))
-  
 })
 
 #' cellNames<- Generic

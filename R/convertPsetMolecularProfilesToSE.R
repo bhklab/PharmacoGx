@@ -17,10 +17,9 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
   
   eSets <- pSet@molecularProfiles # Extract eSet data
   
-  pSet@molecularProfiles <- 
-    #parallel::mc
+  pSet@molecularProfiles <-
     lapply(eSets,
-           FUN=function(eSet){
+           function(eSet){
              
              # Change rownames from probes to EnsemblGeneId for rna data type
              if (grepl("^rna$", Biobase::annotation(eSet))) {
@@ -29,21 +28,24 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
              
              # Build summarized experiment from eSet
              SE <- SummarizedExperiment::SummarizedExperiment(
-               # Convert to SimpleList class to meet SE requirements
-               assays = S4Vectors::SimpleList(eSet@assayData$exprs
-                                              ),
+               ## TODO:: Do we want to pass an environment for better memory efficiency?
+               assays=SimpleList(as.list(Biobase::assayData(eSet))
+                              ),
                # Switch rearrange columns so that IDs are first, probes second
-               rowData = S4Vectors::DataFrame(Biobase::fData(eSet),
+               rowData=S4Vectors::DataFrame(Biobase::fData(eSet),
                                               rownames=rownames(Biobase::fData(eSet)) 
                                               ),
-               colData = S4Vectors::DataFrame(Biobase::pData(eSet),
+               colData=S4Vectors::DataFrame(Biobase::pData(eSet),
                                               rownames=rownames(Biobase::pData(eSet))
                                               ),
-               metadata = list("experimentData" = eSet@experimentData, 
-                               "annotation" = Biobase::annotation(eSet), 
-                               "protocolData" = Biobase::protocolData(eSet), 
-                               ".__classVersion__" = eSet@.__classVersion__)
+               metadata=list("experimentData" = eSet@experimentData, 
+                             "annotation" = Biobase::annotation(eSet), 
+                             "protocolData" = Biobase::protocolData(eSet)
+                            )
                )
+               ## TODO:: Determine if this can be done in the SE constructor?
+               # Extract names from expression set
+               assayNames(SE) <- assayDataElementNames(eSet)
                # Assign SE to pSet
                mDataType <- Biobase::annotation(eSet)
                pSet@molecularProfiles[[mDataType]] <- SE

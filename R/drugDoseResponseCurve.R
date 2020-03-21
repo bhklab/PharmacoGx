@@ -10,9 +10,15 @@
 #' from a pset. The names of the concentration list determine the legend labels. 
 #' 
 #' @examples
+##TODO:: How do you pass PSets to this?
 #' if (interactive()) {
+#' # Manually enter the plot parameters
 #' drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
 #'  viabilities=list(c(100,50,30,1)), plot.type="Both")
+#' 
+#' # Generate a plot from one or more PSets
+#' data(GDSCsmall)
+#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
 #' }
 #' 
 #' @param drug [string] A drug name for which the drug response curve should be 

@@ -3,10 +3,10 @@
 ##' Checks that all the information contained in an ExpressionSet molecularProfile 
 ##'   was successfully tranferred to the SummarizedExperiment molecularProfile
 ##'   
-##' @param pSet [S4] a PSet containing molecularProfiles as SummarizedExperiments
-##' @param pSet [S4] a PSet containing molecularProfiles as ExpressionSets
+##' @param pSet \code{S4} a PSet containing molecularProfiles as SummarizedExperiments
+##' @param pSet \code{S4} a PSet containing molecularProfiles as ExpressionSets
 ##' 
-##' @return [message] Any slots which are not the same
+##' @return \code{message} Any slots which are not the same
 ##' 
 ##' @importFrom testthat expect_equal test_that
 ##' 
@@ -31,14 +31,16 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   print("Checking molecularProfiles slots hold equivalent data.")
   
     for (i in seq_len(length(pSet_old@molecularProfiles))) {
-      testthat::expect_true(
-        all(
-          exprs(pSet_old@molecularProfiles[[i]]) == 
-          assays(pSet_new@molecularProfiles[[i]])[[1]],
-          na.rm = TRUE
-        ),
-        info = "The assay data is not equivalent"
-      )
+      for (j in seq_along(assays(pSet_new@molecularProfiles[[i]]))) {
+        testthat::expect_true(
+          all(
+            as.list(assayData(pSet_old@molecularProfiles[[i]]))[[j]] == 
+            assay(pSet_new@molecularProfiles[[i]], j),
+            na.rm = TRUE
+          ),
+          info = "The assay data is not equivalent"
+        )
+      }
     }
     ## TODO:: Rewrite this as an apply statement
     for (i in seq_len(length(pSet_old@molecularProfiles))) { # Have to compare like this due to NAs in data
@@ -86,11 +88,12 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
       info = "The experimentData is not equivalent"
     )
     
-    testthat::expect_equal(
-      lapply(pSet_old@molecularProfiles, function(x) { x@.__classVersion__ }), 
-      lapply(pSet_new@molecularProfiles, function(x) { x@metadata$.__classVersion__}),
-      info = "The .__classVersion__ is not equivalent"
-    )
+    ##TODO:: Removed .__classVersion__ from SE as it is a property specific to eSet
+    # testthat::expect_equal(
+    #   lapply(pSet_old@molecularProfiles, function(x) { x@.__classVersion__ }), 
+    #   lapply(pSet_new@molecularProfiles, function(x) { x@metadata$.__classVersion__}),
+    #   info = "The .__classVersion__ is not equivalent"
+    # )
     
   # Comparing remainder of pSet slots; should not be affect by conversion
   print("Comparing remainder of pSet slots")
@@ -122,4 +125,5 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   testthat::test_that("Checking pSet@curation slot is unchanged.", {
     testthat::expect_equal(pSet_old@curation, pSet_new@curation)
   })
+  message("Tests pass!")
 }
