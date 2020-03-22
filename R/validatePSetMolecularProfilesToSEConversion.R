@@ -128,13 +128,13 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   message("Tests pass!")
 }
 
-## Doesn't work; issue with scoping of get() function
+##TODO:: Determine why CCLEsmall is 3x larger in memory after conversion?
 resaveAllExampleDatasets <- function(datasets) {
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
     assign(dataset, convertPsetMolecularProfilesToSE(get(dataset)))
-    save(get(dataset, pos=-2, inherits=TRUE), file=paste0(dataDir, '/', dataset, '.rda'))
+    save(dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }
 
