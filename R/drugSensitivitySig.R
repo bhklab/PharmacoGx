@@ -68,6 +68,7 @@
 #'   second, and return values in the third.
 #' @export
 #' @import parallel
+#' @importFrom SummarizedExperiment assayNames
 drugSensitivitySig <- function(pSet,
  mDataType,
  drugs,

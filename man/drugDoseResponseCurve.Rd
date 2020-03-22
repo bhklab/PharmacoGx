@@ -103,8 +103,13 @@ from a pset. The names of the concentration list determine the legend labels.
 }
 \examples{
 if (interactive()) {
+# Manually enter the plot parameters
 drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
  viabilities=list(c(100,50,30,1)), plot.type="Both")
+
+# Generate a plot from one or more PSets
+data(GDSCsmall)
+drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
 }
 
 }

@@ -2,7 +2,7 @@
 #' into one entry per drug
 #'
 #' Given a PharmacoSet with molecular data, this function will summarize
-#' the data into one profile per cell line, using the chosed summary.stat. Note
+#' the data into one profile per cell line, using the chosen summary.stat. Note
 #' that this does not really make sense with perturbation type data, and will
 #' combine experiments and controls when doing the summary if run on a
 #' perturbation dataset.
@@ -33,10 +33,12 @@
 #'   If NA, no binarization is done.
 #' @param binarize.direction \code{character} One of "less" or "greater", the direction of binarization on 
 #'   binarize.threshold, if it is not NA. 
+#'   
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
+#'  
 #' @importFrom utils setTxtProgressBar txtProgressBar
-#' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- colData colData<- assays assays<-
+#' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- colData colData<- assays assays<- assayNames assayNames<-
 #' @importFrom Biobase AnnotatedDataFrame
 #' @export
 
@@ -89,6 +91,7 @@ summarizeMolecularProfiles <- function(pSet,
     cell.lines <- cellNames(pSet)
   }
   
+  ##TODO:: have less confusing variable
   dd <- molecularProfiles(pSet, mDataType)
   pp <- phenoInfo(pSet, mDataType)
   
@@ -209,16 +212,21 @@ summarizeMolecularProfiles <- function(pSet,
     dd2 <- tt
   }
   res <- SummarizedExperiment::SummarizedExperiment(dd2)
-  #Biobase::exprs(res) <- dd2
   pp2 <- S4Vectors::DataFrame(pp2, row.names=rownames(pp2))
   pp2$tissueid <- cellInfo(pSet)[pp2$cellid, "tissueid"]
   SummarizedExperiment::colData(res) <- pp2
   SummarizedExperiment::rowData(res) <- featureInfo(pSet, mDataType)
-  #Biobase::exprs(res) <- Biobase::exprs(res)[features,]
-  #Biobase::fData(res) <- Biobase::fData(res)[features,]
+  ##TODO:: Generalize this to multiple assay SummarizedExperiments!
+  if(!is.null(SummarizedExperiment::assay(res, 1))) {
+    SummarizedExperiment::assay(res, 2) <- matrix(rep(NA, 
+                                                      length(assay(res, 1))
+                                                      ), 
+                                                      nrow=nrow(assay(res, 1)), 
+                                                      ncol=ncol(assay(res, 1))
+                                                  )
+  }
+  assayNames(res) <- assayNames(pSet@molecularProfiles[[mDataType]])
   res <- res[features,]
   S4Vectors::metadata(res) <- S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])
-  ####NOTE:: Removed se.exprs from assays in conversion to SE
-  #if(!is.null(SummarizedExperiment::assays(res)$exprs)) SummarizedExperiment::assays(res)$se.exprs <- NULL
   return(res)
 }

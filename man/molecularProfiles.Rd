@@ -4,15 +4,20 @@
 \alias{molecularProfiles}
 \title{molecularProfiles Generic}
 \usage{
-molecularProfiles(pSet, mDataType)
+molecularProfiles(pSet, mDataType, assay, ...)
 }
 \arguments{
 \item{pSet}{The \code{PharmacoSet} to retrieve molecular profiles from}
 
-\item{mDataType}{the type of molecular data}
+\item{mDataType}{\code{character} The type of molecular data}
+
+\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
+in the SummarizedExperiment for the given mDataType}
+
+\item{...}{\code{list} Fall through params for other functions. Needed to add new arguments to a generic.}
 }
 \value{
-a \code{data.frame} with the experiment info
+a \code{matrix} of data for the given mDataType and assay
 }
 \description{
 Generic for molecularProfiles method

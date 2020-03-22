@@ -4,7 +4,9 @@
 \name{GDSCsmall}
 \alias{GDSCsmall}
 \title{Genomics of Drug Sensitivity in Cancer Example PharmacoSet}
-\format{PharmacoSet object}
+\format{
+PharmacoSet object
+}
 \usage{
 data(GDSCsmall)
 }

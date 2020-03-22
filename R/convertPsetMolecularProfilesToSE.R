@@ -8,9 +8,11 @@
 #' @return \code{S4} A PharmacoSet containing molecular data in a SummarizedExperiments
 #' 
 #' @importFrom parallel mclapply
-#' @importFrom SummarizedExperiment SummarizedExperiment Assays
+#' @importFrom SummarizedExperiment assay assays assayNames
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment Assays
 #' @importFrom Biobase exprs fData pData annotation protocolData
 #' @importFrom S4Vectors SimpleList DataFrame
+#' @importFrom stats setNames
 #' 
 #' @export
 convertPsetMolecularProfilesToSE <- function(pSet) {
@@ -33,11 +35,11 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
                               ),
                # Switch rearrange columns so that IDs are first, probes second
                rowData=S4Vectors::DataFrame(Biobase::fData(eSet),
-                                              rownames=rownames(Biobase::fData(eSet)) 
-                                              ),
+                                            rownames=rownames(Biobase::fData(eSet)) 
+                                            ),
                colData=S4Vectors::DataFrame(Biobase::pData(eSet),
-                                              rownames=rownames(Biobase::pData(eSet))
-                                              ),
+                                            rownames=rownames(Biobase::pData(eSet))
+                                            ),
                metadata=list("experimentData" = eSet@experimentData, 
                              "annotation" = Biobase::annotation(eSet), 
                              "protocolData" = Biobase::protocolData(eSet)
@@ -45,7 +47,7 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
                )
                ## TODO:: Determine if this can be done in the SE constructor?
                # Extract names from expression set
-               assayNames(SE) <- assayDataElementNames(eSet)
+               SummarizedExperiment::assayNames(SE) <- Biobase::assayDataElementNames(eSet)
                # Assign SE to pSet
                mDataType <- Biobase::annotation(eSet)
                pSet@molecularProfiles[[mDataType]] <- SE

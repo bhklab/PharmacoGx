@@ -54,7 +54,7 @@ binarize.threshold, if it is not NA.}
 }
 \description{
 Given a PharmacoSet with molecular data, this function will summarize
-the data into one profile per cell line, using the chosed summary.stat. Note
+the data into one profile per cell line, using the chosen summary.stat. Note
 that this does not really make sense with perturbation type data, and will
 combine experiments and controls when doing the summary if run on a
 perturbation dataset.

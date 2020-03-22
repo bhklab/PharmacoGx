@@ -15,7 +15,7 @@ Imports:
     Biobase,
     S4Vectors,
     SummarizedExperiment,
-    piano, 
+    piano,
     magicaxis, 
     RColorBrewer, 
     parallel, 
@@ -30,7 +30,7 @@ Imports:
     reshape2,
     testthat
 Depends: R (>= 3.6) 
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues

@@ -7,10 +7,12 @@
 validatePsetMolecularProfilesToSEConversion(pSet_old, pSet_new)
 }
 \arguments{
-\item{pSet}{[S4] a PSet containing molecularProfiles as ExpressionSets}
+\item{pSet_old}{\code{S4} a PSet containing molecularProfiles as ExpressionSets}
+
+\item{pSet_new}{\code{S4} a PSet containing molecularProfiles as SummarizedExperiments}
 }
 \value{
-[message] Any slots which are not the same
+\code{message} Any slots which are not the same
 }
 \description{
 Checks that all the information contained in an ExpressionSet molecularProfile 

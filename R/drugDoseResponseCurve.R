@@ -96,8 +96,8 @@ function(drug,
          legend.loc = "topright",
          verbose=TRUE) {
   if(!missing(pSets)){
-    if (class(pSets) != "list") {
-      if (class(pSets) == "PharmacoSet") {
+    if (!is(pSets, "list")) {
+      if (is(pSets, "PharmacoSet")) {
         temp <- pSetName(pSets)
         pSets <- list(pSets)
         names(pSets) <- temp
@@ -120,7 +120,7 @@ function(drug,
       stop("Please pass in the viabilities to Plot with the concentrations.")
 
     }
-    if (class(concentrations) != "list") {
+    if (!is(concentrations, "list")) {
       if (mode(concentrations) == "numeric") {
         if(mode(viabilities)!="numeric"){
           stop("Passed in 1 vector of concentrations but the viabilities are not numeric!")

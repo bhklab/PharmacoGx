@@ -12,7 +12,8 @@
 \alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
 \alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{molecularProfiles,PharmacoSet-method}
-\alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,character,missing,matrix-method}
 \alias{featureInfo,PharmacoSet-method}
 \alias{featureInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{sensitivityInfo,PharmacoSet-method}
@@ -48,9 +49,11 @@
 
 \S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
+\S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType, assay)
 
-\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object, mDataType) <- value
+\S4method{molecularProfiles}{PharmacoSet,character,character,matrix}(object, mDataType, assay) <- value
+
+\S4method{molecularProfiles}{PharmacoSet,character,missing,matrix}(object, mDataType, assay) <- value
 
 \S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
 
@@ -99,6 +102,9 @@
 
 \item{mDataType}{A \code{character} with the type of molecular data to 
 return/update}
+
+\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
+in the SummarizedExperiment for the given mDataType}
 }
 \value{
 An object of the PharmacoSet class
@@ -135,6 +141,8 @@ respecitively as sensitivity and perturbation datasets.
 
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the PharmacoSet
 
+\item \code{molecularProfiles<-}: Update the given type of molecular data from the PharmacoSet
+
 \item \code{featureInfo}: Return the feature info for the given molecular data
 
 \item \code{featureInfo<-}: Replace the gene info for the molecular data
@@ -151,7 +159,7 @@ sensitivity
 \item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
 
-\item \code{sensitivityMeasures}: Returns the available sensitivity profile
+\item \code{sensitivityMeasures}: returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
 \item \code{drugNames}: Return the names of the drugs used in the PharmacoSet

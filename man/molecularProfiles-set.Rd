@@ -4,12 +4,16 @@
 \alias{molecularProfiles<-}
 \title{molecularProfiles<- Generic}
 \usage{
-molecularProfiles(object, mDataType) <- value
+molecularProfiles(object, mDataType, assay, ...) <- value
 }
 \arguments{
 \item{object}{The \code{PharmacoSet} to replace molecular profiles in}
 
 \item{mDataType}{The type of molecular data to be updated}
+
+\item{assay}{\code{character} Name or index of the assay data to return}
+
+\item{...}{\code{list} Fall through parameters to other functions. Needed to add addtional arguments to a generic.}
 
 \item{value}{A \code{matrix} with the new profiles}
 }

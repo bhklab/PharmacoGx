@@ -3,12 +3,14 @@
 ##' Checks that all the information contained in an ExpressionSet molecularProfile 
 ##'   was successfully tranferred to the SummarizedExperiment molecularProfile
 ##'   
-##' @param pSet \code{S4} a PSet containing molecularProfiles as SummarizedExperiments
-##' @param pSet \code{S4} a PSet containing molecularProfiles as ExpressionSets
+##' @param pSet_new \code{S4} a PSet containing molecularProfiles as SummarizedExperiments
+##' @param pSet_old \code{S4} a PSet containing molecularProfiles as ExpressionSets
 ##' 
 ##' @return \code{message} Any slots which are not the same
 ##' 
 ##' @importFrom testthat expect_equal test_that
+##' @import SummarizedExperiment
+##' @import Biobase
 ##' 
 ##' @export
 ##'
@@ -129,12 +131,15 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
 }
 
 ##TODO:: Determine why CCLEsmall is 3x larger in memory after conversion?
+#' Utility function to resave all datasets after modifying convertPSetMolecularProfiles
+#' 
+#' @param datasets \code{character} A list of the example datasets to update
 resaveAllExampleDatasets <- function(datasets) {
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
     assign(dataset, convertPsetMolecularProfilesToSE(get(dataset)))
-    save(dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
+    save(list=dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }
 

@@ -66,7 +66,7 @@
 
 
 #####
-# CONSTRUCTOR
+# CONSTRUCTOR -----
 #####
 
 #' PharmacoSet constructor
@@ -116,7 +116,7 @@
 PharmacoSet <-  function(name,
                           molecularProfiles=list(), 
                           cell=data.frame(), 
-                          drug=data.frame(), 
+                          drug=data.frame(),
                           sensitivityInfo=data.frame(),
                           sensitivityRaw=array(dim=c(0,0,0)), 
                           sensitivityProfiles=matrix(), 
@@ -141,7 +141,7 @@ PharmacoSet <-  function(name,
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     ## TODO:: Determine if I should use SummarizedExperiment construtor here?
     for (i in seq_along(molecularProfiles)){
-        if (class(molecularProfiles[[i]]) != "SummarizedExperiment"){
+        if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
             stop(sprintf("Please provide the %s data as a SummarizedExperiment", 
                          names(molecularProfiles[i])))
         }else{
@@ -152,10 +152,10 @@ PharmacoSet <-  function(name,
         }
     
     }
-    #if (class(cell)!="data.frame"){
+    #if (!is(cell, "data.frame")) {
     #    stop("Please provide the cell line annotations as a data frame.")
     #}
-    #if (class(drug)!="data.frame"){
+    #if (!is(drug, "data.frame")) {
     #    stop("Please provide the drug annotations as a data frame.")
     #}
     
@@ -202,7 +202,7 @@ PharmacoSet <-  function(name,
 
 
 #####
-# CELL SLOT GETTERS/SETTERS
+# CELL SLOT GETTERS/SETTERS ----
 #####
 
 #' cellInfo Generic
@@ -248,7 +248,7 @@ setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet",value="d
 
 
 #####
-# DRUG SLOT GETTERS/SETTERS
+# DRUG SLOT GETTERS/SETTERS ----
 #####
 
 #' drugInfo Generic
@@ -291,7 +291,7 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="d
 })
 
 #####
-# MOLECULAR PROFILES SLOT GETTERS/SETTERS ---------------------------------
+# MOLECULAR PROFILES SLOT GETTERS/SETTERS ----
 #####
 
 #' phenoInfo Generic
@@ -361,12 +361,14 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' @param mDataType \code{character} The type of molecular data
 #' @param assay \code{character} Name of the desired assay; if excluded defaults to first assay
 #'   in the SummarizedExperiment for the given mDataType
+#' @param ... \code{list} Fall through params for other functions. Needed to add new arguments to a generic.
 #' 
 #' @return a \code{matrix} of data for the given mDataType and assay
 #' 
 setGeneric("molecularProfiles", function(pSet, mDataType, assay, ...) standardGeneric("molecularProfiles"))
 #' @describeIn PharmacoSet Return the given type of molecular data from the PharmacoSet 
 #' @export
+#' @inheritParams molecularProfiles
 setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType, assay){
     
   if(mDataType %in% names(pSet@molecularProfiles)){
@@ -396,15 +398,24 @@ setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType, assay){
 #' @param mDataType The type of molecular data to be updated
 #' @param assay \code{character} Name or index of the assay data to return
 #' @param value A \code{matrix} with the new profiles
+#' @param ... \code{list} Fall through parameters to other functions. Needed to add addtional arguments to a generic.
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
-setGeneric("molecularProfiles<-", function(object, mDataType, assay, value, ...) standardGeneric("molecularProfiles<-"))
+setGeneric("molecularProfiles<-", function(object, mDataType, assay, ..., value) standardGeneric("molecularProfiles<-"))
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
     SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
+  }
+  object
+})
+#' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
+#' @export
+setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
+  if (mDataType %in% names(object@molecularProfiles)) {
+    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
   }
   object
 })
@@ -839,7 +850,6 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 mDataNames <- function(pSet){
 
   return(names(pSet@molecularProfiles))
-
 }
 
 #'`[`
@@ -911,7 +921,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, ke
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
   	exps <- adArgs[["exps"]]
-  	if(class(exps)=="data.frame"){
+  	if(is(exps, "data.frame")) {
   		exps2 <- exps[[pSetName(pSet)]]
   		names(exps2) <- rownames(exps)
   		exps <- exps2
@@ -1111,7 +1121,7 @@ updateCellId <- function(pSet, new.ids = vector("character")){
 
     duplId <- unique(new.ids[duplicated(new.ids)])
     for(id in duplId){
-
+  
       if (ncol(sensNumber(pSet))>0){
         myx <- which(new.ids[sensMatch] == id)
         sensNumber(pSet)[myx[1],] <- apply(sensNumber(pSet)[myx,], 2, sum)
@@ -1308,8 +1318,9 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
 }
 
 .summarizeSensitivityNumbers <- function(pSet) {
-
-  assign("PSet_sumSenNum", pSet, envir = .GlobalEnv)
+  
+  ## TODO:: Checks don't like assigning to global evnironment. Can we return this?
+  assign("PSet_sumSenNum", pSet) # Removed envir=.GlobalEnv
   if (pSet@datasetType != "sensitivity" && pSet@datasetType != "both") {
     stop ("Data type must be either sensitivity or both")
   }
@@ -1390,7 +1401,7 @@ updateDrugId <- function(pSet, new.ids = vector("character")){
   perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(pSet@molecularProfiles)), dimnames=list(celln, drugn, names((pSet@molecularProfiles))))
 
     for (i in seq_len(length(pSet@molecularProfiles))) {
-      if (nrow(Biobase::pData(pSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(SummarizedExperiment::colData(pSet@molecularProfiles[[i]]))))) {
+      if (nrow(SummarizedExperiment::colData(pSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(SummarizedExperiment::colData(pSet@molecularProfiles[[i]]))))) {
       tt <- table(SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "cellid"], SummarizedExperiment::colData(pSet@molecularProfiles[[i]])[ , "drugid"])
         perturbation.info[rownames(tt), colnames(tt), names(pSet@molecularProfiles)[i]] <- tt
       }
@@ -1430,7 +1441,7 @@ checkPSetStructure <-
     # Checking molecularProfiles
     #####
     # Can this be parallelized or does it mess with the order of printing warnings?
-    for( i in seq_len(length(pSet@molecularProfiles))) {
+    for( i in seq_along(pSet@molecularProfiles)) {
       profile <- pSet@molecularProfiles[[i]]
       nn <- names(pSet@molecularProfiles)[i]
       
@@ -1443,9 +1454,17 @@ checkPSetStructure <-
       }
       
       
-      ## TODO:: Confirm the above and modify warnings accordingly
-      #warning(ifelse(nrow(rowData(profile)) != nrow(assays(profile)$exprs), sprintf("%s: number of features in fData is different from SummarizedExperiment slots", nn), sprintf("%s: rowData dimension is OK", nn)))
-      #warning(ifelse(nrow(Biobase::pData(profile)) != ncol(Biobase::exprs(profile)), sprintf("%s: number of cell lines in pData is different from expression slots", nn), sprintf("%s: colData dimension is OK", nn)))
+      ## Test if sample and feature annotations dimensions match the assay
+      warning(ifelse(nrow(rowData(profile)) != nrow(assays(profile)[[1]]),
+                     sprintf("%s: number of features in fData is different from SummarizedExperiment slots", nn),
+                     sprintf("%s: rowData dimension is OK", nn)
+                     )
+              )
+      warning(ifelse(nrow(colData(profile)) != ncol(assays(profile)[[1]]),
+                     sprintf("%s: number of cell lines in pData is different from expression slots", nn),
+                     sprintf("%s: colData dimension is OK", nn)
+                     )
+              )
       
       
       # Checking sample metadata for required columns
@@ -1531,15 +1550,15 @@ checkPSetStructure <-
       print("rownames of curation drug slot should be the same as drug slot (curated drug ids)")
     }
     
-    if(class(pSet@cell) != "data.frame") {
+    if(!is(pSet@cell, "data.frame")) {
       warning("cell slot class type should be dataframe")
     }
-    if(class(pSet@drug) != "data.frame") {
+    if(!is(pSet@drug, "data.frame")) {
       warning("drug slot class type should be dataframe")
     }
     if(pSet@datasetType %in% c("sensitivity", "both"))
     {
-      if(class(pSet@sensitivity$info) != "data.frame") {
+      if(!is(pSet@sensitivity$info, "data.frame")) {
         warning("sensitivity info slot class type should be dataframe")
       }
       if("cellid" %in% colnames(pSet@sensitivity$info)) {
