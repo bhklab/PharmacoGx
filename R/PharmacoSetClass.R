@@ -91,6 +91,7 @@
 #'   PharmacoSet, for proper processing of the data
 #' @param verify \code{boolean} Should the function verify the PharmacoSet and
 #'   print out any errors it finds after construction?
+#' 
 #' @return An object of class PharmacoSet
 #
 #' @import methods
@@ -331,10 +332,10 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' molecularProfiles(CCLEsmall, "rna")
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve molecular profiles from
+#' @param cSet The parameter name from the generic function definition
 #' @param mDataType \code{character} The type of molecular data
 #' @param assay \code{character} Name of the desired assay; if excluded defaults to first assay
 #'   in the SummarizedExperiment for the given mDataType
-#' @param ... \code{list} Fall through params for other functions. Needed to add new arguments to a generic.
 #' 
 #' @return a \code{matrix} of data for the given mDataType and assay
 #' 
@@ -342,7 +343,6 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' 
 #' @describeIn PharmacoSet Return the given type of molecular data from the PharmacoSet 
 #' @export
-#' @inheritParams molecularProfiles
 setMethod(molecularProfiles, "PharmacoSet", function(cSet=pSet, mDataType, assay){
   callNextMethod(cSet, mDataType, assay)
 })
@@ -501,7 +501,7 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(cSet=pSet) {
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' @return Updated \code{PharmacoSet} 
 #' 
-#' @importFrom CoreGx sensitivitiyProfiles<-
+#' @importFrom CoreGx sensitivityProfiles<-
 #' 
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
@@ -673,22 +673,23 @@ setMethod(dateCreated, "PharmacoSet", function(cSet=pSet) {
   callNextMethod(cSet)
 })
 
-#' pSetName Generic
+#' name Generic
 #' 
-#' A generic for the pSetName method
+#' Retrun the name of the PharmacoSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' pSetName(CCLEsmall)
+#' name(CCLEsmall)
 #' 
-#' @param pSet A \code{PharmacoSet} 
+#' @param pSet A \code{PharmacoSet}
+#' @param cSet The parameter name from the generic function defintion
 #' @return The name of the PharmacoSet
 #'
-#' @importFrom CoreGx cSetName
+#' @importFrom CoreGx name
 #' 
 #' @describeIn PharmacoSet Return the name of the PharmacoSet 
 #' @export
-setMethod(pSetName, "PharmacoSet", function(cSet=pSet){
+setMethod(name, "PharmacoSet", function(cSet=pSet){
   callNextMethod(cSet)
 })
 
