@@ -1,3 +1,4 @@
+##TODO:: Add function documentation
 computeDSS <- function(concentration,
                        viability,
                        Hill_fit,

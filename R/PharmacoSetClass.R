@@ -43,19 +43,7 @@
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   PharmacoSet, for proper processing of the data
 #' @return An object of the PharmacoSet class
-.PharmacoSet <- setClass("PharmacoSet", slots = list(
-                                                     annotation = "list",
-                                                     molecularProfiles = "list",
-                                                     cell="data.frame", 
-                                                     drug="data.frame", 
-                                                     datasetType="character", 
-                                                     sensitivity="list",
-                                                     perturbation="list",
-                                                     curation="list"
-                                                     # tables="array",
-                                                     # table.summary="list",
-                                                     # dateCreated="character",
-                                                     ))
+.PharmacoSet <- setClass("PharmacoSet", slots = list(drug="data.frame"), contains="CoreSet")
 
 
 # The default constructor above does a poor job of explaining the required 
@@ -63,7 +51,6 @@
 # user into providing the required components of the curation and senstivity 
 # lists and hides the annotation slot which the user does not need to manually 
 # fill. This also follows the design of the Expression Set class.
-
 
 #####
 # CONSTRUCTOR -----
@@ -177,7 +164,6 @@ PharmacoSet <-  function(name,
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
     ### TODO:: Make sure to fix the curation to check for matching row names to the drug and cell line matrices!!!!!!
     
-    
     perturbation <- list()
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
@@ -205,47 +191,44 @@ PharmacoSet <-  function(name,
 # CELL SLOT GETTERS/SETTERS ----
 #####
 
-#' cellInfo Generic
-#' 
-#' Generic for cellInfo method 
-#' 
+#' cellInfo
+#'
+#' Return cell line metadata from a pSet
+#'
 #' @examples
 #' data(CCLEsmall)
 #' cellInfo(CCLEsmall)
-#' 
+#'
 #' @param pSet The \code{PharmacoSet} to retrieve cell info from
-#' 
+#' @param cSet Parameter name from generic
+#'
 #' @return a \code{data.frame} with the cell annotations
-setGeneric("cellInfo", function(pSet) standardGeneric("cellInfo"))
+#' 
+#' @describeIn PharmacoSet
+#' 
+#' @importFrom CoreGx cellInfo
+setMethod(cellInfo, "PharmacoSet", function(cSet=pSet){
+  callNextMethod(cSet=pSet)
+})
 
 #' cellInfo<- Generic
-#' 
+#'
 #' Generic for cellInfo replace method
-#' 
+#'
 #' @examples
 #' data(CCLEsmall)
 #' cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
-#' 
+#'
 #' @param object The \code{PharmacoSet} to replace cell info in
 #' @param value A \code{data.frame} with the new cell annotations
 #' @return Updated \code{PharmacoSet}
-setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
-#' @describeIn PharmacoSet Returns the annotations for all the cell lines tested on in the PharmacoSet
+#'
 #' @export
-setMethod(cellInfo, "PharmacoSet", function(pSet){
-  pSet@cell
+#' 
+#' @importFrom CoreGx cellInfo<-
+setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value){
+  callNextMethod(object, value)
 })
-#' @describeIn PharmacoSet Update the cell line annotations
-#' @export
-setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-  if(is.null(rownames(value))){
-    stop("Please provide the cell_id as rownames for the cell line annotations")
-  }
-  
-  object@cell <- value
-  object
-})
-
 
 #####
 # DRUG SLOT GETTERS/SETTERS ----
@@ -262,6 +245,13 @@ setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet",value="d
 #' @param pSet The \code{PharmacoSet} to retrieve drug info from
 #' @return a \code{data.frame} with the drug annotations
 setGeneric("drugInfo", function(pSet) standardGeneric("drugInfo"))
+#' @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
+#' 
+#' @export
+#' 
+setMethod(drugInfo, "PharmacoSet", function(pSet){
+  pSet@drug
+})
 
 #' drugInfo<- Generic
 #' 
@@ -274,18 +264,12 @@ setGeneric("drugInfo", function(pSet) standardGeneric("drugInfo"))
 #' @param object The \code{PharmacoSet} to replace drug info in
 #' @param value A \code{data.frame} with the new drug annotations
 #' @return Updated \code{PharmacoSet}
-setGeneric("drugInfo<-", function(object, value) standardGeneric("drugInfo<-"))
-#' @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
 #' 
-#' @export
-#' 
-setMethod(drugInfo, "PharmacoSet", function(pSet){
-  pSet@drug
-})
+setGeneric('drugInfo<-', function(object, value) standardGeneric('drugInfo<-'))
 #' @describeIn PharmacoSet Update the drug annotations
 #' 
 #' @export
-setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
+setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value) {
   object@drug <- value
   object
 })
@@ -303,18 +287,17 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet",value="d
 #' phenoInfo(CCLEsmall, mDataType="rna")
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve rna annotations from
+#' @param cSet Parameter name from parent method inherited from CoreGx
 #' @param mDataType the type of molecular data 
+#' 
 #' @return a \code{data.frame} with the experiment info
-setGeneric("phenoInfo", function(pSet, mDataType) standardGeneric("phenoInfo"))
+#' 
+#' @importFrom CoreGx phenoInfo
+#' 
 #' @describeIn PharmacoSet Return the experiment info from the given type of molecular data in PharmacoSet 
 #' @export
-setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
-    
-  if(mDataType %in% names(pSet@molecularProfiles)){ # Columns = Samples
-    return(colData(pSet@molecularProfiles[[mDataType]]))
-  }else{
-    return(NULL)
-  }
+setMethod(phenoInfo, "PharmacoSet", function(cSet=pSet, mDataType){
+    callNextMethod(cSet, mDataType)
 })
 
 #' phenoInfo<- Generic
@@ -331,22 +314,12 @@ setMethod(phenoInfo, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @return The updated \code{PharmacoSet}
 #' 
-setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
-#' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet 
-#' @export
-setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="data.frame"), function(object, mDataType, value){
-  if(mDataType %in% names(object@molecularProfiles)){
-    SummarizedExperiment::colData(object@molecularProfiles[[mDataType]]) <- S4Vectors::DataFrame(value, rownames = rownames(value))
-  }
-  object
-})
+#' @importFrom CoreGx phenoInfo<-
+#' 
 #' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet
 #' @export 
 setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
-  if(mDataType %in% names(object@molecularProfiles)){
-    SummarizedExperiment::colData(object@molecularProfiles[[mDataType]]) <- value
-  }
-  object
+  callNextMethod(object, mDataType, value)
 })
 
 #' molecularProfiles Generic
@@ -365,25 +338,13 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' 
 #' @return a \code{matrix} of data for the given mDataType and assay
 #' 
-setGeneric("molecularProfiles", function(pSet, mDataType, assay, ...) standardGeneric("molecularProfiles"))
+#' @importFrom CoreGx molecularProfiles
+#' 
 #' @describeIn PharmacoSet Return the given type of molecular data from the PharmacoSet 
 #' @export
 #' @inheritParams molecularProfiles
-setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType, assay){
-    
-  if(mDataType %in% names(pSet@molecularProfiles)){
-    if (!missing(assay)) {
-      if (assay %in% assayNames(pSet@molecularProfiles[[mDataType]])) {
-        return(SummarizedExperiment::assay(pSet@molecularProfiles[[mDataType]], assay))
-      } else {
-        stop(paste('Assay', assay, 'not found in the SummarizedExperiment object!'))
-      }
-    } else {
-      return(SummarizedExperiment::assay(pSet@molecularProfiles[[mDataType]], 1))
-    }
-  } else {
-    stop(paste0('mDataType ', mDataType, ' not found the pSet!'))
-  }
+setMethod(molecularProfiles, "PharmacoSet", function(cSet=pSet, mDataType, assay){
+  callNextMethod(cSet, mDataType, assay)
 })
 
 #' molecularProfiles<- Generic
@@ -402,22 +363,17 @@ setMethod(molecularProfiles, "PharmacoSet", function(pSet, mDataType, assay){
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
-setGeneric("molecularProfiles<-", function(object, mDataType, assay, ..., value) standardGeneric("molecularProfiles<-"))
+#' @importFrom CoreGx molecularProfiles<-
+#' 
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
-  }
-  object
+  callNextMethod(object, mDataType, assay, value)
 })
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
-  }
-  object
+  callNextMethod(object, mDataType, assay, value)
 })
 
 #' featureInfo Generic
@@ -429,20 +385,17 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
 #' featureInfo(CCLEsmall, "rna")
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve feature annotations from
+#' @param cSet Parameter name from parent class
 #' @param mDataType the type of molecular data 
 #' @return a \code{data.frame} with the experiment info
-setGeneric("featureInfo", function(pSet, mDataType) standardGeneric("featureInfo"))
+#'
 #' @describeIn PharmacoSet Return the feature info for the given molecular data
 #' 
+#' @importFrom CoreGx featureInfo
+#' 
 #' @export
-setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
-  
-  if(mDataType %in% names(pSet@molecularProfiles)){
-    return(SummarizedExperiment::rowData(pSet@molecularProfiles[[mDataType]]))
-  }else{
-    return(NULL)
-  }
-  
+setMethod(featureInfo, "PharmacoSet", function(cSet=pSet, mDataType){
+  callNextMethod(cSet, mDataType)
 })
 
 #' featureInfo<- Generic
@@ -459,17 +412,13 @@ setMethod(featureInfo, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
-setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("featureInfo<-"))
+#' @importFrom CoreGx featureInfo<-
+#' 
 #' @describeIn PharmacoSet Replace the gene info for the molecular data
 #' 
 #' @export
 setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
-  
-  if(mDataType %in% names(object@molecularProfiles)){
-    SummarizedExperiment::rowData(object@molecularProfiles[[mDataType]]) <- 
-      S4Vectors::DataFrame(value, rownames = rownames(value))
-  }
-  object
+  callNextMethod(object, mDataType, value)
 })
 
 #####
@@ -478,25 +427,29 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
 
 #' sensitivityInfo Generic
 #' 
-#' Generic for sensitivityInfo method
+#' Get the senstivity information DataFrame from a pSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
 #' sensitivityInfo(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve sensitivity experiment annotations from
+#' @param cSet Parameter from parent class
+#' 
 #' @return a \code{DataFrame} with the experiment info
-setGeneric("sensitivityInfo", function(pSet) standardGeneric("sensitivityInfo"))
+#'
+#' @importFrom CoreGx sensitivityInfo
+#'
 #' @describeIn PharmacoSet Return the drug dose sensitivity experiment info
+#'
 #' @export
-setMethod(sensitivityInfo, "PharmacoSet", function(pSet){
-    return(pSet@sensitivity$info)
+setMethod(sensitivityInfo, "PharmacoSet", function(cSet=pSet){
+  callNextMethod(cSet)
 })
 
 #' sensitivityInfo<- Generic
 #' 
-#' A generic for the sensitivityInfo replacement method
-#' 
+#' Set the sensitivityInfo DataFrame in a pSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
@@ -505,38 +458,40 @@ setMethod(sensitivityInfo, "PharmacoSet", function(pSet){
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{DataFrame} with the new sensitivity annotations
 #' @return Updated \code{PharmacoSet} 
-setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
+#' 
+#' @importFrom CoreGx sensitivityInfo<-
+#' 
 #' @describeIn PharmacoSet Update the sensitivity experiment info
 #' @export
 setReplaceMethod("sensitivityInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-
-    object@sensitivity$info <- value
-    object
+  callNextMethod(object, value)
 })
 
 
-#' sensitivityProfiles Generic
+#' sensitivityProfiles
 #' 
-#' Generic for sensitivityProfiles method 
+#' Get the sensitivityProfiles data.frame from a pSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
 #' sensitivityProfiles(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} to retrieve sensitivity experiment data from
+#' @param cSet Parameter from parent class
+#' 
 #' @return a \code{data.frame} with the experiment info
-setGeneric("sensitivityProfiles", function(pSet) standardGeneric("sensitivityProfiles"))
+#'
+#' @importFrom CoreGx sensitivityProfiles
+#' 
 #' @describeIn PharmacoSet Return the phenotypic data for the drug dose sensitivity
 #' @export
-setMethod(sensitivityProfiles, "PharmacoSet", function(pSet){
-    
-    return(pSet@sensitivity$profiles)
-    
+setMethod(sensitivityProfiles, "PharmacoSet", function(cSet=pSet) {
+  callNextMethod(cSet)
 })
 
-#' sensitivityProfiles<- Generic
+#' sensitivityProfiles<-
 #' 
-#' A generic for the sensitivityProfiles replacement method
+#' Set the sensitivityProfiles in a pSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
@@ -545,41 +500,42 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(pSet){
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' @return Updated \code{PharmacoSet} 
-setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
+#' 
+#' @importFrom CoreGx sensitivitiyProfiles<-
+#' 
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-
-    object@sensitivity$profiles <- value
-    object
+  classNextMethod(object, value)
 })
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-
-    object@sensitivity$profiles <- as.data.frame(value)
-    object
+  classNextMethod(object, value)
 })
+
 #' sensitivityMeasures Generic
 #' 
-#' A generic for the sensitivityMeasures  method
+#' Get the types of sensitivity measurements from a pSet object
 #' 
 #' @examples
 #' data(CCLEsmall)
 #' sensitivityMeasures(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} 
+#' @param cSet Parameter from parent class
+#' 
 #' @return A \code{character} vector of all the available sensitivity measures
-setGeneric("sensitivityMeasures", function(pSet) standardGeneric("sensitivityMeasures"))
+#'
+#' @importFrom CoreGx sensitivityMeasures
+#'
 #' @describeIn PharmacoSet returns the available sensitivity profile
 #'   summaries, for example, whether there are IC50 values available
 #' @export
-setMethod(sensitivityMeasures, "PharmacoSet", function(pSet){
-    
-    return(colnames(sensitivityProfiles(pSet)))
-    
+setMethod(sensitivityMeasures, "PharmacoSet", function(cSet=pSet){
+  callNextMethod(cSet)
 })
 
 ##TODO:: Arrange slot accessors to be together!
@@ -598,7 +554,6 @@ setGeneric("drugNames", function(pSet) standardGeneric("drugNames"))
 #' @describeIn PharmacoSet Return the names of the drugs used in the PharmacoSet
 #' @export
 setMethod(drugNames, "PharmacoSet", function(pSet){
-  
   rownames(drugInfo(pSet))
 })
 
@@ -618,7 +573,6 @@ setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-")
 #' @describeIn PharmacoSet Update the drug names used in the dataset
 #' @export
 setReplaceMethod("drugNames", signature = signature(object="PharmacoSet",value="character"), function(object, value){
-    
     object <- updateDrugId(object, value)
     return(object)
     })
@@ -632,13 +586,16 @@ setReplaceMethod("drugNames", signature = signature(object="PharmacoSet",value="
 #' cellNames(CCLEsmall)
 #' 
 #' @param pSet The \code{PharmacoSet} to return cell names from
+#' @param cSet Parameter from parent class
 #' @return A vector of the cell names used in the PharmacoSet
-setGeneric("cellNames", function(pSet) standardGeneric("cellNames"))
+#' 
+#' @importFrom CoreGx cellNames
+#' 
 #' @describeIn PharmacoSet Return the cell names used in the dataset
 #' @export
-setMethod(cellNames, "PharmacoSet", function(pSet){
-  
-  rownames(cellInfo(pSet))
+#' 
+setMethod(cellNames, "PharmacoSet", function(cSet=pSet){
+  callNextMethod(cSet)
 })
 
 #' cellNames<- Generic
@@ -651,18 +608,17 @@ setMethod(cellNames, "PharmacoSet", function(pSet){
 #' 
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{character} vector of the new cell names
-#' @return Updated \code{PharmacoSet} 
-setGeneric("cellNames<-", function(object, value) standardGeneric("cellNames<-"))
+#' 
+#' @return Updated \code{PharmacoSet}
+#'  
+#' @importFrom CoreGx cellNames<-
+#' 
 #' @describeIn PharmacoSet Update the cell names used in the dataset
 #' @export
 setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="character"), function(object, value){
-    
-    object <- updateCellId(object, value)
-    return(object)
+    callNextMethod(object, value)
     })
 
-
-    #### TODO:: set replace method for genenames
 #' fNames Generic
 #' 
 #' A generic for the fNames method
@@ -670,19 +626,32 @@ setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="
 #' @examples
 #' data(CCLEsmall)
 #' fNames(CCLEsmall, "rna")
-#' 
+
 #' @param pSet The \code{PharmacoSet} 
 #' @param mDataType The molecular data type to return feature names for
 #' @return A \code{character} vector of the feature names
-setGeneric("fNames", function(pSet, mDataType) standardGeneric("fNames"))
+#' 
+#' @importFrom CoreGx fNames
+#' 
 #' @describeIn PharmacoSet Return the feature names used in the dataset
 #' @export
-setMethod(fNames, "PharmacoSet", function(pSet, mDataType){
-  if (mDataType %in% names(pSet@molecularProfiles)) {
-    rownames(featureInfo(pSet, mDataType))
-  } else {
-    stop("Molecular data type name specified is not part of this PharmacoSet")
-  }
+setMethod(fNames, "PharmacoSet", function(cSet=pSet, mDataType){
+  callNextMethod(cSet, mDataType)
+})
+
+#' fNames<-
+#'
+#' Set feature names of the pSet object
+#' 
+#' @param object The \code{CoreSet} to update
+#' @param value A \code{character} vector of the new cell names
+#' @return Updated \code{CoreSet} 
+#'
+#' @importFrom CoreGx fNames<-
+#'
+#' @export
+setReplaceMethod("fNames", signature = signature(object="PharmacoSet",value="character"), function(object, value){
+  callNextMethod(object, value)
 })
 
 #' dateCreated Generic
@@ -695,11 +664,13 @@ setMethod(fNames, "PharmacoSet", function(pSet, mDataType){
 #' 
 #' @param pSet A \code{PharmacoSet} 
 #' @return The date the PharmacoSet was created
-setGeneric("dateCreated", function(pSet) standardGeneric("dateCreated"))
+#'
+#' @importFrom CoreGx dateCreated
+#'
 #' @describeIn PharmacoSet Return the date the PharmacoSet was created
 #' @export
-setMethod(dateCreated, "PharmacoSet", function(pSet) {
-  pSet@annotation$dateCreated
+setMethod(dateCreated, "PharmacoSet", function(cSet=pSet) {
+  callNextMethod(cSet)
 })
 
 #' pSetName Generic
@@ -712,13 +683,13 @@ setMethod(dateCreated, "PharmacoSet", function(pSet) {
 #' 
 #' @param pSet A \code{PharmacoSet} 
 #' @return The name of the PharmacoSet
-setGeneric("pSetName", function(pSet) standardGeneric("pSetName"))
+#'
+#' @importFrom CoreGx cSetName
+#' 
 #' @describeIn PharmacoSet Return the name of the PharmacoSet 
 #' @export
-setMethod(pSetName, "PharmacoSet", function(pSet){
-    
-    return(pSet@annotation$name)
-    
+setMethod(pSetName, "PharmacoSet", function(cSet=pSet){
+  callNextMethod(cSet)
 })
 
 #' pertNumber Generic
@@ -736,9 +707,7 @@ setGeneric("pertNumber", function(pSet) standardGeneric("pertNumber"))
 #'   experiments
 #' @export
 setMethod(pertNumber, "PharmacoSet", function(pSet){
-    
     return(pSet@perturbation$n)
-    
 })
 
 
@@ -757,9 +726,7 @@ setGeneric("sensNumber", function(pSet) standardGeneric("sensNumber"))
 #'   experiments
 #' @export
 setMethod(sensNumber, "PharmacoSet", function(pSet){
-  
   return(pSet@sensitivity$n)
-  
 })
 
 #' pertNumber<- Generic
@@ -778,10 +745,7 @@ setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-
 #'   experiments
 #' @export
 setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet",value="array"), function(object, value){
-  
-  object@perturbation$n <- value
-  object
-  
+  callNextMethod()
 })
 
 #' sensNumber<- Generic
@@ -801,10 +765,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 #'   experiments
 #' @export
 setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-  
-  object@sensitivity$n <- value
-  object
-  
+  callNextMethod()
 })
 
 #' Show a PharamcoSet
@@ -817,23 +778,9 @@ setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value=
 #' 
 #' @return Prints the PharmacoSet object to the output stream, and returns invisible NULL. 
 #' @export
-setMethod("show", signature=signature(object="PharmacoSet"), 
-    function(object) {
-        cat("Name: ", pSetName(object), "\n")
-        cat("Date Created: ", dateCreated(object), "\n")
-    cat("Number of cell lines: ", nrow(cellInfo(object)), "\n")
-    cat("Number of drug compounds: ", nrow(drugInfo(object)), "\n")
-      if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")}
-      if("rna" %in% names(object@molecularProfiles)){cat("RNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rna")), "\n")}
-      if("rnaseq" %in% names(object@molecularProfiles)){cat("RNASeq: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rnaseq")), "\n")}
-      if("snp" %in% names(object@molecularProfiles)){cat("SNP: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="snp")), "\n")}
-      if("cnv" %in% names(object@molecularProfiles)){cat("CNV: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="cnv")), "\n")}
-        cat("Drug pertubation: \n")
-        cat("\tPlease look at pertNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
-        cat("Drug sensitivity: \n")
-        cat("\tNumber of Experiments: ",nrow(sensitivityInfo(object)),"\n")
-        cat("\tPlease look at sensNumber(pSet) to determine number of experiments for each drug-cell combination.\n")
-    })
+setMethod("show", signature=signature(object="PharmacoSet"), function(object) {
+  callNextMethod()
+})
 
 
 #' mDataNames
@@ -847,10 +794,10 @@ setMethod("show", signature=signature(object="PharmacoSet"),
 #' @param pSet PharamcoSet object
 #' @return Vector of names of the molecular data types
 #' @export
-mDataNames <- function(pSet){
+setMethod('mDataNames', "PharmacoSet", function(cSet=pSet) {
+  callNextMethod()
+})
 
-  return(names(pSet@molecularProfiles))
-}
 
 #'`[`
 #'

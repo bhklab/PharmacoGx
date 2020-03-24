@@ -1,3 +1,4 @@
+##TODO:: Add function documentation
 getRawSensitivityMatrix <-
   function(pSet, cell.id, drug.id, max.conc, quality) {
     cond <- "pSet@sensitivity$info$cellid == cell.id"

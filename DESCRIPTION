@@ -28,8 +28,10 @@ Imports:
     grDevices, 
     lsa, 
     reshape2,
-    testthat
-Depends: R (>= 3.6) 
+    testthat,
+    remotes
+Remotes: bhklab/CoreGx@eSet_to_SE
+Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification

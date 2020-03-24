@@ -1,4 +1,4 @@
-
+##FIXME:: This function is also defined in dmedcauchys.R?
 .multinom<-function(x, y) {
   coeff <- 1
   for (i in seq_len(length(y))) {
