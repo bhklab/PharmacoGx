@@ -697,12 +697,12 @@ setMethod(name, "PharmacoSet", function(object){
 #' 
 #' @param object A \code{PharmacoSet} 
 #' @return A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
-setGeneric("pertNumber", function(object) standardGeneric("pertNumber"))
+
 #' @describeIn PharmacoSet Return the summary of available perturbation
 #'   experiments
 #' @export
 setMethod(pertNumber, "PharmacoSet", function(object){
-    return(object@perturbation$n)
+  callNextMethod(object)
 })
 
 
@@ -716,12 +716,11 @@ setMethod(pertNumber, "PharmacoSet", function(object){
 #' 
 #' @param object A \code{PharmacoSet} 
 #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-setGeneric("sensNumber", function(object) standardGeneric("sensNumber"))
 #' @describeIn PharmacoSet Return the summary of available sensitivity
 #'   experiments
 #' @export
 setMethod(sensNumber, "PharmacoSet", function(object){
-  return(object@sensitivity$n)
+  callNextMethod(object)
 })
 
 #' pertNumber<- Generic
@@ -735,12 +734,12 @@ setMethod(sensNumber, "PharmacoSet", function(object){
 #' @param object A \code{PharmacoSet} 
 #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
 #' @return The updated \code{PharmacoSet} 
-setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
+#'
 #' @describeIn PharmacoSet Update the summary of available perturbation
 #'   experiments
 #' @export
 setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet",value="array"), function(object, value){
-  callNextMethod()
+  callNextMethod(object)
 })
 
 #' sensNumber<- Generic
@@ -755,12 +754,13 @@ setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet",value=
 #' @param object A \code{PharmacoSet} 
 #' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
 #' @return The updated \code{PharmacoSet} 
-setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
+#'
 #' @describeIn PharmacoSet Update the summary of available sensitivity
 #'   experiments
+#'
 #' @export
 setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-  callNextMethod()
+  callNextMethod(object, value)
 })
 
 #' Show a PharamcoSet

@@ -7,12 +7,12 @@
 \S4method{fNames}{PharmacoSet,character}(object) <- value
 }
 \arguments{
-\item{object}{The \code{CoreSet} to update}
+\item{object}{The \code{PharmacoSet} object to update}
 
 \item{value}{A \code{character} vector of the new cell names}
 }
 \value{
-Updated \code{CoreSet}
+Updated \code{PhmaSet}
 }
 \description{
 Set feature names of the object object
