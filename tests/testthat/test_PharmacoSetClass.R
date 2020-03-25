@@ -62,10 +62,9 @@ test_that("fNames result did not change since last time", {
 })
 
 
-
-test_that("pSetName result did not change since last time", {
+test_that("name result did not change since last time", {
 	data(GDSCsmall)
-	expect_equal(pSetName(GDSCsmall), "GDSC")
+	expect_equal(name(GDSCsmall), "GDSC")
 })
 
 test_that("updateCellId works without duplicates", {

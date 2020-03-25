@@ -3,7 +3,7 @@
 export(PharmacoSet)
 export(amcc)
 export(availablePSets)
-export(checkPSetStructure)
+export(checkobjectStructure)
 export(computeABC)
 export(computeAUC)
 export(computeAmax)
