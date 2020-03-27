@@ -1,9 +1,9 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 1.16.1
-Date: 2017-11-23
-Author: Petr Smirnov, Zhaleh Safikhani, Mark Freeman, Benjamin Haibe-Kains
+Version: 2.0.0
+Date: 2020-03-25
+Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
@@ -30,7 +30,7 @@ Imports:
     reshape2,
     testthat,
     remotes
-Remotes: bhklab/CoreGx@eSet_to_SE
+Remotes: bhklab/CoreGx@eSet_To_SE
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr

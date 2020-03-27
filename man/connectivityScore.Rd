@@ -57,7 +57,6 @@ xx <- cbind(xValue, xSig)
 yy <- cbind(yValue, ySig)
 rownames(xx) <- rownames(yy) <- c('1','2','3','4','5','6','7','8','9','10','11')
 data.cor <- connectivityScore(xx,yy,method="gwc", gwc.method="spearman", nperm=300)
-
 }
 \references{
 F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted

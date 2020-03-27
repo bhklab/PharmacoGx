@@ -20,9 +20,9 @@
 #' @slot annotation A \code{list} of annotation data about the PharmacoSet,
 #'    including the \code{$name} and the session information for how the object
 #'    was creating, detailing the exact versions of R and all the packages used
-#' @slot molecularProfiles A \code{list} containing 4 \code{SummarizedExperiment} 
-#'   type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-#'   measurements respectively, with associated \code{fData} and \code{pData} 
+#' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment} 
+#'   type object for holding data for RNA, DNA, SNP and CNV 
+#'   measurements, with associated \code{fData} and \code{pData} 
 #'   containing the row and column metadata
 #' @slot cell A \code{data.frame} containing the annotations for all the cell 
 #'   lines profiled in the data set, across all data types
@@ -68,29 +68,36 @@
 #' ## For help creating a PharmacoSet object, please see the following vignette:
 #' browseVignettes("PharmacoGx")
 #' 
-#' @param name A \code{character} string detailing the name of the dataset
-#' @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
-#'   molecular profiles for each data type.
-#' @param cell A \code{data.frame} containg the annotations for all the cell
-#'   lines profiled in the data set, across all data types
-#' @param drug A \code{data.frame} containg the annotations for all the drugs
-#'   profiled in the data set, across all data types
-#' @param sensitivityInfo A \code{data.frame} containing the information for the
-#'   sensitivity experiments
-#' @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
-#'   dose response data for the sensitivity experiments
-#' @param sensitivityProfiles \code{data.frame} containing drug sensitivity profile 
-#'   statistics such as IC50 and AUC
-#' @param sensitivityN,perturbationN A \code{data.frame} summarizing the
-#'   available sensitivity/perturbation data
-#' @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
-#'   the names for drugs, cells and tissues used in the data set to universal
-#'   identifiers used between different PharmacoSet objects
-#' @param datasetType A \code{character} string of 'sensitivity',
-#'   'preturbation', or both detailing what type of data can be found in the
-#'   PharmacoSet, for proper processing of the data
-#' @param verify \code{boolean} Should the function verify the PharmacoSet and
-#'   print out any errors it finds after construction?
+##TODO:: Determine how to generalise the constructor documentation in CoreGx
+## to make sense with all three packages which depend on it. For now it says
+## CoreSet instead of PharmacoSet
+##TODO:: Determine if there is any way to execture R code when making roxygen2
+## documentation. Then we could use a variable to fill in the class for each
+## package.
+#' @inheritParams CoreGx::CoreSet
+# @param name A \code{character} string detailing the name of the dataset
+# @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
+#   molecular profiles for each data type.
+# @param cell A \code{data.frame} containg the annotations for all the cell
+#   lines profiled in the data set, across all data types
+# @param drug A \code{data.frame} containg the annotations for all the drugs
+#   profiled in the data set, across all data types
+# @param sensitivityInfo A \code{data.frame} containing the information for the
+#   sensitivity experiments
+# @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
+#   dose response data for the sensitivity experiments
+# @param sensitivityProfiles \code{data.frame} containing drug sensitivity profile
+#   statistics such as IC50 and AUC
+# @param sensitivityN,perturbationN A \code{data.frame} summarizing the
+#   available sensitivity/perturbation data
+# @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
+#   the names for drugs, cells and tissues used in the data set to universal
+#   identifiers used between different PharmacoSet objects
+# @param datasetType A \code{character} string of 'sensitivity',
+#   'preturbation', or both detailing what type of data can be found in the
+#   PharmacoSet, for proper processing of the data
+# @param verify \code{boolean} Should the function verify the PharmacoSet and
+#   print out any errors it finds after construction?
 #' 
 #' @return An object of class PharmacoSet
 #
@@ -187,6 +194,7 @@ PharmacoSet <-  function(name,
   return(pSet)
 }
 
+##TODO:: Figure out how to properly inherit params from CoreGx
 
 #####
 # CELL SLOT GETTERS/SETTERS ----
@@ -636,17 +644,30 @@ setMethod(fNames, signature=signature(object="PharmacoSet", mDataType="character
 
 #' fNames<-
 #'
+#' Setter for the feature names of a \code{SummarizedExperiment} in the 
+#'   molecularProfiles slot
+#'
+#' @examples
+#' data(CCLEsmall)
+#' fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
+#'
 #' Set feature names of the object object
 #' 
 #' @param object The \code{PharmacoSet} object to update
+#' @param mDataType The molecular data type to update
 #' @param value A \code{character} vector of the new cell names
-#' @return Updated \code{PhmaSet} 
+#' @return Updated \code{PharmacoSet} 
 #'
 #' @importFrom CoreGx fNames<-
 #'
 #' @export
-setReplaceMethod("fNames", signature = signature(object="PharmacoSet",value="character"), function(object, value){
-  callNextMethod(object, value)
+setReplaceMethod("fNames", 
+                 signature = signature(object="PharmacoSet",
+                                       mDataType='character', 
+                                       value="character"), 
+                 function(object, mDataType, value)
+{
+  callNextMethod(object, mDataType, value)
 })
 
 #' dateCreated Generic

@@ -275,7 +275,7 @@ drugSensitivitySig <- function(pSet,
     }
     
     drug.sensitivity <- PharmacoSig(drug.sensitivity, 
-                                    PSetName = pSetName(pSet), 
+                                    PSetName = name(pSet), 
                                     Call = as.character(match.call()), 
                                     SigType='Sensitivity',
                                     Arguments = list(

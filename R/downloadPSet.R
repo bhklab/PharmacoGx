@@ -79,12 +79,12 @@ downloadPSet <- function(name, saveDir=file.path(".", "PSets"), pSetFileName=NUL
   
   if(file.exists(outfn)){
     pSetTable <- read.table(outfn, as.is=TRUE)
-    newrow <- c(pSetName(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
+    newrow <- c(name(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
     pSetTable <- rbind(pSetTable, newrow)
     rownames(pSetTable) <- pSetTable[,1]
     write.table(pSetTable, file=outfn)
   } else {
-    newrow <- c(pSetName(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
+    newrow <- c(name(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
     pSetTable <- t(matrix(newrow))
     colnames(pSetTable) <- c("PSet.Name","Dataset.Type","Available.Molecular.Profiles","Date.Updated","URL")
     rownames(pSetTable) <- pSetTable[,1]

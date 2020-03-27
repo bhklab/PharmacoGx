@@ -98,7 +98,7 @@ function(drug,
   if(!missing(pSets)){
     if (!is(pSets, "list")) {
       if (is(pSets, "PharmacoSet")) {
-        temp <- pSetName(pSets)
+        temp <- name(pSets)
         pSets <- list(pSets)
         names(pSets) <- temp
       } else {
@@ -182,7 +182,7 @@ function(drug,
       exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"cellid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"drugid"] == drug)
       if(length(exp_i) > 0) {
         if (summarize.replicates) {
-          pSetNames[[i]] <- pSetName(pSets[[i]])
+          pSetNames[[i]] <- name(pSets[[i]])
           if (length(exp_i) == 1) {
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
               "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=FALSE))
@@ -209,7 +209,7 @@ function(drug,
         }else {
           for (exp in exp_i) {
             j <- j + 1
-            pSetNames[[j]] <- pSetName(pSets[[i]])
+            pSetNames[[j]] <- name(pSets[[i]])
 
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Dose"])),
               "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"])), stringsAsFactors=FALSE))

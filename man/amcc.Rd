@@ -2,43 +2,48 @@
 % Please edit documentation in R/AdaptiveMatthewCor.R
 \name{amcc}
 \alias{amcc}
-\title{Calculate an Adaptive Matthews Correlation Coefficient}
+\title{Adaptive Matthews Correlation Coefficient}
 \usage{
-amcc(
-  x,
-  y,
-  step.prct = 0,
-  min.cat = 3,
-  nperm = 1000,
-  setseed = 12345,
-  nthread = 1
-)
+amcc(x, y, step.prct = 0, min.cat = 3, nperm = 1000, nthread = 1)
 }
 \arguments{
-\item{x, y}{Two paired vectors of values. Could be replicates of observations for the same experiments for example.}
+\item{x}{Two paired vectors of values. Could be replicates of observations 
+for the same experiments for example.}
 
-\item{step.prct}{Instead of testing all possible splits of the data, it is possible to test steps of a percentage size of the total number of ranks in x/y. If this variable is 0, function defaults to testing all possible splits.}
+\item{y}{Two paired vectors of values. Could be replicates of observations 
+for the same experiments for example.}
 
-\item{min.cat}{The minimum number of members per category. Classifications with less members fitting into both categories will not be considered.}
+\item{step.prct}{Instead of testing all possible splits of the data, it is 
+possible to test steps of a percentage size of the total number of ranks in 
+x/y. If this variable is 0, function defaults to testing all possible 
+splits.}
 
-\item{nperm}{The number of perumatation to use for estimating significance. If 0, then no p-value is calculated.}
+\item{min.cat}{The minimum number of members per category. Classifications 
+with less members fitting into both categories will not be considered.}
 
-\item{setseed}{Allows setting a consitent seed for reproducibility of permutation testing results. Defaults to 12345.}
+\item{nperm}{The number of perumatation to use for estimating significance. 
+If 0, then no p-value is calculated.}
 
-\item{nthread}{Number of threads to parallize over. Both the AMCC calculation and the permutation testing is done in parallel.}
+\item{nthread}{Number of threads to parallize over. Both the AMCC calculation 
+and the permutation testing is done in parallel.}
 }
 \value{
-Returns a list with two elements. $amcc contains the highest "mcc" value over all the splits, the p value, as well as the rank at which the split was done.
+Returns a list with two elements. $amcc contains the highest "mcc" 
+  value over all the splits, the p value, as well as the rank at which the 
+  split was done.
 }
 \description{
-This function calculates an Adaptive Matthews Correlation Coefficient (AMCC) for two vectors of values identical length. It assumes the entries in the two vectors are paired.
-The Adaptive Matthews Correlation Coefficient for two vectors of values is defined as the Maximum Matthews Coefficient over all possible 
-binary splits of the ranks of the two vectors. In this way, it calculates the best possible agreement of a binary 
-classifier on the two vectors of data. #If the AMCC is low, then it is impossible to find any binary classification of the two vectors with a high degree of concordance.
+This function calculates an Adaptive Matthews Correlation Coefficient (AMCC) 
+for two vectors of values of the same length. It assumes the entries in the 
+two vectors are paired. The Adaptive Matthews Correlation Coefficient for two
+vectors of values is defined as the Maximum Matthews Coefficient over all 
+possible binary splits of the ranks of the two vectors. In this way, it 
+calculates the best possible agreement of a binary classifier on the two 
+vectors of data. If the AMCC is low, then it is impossible to find any binary 
+classification of the two vectors with a high degree of concordance.
 }
 \examples{
 x <- c(1,2,3,4,5,6,7)
 y <- c(1,3,5,4,2,7,6)
 amcc(x,y, min.cat=2)
-
 }

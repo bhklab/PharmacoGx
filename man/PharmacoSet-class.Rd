@@ -90,7 +90,7 @@
 \arguments{
 \item{object}{A \code{PharmacoSet}}
 
-\item{value}{A \code{character} vector of the new cell names}
+\item{value}{A new \code{data.frame} with the number of sensitivity experiments per drug and cell line}
 
 \item{mDataType}{The molecular data type to return feature names for}
 
@@ -134,6 +134,14 @@ A \code{character} vector of the feature names
 The date the PharmacoSet was created
 
 The name of the PharmacoSet
+
+A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+
+A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+
+The updated \code{PharmacoSet}
+
+The updated \code{PharmacoSet}
 }
 \description{
 The PharmacoSet (pSet) class was developed to contain and organise large 
@@ -180,6 +188,14 @@ Return the feature names for the specified molecular data type
 A generic for the dateCreated method
 
 Retrun the name of the PharmacoSet object
+
+A generic for the pertNumber method
+
+A generic for the sensNumber method
+
+A generic for the pertNumber method
+
+A generic for the sensNumber method
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -252,9 +268,9 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{SummarizedExperiment} 
-type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-measurements respectively, with associated \code{fData} and \code{pData} 
+\item{\code{molecularProfiles}}{A \code{list} containing \code{SummarizedExperiment} 
+type object for holding data for RNA, DNA, SNP and CNV 
+measurements, with associated \code{fData} and \code{pData} 
 containing the row and column metadata}
 
 \item{\code{cell}}{A \code{data.frame} containing the annotations for all the cell 
@@ -333,5 +349,17 @@ dateCreated(CCLEsmall)
 
 data(CCLEsmall)
 name(CCLEsmall)
+
+data(CCLEsmall)
+pertNumber(CCLEsmall)
+
+data(CCLEsmall)
+sensNumber(CCLEsmall)
+
+data(CCLEsmall)
+pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
+
+data(CCLEsmall)
+sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
 
 }
