@@ -15,7 +15,7 @@
 #' @importFrom stats setNames
 #' 
 #' @export
-convertPsetMolecularProfilesToSE <- function(pSet) {
+.convertPsetMolecularProfilesToSE <- function(pSet) {
   
   eSets <- pSet@molecularProfiles # Extract eSet data
   
@@ -72,7 +72,7 @@ convertPsetMolecularProfilesToSE <- function(pSet) {
 ##' 
 ##' @export
 ##'
-validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
+.validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   
   # Testing that pSets are in correct order
   print("Checking is pSet structures are correct")
@@ -192,11 +192,11 @@ validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
 #' Utility function to resave all datasets after modifying convertPSetMolecularProfiles
 #' 
 #' @param datasets \code{character} A list of the example datasets to update
-resaveAllExampleDatasets <- function(datasets) {
+.resaveAllExampleDatasets <- function(datasets) {
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
-    assign(dataset, convertPsetMolecularProfilesToSE(get(dataset)))
+    assign(dataset, .convertPsetMolecularProfilesToSE(get(dataset)))
     save(list=dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }

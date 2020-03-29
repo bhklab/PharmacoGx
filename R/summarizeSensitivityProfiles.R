@@ -23,14 +23,14 @@
 #' @param fill.missing \code{boolean} should the missing cell lines not in the
 #'   molecular data object be filled in with missing values?
 #' @param verbose Should the function print progress messages?
+#' 
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
+#'   
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom stats median
 #' @importFrom reshape2 acast
 #' @export
-
-
 summarizeSensitivityProfiles <- function(pSet, 
                                          sensitivity.measure="auc_recomputed", 
                                          cell.lines, 

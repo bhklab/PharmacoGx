@@ -240,23 +240,23 @@ correlation coefficient.
 
   
   GDSC.auc <- summarizeSensitivityProfiles(
-                object=common$GDSC,
+                common$GDSC,
                 sensitivity.measure='auc_published', 
                 summary.stat="median",
                 verbose=FALSE)
   CCLE.auc <- summarizeSensitivityProfiles(
-                object=common$CCLE,
+                common$CCLE,
                 sensitivity.measure='auc_published', 
                 summary.stat="median",
                 verbose=FALSE)
   
   GDSC.ic50 <- summarizeSensitivityProfiles(
-                object=common$GDSC, 
+                common$GDSC, 
                 sensitivity.measure='ic50_published', 
                 summary.stat="median",
                 verbose=FALSE)
   CCLE.ic50 <- summarizeSensitivityProfiles(
-                object=common$CCLE, 
+                common$CCLE, 
                 sensitivity.measure='ic50_published', 
                 summary.stat="median",
                 verbose=FALSE)

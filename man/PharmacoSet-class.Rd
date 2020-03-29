@@ -95,8 +95,6 @@
 \item{mDataType}{The molecular data type to return feature names for}
 
 \item{assay}{\code{character} Name or index of the assay data to return}
-
-\item{...}{\code{list} Fall through parameters to other functions. Needed to add addtional arguments to a generic.}
 }
 \value{
 An object of the PharmacoSet class

@@ -377,7 +377,6 @@ setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay){
 #' @param mDataType The type of molecular data to be updated
 #' @param assay \code{character} Name or index of the assay data to return
 #' @param value A \code{matrix} with the new profiles
-#' @param ... \code{list} Fall through parameters to other functions. Needed to add addtional arguments to a generic.
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
@@ -903,10 +902,10 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' data(CCLEsmall)
 #' CCLEdrugs  <- drugNames(CCLEsmall)
 #' CCLEcells <- cellNames(CCLEsmall)
-#' object <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
-#' object
+#' pSet <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
+#' pSet
 #' 
-#' @param pSet A \code{PharmacoSet} to be subsetted
+#' @param object A \code{PharmacoSet} to be subsetted
 #' @param cells A list or vector of cell names as used in the dataset to which
 #'   the object will be subsetted. If left blank, then all cells will be left in
 #'   the dataset.
@@ -924,7 +923,7 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' @importFrom CoreGx .intersectList
 #' @export
 # subsetTo <- function(object, cells=NULL, drugs=NULL, exps=NULL, molecular.data.cells=NULL, keep.controls=TRUE) {
-subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, 
+subsetTo <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL, 
                      keep.controls=TRUE, ...) {
   drop=FALSE #TODO:: Is this supposed to be here?
   
@@ -1096,110 +1095,7 @@ subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL,
 ### TODO:: Add updating of sensitivity Number tables
 #' @importFrom CoreGx updateCellId
 updateCellId <- function(object, new.ids = vector("character")){
-  
-  if (length(new.ids)!=nrow(cellInfo(object))){
-    stop("Wrong number of cell identifiers")
-  }
-
-  if(object@datasetType=="sensitivity"|object@datasetType=="both"){
-    myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
-    sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
-
-  }
-  
-  
-  object@molecularProfiles <- lapply(object@molecularProfiles, function(SE){
-          
-      myx <- match(SummarizedExperiment::colData(SE)[["cellid"]], rownames(cellInfo(object)))
-      SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
-      return(SE)
-        })
-
-
-  if(any(duplicated(new.ids))){
-    warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
-    
-    if(ncol(sensNumber(object))>0){
-      sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-    }
-    if(dim(pertNumber(object))[[2]]>0){
-      pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-    }
-    curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-
-    duplId <- unique(new.ids[duplicated(new.ids)])
-    for(id in duplId){
-  
-      if (ncol(sensNumber(object))>0){
-        myx <- which(new.ids[sensMatch] == id)
-        sensNumber(object)[myx[1],] <- apply(sensNumber(object)[myx,], 2, sum)
-        sensNumber(object) <- sensNumber(object)[-myx[-1],]
-        # sensMatch <- sensMatch[-myx[-1]]
-      }
-      if (dim(pertNumber(object))[[1]]>0){
-        myx <- which(new.ids[pertMatch] == id)
-        pertNumber(object)[myx[1],,] <- apply(pertNumber(object)[myx,,], c(1,3), sum)
-        pertNumber(object) <- pertNumber(object)[-myx[-1],,]
-        # pertMatch <- pertMatch[-myx[-1]]
-      }
-
-      myx <- which(new.ids[curMatch] == id)
-      object@curation$cell[myx[1],] <- apply(object@curation$cell[myx,], 2, paste, collapse="///")
-      object@curation$cell <- object@curation$cell[-myx[-1],]
-      object@curation$tissue[myx[1],] <- apply(object@curation$tissue[myx,], 2, paste, collapse="///")
-      object@curation$tissue <- object@curation$tissue[-myx[-1],]
-      # curMatch <- curMatch[-myx[-1]]
-
-      myx <- which(new.ids == id)
-      cellInfo(object)[myx[1],] <- apply(cellInfo(object)[myx,], 2, paste, collapse="///")
-      cellInfo(object) <- cellInfo(object)[-myx[-1],]
-      new.ids <- new.ids[-myx[-1]]
-      if(ncol(sensNumber(object))>0){
-        sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-      }
-      if(dim(pertNumber(object))[[1]]>0){
-        pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-      }
-      curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-    }
-  } else {
-    if (dim(pertNumber(object))[[1]]>0){
-      pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-    }
-    if (ncol(sensNumber(object))>0){
-      sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-    }
-    curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-  }
-
-  if (dim(pertNumber(object))[[1]]>0){
-    dimnames(pertNumber(object))[[1]] <- new.ids[pertMatch]
-  }
-  if (ncol(sensNumber(object))>0){
-    rownames(sensNumber(object)) <- new.ids[sensMatch]
-  }
-  rownames(object@curation$cell) <- new.ids[curMatch]
-  rownames(object@curation$tissue) <- new.ids[curMatch]
-  rownames(cellInfo(object)) <- new.ids
-
-
-
-
-
-  # myx <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-  # rownames(object@curation$cell) <- new.ids[myx]
-  # rownames(object@curation$tissue) <- new.ids[myx]
-  # if (dim(pertNumber(object))[[1]]>0){
-  #   myx <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-  #   dimnames(pertNumber(object))[[1]] <- new.ids[myx]
-  # }
-  # if (nrow(sensNumber(object))>0){
-  #   myx <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-  #   rownames(sensNumber(object)) <- new.ids[myx]
-  # }
-  # rownames(cellInfo(object)) <- new.ids
-  return(object)
-
+  CoreGx::updateCellId(object, new.ids)
 }
 
 # updateFeatureNames <- function(object, new.ids = vector("character")){
@@ -1358,22 +1254,9 @@ updateDrugId <- function(object, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
+#' @importFrom CoreGx .summarizeMolecularNumbers
 .summarizeMolecularNumbers <- function(object) {
-  
-  ## consider all molecular types
-  mDT <- mDataNames(object)
-  
-  ## consider all cell lines
-  celln <- rownames(object@cell)
-  
-  molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), dimnames=list(celln, mDT))
-  
-  for(mDataType in mDT) {
-    tt <- table(phenoInfo(object, mDataType)$cellid)
-    molecular.info[names(tt), mDataType] <- tt
-
-  }
-  return(molecular.info)
+  CoreGx::.summarizeMolecularNumbers
 }
 
 .summarizePerturbationNumbers <- function(object) {
