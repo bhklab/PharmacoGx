@@ -15,7 +15,6 @@ Imports:
     Biobase,
     S4Vectors,
     SummarizedExperiment,
-    piano,
     magicaxis, 
     RColorBrewer, 
     parallel, 
@@ -26,10 +25,8 @@ Imports:
     utils, 
     graphics, 
     grDevices, 
-    lsa, 
     reshape2,
-    testthat,
-    remotes
+    testthat
 Remotes: bhklab/CoreGx@eSet_To_SE
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0

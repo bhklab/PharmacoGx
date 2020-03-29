@@ -24,6 +24,4 @@ Setter for the feature names of a \code{SummarizedExperiment} in the
 data(CCLEsmall)
 fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
 
-Set feature names of the object object
-
 }

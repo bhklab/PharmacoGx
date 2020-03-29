@@ -7,14 +7,15 @@
 mcc(x, y, nperm = 1000, nthread = 1)
 }
 \arguments{
-\item{x}{factor of the same length with the same number of levels}
+\item{x}{\code{factor} of the same length with the same number of levels}
 
-\item{y}{factor of the same length with the same number of levels}
+\item{y}{\code{factor} of the same length with the same number of levels}
 
-\item{nperm}{number of permutations for significance estimation. If 0, 
-no permutation testing is done}
+\item{nperm}{\code{numeric} number of permutations for significance 
+estimation. If 0, no permutation testing is done}
 
-\item{nthread}{can parallelize permutation texting using parallel's mclapply}
+\item{nthread}{\code{numeric} can parallelize permutation texting using 
+parallel's mclapply}
 }
 \value{
 A list with the MCC as the $estimate, and p value as $p.value

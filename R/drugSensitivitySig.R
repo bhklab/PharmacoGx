@@ -64,11 +64,14 @@
 #' @param molecular.cutoff.direction [character] One of "less" or "greater", allows to set direction of binarization. 
 #' @param verbose [boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed
 #' @param ... additional arguments not currently fully supported by the function  
+#' 
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
+#' 
 #' @export
+#' 
 #' @import parallel
-#' @importFrom SummarizedExperiment assayNames
+#' @importFrom SummarizedExperiment assayNames assay
 drugSensitivitySig <- function(pSet,
  mDataType,
  drugs,

@@ -1,6 +1,7 @@
 #' Cosine Permuations
 #' 
 #' @inherit CoreGx::cosinePerm
+#' @inheritParams CoreGx::cosinePerm
 #' 
 #' @export
 cosinePerm <- function(x, y, nperm=1000, 

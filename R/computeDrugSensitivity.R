@@ -126,8 +126,10 @@
   max.dose <- 10^100
   for(i in seq_len(length(doses)))
   {
-    min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
-    max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
+    min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm = TRUE), 
+                    na.rm = TRUE)
+    max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm = TRUE), 
+                    na.rm = TRUE)
   }
   
   common.ranges <- list()
@@ -146,6 +148,8 @@
 }
 
 ## calculate residual of fit
+## FIXME:: Why is this different from CoreGx?
+#' @importFrom CoreGx .dmedncauchys .dmednnormals .edmednnormals .edmedncauchys
 .residual<-function(x, y, n, pars, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
   family <- match.arg(family)
   Cauchy_flag = (family == "Cauchy")
@@ -189,7 +193,7 @@
   }
 }
 
-## generate an initial guess for dose-response curve parameters by evaluating the residuals at different lattice points of the search space
+##FIXME:: Why is this different from CoreGx?
 .meshEval<-function(log_conc,
                     viability,
                     lower_bounds = c(0, 0, -6),
@@ -236,13 +240,6 @@
   return(guess)
 }
 
-## get vector of interpolated concentrations for graphing purposes
-.GetSupportVec <- function(x, output_length = 1001) {
-  return(seq(from = min(x), to = max(x), length.out = output_length))
-}
-######## TODO ADD computationg from  being passed in params
-
-
 #  Fits dose-response curves to data given by the user
 #  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
 #
@@ -254,6 +251,9 @@
 #
 #  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #  curve-fitting is performed.
+#' @importFrom CoreGx .getSupportVec
+#' @export
+#' @keywords internal
 .computeAUCUnderFittedCurve <- function(concentration, viability, trunc=TRUE, verbose=FALSE) {
   
   # #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
@@ -305,7 +305,7 @@
                                        conc_as_log = TRUE,
                                        viability_as_pct = FALSE,
                                        trunc = trunc))
-  x <- .GetSupportVec(log_conc)
+  x <- .getSupportVec(log_conc)
   return(1 - trapz(x, .Hill(x, pars)) / (log_conc[length(log_conc)] - log_conc[1]))
 }
 #This function is being used in computeSlope 

@@ -135,9 +135,11 @@ The date the PharmacoSet was created
 
 The name of the PharmacoSet
 
-A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+A 3D \code{array} with the number of perturbation experiments per 
+  drug and cell line, and data type
 
-A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+A \code{data.frame} with the number of sensitivity experiments per 
+  drug and cell line
 
 The updated \code{PharmacoSet}
 
@@ -205,7 +207,8 @@ A generic for the sensNumber method
 
 \item \code{drugInfo<-}: Update the drug annotations
 
-\item \code{phenoInfo}: Return the experiment info from the given type of molecular data in PharmacoSet
+\item \code{phenoInfo}: Return the experiment info from the given type of 
+molecular data in PharmacoSet
 
 \item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the PharmacoSet
 
@@ -300,40 +303,40 @@ PharmacoSet, for proper processing of the data}
 
 \examples{
 data(CCLEsmall)
-cellInfo(CCLEsmall)
+cellInf <- cellInfo(CCLEsmall)
 
 data(CCLEsmall)
-phenoInfo(CCLEsmall, mDataType="rna")
+phenoInf <- phenoInfo(CCLEsmall, mDataType="rna")
 
 data(CCLEsmall)
 phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
 
 data(CCLEsmall)
-molecularProfiles(CCLEsmall, "rna")
+molProf <- molecularProfiles(CCLEsmall, "rna")
 
 data(CCLEsmall)
 molecularProfiles(CCLEsmall, "rna") <- molecularProfiles(CCLEsmall, "rna")
 
 data(CCLEsmall)
-featureInfo(CCLEsmall, "rna")
+featInf <- featureInfo(CCLEsmall, "rna")
 
 data(CCLEsmall)
 featureInfo(CCLEsmall, "rna") <- featureInfo(CCLEsmall, "rna")
 
 data(CCLEsmall)
-sensitivityInfo(CCLEsmall)
+sensInf <- sensitivityInfo(CCLEsmall)
 
 data(CCLEsmall)
 sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 
 data(CCLEsmall)
-sensitivityProfiles(CCLEsmall)
+sensProf <- sensitivityProfiles(CCLEsmall)
 
 data(CCLEsmall)
 sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
 
 data(CCLEsmall)
-sensitivityMeasures(CCLEsmall)
+sensMeas <- sensitivityMeasures(CCLEsmall)
 
 data(CCLEsmall)
 cellNames(CCLEsmall)

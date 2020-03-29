@@ -42,8 +42,11 @@
 #' @slot datasetType A \code{character} string of 'sensitivity', 
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   PharmacoSet, for proper processing of the data
+#'  
+#' @importClassesFrom CoreGx CoreSet
 #' @return An object of the PharmacoSet class
-.PharmacoSet <- setClass("PharmacoSet", slots = list(drug="data.frame"), contains="CoreSet")
+.PharmacoSet <- setClass("PharmacoSet", slots = list(drug="data.frame"), 
+                         contains="CoreSet")
 
 
 # The default constructor above does a poor job of explaining the required 
@@ -80,7 +83,7 @@
 #   molecular profiles for each data type.
 # @param cell A \code{data.frame} containg the annotations for all the cell
 #   lines profiled in the data set, across all data types
-# @param drug A \code{data.frame} containg the annotations for all the drugs
+#' @param drug A \code{data.frame} containg the annotations for all the drugs
 #   profiled in the data set, across all data types
 # @param sensitivityInfo A \code{data.frame} containing the information for the
 #   sensitivity experiments
@@ -90,9 +93,9 @@
 #   statistics such as IC50 and AUC
 # @param sensitivityN,perturbationN A \code{data.frame} summarizing the
 #   available sensitivity/perturbation data
-# @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
-#   the names for drugs, cells and tissues used in the data set to universal
-#   identifiers used between different PharmacoSet objects
+#' @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
+#'   the names for drugs, cells and tissues used in the data set to universal
+#'   identifiers used between different PharmacoSet objects
 # @param datasetType A \code{character} string of 'sensitivity',
 #   'preturbation', or both detailing what type of data can be found in the
 #   PharmacoSet, for proper processing of the data
@@ -106,6 +109,7 @@
 #' @importFrom stats na.omit
 #' @importFrom SummarizedExperiment rowData colData assay assays assayNames Assays
 #' @importFrom S4Vectors DataFrame SimpleList metadata
+#' @importFrom CoreGx CoreSet
 #' 
 #' @export
 PharmacoSet <-  function(name,
@@ -184,7 +188,7 @@ PharmacoSet <-  function(name,
     }
     
     pSet  <- .PharmacoSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), drug=as.data.frame(drug), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
-    if (verify) { checkobjectStructure(pSet) }
+    if (verify) { checkPsetStructure(pSet) }
   if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
     pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
   }
@@ -206,7 +210,7 @@ PharmacoSet <-  function(name,
 #'
 #' @examples
 #' data(CCLEsmall)
-#' cellInfo(CCLEsmall)
+#' cellInf <- cellInfo(CCLEsmall)
 #'
 #' @param object The \code{PharmacoSet} to retrieve cell info from
 #'
@@ -215,6 +219,8 @@ PharmacoSet <-  function(name,
 #' @describeIn PharmacoSet
 #' 
 #' @importFrom CoreGx cellInfo
+#' @importFrom methods callNextMethod
+#' @export
 setMethod(cellInfo, "PharmacoSet", function(object){
   callNextMethod(object)
 })
@@ -231,9 +237,9 @@ setMethod(cellInfo, "PharmacoSet", function(object){
 #' @param value A \code{data.frame} with the new cell annotations
 #' @return Updated \code{PharmacoSet}
 #'
-#' @export
-#' 
 #' @importFrom CoreGx cellInfo<-
+#' @importFrom methods callNextMethod
+#' @export
 setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value){
   callNextMethod(object, value)
 })
@@ -248,16 +254,16 @@ setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet", value="
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' drugInfo(CCLEsmall)
+#' drugInf <- drugInfo(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to retrieve drug info from
 #' 
 #' @return a \code{data.frame} with the drug annotations
 setGeneric("drugInfo", function(object) standardGeneric("drugInfo"))
+#'
 #' @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
 #' 
 #' @export
-#' 
 setMethod(drugInfo, "PharmacoSet", function(object){
   object@drug
 })
@@ -294,16 +300,19 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet", value="
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' phenoInfo(CCLEsmall, mDataType="rna")
+#' phenoInf <- phenoInfo(CCLEsmall, mDataType="rna")
 #' 
 #' @param object The \code{PharmacoSet} to retrieve rna annotations from
 #' @param mDataType the type of molecular data 
 #' 
 #' @return a \code{data.frame} with the experiment info
 #' 
+#' @describeIn PharmacoSet Return the experiment info from the given type of 
+#'   molecular data in PharmacoSet
+#'   
 #' @importFrom CoreGx phenoInfo
-#' 
-#' @describeIn PharmacoSet Return the experiment info from the given type of molecular data in PharmacoSet 
+#' @importFrom methods callNextMethod
+#'
 #' @export
 setMethod(phenoInfo, "PharmacoSet", function(object, mDataType){
     callNextMethod(object, mDataType)
@@ -322,10 +331,11 @@ setMethod(phenoInfo, "PharmacoSet", function(object, mDataType){
 #' @param value a \code{dataframe}  with the new experiment annotations
 #' 
 #' @return The updated \code{PharmacoSet}
-#' 
-#' @importFrom CoreGx phenoInfo<-
-#' 
+#'
 #' @describeIn PharmacoSet Update the given type of molecular data experiment info in the PharmacoSet
+#' 
+#' @importFrom methods callNextMethod
+#' @importFrom CoreGx phenoInfo<-
 #' @export 
 setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
   callNextMethod(object, mDataType, value)
@@ -337,7 +347,7 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' molecularProfiles(CCLEsmall, "rna")
+#' molProf <- molecularProfiles(CCLEsmall, "rna")
 #' 
 #' @param object The \code{PharmacoSet} to retrieve molecular profiles from
 #' @param mDataType \code{character} The type of molecular data
@@ -346,9 +356,10 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' 
 #' @return a \code{matrix} of data for the given mDataType and assay
 #' 
-#' @importFrom CoreGx molecularProfiles
-#' 
 #' @describeIn PharmacoSet Return the given type of molecular data from the PharmacoSet 
+#' 
+#' @importFrom CoreGx molecularProfiles
+#' @importFrom methods callNextMethod
 #' @export
 setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay){
   callNextMethod(object, mDataType, assay)
@@ -370,9 +381,10 @@ setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay){
 #' 
 #' @return Updated \code{PharmacoSet}
 #' 
-#' @importFrom CoreGx molecularProfiles<-
-#' 
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
+#' 
+#' @importFrom methods callNextMethod
+#' @importFrom CoreGx molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   callNextMethod(object, mDataType, assay, value)
@@ -389,7 +401,7 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' featureInfo(CCLEsmall, "rna")
+#' featInf <- featureInfo(CCLEsmall, "rna")
 #' 
 #' @param object The \code{PharmacoSet} to retrieve feature annotations from
 #' @param mDataType the type of molecular data 
@@ -397,8 +409,8 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
 #'
 #' @describeIn PharmacoSet Return the feature info for the given molecular data
 #' 
+#' @importFrom methods callNextMethod
 #' @importFrom CoreGx featureInfo
-#' 
 #' @export
 setMethod(featureInfo, "PharmacoSet", function(object, mDataType){
   callNextMethod(object, mDataType)
@@ -419,6 +431,7 @@ setMethod(featureInfo, "PharmacoSet", function(object, mDataType){
 #' @return Updated \code{PharmacoSet}
 #' 
 #' @importFrom CoreGx featureInfo<-
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Replace the gene info for the molecular data
 #' 
@@ -437,13 +450,14 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' sensitivityInfo(CCLEsmall)
+#' sensInf <- sensitivityInfo(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to retrieve sensitivity experiment annotations from
 #' 
 #' @return a \code{DataFrame} with the experiment info
 #'
 #' @importFrom CoreGx sensitivityInfo
+#' @importFrom methods callNextMethod
 #'
 #' @describeIn PharmacoSet Return the drug dose sensitivity experiment info
 #'
@@ -466,6 +480,7 @@ setMethod(sensitivityInfo, "PharmacoSet", function(object){
 #' @return Updated \code{PharmacoSet} 
 #' 
 #' @importFrom CoreGx sensitivityInfo<-
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Update the sensitivity experiment info
 #' @export
@@ -480,13 +495,14 @@ setReplaceMethod("sensitivityInfo", signature = signature(object="PharmacoSet",v
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' sensitivityProfiles(CCLEsmall)
+#' sensProf <- sensitivityProfiles(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} to retrieve sensitivity experiment data from
 #' 
 #' @return a \code{data.frame} with the experiment info
 #'
 #' @importFrom CoreGx sensitivityProfiles
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Return the phenotypic data for the drug dose sensitivity
 #' @export
@@ -504,21 +520,23 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #' 
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
+#' 
 #' @return Updated \code{PharmacoSet} 
 #' 
 #' @importFrom CoreGx sensitivityProfiles<-
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-  classNextMethod(object, value)
+  callNextMethod(object, value)
 })
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-  classNextMethod(object, value)
+  callNextMethod(object, value)
 })
 
 #' sensitivityMeasures Generic
@@ -527,13 +545,14 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSe
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' sensitivityMeasures(CCLEsmall)
+#' sensMeas <- sensitivityMeasures(CCLEsmall)
 #' 
 #' @param object The \code{PharmacoSet} 
 #' 
 #' @return A \code{character} vector of all the available sensitivity measures
 #'
 #' @importFrom CoreGx sensitivityMeasures
+#' @importFrom methods callNextMethod
 #'
 #' @describeIn PharmacoSet returns the available sensitivity profile
 #'   summaries, for example, whether there are IC50 values available
@@ -565,7 +584,6 @@ setMethod(drugNames, "PharmacoSet", function(object){
 #' 
 #' A generic for the drugNames replacement method
 #' 
-#' 
 #' @examples
 #' data(CCLEsmall)
 #' drugNames(CCLEsmall) <- drugNames(CCLEsmall)
@@ -593,6 +611,7 @@ setReplaceMethod("drugNames", signature = signature(object="PharmacoSet",value="
 #' @return A vector of the cell names used in the PharmacoSet
 #' 
 #' @importFrom CoreGx cellNames
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Return the cell names used in the dataset
 #' @export
@@ -615,6 +634,7 @@ setMethod(cellNames, "PharmacoSet", function(object){
 #' @return Updated \code{PharmacoSet}
 #'  
 #' @importFrom CoreGx cellNames<-
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Update the cell names used in the dataset
 #' @export
@@ -635,6 +655,7 @@ setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="
 #' @return A \code{character} vector of the feature names
 #' 
 #' @importFrom CoreGx fNames
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Return the feature names used in the dataset
 #' @export
@@ -650,8 +671,6 @@ setMethod(fNames, signature=signature(object="PharmacoSet", mDataType="character
 #' @examples
 #' data(CCLEsmall)
 #' fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
-#'
-#' Set feature names of the object object
 #' 
 #' @param object The \code{PharmacoSet} object to update
 #' @param mDataType The molecular data type to update
@@ -659,6 +678,7 @@ setMethod(fNames, signature=signature(object="PharmacoSet", mDataType="character
 #' @return Updated \code{PharmacoSet} 
 #'
 #' @importFrom CoreGx fNames<-
+#' @importFrom methods callNextMethod
 #'
 #' @export
 setReplaceMethod("fNames", 
@@ -682,6 +702,7 @@ setReplaceMethod("fNames",
 #' @return The date the PharmacoSet was created
 #'
 #' @importFrom CoreGx dateCreated
+#' @importFrom methods callNextMethod
 #'
 #' @describeIn PharmacoSet Return the date the PharmacoSet was created
 #' @export
@@ -689,7 +710,7 @@ setMethod(dateCreated, "PharmacoSet", function(object) {
   callNextMethod(object)
 })
 
-#' name Generic
+#' name getter method
 #' 
 #' Retrun the name of the PharmacoSet object
 #' 
@@ -701,6 +722,7 @@ setMethod(dateCreated, "PharmacoSet", function(object) {
 #' @return The name of the PharmacoSet
 #'
 #' @importFrom CoreGx name
+#' @importFrom methods callNextMethod
 #' 
 #' @describeIn PharmacoSet Return the name of the PharmacoSet 
 #' @export
@@ -717,8 +739,12 @@ setMethod(name, "PharmacoSet", function(object){
 #' pertNumber(CCLEsmall)
 #' 
 #' @param object A \code{PharmacoSet} 
-#' @return A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
-
+#' @return A 3D \code{array} with the number of perturbation experiments per 
+#'   drug and cell line, and data type
+#'
+#' @importFrom CoreGx pertNumber
+#' @importFrom methods callNextMethod
+#' 
 #' @describeIn PharmacoSet Return the summary of available perturbation
 #'   experiments
 #' @export
@@ -736,9 +762,14 @@ setMethod(pertNumber, "PharmacoSet", function(object){
 #' sensNumber(CCLEsmall)
 #' 
 #' @param object A \code{PharmacoSet} 
-#' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+#' @return A \code{data.frame} with the number of sensitivity experiments per 
+#'   drug and cell line
+#'
 #' @describeIn PharmacoSet Return the summary of available sensitivity
 #'   experiments
+#'
+#' @importFrom CoreGx sensNumber
+#' @importFrom methods callNextMethod
 #' @export
 setMethod(sensNumber, "PharmacoSet", function(object){
   callNextMethod(object)
@@ -754,13 +785,17 @@ setMethod(sensNumber, "PharmacoSet", function(object){
 #' 
 #' @param object A \code{PharmacoSet} 
 #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+#' 
 #' @return The updated \code{PharmacoSet} 
 #'
 #' @describeIn PharmacoSet Update the summary of available perturbation
 #'   experiments
+#'   
+#' @importFrom CoreGx pertNumber<-
+#' @importFrom methods callNextMethod
 #' @export
-setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet",value="array"), function(object, value){
-  callNextMethod(object)
+setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet", value="array"), function(object, value){
+  callNextMethod(object, value)
 })
 
 #' sensNumber<- Generic
@@ -774,11 +809,14 @@ setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet",value=
 #' 
 #' @param object A \code{PharmacoSet} 
 #' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
+#' 
 #' @return The updated \code{PharmacoSet} 
 #'
 #' @describeIn PharmacoSet Update the summary of available sensitivity
 #'   experiments
 #'
+#' @importFrom CoreGx sensNumber<-
+#' @importFrom methods callNextMethod
 #' @export
 setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
   callNextMethod(object, value)
@@ -792,12 +830,16 @@ setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value=
 #' data(CCLEsmall)
 #' CCLEsmall
 #' 
-#' @return Prints the PharmacoSet object to the output stream, and returns invisible NULL. 
+#' @return Prints the PharmacoSet object to the output stream, and returns 
+#'   invisible NULL. 
+#' 
+#'  @importFrom CoreGx show
+#'  @importFrom methods callNextMethod
+#'
 #' @export
 setMethod("show", signature=signature(object="PharmacoSet"), function(object) {
-  callNextMethod()
+  callNextMethod(object)
 })
-
 
 #' mDataNames
 #' 
@@ -808,7 +850,11 @@ setMethod("show", signature=signature(object="PharmacoSet"), function(object) {
 #' mDataNames(CCLEsmall)
 #' 
 #' @param object PharamcoSet object
+#' 
 #' @return Vector of names of the molecular data types
+#' 
+#' @importFrom CoreGx mDataNames
+#' @importFrom methods callNextMethod
 #' @export
 setMethod('mDataNames', "PharmacoSet", function(object) {
   callNextMethod(object)
@@ -839,11 +885,8 @@ setMethod(`[`, "PharmacoSet", function(x, i, j, ..., drop = FALSE){
 #' @return A named vector with the number of Cells and Drugs in the PharmacoSet
 #' @export
 setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
-
   return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
-
 })
-
 
 ## FIXED? TODO:: Subset function breaks if it doesnt find cell line in sensitivity info
 #' A function to subset a PharmacoSet to data containing only specified drugs, cells and genes
@@ -863,7 +906,7 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' object <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
 #' object
 #' 
-#' @param object A \code{PharmacoSet} to be subsetted
+#' @param pSet A \code{PharmacoSet} to be subsetted
 #' @param cells A list or vector of cell names as used in the dataset to which
 #'   the object will be subsetted. If left blank, then all cells will be left in
 #'   the dataset.
@@ -875,21 +918,25 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 #' @param keep.controls If the dataset has perturbation type experiments, should
 #'   the controls be kept in the dataset? Defaults to true.
 #' @param ... Other arguments passed by other function within the package
+#' 
 #' @return A PharmacoSet with only the selected drugs and cells
+#' 
+#' @importFrom CoreGx .intersectList
 #' @export
 # subsetTo <- function(object, cells=NULL, drugs=NULL, exps=NULL, molecular.data.cells=NULL, keep.controls=TRUE) {
-subsetTo <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...) {
-  drop=FALSE
+subsetTo <- function(pSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, 
+                     keep.controls=TRUE, ...) {
+  drop=FALSE #TODO:: Is this supposed to be here?
   
   adArgs = list(...)
   if ("exps" %in% names(adArgs)) {
   	exps <- adArgs[["exps"]]
   	if(is(exps, "data.frame")) {
-  		exps2 <- exps[[objectName(object)]]
+  		exps2 <- exps[[name(object)]]
   		names(exps2) <- rownames(exps)
   		exps <- exps2
   	} else{
-  		exps <- exps[[objectName(object)]]
+  		exps <- exps[[name(object)]]
   	}
   }else {
     exps <- NULL
@@ -1024,11 +1071,11 @@ subsetTo <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL, 
 			drugs <- unique(sensitivityInfo(object)[["drugid"]])
 		}
 		if(object@datasetType == "perturbation" | object@datasetType == "both"){
-			drugs <- union(drugs, na.omit(unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[["drugid"]])}))))
+			drugs <- union(drugs, na.omit(CoreGx::.unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[["drugid"]])}))))
 		}
 	}
 	if (length(cells)==0) {
-		cells <- union(cells, na.omit(unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[["cellid"]])}))))
+		cells <- union(cells, na.omit(CoreGx::.unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[["cellid"]])}))))
         if (object@datasetType =="sensitivity" | object@datasetType == "both"){
             cells <- union(cells, sensitivityInfo(object)[["cellid"]])
         }
@@ -1047,6 +1094,7 @@ subsetTo <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL, 
       return(object)
 }
 ### TODO:: Add updating of sensitivity Number tables
+#' @importFrom CoreGx updateCellId
 updateCellId <- function(object, new.ids = vector("character")){
   
   if (length(new.ids)!=nrow(cellInfo(object))){
@@ -1066,9 +1114,6 @@ updateCellId <- function(object, new.ids = vector("character")){
       SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
       return(SE)
         })
-
-
-
 
 
   if(any(duplicated(new.ids))){
@@ -1382,19 +1427,20 @@ updateDrugId <- function(object, new.ids = vector("character")){
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' checkobjectStructure(CCLEsmall)
+#' checkPsetStructure(CCLEsmall)
 #' 
 #' @param object A \code{PharmacoSet} to be verified
 #' @param plotDist Should the function also plot the distribution of molecular data?
 #' @param result.dir The path to the directory for saving the plots as a string
 #' 
-#' @return Prints out messages whenever describing the errors found in the structure of the object object passed in.
+#' @return Prints out messages whenever describing the errors found in the 
+#'   structure of the object object passed in.
 #' 
 #' @importFrom graphics hist
 #' @importFrom grDevices dev.off pdf
 #' 
 #' @export
-checkobjectStructure <-
+checkPsetStructure <-
   function(object, plotDist=FALSE, result.dir=".") {
     
     # Make directory to store results if it doesn't exist
@@ -1419,32 +1465,44 @@ checkobjectStructure <-
       
       ## Test if sample and feature annotations dimensions match the assay
       warning(ifelse(nrow(rowData(profile)) != nrow(assays(profile)[[1]]),
-                     sprintf("%s: number of features in fData is different from SummarizedExperiment slots", nn),
+                     sprintf("%s: number of features in fData is different from 
+                             SummarizedExperiment slots", nn),
                      sprintf("%s: rowData dimension is OK", nn)
                      )
               )
       warning(ifelse(nrow(colData(profile)) != ncol(assays(profile)[[1]]),
-                     sprintf("%s: number of cell lines in pData is different from expression slots", nn),
+                     sprintf("%s: number of cell lines in pData is different 
+                             from expression slots", nn),
                      sprintf("%s: colData dimension is OK", nn)
                      )
               )
       
       
       # Checking sample metadata for required columns
-      warning(ifelse("cellid" %in% colnames(colData(profile)), "", sprintf("%s: cellid does not exist in colData (samples) columns", nn)))
-      warning(ifelse("batchid" %in% colnames(colData(profile)), "", sprintf("%s: batchid does not exist in colData (samples) columns", nn)))
+      warning(ifelse("cellid" %in% colnames(colData(profile)), "", 
+                     sprintf("%s: cellid does not exist in colData (samples) 
+                             columns", nn)))
+      warning(ifelse("batchid" %in% colnames(colData(profile)), "", 
+                     sprintf("%s: batchid does not exist in colData (samples) 
+                             columns", nn)))
       
       # Checking mDataType of the SummarizedExperiment for required columns
-      if(S4Vectors::metadata(profile)$annotation == "rna" | S4Vectors::metadata(profile)$annotation == "rnaseq")
+      if(S4Vectors::metadata(profile)$annotation == "rna" | 
+         S4Vectors::metadata(profile)$annotation == "rnaseq")
       {
-        warning(ifelse("BEST" %in% colnames(rowData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in rowData (features) columns", nn)))
-        warning(ifelse("Symbol" %in% colnames(rowData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in rowData (features) columns", nn)))
+        warning(ifelse("BEST" %in% colnames(rowData(profile)), "BEST is OK", 
+                       sprintf("%s: BEST does not exist in rowData (features) 
+                               columns", nn)))
+        warning(ifelse("Symbol" %in% colnames(rowData(profile)), "Symbol is OK", 
+                       sprintf("%s: Symbol does not exist in rowData (features) 
+                               columns", nn)))
       }
       
       # Check that all cellids from the object are included in molecularProfiles
       if("cellid" %in% colnames(rowData(profile))) {
         if(!all(colData(profile)[,"cellid"] %in% rownames(object@cell))) {
-          warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
+          warning(sprintf("%s: not all the cell lines in this profile are in 
+                          cell lines slot", nn))
         }
       }else {
         warning(sprintf("%s: cellid does not exist in colData (samples)", nn))
@@ -1457,60 +1515,81 @@ checkobjectStructure <-
     if("tissueid" %in% colnames(object@cell)) {
       if("unique.tissueid" %in% colnames(object@curation$tissue))
       {
-        if(length(intersect(rownames(object@curation$tissue), rownames(object@cell))) != nrow(object@cell)) {
-          message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
+        if(length(intersect(rownames(object@curation$tissue), 
+                            rownames(object@cell))) != nrow(object@cell)) {
+          message("rownames of curation tissue slot should be the same as cell 
+                  slot (curated cell ids)")
         } else{
-          if(length(intersect(object@cell$tissueid, object@curation$tissue$unique.tissueid)) != length(table(object@cell$tissueid))){
-            message("tissueid should be the same as unique tissue id from tissue curation slot")
+          if(length(intersect(object@cell$tissueid, 
+                              object@curation$tissue$unique.tissueid)) != 
+             length(table(object@cell$tissueid))){
+            message("tissueid should be the same as unique tissue id from tissue 
+                    curation slot")
           }
         }
       } else {
-        message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
+        message("unique.tissueid which is curated tissue id across data set 
+                should be a column of tissue curation slot")
       }
-      if(any(is.na(object@cell[,"tissueid"]) | object@cell[,"tissueid"]=="", na.rm=TRUE)){
-        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(object@cell)[which(is.na(object@cell[,"tissueid"]) | object@cell[,"tissueid"]=="")], collapse=" ")))
+      if(any(is.na(object@cell[,"tissueid"]) | object@cell[,"tissueid"]=="", 
+             na.rm=TRUE)){
+        message(sprintf("There is no tissue type for this cell line(s): %s", 
+                        paste(rownames(object@cell)[which(is.na(
+                          object@cell[,"tissueid"]) | 
+                            object@cell[,"tissueid"]=="")], collapse=" ")))
       }
     } else {
       warning("tissueid does not exist in cell slot")
     }
     
     if("unique.cellid" %in% colnames(object@curation$cell)) {
-      if(length(intersect(object@curation$cell$unique.cellid, rownames(object@cell))) != nrow(object@cell)) {
+      if(length(intersect(object@curation$cell$unique.cellid, 
+                          rownames(object@cell))) != nrow(object@cell)) {
         print("rownames of cell slot should be curated cell ids")
       }
     } else {
-      print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
+      print("unique.cellid which is curated cell id across data set should be a 
+            column of cell curation slot")
     }
 #     if("cellid" %in% colnames(object@cell)) {
-#       if(length(intersect(object@curation$cell$cellid, rownames(object@cell))) != nrow(object@cell)) {
+#       if(length(intersect(object@curation$cell$cellid, rownames(object@cell)))
+#    != nrow(object@cell)) {
 #         print("values of cellid column should be curated cell line ids")
 #       }
 #     } else {
 #       print("cellid which is curated cell id across data set should be a column of cell slot")
 #     }
     
-    if(length(intersect(rownames(object@curation$cell), rownames(object@cell))) != nrow(object@cell)) {
-      print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
+    if(length(intersect(rownames(object@curation$cell), 
+                        rownames(object@cell))) != nrow(object@cell)) {
+      print("rownames of curation cell slot should be the same as cell slot 
+            (curated cell ids)")
     }
     
     if("unique.drugid" %in% colnames(object@curation$drug)) {
-      if(length(intersect(object@curation$drug$unique.drugid, rownames(object@drug))) != nrow(object@drug)) {
+      if(length(intersect(object@curation$drug$unique.drugid, 
+                          rownames(object@drug))) != nrow(object@drug)) {
         print("rownames of drug slot should be curated drug ids")
       }
     } else {
-      print("unique.drugid which is curated drug id across data set should be a column of drug curation slot")
+      print("unique.drugid which is curated drug id across data set should be a 
+            column of drug curation slot")
     }
     
 #     if("drugid" %in% colnames(object@drug)) {
-#       if(length(intersect(object@curation$drug$drugid, rownames(object@drug))) != nrow(object@drug)) {
+#       if(length(intersect(object@curation$drug$drugid, 
+#    rownames(object@drug))) != nrow(object@drug)) {
 #         print("values of drugid column should be curated drug ids")
 #       }
 #     } else {
-#       print("drugid which is curated drug id across data set should be a column of drug slot")
+#       print("drugid which is curated drug id across data set should be a 
+#    column of drug slot")
 #     }
     
-    if(length(intersect(rownames(object@curation$cell), rownames(object@cell))) != nrow(object@cell)) {
-      print("rownames of curation drug slot should be the same as drug slot (curated drug ids)")
+    if(length(intersect(rownames(object@curation$cell), 
+                        rownames(object@cell))) != nrow(object@cell)) {
+      print("rownames of curation drug slot should be the same as drug 
+            slot (curated drug ids)")
     }
     
     if(!is(object@cell, "data.frame")) {
@@ -1525,7 +1604,7 @@ checkobjectStructure <-
         warning("sensitivity info slot class type should be dataframe")
       }
       if("cellid" %in% colnames(object@sensitivity$info)) {
-        if(!all(object@sensitivity$info[,"cellid"] %in% rownames(object@cell))) {
+        if(!all(object@sensitivity$info[,"cellid"] %in% rownames(object@cell))){
           warning("not all the cell lines in sensitivity data are in cell slot")
         }
       }else {
@@ -1542,12 +1621,16 @@ checkobjectStructure <-
       }
       
       if(any(!is.na(object@sensitivity$raw))) {
-        if(!all(dimnames(object@sensitivity$raw)[[1]] %in% rownames(object@sensitivity$info))) {
-          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
+        if(!all(dimnames(object@sensitivity$raw)[[1]] %in% 
+                rownames(object@sensitivity$info))) {
+          warning("For some experiments there is raw sensitivity data but no 
+                  experiment information in sensitivity info")
         }
       }
-      if(!all(rownames(object@sensitivity$profiles) %in% rownames(object@sensitivity$info))) {
-        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
+      if(!all(rownames(object@sensitivity$profiles) %in% 
+              rownames(object@sensitivity$info))) {
+        warning("For some experiments there is sensitivity profiles but no 
+                experiment information in sensitivity info")
       }
     }
   }

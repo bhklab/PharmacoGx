@@ -1,6 +1,7 @@
 #' Drug sensitivity calling using waterfall plots
 #'
 #' @inherit CoreGx::callingWaterfall
+#' @inheritParams CoreGx::callingWaterfall
 #' 
 callingWaterfall <-
 function(x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2),

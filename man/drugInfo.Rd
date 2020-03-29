@@ -17,6 +17,6 @@ Generic for drugInfo method
 }
 \examples{
 data(CCLEsmall)
-drugInfo(CCLEsmall)
+drugInf <- drugInfo(CCLEsmall)
 
 }

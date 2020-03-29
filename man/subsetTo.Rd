@@ -5,7 +5,7 @@
 \title{A function to subset a PharmacoSet to data containing only specified drugs, cells and genes}
 \usage{
 subsetTo(
-  object,
+  pSet,
   cells = NULL,
   drugs = NULL,
   molecular.data.cells = NULL,
@@ -14,7 +14,7 @@ subsetTo(
 )
 }
 \arguments{
-\item{object}{A \code{PharmacoSet} to be subsetted}
+\item{pSet}{A \code{PharmacoSet} to be subsetted}
 
 \item{cells}{A list or vector of cell names as used in the dataset to which
 the object will be subsetted. If left blank, then all cells will be left in

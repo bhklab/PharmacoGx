@@ -17,7 +17,6 @@
 #' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
 #'   rownames of the non-noisy curves
 #' @export
- 
 filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
     
     acceptable <- mclapply(rownames(sensitivityInfo(pSet)), function(xp) {

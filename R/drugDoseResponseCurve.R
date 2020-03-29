@@ -61,20 +61,17 @@
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend. 
 #' @param trunc [bool] Should the viability values be truncated to lie in [0-100] before doing the fitting
 #' @param verbose [boolean] Should warning messages about the data passed in be printed?
+#' 
 #' @return Plots to the active graphics device and returns and invisible NULL.
-#' @export
+#' 
 #' @import RColorBrewer
-#' @importFrom graphics plot rect
+#' 
+#' @importFrom graphics plot rect points lines legend
 #' @importFrom grDevices rgb
-#' @importFrom graphics plot
-#' @importFrom graphics rect
-#' @importFrom grDevices rgb
-#' @importFrom graphics points
-#' @importFrom graphics lines
-#' @importFrom graphics legend
 #' @importFrom magicaxis magaxis
-
-
+#' @importFrom CoreGx .getSupportVec
+#' 
+#' @export
 drugDoseResponseCurve <- 
 function(drug, 
          cellline,
@@ -315,12 +312,12 @@ function(drug,
       lines(doses[[i]], responses[[i]], lty=1, lwd=lwd, col=mycol[i])
     }, "Fitted"={ 
       log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]])
-      log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+      log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     },"Both"={
       lines(doses[[i]],responses[[i]],lty=1,lwd=lwd,col = mycol[i])
       log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
-      log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+      log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     })
     legends<- c(legends, sprintf("%s%s", pSetNames[[i]], legend.values[[i]]))

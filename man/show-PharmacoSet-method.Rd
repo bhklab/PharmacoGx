@@ -10,7 +10,11 @@
 \item{object}{\code{PharmacoSet}}
 }
 \value{
-Prints the PharmacoSet object to the output stream, and returns invisible NULL.
+Prints the PharmacoSet object to the output stream, and returns 
+  invisible NULL. 
+
+ @importFrom CoreGx show
+ @importFrom methods callNextMethod
 }
 \description{
 Show a PharamcoSet

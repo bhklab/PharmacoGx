@@ -1,29 +1,28 @@
-########################
-## Benjamin Haibe-Kains & Petr Smirnov
-## October 23, 2013
-########################
-
-#' @importFrom stats sd
-#' @importFrom stats complete.cases
-#' @importFrom stats lm
-#' @importFrom stats glm
-#' @importFrom stats anova
-#' @importFrom stats pf
-#' @importFrom stats formula
-#' @importFrom stats var
-
-geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene=FALSE, model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
-## input:
-##  x: numeric vector of gene expression values
-##  type: vector of factors specifying the cell lines or type types
-##  batch: vector of factors specifying the batch
-##  drugpheno: numeric vector of drug sensitivity values (e.g., IC50 or AUC)
-##  duration: numeric vector of experiment duration in hours
-##  interaction.typexgene: Should interaction between gene expression and cell/type type be computed? Default set to FALSE
-##  model: Should the full linear model be returned? Default set to FALSE
-##
-## output:
-##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
+#' Calcualte The Gene Drug Sensitivity
+#' 
+#' TODO:: Write a description!
+#' 
+#' @param x A \code{numeric} vector of gene expression values
+#' @param type A \code{vector} of factors specifying the cell lines or type types
+#' @param batch A \code{vector} of factors specifying the batch
+#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g., 
+#'   IC50 or AUC)
+# @param duration A \code{numeric} vector of experiment duration in hours
+#' @param interaction.typexgene \code{boolean} Should interaction between gene 
+#'   expression and cell/type type be computed? Default set to FALSE 
+#' @param model \code{boolean} Should the full linear model be returned? Default
+#'   set to FALSE
+#' @param standardize \code{character} One of 'SD', 'rescale' or 'none'
+#' @param verbose \code{boolean} Should the function display messages?
+#'  
+#' @return A \code{vector} reporting the effect size (estimateof the coefficient 
+#'   of drug concentration), standard error (se), sample size (n), t statistic, 
+#'   and F statistics and its corresponding p-value.
+#'
+#' @importFrom stats sd complete.cases lm glm anova pf formula var
+geneDrugSensitivity <- function(x, type, batch, drugpheno, 
+                                interaction.typexgene=FALSE, 
+                                model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
 
   standardize <- match.arg(standardize)
 
@@ -79,7 +78,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
       "SD" = drugpheno <- apply(drugpheno, 2, function(x){
       return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
       "rescale" = drugpheno <- apply(drugpheno, 2, function(x){
-      return(rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE))    })
+      return(.rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE))    })
       )
 
   }else{
@@ -88,7 +87,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(length(table(x)) > 2  & standardize!= "none"){
     switch(standardize, 
       "SD" = xx <- x[ccix]/sd(as.numeric(x[ccix])) ,
-      "rescale" = xx <- rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
+      "rescale" = xx <- .rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
       )
   }else{
     xx <- x[ccix]
@@ -234,8 +233,18 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
   return(rest)
 }
 
-
-
-
-
-## End
+## Helper Functions
+##TODO:: Add  function documentation
+#' @importFrom stats quantile
+.rescale <- function(x, na.rm=FALSE, q=0) 
+{
+  if(q == 0) {
+    ma <- max(x, na.rm=na.rm)
+    mi <- min(x, na.rm=na.rm)
+  } else {
+    ma <- quantile(x, probs=1-(q/2), na.rm=na.rm)
+    mi <- quantile(x, probs=q/2, na.rm=na.rm)
+  }
+  xx <- (x - mi) / (ma - mi)
+  return(xx)
+}

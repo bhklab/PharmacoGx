@@ -30,6 +30,8 @@ molecular profiles for each molecular data type.}
 \item{cell}{A \code{data.frame} containing the annotations for all the cell
 lines profiled in the data set, across all data types}
 
+\item{drug}{A \code{data.frame} containg the annotations for all the drugs}
+
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the
 sensitivity experiments}
 
@@ -45,13 +47,9 @@ available sensitivity/perturbation data}
 \item{perturbationN}{A \code{data.frame} summarizing the
 available sensitivity/perturbation data}
 
-\item{curationCell}{A \code{data.frame} mapping
-the names for cells and tissues used in the data set to universal
-identifiers used between different CoreSet objects}
-
-\item{curationTissue}{A \code{data.frame} mapping
-the names for cells and tissues used in the data set to universal
-identifiers used between different CoreSet objects}
+\item{curationDrug, curationCell, curationTissue}{A \code{data.frame} mapping
+the names for drugs, cells and tissues used in the data set to universal
+identifiers used between different PharmacoSet objects}
 
 \item{datasetType}{A \code{character} string of 'sensitivity',
 'preturbation', or both detailing what type of data can be found in the

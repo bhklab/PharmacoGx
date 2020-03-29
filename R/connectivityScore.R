@@ -1,6 +1,7 @@
 #' Function computing connectivity scores between two signatures
 #' 
 #' @inherit CoreGx::connectivityScore
+#' @inheritParams CoreGx::connectivityScore
 #' 
 #' @export
 connectivityScore <- 
