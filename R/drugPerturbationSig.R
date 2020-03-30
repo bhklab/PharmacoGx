@@ -1,11 +1,3 @@
-#	Get Drug Perturbation Signatures from a PharmacoSet
-###############################################################################
-## Drug perturbation analysis
-## create profiles before vs after drug for each drug 
-###############################################################################
-
-
-
 #' Creates a signature representing gene expression (or other molecular profile)
 #' change induced by administrating a drug, for use in drug effect analysis.
 #' 
@@ -38,10 +30,11 @@
 #' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
 #'   should the function return for each gene drug pair?
 #' @param verbose [bool] Should diagnostive messages be printed? (default false)
+#' 
 #' @return [list] a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
+#' 
 #' @export
-
 drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
 	availcore <- parallel::detectCores()
 	if ( nthread > availcore) {
@@ -89,7 +82,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread
   }
   
   # splitix <- parallel::splitIndices(nx=length(drugn), ncl=nthread)
-  # splitix <- splitix[sapply(splitix, length) > 0]
+  # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
   mcres <- lapply(drugn, function(x, exprs, sampleinfo) {
     res <- NULL
     i = x 
@@ -100,14 +93,15 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread
     return(res)
   }, exprs=t(molecularProfiles(pSet, mDataType)[features, , drop=FALSE]), sampleinfo=PharmacoGx::phenoInfo(pSet, mDataType))
   res <- do.call(c, mcres)
-  res <- res[!sapply(res, is.null)]
+  res <- res[!vapply(res, is.null, FUN.VALUE=logical(1))]
   drug.perturbation <- array(NA, dim=c(nrow(featureInfo(pSet, mDataType)[features,, drop=FALSE]), length(res), ncol(res[[1]])), dimnames=list(rownames(featureInfo(pSet, mDataType)[features,,drop=FALSE]), names(res), colnames(res[[1]])))
-  for(j in seq_len(ncol(res[[1]]))) {
-    ttt <- sapply(res, function(x, j, k) {
-      xx <- array(NA, dim=length(k), dimnames=list(k))
-      xx[rownames(x)] <- x[ , j, drop=FALSE]
-      return (xx)
-    }, j=j, k=rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]))
+  for (j in seq_len(ncol(res[[1]]))) {
+    ttt <- vapply(res, function(x, j, k) {
+              xx <- array(NA, dim=length(k), dimnames=list(k))
+              xx[rownames(x)] <- x[ , j, drop=FALSE]
+              return (xx)
+              }, j=j, k=rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]),
+            FUN.VALUE=numeric(dim(drug.perturbation)[1]))
     drug.perturbation[rownames(featureInfo(pSet, mDataType)[features,, drop=FALSE]), names(res), j] <- ttt
   }
   
