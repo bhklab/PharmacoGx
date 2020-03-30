@@ -15,6 +15,7 @@
 #' @importFrom stats setNames
 #' 
 #' @export
+#' @keywords internal
 .convertPsetMolecularProfilesToSE <- function(pSet) {
   
   eSets <- pSet@molecularProfiles # Extract eSet data
@@ -71,7 +72,7 @@
 ##' @import Biobase
 ##' 
 ##' @export
-##'
+##' @keywords internal
 .validatePsetMolecularProfilesToSEConversion <- function(pSet_old, pSet_new) {
   
   # Testing that pSets are in correct order
@@ -191,7 +192,17 @@
 ##TODO:: Determine why CCLEsmall is 3x larger in memory after conversion?
 #' Utility function to resave all datasets after modifying convertPSetMolecularProfiles
 #' 
+#' Converts all example dastasets specificed as an argument from 
+#'   molecularProfiles as ExpressionSet to molecularProfiles as 
+#'   SummarizedExperiment and saves them in the data folder
+#' 
 #' @param datasets \code{character} A list of the example datasets to update
+#' 
+#' @return \code{none} Works by side effects alone to resave all example 
+#'   datasets in a package to have SummarizedExperiments for molecularProfiles
+#' 
+#' @export
+#' @keywords internal
 .resaveAllExampleDatasets <- function(datasets) {
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))

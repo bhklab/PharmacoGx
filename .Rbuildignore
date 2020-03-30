@@ -3,4 +3,10 @@
 .travis.yml
 appveyor.yml
 codecover.R
-vignettes/figure
+vignettes
+.git
+.gitignore
+data/*old.rda
+
+!vignettes/CreatingPharmacoSet.Rmd
+!vigneettes/PharmacoGx.Rmd

@@ -18,3 +18,4 @@
 Checks that all the information contained in an ExpressionSet molecularProfile 
   was successfully tranferred to the SummarizedExperiment molecularProfile
 }
+\keyword{internal}

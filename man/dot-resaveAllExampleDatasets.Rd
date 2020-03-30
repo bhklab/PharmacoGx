@@ -9,6 +9,13 @@
 \arguments{
 \item{datasets}{\code{character} A list of the example datasets to update}
 }
-\description{
-Utility function to resave all datasets after modifying convertPSetMolecularProfiles
+\value{
+\code{none} Works by side effects alone to resave all example 
+  datasets in a package to have SummarizedExperiments for molecularProfiles
 }
+\description{
+Converts all example dastasets specificed as an argument from 
+  molecularProfiles as ExpressionSet to molecularProfiles as 
+  SummarizedExperiment and saves them in the data folder
+}
+\keyword{internal}

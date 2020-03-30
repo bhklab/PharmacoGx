@@ -2,6 +2,7 @@
 
 export(.computeAUCUnderFittedCurve)
 export(.convertPsetMolecularProfilesToSE)
+export(.resaveAllExampleDatasets)
 export(.validatePsetMolecularProfilesToSEConversion)
 export(PharmacoSet)
 export(amcc)

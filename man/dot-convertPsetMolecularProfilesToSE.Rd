@@ -16,3 +16,4 @@
 Converts all ExpressionSet objects within the molecularProfiles slot of a 
   PharmacoSet to SummarizedExperiments
 }
+\keyword{internal}
