@@ -14,8 +14,10 @@
 #' @param mean.viablity [numeric] average expected viability value
 #' @param nthread [numeric] if multiple cores are available, how many cores
 #'   should the computation be parallelized over? 
+#' 
 #' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
 #'   rownames of the non-noisy curves
+#' 
 #' @export
 filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
     
@@ -47,9 +49,9 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
     xx <- as.numeric(xx)
     if(trunc)
     {
-        return(c(pmin(100, xx[2:length(xx)]) - pmin(100, xx[1:length(xx)-1]), 0))
+        return(c(pmin(100, xx[seq(2,length(xx))]) - pmin(100, xx[seq_along(xx)-1]), 0))
     }else{
-        return(c(xx[2:length(xx)] - xx[1:length(xx)-1]), 0)
+        return(c(xx[seq(2, length(xx))] - xx[seq_along(xx) - 1]), 0)
     }
 }
 
@@ -59,8 +61,8 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
     if(trunc) {
         xx <- pmin(xx, 100)
     }
-    tt <- t(combn(seq_len(length(xx)), 2 , simplify = TRUE))
+    tt <- t(combn(seq_along(xx), 2 , simplify = TRUE))
     tt <- tt[which(((tt[,2] - tt[,1]) >= 2) == TRUE),]
-    cum.sum <- unlist(lapply(seq_len(nrow(tt)), function(x){xx[tt[x,2]]-xx[tt[x,1]]}))
+    cum.sum <- unlist(lapply(seq_len(nrow(tt)), function(x) { xx[tt[x, 2]] - xx[tt[x, 1]]}))
     return(max(cum.sum))
 }

@@ -11,10 +11,9 @@
 #' genetic profiles of cell lines pre and post treatement with compounds, known 
 #' respecitively as sensitivity and perturbation datasets.
 #' 
-# @param object A \code{PharmacoSet} object ##TODO:: Is this param needed?
+#' @param object A \code{PharmacoSet} object
 #' @param mDataType A \code{character} with the type of molecular data to 
 #'   return/update
-#' @param object A \code{PharmacoSet} object
 #' @param value A replacement value
 #' 
 #' @slot annotation A \code{list} of annotation data about the PharmacoSet,

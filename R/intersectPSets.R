@@ -203,7 +203,7 @@ intersectPSet <-
     
     
     
-    for(i in 1:length(pSets)){
+    for (i in seq_along(pSets)) {
       if(("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn)){
         if(strictIntersect){
           pSets[[i]] <- subsetTo(pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
