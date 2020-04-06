@@ -5,18 +5,10 @@
 \title{Takes molecular data from a PharmacoSet, and summarises them
 into one entry per drug}
 \usage{
-summarizeMolecularProfiles(
-  pSet,
-  mDataType,
-  cell.lines,
-  features,
+summarizeMolecularProfiles(pSet, mDataType, cell.lines, features,
   summary.stat = c("mean", "median", "first", "last", "and", "or"),
-  fill.missing = TRUE,
-  summarize = TRUE,
-  verbose = TRUE,
-  binarize.threshold = NA,
-  binarize.direction = c("less", "greater")
-)
+  fill.missing = TRUE, summarize = TRUE, verbose = TRUE,
+  binarize.threshold = NA, binarize.direction = c("less", "greater"))
 }
 \arguments{
 \item{pSet}{\code{PharmacoSet} The PharmacoSet to summarize}

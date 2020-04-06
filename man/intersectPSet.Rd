@@ -5,15 +5,9 @@
 \title{Intersects objects of the PharmacoSet class, subsetting them to the common
 drugs and/or cell lines as selected by the user.}
 \usage{
-intersectPSet(
-  pSets,
-  intersectOn = c("drugs", "cell.lines", "concentrations"),
-  cells,
-  drugs,
-  strictIntersect = FALSE,
-  verbose = TRUE,
-  nthread = 1
-)
+intersectPSet(pSets, intersectOn = c("drugs", "cell.lines",
+  "concentrations"), cells, drugs, strictIntersect = FALSE,
+  verbose = TRUE, nthread = 1)
 }
 \arguments{
 \item{pSets}{[list] a list of PharmacoSet objects, of which the function

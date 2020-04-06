@@ -4,11 +4,8 @@
 \alias{availablePSets}
 \title{Return a table of PharmacoSets available for download}
 \usage{
-availablePSets(
-  saveDir = file.path(".", "PSets"),
-  myfn = "PSets.csv",
-  verbose = TRUE
-)
+availablePSets(saveDir = file.path(".", "PSets"), myfn = "PSets.csv",
+  verbose = TRUE)
 }
 \arguments{
 \item{saveDir}{\code{character} Directory to save the table of PSets}
