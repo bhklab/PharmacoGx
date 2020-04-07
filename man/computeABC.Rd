@@ -5,9 +5,18 @@
 \title{Fits dose-response curves to data given by the user
 and returns the ABC of the fitted curves.}
 \usage{
-computeABC(conc1, conc2, viability1, viability2, Hill_fit1, Hill_fit2,
-  conc_as_log = FALSE, viability_as_pct = TRUE, trunc = TRUE,
-  verbose = TRUE)
+computeABC(
+  conc1,
+  conc2,
+  viability1,
+  viability2,
+  Hill_fit1,
+  Hill_fit2,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{conc1}{[vector] is a vector of drug concentrations.}

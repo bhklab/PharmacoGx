@@ -4,8 +4,15 @@
 \alias{cosinePerm}
 \title{Computes the cosine similarity and significance using permutation test}
 \usage{
-cosinePerm(x, y, nperm = 1000, alternative = c("two.sided", "less",
-  "greater"), include.perm = FALSE, setseed = 12345, nthread = 1)
+cosinePerm(
+  x,
+  y,
+  nperm = 1000,
+  alternative = c("two.sided", "less", "greater"),
+  include.perm = FALSE,
+  setseed = 12345,
+  nthread = 1
+)
 }
 \arguments{
 \item{x}{[factor] is the factors for the first variable}

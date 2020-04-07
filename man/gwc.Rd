@@ -4,8 +4,16 @@
 \alias{gwc}
 \title{Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation}
 \usage{
-gwc(x1, p1, x2, p2, method.cor = c("pearson", "spearman"),
-  nperm = 10000, truncate.p = 1e-16, ...)
+gwc(
+  x1,
+  p1,
+  x2,
+  p2,
+  method.cor = c("pearson", "spearman"),
+  nperm = 10000,
+  truncate.p = 1e-16,
+  ...
+)
 }
 \arguments{
 \item{x1}{\code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment}

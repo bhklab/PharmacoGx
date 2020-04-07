@@ -4,14 +4,22 @@
 \alias{PharmacoSet}
 \title{PharmacoSet constructor}
 \usage{
-PharmacoSet(name, molecularProfiles = list(), cell = data.frame(),
-  drug = data.frame(), sensitivityInfo = data.frame(),
+PharmacoSet(
+  name,
+  molecularProfiles = list(),
+  cell = data.frame(),
+  drug = data.frame(),
+  sensitivityInfo = data.frame(),
   sensitivityRaw = array(dim = c(0, 0, 0)),
-  sensitivityProfiles = matrix(), sensitivityN = matrix(nrow = 0, ncol
-  = 0), perturbationN = array(NA, dim = c(0, 0, 0)),
-  curationDrug = data.frame(), curationCell = data.frame(),
-  curationTissue = data.frame(), datasetType = c("sensitivity",
-  "perturbation", "both"), verify = TRUE)
+  sensitivityProfiles = matrix(),
+  sensitivityN = matrix(nrow = 0, ncol = 0),
+  perturbationN = array(NA, dim = c(0, 0, 0)),
+  curationDrug = data.frame(),
+  curationCell = data.frame(),
+  curationTissue = data.frame(),
+  datasetType = c("sensitivity", "perturbation", "both"),
+  verify = TRUE
+)
 }
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset}

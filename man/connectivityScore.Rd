@@ -4,9 +4,15 @@
 \alias{connectivityScore}
 \title{Function computing connectivity scores between two signatures}
 \usage{
-connectivityScore(x, y, method = c("gsea", "fgsea", "gwc"),
-  nperm = 10000, nthread = 1, gwc.method = c("spearman", "pearson"),
-  ...)
+connectivityScore(
+  x,
+  y,
+  method = c("gsea", "fgsea", "gwc"),
+  nperm = 10000,
+  nthread = 1,
+  gwc.method = c("spearman", "pearson"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{matrix} with the first gene signature. In the case of GSEA the vector of
