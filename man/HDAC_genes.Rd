@@ -4,8 +4,10 @@
 \name{HDAC_genes}
 \alias{HDAC_genes}
 \title{HDAC Gene Signature}
-\format{a 13x2 data.frame with gene identifiers in the first column and
-  direction change in the second}
+\format{
+a 13x2 data.frame with gene identifiers in the first column and
+  direction change in the second
+}
 \usage{
 data(HDAC_genes)
 }
