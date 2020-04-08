@@ -45,7 +45,7 @@ matrix:
       - brew cask reinstall xquartz 
       - brew install tcl-tk
       - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
-      - if [[ "$OSTYPE" != "linux-gnu"]]; then sudo tlmgr install inconsolata; fi # Fix LaTeX error on macOS
+      - sudo tlmgr install inconsolata # Fix LaTeX error on macOS
     ## VIRTUAL GUI
     # - Launches virtual GUI to catch renders on the headless test server
     before_script:
