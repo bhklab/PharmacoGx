@@ -4,12 +4,8 @@
 \alias{downloadPertSig}
 \title{Download Drug Perturbation Signatures}
 \usage{
-downloadPertSig(
-  name,
-  saveDir = file.path(".", "PSets", "Sigs"),
-  myfn = NULL,
-  verbose = TRUE
-)
+downloadPertSig(name, saveDir = file.path(".", "PSets", "Sigs"),
+  myfn = NULL, verbose = TRUE)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PharmacoSet for which to

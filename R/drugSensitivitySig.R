@@ -34,7 +34,7 @@
 #'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' print(drug.sensitivity)
 #' 
-#' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
+#' @param pSet [PharmacoSet] a PharmacoSet of the sensitivity experiment type
 #' @param mDataType [character] which one of the molecular data types to use
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
 #' @param drugs [character] a vector of drug names for which to compute the
