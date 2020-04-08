@@ -4,9 +4,16 @@
 \alias{computeAUC}
 \title{Computes the AUC for a Drug Dose Viability Curve}
 \usage{
-computeAUC(concentration, viability, Hill_fit, conc_as_log = FALSE,
-  viability_as_pct = TRUE, trunc = TRUE, area.type = c("Fitted",
-  "Actual"), verbose = TRUE)
+computeAUC(
+  concentration,
+  viability,
+  Hill_fit,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  area.type = c("Fitted", "Actual"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{concentration}{[vector] is a vector of drug concentrations.}

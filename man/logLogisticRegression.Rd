@@ -5,11 +5,22 @@
 \title{Fits curves of the form E = E_inf + (1 - E_inf)/(1 + (c/EC50)^HS) to dose-response data points (c, E) given by the user
 and returns a vector containing estimates for HS, E_inf, and EC50.}
 \usage{
-logLogisticRegression(conc, viability, density = c(2, 10, 2),
-  step = 0.5/density, precision = 0.05, lower_bounds = c(0, 0, -6),
-  upper_bounds = c(4, 1, 6), scale = 0.07, family = c("normal",
-  "Cauchy"), median_n = 1, conc_as_log = FALSE,
-  viability_as_pct = TRUE, trunc = TRUE, verbose = FALSE)
+logLogisticRegression(
+  conc,
+  viability,
+  density = c(2, 10, 2),
+  step = 0.5/density,
+  precision = 0.05,
+  lower_bounds = c(0, 0, -6),
+  upper_bounds = c(4, 1, 6),
+  scale = 0.07,
+  family = c("normal", "Cauchy"),
+  median_n = 1,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{conc}{[vector] is a vector of drug concentrations.}

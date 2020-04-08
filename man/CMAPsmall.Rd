@@ -4,7 +4,9 @@
 \name{CMAPsmall}
 \alias{CMAPsmall}
 \title{Connectivity Map Example PharmacoSet}
-\format{PharmacoSet object}
+\format{
+PharmacoSet object
+}
 \usage{
 data(CMAPsmall)
 }

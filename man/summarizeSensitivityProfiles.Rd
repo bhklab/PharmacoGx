@@ -5,10 +5,15 @@
 \title{Takes the sensitivity data from a PharmacoSet, and summarises them into a
 drug vs cell line table}
 \usage{
-summarizeSensitivityProfiles(pSet,
-  sensitivity.measure = "auc_recomputed", cell.lines, drugs,
+summarizeSensitivityProfiles(
+  pSet,
+  sensitivity.measure = "auc_recomputed",
+  cell.lines,
+  drugs,
   summary.stat = c("mean", "median", "first", "last", "max", "min"),
-  fill.missing = TRUE, verbose = TRUE)
+  fill.missing = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] The PharmacoSet from which to extract the data}

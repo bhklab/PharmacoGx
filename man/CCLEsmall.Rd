@@ -4,7 +4,9 @@
 \name{CCLEsmall}
 \alias{CCLEsmall}
 \title{Cancer Cell Line Encyclopedia (CCLE) Example PharmacoSet}
-\format{PharmacoSet object}
+\format{
+PharmacoSet object
+}
 \usage{
 data(CCLEsmall)
 }

@@ -6,14 +6,25 @@
 other molecular profile) and drug dose response, for use in drug sensitivity
 analysis.}
 \usage{
-drugSensitivitySig(pSet, mDataType, drugs, features, cells, tissues,
+drugSensitivitySig(
+  pSet,
+  mDataType,
+  drugs,
+  features,
+  cells,
+  tissues,
   sensitivity.measure = "auc_recomputed",
-  molecular.summary.stat = c("mean", "median", "first", "last", "or",
-  "and"), sensitivity.summary.stat = c("mean", "median", "first",
-  "last"), returnValues = c("estimate", "pvalue", "fdr"),
-  sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
-  molecular.cutoff = NA, molecular.cutoff.direction = c("less",
-  "greater"), nthread = 1, verbose = TRUE, ...)
+  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+  sensitivity.summary.stat = c("mean", "median", "first", "last"),
+  returnValues = c("estimate", "pvalue", "fdr"),
+  sensitivity.cutoff,
+  standardize = c("SD", "rescale", "none"),
+  molecular.cutoff = NA,
+  molecular.cutoff.direction = c("less", "greater"),
+  nthread = 1,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{pSet}{[PharmacoSet] a PharmacoSet of the sensitivity experiment type}
