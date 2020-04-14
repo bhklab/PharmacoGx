@@ -26,7 +26,8 @@ Imports:
     graphics, 
     grDevices, 
     reshape2,
-    testthat
+    testthat,
+    jsonlite
 Remotes: bhklab/CoreGx@eSet_To_SE
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
