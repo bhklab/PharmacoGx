@@ -1,6 +1,6 @@
 #' Calcualte The Gene Drug Sensitivity
 #' 
-#' TODO:: Write a description!
+#' This version of the function uses a partial correlation instead of standardized linear models. 
 #' 
 #' @param x A \code{numeric} vector of gene expression values
 #' @param type A \code{vector} of factors specifying the cell lines or type types
@@ -34,7 +34,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       x[is.infinite(x)] <- NA
     }
     return(list(x))
-  }, USE.NAMES=FALSE,
+  }, USE.NAMES=TRUE,
   FUN.VALUE=list(1)), check.names=FALSE)
 
 
