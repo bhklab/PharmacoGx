@@ -33,7 +33,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
       x[is.infinite(x)] <- NA
     }
     return(list(x))
-  }, USE.NAMES=FALSE,
+  }, USE.NAMES=TRUE,
   FUN.VALUE=list(1)), check.names=FALSE)
 
 
