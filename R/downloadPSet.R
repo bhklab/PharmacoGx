@@ -5,6 +5,10 @@
 #' the date of last update, the name of the PSet, and references for the data contained within,
 #' a DOI for the data, and a direct download link. Download can also be done using the downloadPSet
 #' function.  
+#' 
+#' Much more information on the processing of the data and data provenance can be found at:
+#' orcestra.ca 
+#' 
 #'
 #' @examples
 #' if (interactive()){
