@@ -20,7 +20,7 @@
 #'   and F statistics and its corresponding p-value.
 #'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var
-geneDrugSensitivity <- function(x, type, batch, drugpheno, 
+geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno, 
                                 interaction.typexgene=FALSE, 
                                 model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
 
@@ -33,7 +33,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
       x[is.infinite(x)] <- NA
     }
     return(list(x))
-  }, USE.NAMES=TRUE,
+  }, USE.NAMES=FALSE,
   FUN.VALUE=list(1)), check.names=FALSE)
 
 
