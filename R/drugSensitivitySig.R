@@ -160,6 +160,17 @@ drugSensitivitySig <- function(pSet,
     features <- features[fix]
   }
   
+  if(is.null(dots[["modeling.method"]])){
+    modeling.method <- "anova"
+  } else {
+    modeling.method <- dots[["modeling.method"]]
+  }
+  if(is.null(dots[["inference.method"]])){
+    inference.method <- "analytic"
+  } else {
+    inference.method <- dots[["inference.method"]]
+  }
+
   if(is.null(dots[["sProfiles"]])){
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
       
@@ -226,7 +237,7 @@ drugSensitivitySig <- function(pSet,
     
     splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
     splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
+    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method) {
       res <- NULL
       for(i in drugn[x]) {
         ## using a linear model (x ~ concentration + cell + batch)
@@ -236,12 +247,14 @@ drugSensitivitySig <- function(pSet,
         if(!is.na(sensitivity.cutoff)) {
           dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
         }
-        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose)
+        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose, modeling.method=modeling.method, inference.method=inference.method)
         res <- c(res, list(rr$all))
       }
       names(res) <- drugn[x]
       return(res)
-    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
+    }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]),
+       drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize,
+       modeling.method=modeling.method, inference.method=inference.method)
     
     res <- do.call(c, mcres)
     res <- res[!vapply(res, is.null, FUN.VALUE=logical(1))]

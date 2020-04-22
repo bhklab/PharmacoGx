@@ -20,12 +20,24 @@
 ## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
-rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=FALSE, standardize = "SD", nthread=1, verbose=FALSE) {
+rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, 
+                                     single.type=FALSE, standardize = "SD",
+                                     nthread=1, verbose=FALSE, 
+                                     modeling.method = c("anova", "pearson"),
+                                     inference.method = c("analytic", "resampling")) {
   if (nthread != 1) {
     availcore <- parallel::detectCores()
-    if (missing(nthread) || nthread < 1 || nthread > availcore) {
+    if ((missing(nthread) || nthread < 1 || nthread > availcore) && verbose) {
+      warning("nthread undefined, negative or larger than available cores. Resetting to maximum number of cores.")
       nthread <- availcore
     }
+  }
+
+  modeling.method <- match.arg(modeling.method)
+  inference.method <- match.arg(inference.method)
+
+  if(modeling.method == "anova" && inference.method == "resampling") {
+    stop("Not yet implemented to do resampling based inference for anova model")
   }
 
   if(is.null(dim(drugpheno))){
@@ -58,31 +70,32 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
   res <- NULL
   ccix <- complete.cases(data, type, batch, drugpheno)
   nn <- sum(ccix)
-#  nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "fdr")
-#  nc <- c("estimate", "se", "n", "pvalue", "fdr")
-  if(!any(unlist(lapply(drugpheno,is.factor)))){
-     if(ncol(drugpheno)>1){
-      ##### FIX NAMES!!!
-      nc <- lapply(seq_len(ncol(drugpheno)), function(i){
 
-        est <- paste("estimate", i, sep=".")
-        se <-  paste("se", i, sep=".")
-        tstat <- paste("tstat", i, sep=".")
 
-        nc <- c(est, se, tstat)
-        return(nc)
+  if(modeling.method == "anova"){
+    if(!any(unlist(lapply(drugpheno,is.factor)))){
+      if(ncol(drugpheno)>1){
+        ##### FIX NAMES!!! This is important
+        nc <- lapply(seq_len(ncol(drugpheno)), function(i){
 
-      })
-      #nc <- do.call(c, rest)
-      nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
+          est <- paste("estimate", i, sep=".")
+          se <-  paste("se", i, sep=".")
+          tstat <- paste("tstat", i, sep=".")
+
+          nc <- c(est, se, tstat)
+          return(nc)
+
+        })
+        nc  <- c(nc, n=nn, "fstat"=NA, "pvalue"=NA, "fdr")
+      } else {
+        nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
+      }
     } else {
-      nc  <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
-    }
-  } else {
-    # nc  <- c("estimate", "se", "n", "pvalue", "fdr")
-    nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
-  }  
-    
+      nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
+    }  
+  } else if (modeling.method == "pearson") {
+    nc <- c("estimate", "n", "df", "pvalue", "lower", "upper")
+  }
 
   
   for (ll in seq_len(length(ltype))) {
@@ -102,10 +115,22 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
-        res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
+      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method) {
+        if(modeling.method == "anova"){
+          res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
+        } else if(modeling.method == "pearson") {
+          res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr, 
+                                                    type=type,
+                                                    batch=batch, 
+                                                    drugpheno=drugpheno, 
+                                                    verbose=verbose, 
+                                                    test=inference.method))
+      ## TODO:: insert logic about computing the appropriate number of permutations. 
+        }
+
+
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread)
+      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread, modeling.method = modeling.method, inference.method = inference.method)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
