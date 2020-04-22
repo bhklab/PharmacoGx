@@ -42,7 +42,7 @@ jobs:
         run: | 
           tlmgr install preprint
           tlmgr install ae
-          tlmgr install epstopdf
+          tlmgr install oberdiek
           tlmgr update --self --all
           tlmgr path add
           fmtutil-sys --all
