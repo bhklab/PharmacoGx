@@ -41,6 +41,7 @@ jobs:
       - name: Install Latex Packages
         run: | 
           tlmgr install preprint
+          tlmgr install ae
         
       - name: Query dependencies
         run: |
