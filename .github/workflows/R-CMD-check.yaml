@@ -35,7 +35,9 @@ jobs:
           r-version: ${{ matrix.config.r }}
 
       - uses: r-lib/actions/setup-pandoc@master
-
+        
+      - uses: r-lib/actions/setup-tinytex@master
+        
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -60,9 +62,18 @@ jobs:
           sudo -s eval "$sysreqs"
           
       - name: Install Missing GLPACK
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get install glpk-utils libglpk-dev
+
+      - name: Install XQuartz
+        if: runner.os == 'macOS'
+        run: |
+          wget https://dl.bintray.com/xquartz/downloads/XQuartz-2.7.11.dmg
+          sudo hdiutil attach XQuartz-2.7.11.dmg
+          sudo installer -package /Volumes/XQuartz-2.7.11/XQuartz.pkg
           
+           
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
