@@ -1,3 +1,4 @@
+#' @importFrom BiocParallel bplapply
 .calculateSensitivitiesStar <-
   function (pSets = list(), exps=NULL, cap=NA, na.rm=TRUE, area.type=c("Fitted","Actual"), nthread=1) {
     
@@ -29,10 +30,14 @@
         
        }
     }
-   	cl <- makeCluster(nthread)
+
+    op <- options()
+    options(mc.cores=nthread)
+    on.exit(options(op))
+
     for(study in names(pSets)){
 
-    	auc_recomputed_star <- unlist(parSapply(cl=cl, rownames(pSets[[study]]@sensitivity$raw), function(experiment, exps, study, dataset, area.type){
+    	auc_recomputed_star <- unlist(bplapply(rownames(pSets[[study]]@sensitivity$raw), function(experiment, exps, study, dataset, area.type){
     		if(!experiment %in% exps[,study]){return(NA_real_)}
     		return(computeAUC(concentration=as.numeric(dataset[experiment,,1]), 
                         viability=as.numeric(dataset[experiment,,2]), 
@@ -43,7 +48,7 @@
     	
     	pSets[[study]]@sensitivity$profiles$auc_recomputed_star <- auc_recomputed_star
     }
-    stopCluster(cl)
+
     return(pSets)
   }
 
