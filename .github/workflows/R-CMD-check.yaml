@@ -40,7 +40,7 @@ jobs:
         
       - name: Install Latex Packages
         run: | 
-          tlmgr install authblk
+          tlmgr install preprint
         
       - name: Query dependencies
         run: |
