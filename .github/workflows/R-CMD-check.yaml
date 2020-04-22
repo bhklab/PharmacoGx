@@ -42,6 +42,7 @@ jobs:
         run: | 
           tlmgr install preprint
           tlmgr install ae
+          tlmgr install epstopdf
         
       - name: Query dependencies
         run: |
