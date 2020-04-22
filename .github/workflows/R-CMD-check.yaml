@@ -64,7 +64,7 @@ jobs:
       - name: Install Missing GLPACK
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install glpk-utils libglpk-dev
+          sudo apt install glpk-utils libglpk-dev
 
       - name: Install XQuartz
         if: runner.os == 'macOS'
