@@ -91,7 +91,7 @@ summarizeMolecularProfiles <- function(pSet,
     cell.lines <- cellNames(pSet)
   }
   
-  ##TODO:: have less confusing variable
+  ##TODO:: have less confusing variable names
   dd <- molecularProfiles(pSet, mDataType)
   pp <- phenoInfo(pSet, mDataType)
   

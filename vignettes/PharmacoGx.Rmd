@@ -6,13 +6,13 @@ author:
   affilnum: 1
 
 - name: Zhaleh Safikhani
-  affilnum: '1, 2'
+  affilnum: '1,2'
 
 - name: Benjamin Haibe-Kains
-  affilnum: '1, 2, 3'
+  affilation: '1, 2, 3'
   
-affiliation: 
-
+affiliation:
+  
 - affilnum: 1
   affil: Princess Margaret Cancer Centre, University Health Network, Toronto Canada
   
@@ -28,9 +28,11 @@ output:
     fig_caption: yes
     fig_width: 7
     fig_height: 7
-    keep_tex: no
+    keep_tex: yes
     number_sections: no
     template: manuscript.latex
+    includes:
+      in_header: header.tex
 
   html_document: null
   
@@ -44,15 +46,16 @@ geometry: margin=1in
 fontsize: 11pt
 spacing: singlespacing
 footerdate: no
+abstractt: no
 bibliography: 
   - pharmacogx.bib
-  
+csl: ecology.csl
+
 vignette: >
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\usepackage[UTF-8]{inputenc}
   %\VignetteIndexEntry{PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets}
-
 ---
 
 \vspace{5pt}
@@ -70,6 +73,14 @@ opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE, include = TRUE)
 opts_chunk$set(tidy = FALSE, comment = NA, highlight = TRUE)
 
 ```
+
+
+```{r knitcitation, include=FALSE}
+library(knitcitations)
+cleanbib()
+cite_options(citation_format = "pandoc")
+```
+
 \normalsize
 
 \clearpage

@@ -4,4 +4,6 @@ PharmacoGx.Rproj
 .Rhistory
 .RData
 */.DS_store
-old_data
+*/figure
+doc
+Meta

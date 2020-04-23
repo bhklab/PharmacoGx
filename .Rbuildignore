@@ -6,6 +6,10 @@ codecover.R
 .git
 .gitignore
 old_data
-
+.*Rproj
+.*tar.gz
 ^appveyor\.yml$
 ^\.github$
+vignettes/figure
+^doc$
+^Meta$

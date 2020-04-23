@@ -1,20 +1,23 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 1.17.2
-Date: 2020-01-28
-Author: Petr Smirnov, Zhaleh Safikhani, Mark Freeman, Benjamin Haibe-Kains
+Version: 1.17.3
+Date: 2020-04-23
+Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
-    knitr
+    knitr,
+    knitcitations
 Encoding: UTF-8
 Imports: 
     Biobase,
     S4Vectors,
     SummarizedExperiment,
+    BiocParallel,
+    ggplot2,
     magicaxis, 
     RColorBrewer, 
     parallel, 
@@ -28,7 +31,7 @@ Imports:
     reshape2,
     testthat,
     jsonlite
-Remotes: bhklab/CoreGx@eSet_To_SE
+Remotes: bhklab/CoreGx@master
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
@@ -44,7 +47,6 @@ Collate:
     'PharmacoSetClass.R'
     'SanityCheck.R'
     'callingWaterfall.R'
-    'combineTest.R'
     'computeABC.R'
     'computeAUC.R'
     'computeAUC_old.R'
@@ -55,13 +57,8 @@ Collate:
     'computeICn.R'
     'computeSlope.R'
     'connectivityScore.R'
-    'corWeighted.R'
     'cosinePerm.R'
     'datasets.R'
-    'distancePointLine.R'
-    'distancePointSegment.R'
-    'dmedncauchys.R'
-    'dmednnormals.R'
     'downloadPSet.R'
     'downloadSignatures.R'
     'drugDoseResponseCurve.R'
@@ -71,15 +68,12 @@ Collate:
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
     'getRawSensitivityMatrix.R'
-    'intersectList.R'
+    'globals.R'
     'intersectPSets.R'
     'signatureClass.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'rescale.R'
-    'stripWhiteSpace.R'
     'summarizeMolecularProfiles.R'
     'summarizeSensitivityProfiles.R'
-    'symSetDiffList.R'
-    'unionList.R'
+    'utilities.R'
