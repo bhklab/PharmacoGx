@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - CoreGx_dependency
   pull_request:
     branches:
       - master
