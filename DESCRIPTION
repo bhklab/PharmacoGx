@@ -1,9 +1,9 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 1.9.0
-Date: 2020-03-25
-Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
+Version: 1.17.2
+Date: 2020-01-28
+Author: Petr Smirnov, Zhaleh Safikhani, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
 License: Artistic-2.0
@@ -34,3 +34,52 @@ RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
+Collate: 
+    'AdaptiveMatthewCor.R'
+    'ComputeGR.R'
+    'GR.R'
+    'GWC.R'
+    'LogLogisticRegression.R'
+    'MatthewCor.R'
+    'PharmacoSetClass.R'
+    'SanityCheck.R'
+    'callingWaterfall.R'
+    'combineTest.R'
+    'computeABC.R'
+    'computeAUC.R'
+    'computeAUC_old.R'
+    'computeAmax.R'
+    'computeDSS.R'
+    'computeDrugSensitivity.R'
+    'computeIC50.R'
+    'computeICn.R'
+    'computeSlope.R'
+    'connectivityScore.R'
+    'corWeighted.R'
+    'cosinePerm.R'
+    'datasets.R'
+    'distancePointLine.R'
+    'distancePointSegment.R'
+    'dmedncauchys.R'
+    'dmednnormals.R'
+    'downloadPSet.R'
+    'downloadSignatures.R'
+    'drugDoseResponseCurve.R'
+    'drugPerturbationSig.R'
+    'drugSensitivitySig.R'
+    'filterNoisyCurves.R'
+    'geneDrugPerturbation.R'
+    'geneDrugSensitivity.R'
+    'getRawSensitivityMatrix.R'
+    'intersectList.R'
+    'intersectPSets.R'
+    'signatureClass.R'
+    'plotPSig.R'
+    'rankGeneDrugPerturbation.R'
+    'rankGeneDrugSensitivity.R'
+    'rescale.R'
+    'stripWhiteSpace.R'
+    'summarizeMolecularProfiles.R'
+    'summarizeSensitivityProfiles.R'
+    'symSetDiffList.R'
+    'unionList.R'

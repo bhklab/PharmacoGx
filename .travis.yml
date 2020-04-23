@@ -18,7 +18,8 @@ r_github_packages:
 matrix:
   include:
   ## LINUX SETTINGS
-  - os: linux
+  - r: bioc-devel
+    os: linux
     dist: xenial
     ## APT PACKAGE SETTINGS
     addons:

@@ -3,10 +3,9 @@
 .travis.yml
 appveyor.yml
 codecover.R
-vignettes
 .git
 .gitignore
 old_data
 
-!vignettes/CreatingPharmacoSet.Rmd
-!vigneettes/PharmacoGx.Rmd
+^appveyor\.yml$
+^\.github$
