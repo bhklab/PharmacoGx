@@ -4,7 +4,7 @@
 \alias{plot.PharmacoSig}
 \title{Plots a PharmacoSig object into a Volcano Plot}
 \usage{
-plot.PharmacoSig(
+\method{plot}{PharmacoSig}(
   x,
   adjust.method,
   drugs,

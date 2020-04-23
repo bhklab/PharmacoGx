@@ -35,6 +35,7 @@ setGeneric("plot")
 #' @export
 #' @import ggplot2
 #' @include signatureClass.R
+#' @method plot PharmacoSig
 plot.PharmacoSig <- function(x, adjust.method, drugs, features, effect_cutoff, signif_cutoff, color, ...){
 	dots <- list(...)
 	ndots <- length(dots)
@@ -109,13 +110,17 @@ plot.PharmacoSig <- function(x, adjust.method, drugs, features, effect_cutoff, s
 
 		x.m$Cutoff <- NA_character_
 
-		plot.elements <- plot.elements + geom_point(X, Y, color = color, data=x.m)
+		plot.elements <- plot.elements + geom_point(aes(X, Y), color = color, data=x.m)
 	}
 
 
 	plot.elements
 }
 
+#  Plots a PharmacoSig object into a Volcano Plot
+# 
+# 
+# @S3method plot PharmacoSig
 setMethod("plot", "PharmacoSig", plot.PharmacoSig)
 
 
