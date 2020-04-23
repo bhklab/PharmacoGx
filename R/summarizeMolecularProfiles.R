@@ -222,7 +222,8 @@ summarizeMolecularProfiles <- function(pSet,
                                                       length(assay(res, 1))
                                                       ), 
                                                       nrow=nrow(assay(res, 1)), 
-                                                      ncol=ncol(assay(res, 1))
+                                                      ncol=ncol(assay(res, 1)),
+                                                  dimnames=dimnames(assay(res, 1))
                                                   )
   }
   assayNames(res) <- assayNames(pSet@molecularProfiles[[mDataType]])

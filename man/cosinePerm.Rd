@@ -22,10 +22,10 @@ cosinePerm(
 distribution of MCC estimates}
 
 \item{alternative}{\code{string} indicates the alternative hypothesis and 
-must be one of ‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify 
-just the initial letter.  ‘"greater"’ corresponds to positive association, 
-‘"less"’ to negative association. Options are "two.sided", "less", or 
-"greater"}
+must be one of ‘'two.sided'’, ‘'greater'’ or ‘'less'’.  You can specify 
+just the initial letter.  ‘'greater'’ corresponds to positive association, 
+‘'less'’ to negative association. Options are 'two.sided', 'less', or 
+'greater'}
 
 \item{include.perm}{\code{boolean} indicates whether the estimates for the 
 null distribution should be returned. Default set to 'FALSE'}

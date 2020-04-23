@@ -12,7 +12,9 @@ downloadPSet(
 )
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PhamracoSet to download.}
+\item{name}{\code{Character} string, the name of the PhamracoSet to download. 
+Note that this is not the dataset name, but the PSet name - dataset names are not guaranteed
+to be unique.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
@@ -24,17 +26,17 @@ directory if it does not exist.}
 Defaults to TRUE.}
 }
 \value{
-A PSet object with the dataset, downloaded from our server
+A PSet object with the dataset
 }
 \description{
 This function allows you to download a \code{PharmacoSet} object for use with this
 package. The \code{PharmacoSets} have been extensively curated and organised within
 a PharacoSet class, enabling use with all the analysis tools provided in
-\code{PharmacoGx}.
+\code{PharmacoGx}. User \code{availablePSets} to discover which PSets are available.
 }
 \examples{
 if (interactive()){
-downloadPSet("CMAP")
+downloadPSet("CTRPv2")
 }
 
 }

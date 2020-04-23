@@ -28,7 +28,7 @@ If 0, then no p-value is calculated.}
 and the permutation testing is done in parallel.}
 }
 \value{
-Returns a list with two elements. $amcc contains the highest "mcc" 
+Returns a list with two elements. $amcc contains the highest 'mcc' 
   value over all the splits, the p value, as well as the rank at which the 
   split was done.
 }

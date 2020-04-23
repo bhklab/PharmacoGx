@@ -4,26 +4,21 @@
 \alias{availablePSets}
 \title{Return a table of PharmacoSets available for download}
 \usage{
-availablePSets(
-  saveDir = file.path(".", "PSets"),
-  myfn = "PSets.csv",
-  verbose = TRUE
-)
-}
-\arguments{
-\item{saveDir}{\code{character} Directory to save the table of PSets}
-
-\item{myfn}{\code{character} The filename for the table of PSets}
-
-\item{verbose}{\code{bool} Should status messages be printed during download.}
+availablePSets()
 }
 \value{
 A data.frame with details about the available PharmacoSet objects
 }
 \description{
-The function fetches a table of all PharmacoSets available for download from the PharmacoGx server. 
-The table includes the names of the PharamcoSet, the types of data available
-in the object, and the date of last update.
+The function fetches a table of all PharmacoSets available for download. 
+The table includes the dataset names, version information for the data in the PSet,
+the date of last update, the name of the PSet, and references for the data contained within,
+a DOI for the data, and a direct download link. Download can also be done using the downloadPSet
+function.
+}
+\details{
+Much more information on the processing of the data and data provenance can be found at:
+orcestra.ca
 }
 \examples{
 if (interactive()){

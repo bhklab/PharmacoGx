@@ -6,7 +6,7 @@ codecover.R
 vignettes
 .git
 .gitignore
-data/*old.rda
+old_data
 
 !vignettes/CreatingPharmacoSet.Rmd
 !vigneettes/PharmacoGx.Rmd
