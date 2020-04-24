@@ -37,7 +37,11 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
         
-      - uses: r-lib/actions/setup-tinytex@master
+      - if: runner.os != 'Windows'
+        uses: r-lib/actions/setup-tinytex@master
+        
+      - if: runner.os == 'Windows'
+        uses: p-smirnov/actions/setup-tinytex@master
         
       - name: Install Latex Packages
         run: | 
