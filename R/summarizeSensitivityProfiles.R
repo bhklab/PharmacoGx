@@ -84,6 +84,11 @@ summarizeSensitivityProfiles <- function(pSet,
 
 
   # }
+  if(is.factor(dd[, sensitivity.measure]) | is.character(dd[, sensitivity.measure])){
+    warning("Sensitivity measure is stored as a factor or character in the PSet. This is incorrect.\n 
+             Please correct this and/or file an issue. Fixing in the call of this function.")
+    dd[, sensitivity.measure] <- as.numeric(as.character(dd[, sensitivity.measure]))
+  }
 
   pp_dd <- cbind(pp[,c("cellid", "drugid")], "sensitivity.measure"=dd[, sensitivity.measure])
 

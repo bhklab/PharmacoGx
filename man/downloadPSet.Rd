@@ -4,37 +4,42 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(
-  name,
-  saveDir = file.path(".", "PSets"),
-  pSetFileName = NULL,
-  verbose = TRUE
-)
+downloadPSet(name, saveDir = tempdir(), pSetFileName = NULL, verbose = TRUE)
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PhamracoSet to download.}
+\item{name}{\code{Character} string, the name of the PhamracoSet to download. 
+Note that this is not the dataset name, but the PSet name - dataset names are 
+not guaranteed to be unique.}
 
 \item{saveDir}{\code{Character} string with the folder path where the
-PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
+PharmacoSet should be saved. Defaults to `tempdir()`. Will create
 directory if it does not exist.}
 
-\item{pSetFileName}{\code{character} string, the file name to save the dataset under}
+\item{pSetFileName}{\code{character} string, the file name to save the 
+dataset under}
 
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
 }
 \value{
-A PSet object with the dataset, downloaded from our server
+A PSet object with the dataset
 }
 \description{
 This function allows you to download a \code{PharmacoSet} object for use with this
 package. The \code{PharmacoSets} have been extensively curated and organised within
 a PharacoSet class, enabling use with all the analysis tools provided in
-\code{PharmacoGx}.
+\code{PharmacoGx}. User \code{availablePSets} to discover which PSets are available.
 }
+\section{Warning}{
+
+BREAKING CHANGES - this function now defaults to `tempdir()` as the download
+path! You must specify a saveDir or manually save the PSet if you want 
+your download to persist past your current R session.`
+}
+
 \examples{
 if (interactive()){
-downloadPSet("CMAP")
+downloadPSet("CTRPv2", saveDir=file.path(".", "pSets"))
 }
 
 }

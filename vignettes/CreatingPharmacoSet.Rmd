@@ -1,18 +1,18 @@
 ---
-title: 'Creating a PharmacoSet Object'
+title: 'PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets'
 
 author:  
 - name: Petr Smirnov
   affilnum: 1
 
 - name: Zhaleh Safikhani
-  affilnum: '1, 2'
+  affilnum: '1,2'
 
 - name: Benjamin Haibe-Kains
-  affilnum: '1, 2, 3'
+  affilation: '1, 2, 3'
   
-affiliation: 
-
+affiliation:
+  
 - affilnum: 1
   affil: Princess Margaret Cancer Centre, University Health Network, Toronto Canada
   
@@ -28,9 +28,11 @@ output:
     fig_caption: yes
     fig_width: 7
     fig_height: 7
-    keep_tex: no
-    number_sections: yes
+    keep_tex: yes
+    number_sections: no
     template: manuscript.latex
+    includes:
+      in_header: header.tex
 
   html_document: null
   
@@ -44,13 +46,16 @@ geometry: margin=1in
 fontsize: 11pt
 spacing: singlespacing
 footerdate: no
+abstractt: no
+bibliography: 
+  - pharmacogx.bib
+csl: ecology.csl
 
 vignette: >
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\usepackage[UTF-8]{inputenc}
   %\VignetteIndexEntry{Creating a PharmacoSet Object}
-
 ---
 
 \vspace{5pt}
@@ -68,6 +73,15 @@ opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE, include = TRUE)
 opts_chunk$set(tidy = FALSE, comment = NA, highlight = TRUE)
 
 ```
+
+
+```{r knitcitation, include=FALSE}
+library(knitcitations)
+cleanbib()
+cite_options(citation_format = "pandoc")
+```
+
+
 \normalsize
 
 \clearpage
@@ -89,26 +103,22 @@ the process and structure is documented below.
 
 The base PharmacoSet structure is as follows:
 
-`annotation`:
+## `annotation`:
 
 * `name`: Acronym of the pharmacogenomic dataset.
 * `dateCreated`: When the object was created.
+* `sessionInfo`: Software environment used to create the object.
+* `call`: Set of parameters used to create the object.
+* `dataType`: Either 'sensitivity', 'perturbation', or 'both'
+* `cell`: data frame annotating all cell lines investigated in the study.
+* `drug`: data frame annotating all the drugs investigated in the study.
 
-`sessionInfo`: Software environment used to create the object.
-
-`call`: Set of parameters used to create the object.
-
-`dataType`: Either 'sensitivity', 'perturbation', or 'both'
-
-`cell`: data frame annotating all cell lines investigated in the study.
-
-`drug`: data frame annotating all the drugs investigated in the study.
-
-`molecularProfiles`: List of `SummarizedExperiment` objects containing the 
+## `molecularProfiles`: 
+* List of `SummarizedExperiment` objects containing the 
 molecular profiles of the cell lines, such as mutations, gene expressions, or 
 copy number variations.
 
-`sensitivity`: 
+## `sensitivity`: 
 
 * `n`: Number of experiments for each cell line treated with a given drug.
 * `info`: Metadata for each pharmacological experiment.
@@ -117,7 +127,7 @@ drug dose-response curves.
 * `profiles`: Drug sensitivity values summarizing each dose-response curve 
 (IC$_{50}$, AUC, etc.)
 
-`perturbation`:
+##`perturbation`:
 
 * `n`: Number of experiments for each cell line perturbed by a given drug, for 
   each molecular data type

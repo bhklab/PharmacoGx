@@ -225,8 +225,13 @@ drugSensitivitySig <- function(pSet,
     
     molcellx <- phenoInfo(pSet, mDataType)[ ,"cellid"] %in% celln
 
-    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[molcellx,"cellid"], "tissueid"]) 
-    batch <- phenoInfo(pSet, mDataType)[molcellx, "batchid"]
+    type <- as.factor(cellInfo(pSet)[phenoInfo(pSet, mDataType)[molcellx,"cellid"], "tissueid"])
+
+    if("batchid" %in% colnames(phenoInfo(pSet, mDataType))){
+      batch <- phenoInfo(pSet, mDataType)[molcellx, "batchid"]
+    } else {
+      batch <- rep(NA, times=nrow(phenoInfo(pSet, mDataType)))
+    }
     batch[!is.na(batch) & batch == "NA"] <- NA
     batch <- as.factor(batch)
     names(batch) <- phenoInfo(pSet, mDataType)[molcellx, "cellid"]
