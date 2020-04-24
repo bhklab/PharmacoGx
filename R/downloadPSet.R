@@ -32,7 +32,6 @@ availablePSets <- function(){
   return(pSetTable)
 }
 
-
 #' Download a PharmacoSet object
 #'
 #' This function allows you to download a \code{PharmacoSet} object for use with this
@@ -42,23 +41,30 @@ availablePSets <- function(){
 #' 
 #' @examples
 #' if (interactive()){
-#' downloadPSet("CTRPv2")
+#' downloadPSet("CTRPv2", saveDir=file.path(".", "pSets"))
 #' }
 #' 
+#' @section Warning:
+#' BREAKING CHANGES - this function now defaults to `tempdir()` as the download
+#' path! You must specify a saveDir or manually save the PSet if you want 
+#' your download to persist past your current R session.`
+#' 
 #' @param name \code{Character} string, the name of the PhamracoSet to download. 
-#' Note that this is not the dataset name, but the PSet name - dataset names are not guaranteed
-#' to be unique. 
+#' Note that this is not the dataset name, but the PSet name - dataset names are 
+#' not guaranteed to be unique. 
 #' @param saveDir \code{Character} string with the folder path where the
-#'     PharmacoSet should be saved. Defaults to \code{'./PSets/'}. Will create
+#'     PharmacoSet should be saved. Defaults to `tempdir()`. Will create
 #'     directory if it does not exist.
-#' @param pSetFileName \code{character} string, the file name to save the dataset under
+#' @param pSetFileName \code{character} string, the file name to save the 
+#'   dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
+#'
 #' @return A PSet object with the dataset
+#' 
 #' @export
-#' @import downloader 
-
-downloadPSet <- function(name, saveDir=file.path(".", "PSets"), pSetFileName=NULL, verbose=TRUE) {
+#' @importFrom downloader download
+downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE) {
   
   pSetTable <- availablePSets()
   
@@ -75,9 +81,16 @@ downloadPSet <- function(name, saveDir=file.path(".", "PSets"), pSetFileName=NUL
     pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
   }
   if(!file.exists(file.path(saveDir, pSetFileName))){
-    downloader::download(url = as.character(pSetTable[whichx,"Download"]), destfile=file.path(saveDir, pSetFileName), quiet=!verbose)
+    downloader::download(url = as.character(pSetTable[whichx,"Download"]), 
+                         destfile=file.path(saveDir, pSetFileName), 
+                         quiet=!verbose)
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
+  #TODO:: Update this to use annotation accessor method once it is in CoreGx
+  if (is.null(pSet@annotation$version) || pSet@annotation$version < 2 ) {
+    pSet <- .convertPsetMolecularProfilesToSE(pSet)
+    saveRDS(pSet, file=file.path(saveDir, pSetFileName))
+  }
   return(pSet)
 }
 

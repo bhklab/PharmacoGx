@@ -103,26 +103,22 @@ the process and structure is documented below.
 
 The base PharmacoSet structure is as follows:
 
-`annotation`:
+## `annotation`:
 
 * `name`: Acronym of the pharmacogenomic dataset.
 * `dateCreated`: When the object was created.
+* `sessionInfo`: Software environment used to create the object.
+* `call`: Set of parameters used to create the object.
+* `dataType`: Either 'sensitivity', 'perturbation', or 'both'
+* `cell`: data frame annotating all cell lines investigated in the study.
+* `drug`: data frame annotating all the drugs investigated in the study.
 
-`sessionInfo`: Software environment used to create the object.
-
-`call`: Set of parameters used to create the object.
-
-`dataType`: Either 'sensitivity', 'perturbation', or 'both'
-
-`cell`: data frame annotating all cell lines investigated in the study.
-
-`drug`: data frame annotating all the drugs investigated in the study.
-
-`molecularProfiles`: List of `SummarizedExperiment` objects containing the 
+## `molecularProfiles`: 
+* List of `SummarizedExperiment` objects containing the 
 molecular profiles of the cell lines, such as mutations, gene expressions, or 
 copy number variations.
 
-`sensitivity`: 
+## `sensitivity`: 
 
 * `n`: Number of experiments for each cell line treated with a given drug.
 * `info`: Metadata for each pharmacological experiment.
@@ -131,7 +127,7 @@ drug dose-response curves.
 * `profiles`: Drug sensitivity values summarizing each dose-response curve 
 (IC$_{50}$, AUC, etc.)
 
-`perturbation`:
+##`perturbation`:
 
 * `n`: Number of experiments for each cell line perturbed by a given drug, for 
   each molecular data type
