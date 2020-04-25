@@ -63,7 +63,7 @@ cor.boot <- function(data, w){
 }
 
 
-#' Calcualte The Gene Drug Sensitivity
+#' Calculate The Gene Drug Sensitivity
 #' 
 #' This version of the function uses a partial correlation instead of standardized linear models. 
 #' 
@@ -161,11 +161,10 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   } else {
 
     if(ncol(dd) > 2){
-      var1 <- residuals(lm(formula(ffd), dd))
+      lm1 <- lm(formula(ffd), dd)
+      var1 <- residuals(lm1)
       var2 <- residuals(lm(formula(ffx), dd))
-      ## TODO:: Fix degrees of freedom calculation for partial cor - binary variables use more degrees of freedom!
-      controlled.var <- ncol(dd[,!colnames(dd) %in% c("drugpheno.1", "x"), drop=F])
-      df <- nn - 2L - controlled.var
+      df <- lm1$df[2] - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor. 
     } else { ## doing this if statement in the case there are some numerical differences between mean centred values and raw values
       var1 <- dd[,"drugpheno.1"]
       var2 <- dd[,"x"]
