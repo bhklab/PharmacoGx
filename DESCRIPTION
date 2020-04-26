@@ -31,7 +31,6 @@ Imports:
     reshape2,
     testthat,
     jsonlite
-Remotes: bhklab/CoreGx@master
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
