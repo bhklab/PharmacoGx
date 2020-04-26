@@ -64,7 +64,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 	ubatch <- sort(unique(batch[!is.na(xp) & xp == "perturbation"]))
 	names(ubatch) <- paste("batch", ubatch, sep="")
 	
-	for (bb in 1:length(ubatch)) {
+	for (bb in seq_len(length(ubatch))) {
 ## identify the perturbations and corresponding control experiments
 		xpix <- rownames(data)[complete.cases(batch, xp) & batch == ubatch[bb] & xp == "perturbation"]
 		ctrlix <- rownames(data)[complete.cases(batch, xp) & batch == ubatch[bb] & xp == "control"]
@@ -98,7 +98,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 		ltype <- c(ltype, as.list(utype))
 		names(ltype)[-1] <- utype
 	}
-	for(ll in 1:length(ltype)) {
+	for(ll in seq_len(length(ltype))) {
 ## select the type of cell line/tissue of interest
 		inpumat2 <- inpumat[!is.na(inpumat[ , "type"]) & is.element(inpumat[ , "type"], ltype[[ll]]), , drop=FALSE]
 		inpumat2 <- inpumat2[complete.cases(inpumat2), , drop=FALSE]
@@ -111,7 +111,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 			if(nthread > 1) {
 ## parallel threads
 				splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
-				splitix <- splitix[sapply(splitix, length) > 0]
+				splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
 				mcres <- parallel::mclapply(splitix, function(x, data, inpumat) {
 											res <- t(apply(data[rownames(inpumat), x, drop=FALSE], 2, geneDrugPerturbation, concentration=inpumat[ , "concentration"], type=inpumat[ , "type"], batch=inpumat[ , "batch"], duration=inpumat[,"duration"]))
 											return(res)

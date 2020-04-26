@@ -1,5 +1,9 @@
+^.*
 PharmacoGx.Rproj
 .Rproj.user
 .Rhistory
 .RData
-**/.DS_store
+*/.DS_store
+*/figure
+doc
+Meta

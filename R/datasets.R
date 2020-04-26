@@ -1,4 +1,4 @@
-#' Connectivity Map Example PharmacoSet
+  #' Connectivity Map Example PharmacoSet
 #'
 #' A small example version of the Connectivity Map PharmacoSet, used in the
 #' documentation examples. All credit for the data goes to the Connectivity Map

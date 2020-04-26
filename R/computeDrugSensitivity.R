@@ -17,7 +17,7 @@
       trunc <- FALSE
     }
     
-    for(i in 1:nrow(exps)) {
+    for(i in seq_len(nrow(exps))) {
       ranges <- list()
       for (study in names(pSets)) {
         ranges[[study]] <- as.numeric(pSets[[study]]@sensitivity$raw[exps[i,study], ,"Dose"])
@@ -129,14 +129,16 @@
 {
   min.dose <- 0
   max.dose <- 10^100
-  for(i in 1:length(doses))
+  for(i in seq_len(length(doses)))
   {
-    min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
-    max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm = TRUE), na.rm = TRUE)
+    min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm = TRUE), 
+                    na.rm = TRUE)
+    max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm = TRUE), 
+                    na.rm = TRUE)
   }
   
   common.ranges <- list()
-  for(i in 1:length(doses))
+  for(i in seq_len(length(doses)))
   {
     common.ranges[[i]] <- doses[[i]][
       which.min(abs(as.numeric(doses[[i]])-min.dose)):max(
@@ -151,6 +153,8 @@
 }
 
 ## calculate residual of fit
+## FIXME:: Why is this different from CoreGx?
+#' @importFrom CoreGx .dmedncauchys .dmednnormals .edmednnormals .edmedncauchys
 .residual<-function(x, y, n, pars, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
   family <- match.arg(family)
   Cauchy_flag = (family == "Cauchy")
@@ -186,15 +190,15 @@
       
       return(sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmedncauchys(-diffs[up_truncated | down_truncated], n, scale))))
       
-      # return(sum(log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))
-      # * (1 / 2 - 1 / pi * atan(diffs[setdiff(1:length(y), union(down_truncated, up_truncated))] / scale))),
+      # return(sum(log(6 * scale / (pi * (scale ^ 2 + diffs ^ 2)) * (1 / 2 + 1 / pi * atan(diffs[setdiff(seq_along(y), union(down_truncated, up_truncated))] / scale))
+      # * (1 / 2 - 1 / pi * atan(diffs[setdiff(seq_along(y), union(down_truncated, up_truncated))] / scale))),
       # -log(1 / 2 - 3 / (2 * pi) * atan((1 - diffs[down_truncated] - y[down_truncated]) / scale) + 2 / pi ^ 3 * (atan((1 - diffs[down_truncated] - y[down_truncated]) / scale)) ^ 3),
       # -log(-1 / 2 + 3 / (2 * pi) * atan((-diffs[up_truncated] - y[up_truncated]) / scale) - 2 / pi ^ 3 * (atan((- diffs[up_truncated] - y[up_truncated]) / scale)) ^ 3)))
     }
   }
 }
 
-## generate an initial guess for dose-response curve parameters by evaluating the residuals at different lattice points of the search space
+##FIXME:: Why is this different from CoreGx?
 .meshEval<-function(log_conc,
                     viability,
                     lower_bounds = c(0, 0, -6),
@@ -241,13 +245,6 @@
   return(guess)
 }
 
-## get vector of interpolated concentrations for graphing purposes
-.GetSupportVec <- function(x, output_length = 1001) {
-  return(seq(from = min(x), to = max(x), length.out = output_length))
-}
-######## TODO ADD computationg from  being passed in params
-
-
 #  Fits dose-response curves to data given by the user
 #  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
 #
@@ -259,6 +256,9 @@
 #
 #  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #  curve-fitting is performed.
+#' @importFrom CoreGx .getSupportVec
+#' @export
+#' @keywords internal
 .computeAUCUnderFittedCurve <- function(concentration, viability, trunc=TRUE, verbose=FALSE) {
   
   # #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
@@ -310,7 +310,7 @@
                                        conc_as_log = TRUE,
                                        viability_as_pct = FALSE,
                                        trunc = trunc))
-  x <- .GetSupportVec(log_conc)
+  x <- .getSupportVec(log_conc)
   return(1 - trapz(x, .Hill(x, pars)) / (log_conc[length(log_conc)] - log_conc[1]))
 }
 #This function is being used in computeSlope 

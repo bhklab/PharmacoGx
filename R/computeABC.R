@@ -2,7 +2,8 @@
 ## Mark Freeman
 ## All rights Reserved
 ## August 18, 2015
-## Function to calculate area between dose-response curves over their common concentration range
+## Function to calculate area between dose-response curves over their 
+#   common concentration range
 ########################
 
 #' Fits dose-response curves to data given by the user
@@ -37,7 +38,10 @@
 #' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
 #' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
+#' 
 #' @return The numeric area of the absolute difference between the two hill slopes
+#' 
+#' @importFrom CoreGx .getSupportVec
 #' @export 
 computeABC <- function(conc1, conc2, viability1, viability2,
                         Hill_fit1,
@@ -110,7 +114,7 @@ if (missing(Hill_fit1) | missing(Hill_fit2)) {
     return(NA)
   } else {
     extrema <- sort(c(min(log_conc1), max(log_conc1), min(log_conc2), max(log_conc2)))
-    support <- .GetSupportVec(c(extrema[2], extrema[3]))
+    support <- .getSupportVec(c(extrema[2], extrema[3]))
     ABC <- as.numeric(caTools::trapz(support, abs(.Hill(support, pars1) - .Hill(support, pars2))) / (extrema[3] - extrema[2]))
     if(viability_as_pct){
       ABC <- ABC*100

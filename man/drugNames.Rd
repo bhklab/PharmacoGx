@@ -4,10 +4,10 @@
 \alias{drugNames}
 \title{drugNames Generic}
 \usage{
-drugNames(pSet)
+drugNames(object)
 }
 \arguments{
-\item{pSet}{The \code{PharmacoSet} to return drug names from}
+\item{object}{The \code{PharmacoSet} to return drug names from}
 }
 \value{
 A vector of the drug names used in the PharmacoSet

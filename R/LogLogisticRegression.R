@@ -12,7 +12,6 @@
 #' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 #' computeAUC(dose, viability)
 #' 
-#' 
 #' @param conc [vector] is a vector of drug concentrations.
 #' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of the log_conc, where viability 0
@@ -45,8 +44,9 @@
 #' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
 #' @return A vector containing estimates for HS, E_inf, and EC50
 #' @export
+#' 
+#' @importFrom CoreGx .meshEval .residual
 #' @importFrom stats optim dcauchy dnorm pcauchy rcauchy rnorm pnorm integrate
-
 logLogisticRegression <- function(conc,
                                   viability,
                                   density = c(2, 10, 2),
@@ -242,7 +242,7 @@ logLogisticRegression <- function(conc,
       neighbours[5, 3] <- pmin(neighbours[5, 3] + span * step[3], upper_bounds[3])
       neighbours[6, 3] <- pmax(neighbours[6, 3] - span * step[3], lower_bounds[3])
       
-      for (i in 1:nrow(neighbours)) {
+      for (i in seq_len(nrow(neighbours))) {
         neighbour_residuals[i] <- .residual(log_conc,
                                             viability,
                                             pars = neighbours[i, ],

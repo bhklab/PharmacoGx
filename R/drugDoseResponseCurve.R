@@ -10,9 +10,15 @@
 #' from a pset. The names of the concentration list determine the legend labels. 
 #' 
 #' @examples
+##TODO:: How do you pass PSets to this?
 #' if (interactive()) {
+#' # Manually enter the plot parameters
 #' drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
 #'  viabilities=list(c(100,50,30,1)), plot.type="Both")
+#' 
+#' # Generate a plot from one or more PSets
+#' data(GDSCsmall)
+#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
 #' }
 #' 
 #' @param drug [string] A drug name for which the drug response curve should be 
@@ -55,20 +61,17 @@
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend. 
 #' @param trunc [bool] Should the viability values be truncated to lie in [0-100] before doing the fitting
 #' @param verbose [boolean] Should warning messages about the data passed in be printed?
+#' 
 #' @return Plots to the active graphics device and returns and invisible NULL.
-#' @export
+#' 
 #' @import RColorBrewer
-#' @importFrom graphics plot rect
+#' 
+#' @importFrom graphics plot rect points lines legend
 #' @importFrom grDevices rgb
-#' @importFrom graphics plot
-#' @importFrom graphics rect
-#' @importFrom grDevices rgb
-#' @importFrom graphics points
-#' @importFrom graphics lines
-#' @importFrom graphics legend
 #' @importFrom magicaxis magaxis
-
-
+#' @importFrom CoreGx .getSupportVec
+#' 
+#' @export
 drugDoseResponseCurve <- 
 function(drug, 
          cellline,
@@ -92,7 +95,7 @@ function(drug,
   if(!missing(pSets)){
     if (!is(pSets, "list")) {
       if (is(pSets, "PharmacoSet")) {
-        temp <- pSetName(pSets)
+        temp <- name(pSets)
         pSets <- list(pSets)
         names(pSets) <- temp
       } else {
@@ -139,9 +142,9 @@ function(drug,
         stop("The number of concentration and viability vectors passed in differs")
       }
       if(is.null(names(concentrations))){
-        names(concentrations) <- paste("Exp", 1:length(concentrations))
+        names(concentrations) <- paste("Exp", seq_len(length(concentrations)))
       }
-      for(i in 1:length(concentrations)){
+      for(i in seq_len(length(concentrations))){
 
         if (mode(concentrations[[i]]) == "numeric") {
           if(mode(viabilities[[i]])!="numeric"){
@@ -172,11 +175,11 @@ function(drug,
 
   doses <- list(); responses <- list(); legend.values <- list(); j <- 0; pSetNames <- list()
   if(!missing(pSets)){
-    for(i in 1:length(pSets)) {
+    for(i in seq_len(length(pSets))) {
       exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"cellid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"drugid"] == drug)
       if(length(exp_i) > 0) {
         if (summarize.replicates) {
-          pSetNames[[i]] <- pSetName(pSets[[i]])
+          pSetNames[[i]] <- name(pSets[[i]])
           if (length(exp_i) == 1) {
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
               "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=FALSE))
@@ -188,7 +191,7 @@ function(drug,
           }
           doses[[i]] <- drug.responses$Dose
           responses[[i]] <- drug.responses$Viability
-          names(doses[[i]]) <- names(responses[[i]]) <- 1:length(doses[[i]])
+          names(doses[[i]]) <- names(responses[[i]]) <- seq_len(length(doses[[i]]))
           if (!missing(legends.label)) {
             if (length(legends.label) > 1) {
               legend.values[[i]] <- paste(unlist(lapply(legends.label, function(x){
@@ -203,14 +206,14 @@ function(drug,
         }else {
           for (exp in exp_i) {
             j <- j + 1
-            pSetNames[[j]] <- pSetName(pSets[[i]])
+            pSetNames[[j]] <- name(pSets[[i]])
 
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Dose"])),
               "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"])), stringsAsFactors=FALSE))
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
             doses[[j]] <- drug.responses$Dose
             responses[[j]] <- drug.responses$Viability
-            names(doses[[j]]) <- names(responses[[j]]) <- 1:length(doses[[j]])
+            names(doses[[j]]) <- names(responses[[j]]) <- seq_len(length(doses[[j]]))
             if (!missing(legends.label)) {
               if (length(legends.label) > 1) {
                 legend.values[[j]] <- paste(unlist(lapply(legends.label, function(x){
@@ -238,7 +241,7 @@ function(drug,
 
   if(!missing(concentrations)){
     doses2 <- list(); responses2 <- list(); legend.values2 <- list(); j <- 0; pSetNames2 <- list();
-    for (i in 1:length(concentrations)){
+    for (i in seq_len(length(concentrations))){
       doses2[[i]] <- concentrations[[i]]
       responses2[[i]] <- viabilities[[i]]
       if(length(legends.label)>0){
@@ -266,7 +269,7 @@ function(drug,
 
   dose.range <- c(10^100 , 0)
   viability.range <- c(0 , 10)
-  for(i in 1:length(doses)) {
+  for(i in seq_len(length(doses))) {
     dose.range <- c(min(dose.range[1], min(doses[[i]], na.rm=TRUE), na.rm=TRUE), max(dose.range[2], max(doses[[i]], na.rm=TRUE), na.rm=TRUE))
     viability.range <- c(0, max(viability.range[2], max(responses[[i]], na.rm=TRUE), na.rm=TRUE))
   }
@@ -275,7 +278,7 @@ function(drug,
   if(length(doses) > 1) {
     common.ranges <- .getCommonConcentrationRange(doses)
 
-    for(i in 1:length(doses)) {
+    for(i in seq_len(length(doses))) {
       x1 <- min(x1, min(common.ranges[[i]]))
       x2 <- max(x2, max(common.ranges[[i]]))
     }
@@ -295,26 +298,26 @@ function(drug,
     
   }
   plot(NA, xlab="Concentration (uM)", ylab="% Viability", axes =FALSE, main=title, log="x", ylim=viability.range, xlim=dose.range, cex=cex, cex.main=cex.main)
-  magicaxis::magaxis(side=1:2, frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
+  magicaxis::magaxis(side=seq_len(2), frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
   legends <- NULL
   legends.col <- NULL
   if (length(doses) > 1) {
     rect(xleft=x1, xright=x2, ybottom=viability.range[1] , ytop=viability.range[2] , col=rgb(240, 240, 240, maxColorValue = 255), border=FALSE)
   }
 
-  for (i in 1:length(doses)) {
+  for (i in seq_len(length(doses))) {
     points(doses[[i]],responses[[i]],pch=20,col = mycol[i], cex=cex)
 
     switch(plot.type , "Actual"={
       lines(doses[[i]], responses[[i]], lty=1, lwd=lwd, col=mycol[i])
     }, "Fitted"={ 
       log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]])
-      log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+      log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     },"Both"={
       lines(doses[[i]],responses[[i]],lty=1,lwd=lwd,col = mycol[i])
       log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
-      log10_x_vals <- .GetSupportVec(log10(doses[[i]]))
+      log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     })
     legends<- c(legends, sprintf("%s%s", pSetNames[[i]], legend.values[[i]]))
@@ -322,7 +325,7 @@ function(drug,
   }
   if (common.range.star) {
     if (length(doses) > 1) {
-      for (i in 1:length(doses)) {
+      for (i in seq_len(length(doses))) {
         points(common.ranges[[i]], responses[[i]][names(common.ranges[[i]])], pch=8, col=mycol[i])
       }
     }

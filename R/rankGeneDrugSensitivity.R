@@ -32,7 +32,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
 
     drugpheno <- data.frame(drugpheno)
 
-  } else if(!is(drugpheno, "data.frame")){
+  } else if(!is(drugpheno, "data.frame")) {
     drugpheno <- as.data.frame(drugpheno)
 
   }
@@ -63,7 +63,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
   if(!any(unlist(lapply(drugpheno,is.factor)))){
      if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
-      nc <- lapply(1:ncol(drugpheno), function(i){
+      nc <- lapply(seq_len(ncol(drugpheno)), function(i){
 
         est <- paste("estimate", i, sep=".")
         se <-  paste("se", i, sep=".")
@@ -85,15 +85,15 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
     
 
   
-  for (ll in 1:length(ltype)) {
+  for (ll in seq_len(length(ltype))) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
     # ccix <- complete.cases(data[iix, , drop=FALSE], drugpheno[iix,,drop=FALSE], type[iix], batch[iix]) ### HACK???
     
     ccix <- rowSums(!is.na(data)) > 0 | rowSums(!is.na(drugpheno)) > 0 | is.na(type) | is.na(batch)
     ccix <- ccix[iix]
-    # ccix <- !sapply(seq_len(NROW(data[iix,,drop=FALSE])), function(x) {
+    # ccix <- !vapply(seq_len(NROW(data[iix,,drop=FALSE])), function(x) {
     #   return(all(is.na(data[iix,,drop=FALSE][x,])) || all(is.na(drugpheno[iix,,drop=FALSE][x,])) || all(is.na(type[iix][x])) || all(is.na(batch[iix][x])))
-    # })
+    # }, FUN.VALUE=logical(1))
 
     if (sum(ccix) < 3) {
       ## not enough experiments
@@ -101,7 +101,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type=F
       res <- c(res, rest)
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
-      splitix <- splitix[sapply(splitix, length) > 0]
+      splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
       mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize) {
         res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         return(res)

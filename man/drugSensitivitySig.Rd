@@ -27,55 +27,55 @@ drugSensitivitySig(
 )
 }
 \arguments{
-\item{pSet}{[PharmacoSet] a PharmacoSet of the sensitivity experiment type}
+\item{pSet}{\code{PharmacoSet} a PharmacoSet of the perturbation experiment type}
 
-\item{mDataType}{[character] which one of the molecular data types to use
+\item{mDataType}{\code{character} which one of the molecular data types to use
 in the analysis, out of dna, rna, rnaseq, snp, cnv}
 
-\item{drugs}{[character] a vector of drug names for which to compute the
+\item{drugs}{\code{character} a vector of drug names for which to compute the
 signatures. Should match the names used in the PharmacoSet.}
 
-\item{features}{[character] a vector of features for which to compute the
+\item{features}{\code{character} a vector of features for which to compute the
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
-\item{cells}{[character] allows choosing exactly which cell lines to include for the signature fitting. 
+\item{cells}{\code{character} allows choosing exactly which cell lines to include for the signature fitting. 
 Should be a subset of cellNames(pSet)}
 
-\item{tissues}{[character] a vector of which tissue types to include in the signature fitting. 
+\item{tissues}{\code{character} a vector of which tissue types to include in the signature fitting. 
 Should be a subset of cellInfo(pSet)$tissueid}
 
-\item{sensitivity.measure}{[character] which measure of the drug dose 
+\item{sensitivity.measure}{\code{character} which measure of the drug dose 
 sensitivity should the function use for its computations? Use the 
 sensitivityMeasures function to find out what measures are available for each PSet.}
 
-\item{molecular.summary.stat}{What summary statistic should be used to
+\item{molecular.summary.stat}{\code{character} What summary statistic should be used to
 summarize duplicates for cell line molecular profile measurements?}
 
-\item{sensitivity.summary.stat}{What summary statistic should be used to
+\item{sensitivity.summary.stat}{\code{character} What summary statistic should be used to
 summarize duplicates for cell line sensitivity measurements?}
 
-\item{returnValues}{[character] Which of estimate, t-stat, p-value and fdr
+\item{returnValues}{\code{character} Which of estimate, t-stat, p-value and fdr
 should the function return for each gene drug pair?}
 
-\item{sensitivity.cutoff}{[numeric] Allows the user to binarize the sensitivity data using this threshold.}
+\item{sensitivity.cutoff}{\code{numeric} Allows the user to binarize the sensitivity data using this threshold.}
 
-\item{standardize}{[character] One of "SD", "rescale", or "none", for the form of standardization of
+\item{standardize}{\code{character} One of "SD", "rescale", or "none", for the form of standardization of
 the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95%
 interquantile range lies in [0,1]. If none no rescaling is done.}
 
 \item{molecular.cutoff}{Allows the user to binarize the sensitivity data using this threshold.}
 
-\item{molecular.cutoff.direction}{[character] One of "less" or "greater", allows to set direction of binarization.}
+\item{molecular.cutoff.direction}{\code{character} One of "less" or "greater", allows to set direction of binarization.}
 
-\item{nthread}{[numeric] if multiple cores are available, how many cores
+\item{nthread}{\code{numeric} if multiple cores are available, how many cores
 should the computation be parallelized over?}
 
-\item{verbose}{[boolean] 'TRUE' if the warnings and other infomrative message shoud be displayed}
+\item{verbose}{\code{logical} 'TRUE' if the warnings and other informative message shoud be displayed}
 
 \item{...}{additional arguments not currently fully supported by the function}
 }
 \value{
-[list] a 3D array with genes in the first dimension, drugs in the
+\code{list} a 3D array with genes in the first dimension, drugs in the
   second, and return values in the third.
 }
 \description{

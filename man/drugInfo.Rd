@@ -4,10 +4,10 @@
 \alias{drugInfo}
 \title{drugInfo Generic}
 \usage{
-drugInfo(pSet)
+drugInfo(object)
 }
 \arguments{
-\item{pSet}{The \code{PharmacoSet} to retrieve drug info from}
+\item{object}{The \code{PharmacoSet} to retrieve drug info from}
 }
 \value{
 a \code{data.frame} with the drug annotations
@@ -17,6 +17,6 @@ Generic for drugInfo method
 }
 \examples{
 data(CCLEsmall)
-drugInfo(CCLEsmall)
+drugInf <- drugInfo(CCLEsmall)
 
 }

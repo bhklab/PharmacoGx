@@ -1,8 +1,15 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.git
-.docker
 .travis.yml
+appveyor.yml
 codecover.R
+.git
+.gitignore
+old_data
+.*Rproj
+.*tar.gz
 ^appveyor\.yml$
 ^\.github$
+vignettes/figure
+^doc$
+^Meta$

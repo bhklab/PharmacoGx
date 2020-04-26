@@ -26,7 +26,7 @@ with the direction being determined from the sign. In the case of gwc, this
 should be a matrix of identical size to x, once again with the per gene
 responses in the first column, and their significance in the second.}
 
-\item{method}{\code{character} string identifying which method to use, out of 'gsea' and 'gwc'}
+\item{method}{\code{character} string identifying which method to use, out of 'fgsea' and 'gwc'}
 
 \item{nperm}{\code{numeric}, how many permutations should be done to determine
 significance through permutation testing? The minimum is 100, default is
@@ -56,12 +56,11 @@ ySig <- c(0.01, 0.001, .97,0.01, 0.01,0.78,0.9,0.01,0.01,0.01,0.01)
 xx <- cbind(xValue, xSig)
 yy <- cbind(yValue, ySig)
 rownames(xx) <- rownames(yy) <- c('1','2','3','4','5','6','7','8','9','10','11')
-data.cor <- connectivityScore(xx,yy,method="gwc", gwc.method="spearman", nperm=300)
-
+data.cor <- connectivityScore(xx,yy,method='gwc', gwc.method='spearman', nperm=300)
 }
 \references{
-F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted
-   correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
+F. Pozzi, T. Di Matteo, T. Aste, 'Exponential smoothing weighted
+   correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
    10.1140/epjb/e2012-20697-x
 
 Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set

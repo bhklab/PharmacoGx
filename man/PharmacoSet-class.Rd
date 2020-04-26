@@ -5,15 +5,15 @@
 \alias{PharmacoSet-class}
 \alias{.PharmacoSet}
 \alias{cellInfo,PharmacoSet-method}
-\alias{cellInfo<-,PharmacoSet,data.frame-method}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{phenoInfo,PharmacoSet-method}
-\alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
+\alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{molecularProfiles,PharmacoSet-method}
-\alias{molecularProfiles<-,PharmacoSet,character,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,character,missing,matrix-method}
 \alias{featureInfo,PharmacoSet-method}
-\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
+\alias{featureInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{sensitivityInfo,PharmacoSet-method}
 \alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
@@ -24,83 +24,127 @@
 \alias{drugNames<-,PharmacoSet,character-method}
 \alias{cellNames,PharmacoSet-method}
 \alias{cellNames<-,PharmacoSet,character-method}
-\alias{fNames,PharmacoSet-method}
+\alias{fNames,PharmacoSet,character-method}
 \alias{dateCreated,PharmacoSet-method}
-\alias{pSetName,PharmacoSet-method}
+\alias{name,PharmacoSet-method}
 \alias{pertNumber,PharmacoSet-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{pertNumber<-,PharmacoSet,array-method}
 \alias{sensNumber<-,PharmacoSet,matrix-method}
 \title{A Class to Contain PharmacoGenomic datasets together with their curations}
 \usage{
-\S4method{cellInfo}{PharmacoSet}(pSet)
+\S4method{cellInfo}{PharmacoSet}(object)
 
-\S4method{cellInfo}{PharmacoSet,data.frame}(object) <- value
-
-\S4method{drugInfo}{PharmacoSet}(pSet)
+\S4method{drugInfo}{PharmacoSet}(object)
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{phenoInfo}{PharmacoSet}(pSet, mDataType)
+\S4method{phenoInfo}{PharmacoSet}(object, mDataType)
 
-\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
+\S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{PharmacoSet}(pSet, mDataType)
+\S4method{molecularProfiles}{PharmacoSet}(object, mDataType, assay)
 
-\S4method{molecularProfiles}{PharmacoSet,character,matrix}(object, mDataType) <- value
+\S4method{molecularProfiles}{PharmacoSet,character,character,matrix}(object, mDataType, assay) <- value
 
-\S4method{featureInfo}{PharmacoSet}(pSet, mDataType)
+\S4method{molecularProfiles}{PharmacoSet,character,missing,matrix}(object, mDataType, assay) <- value
 
-\S4method{featureInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
+\S4method{featureInfo}{PharmacoSet}(object, mDataType)
 
-\S4method{sensitivityInfo}{PharmacoSet}(pSet)
+\S4method{featureInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
+
+\S4method{sensitivityInfo}{PharmacoSet}(object)
 
 \S4method{sensitivityInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{sensitivityProfiles}{PharmacoSet}(pSet)
+\S4method{sensitivityProfiles}{PharmacoSet}(object)
 
 \S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
 
 \S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
 
-\S4method{sensitivityMeasures}{PharmacoSet}(pSet)
+\S4method{sensitivityMeasures}{PharmacoSet}(object)
 
-\S4method{drugNames}{PharmacoSet}(pSet)
+\S4method{drugNames}{PharmacoSet}(object)
 
 \S4method{drugNames}{PharmacoSet,character}(object) <- value
 
-\S4method{cellNames}{PharmacoSet}(pSet)
+\S4method{cellNames}{PharmacoSet}(object)
 
 \S4method{cellNames}{PharmacoSet,character}(object) <- value
 
-\S4method{fNames}{PharmacoSet}(pSet, mDataType)
+\S4method{fNames}{PharmacoSet,character}(object, mDataType)
 
-\S4method{dateCreated}{PharmacoSet}(pSet)
+\S4method{dateCreated}{PharmacoSet}(object)
 
-\S4method{pSetName}{PharmacoSet}(pSet)
+\S4method{name}{PharmacoSet}(object)
 
-\S4method{pertNumber}{PharmacoSet}(pSet)
+\S4method{pertNumber}{PharmacoSet}(object)
 
-\S4method{sensNumber}{PharmacoSet}(pSet)
+\S4method{sensNumber}{PharmacoSet}(object)
 
 \S4method{pertNumber}{PharmacoSet,array}(object) <- value
 
 \S4method{sensNumber}{PharmacoSet,matrix}(object) <- value
 }
 \arguments{
-\item{pSet}{A \code{PharmacoSet} object}
+\item{object}{A \code{PharmacoSet}}
 
-\item{object}{A \code{PharmacoSet} object}
+\item{value}{A new \code{data.frame} with the number of sensitivity experiments per drug and cell line}
 
-\item{value}{A replacement value}
+\item{mDataType}{The molecular data type to return feature names for}
 
-\item{mDataType}{A \code{character} with the type of molecular data to return/update}
+\item{assay}{\code{character} Name or index of the assay data to return}
 }
 \value{
 An object of the PharmacoSet class
+
+a \code{data.frame} with the cell annotations
+
+a \code{data.frame} with the experiment info
+
+The updated \code{PharmacoSet}
+
+a \code{matrix} of data for the given mDataType and assay
+
+Updated \code{PharmacoSet}
+
+a \code{data.frame} with the experiment info
+
+Updated \code{PharmacoSet}
+
+a \code{DataFrame} with the experiment info
+
+Updated \code{PharmacoSet}
+
+a \code{data.frame} with the experiment info
+
+Updated \code{PharmacoSet}
+
+A \code{character} vector of all the available sensitivity measures
+
+A vector of the cell names used in the PharmacoSet
+
+Updated \code{PharmacoSet}
+
+A \code{character} vector of the feature names
+
+The date the PharmacoSet was created
+
+The name of the PharmacoSet
+
+A 3D \code{array} with the number of perturbation experiments per 
+  drug and cell line, and data type
+
+A \code{data.frame} with the number of sensitivity experiments per 
+  drug and cell line
+
+The updated \code{PharmacoSet}
+
+The updated \code{PharmacoSet}
 }
 \description{
-The PharmacoSet (PSet) class was developed to contain and organise large 
+The PharmacoSet (pSet) class was developed to contain and organise large 
 PharmacoGenomic datasets, and aid in their metanalysis. It was designed 
 primarily to allow bioinformaticians and biologists to work with data at the 
 level of genes, drugs and cell lines, providing a more naturally intuitive 
@@ -110,22 +154,65 @@ while providing a common interface. The class can accomidate datasets
 containing both drug dose response data, as well as datasets contaning 
 genetic profiles of cell lines pre and post treatement with compounds, known 
 respecitively as sensitivity and perturbation datasets.
+
+Return cell line metadata from a object
+
+Generic for phenoInfo method
+
+Generic for phenoInfo replace method
+
+Generic for molecularProfiles method
+
+Generic for molecularProfiles replace method
+
+Generic for featureInfo method
+
+Generic for featureInfo replace method
+
+Get the senstivity information DataFrame from a object object
+
+Set the sensitivityInfo DataFrame in a object object
+
+Get the sensitivityProfiles data.frame from a object object
+
+Set the sensitivityProfiles in a object object
+
+Get the types of sensitivity measurements from a object object
+
+A generic for the cellNames method
+
+A generic for the cellNames replacement method
+
+Return the feature names for the specified molecular data type
+
+A generic for the dateCreated method
+
+Retrun the name of the PharmacoSet object
+
+A generic for the pertNumber method
+
+A generic for the sensNumber method
+
+A generic for the pertNumber method
+
+A generic for the sensNumber method
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{cellInfo}: Returns the annotations for all the cell lines tested on in the PharmacoSet
-
-\item \code{cellInfo<-}: Update the cell line annotations
+\item \code{cellInfo}: 
 
 \item \code{drugInfo}: Returns the annotations for all the drugs tested in the PharmacoSet
 
 \item \code{drugInfo<-}: Update the drug annotations
 
-\item \code{phenoInfo}: Return the experiment info from the given type of molecular data in PharmacoSet
+\item \code{phenoInfo}: Return the experiment info from the given type of 
+molecular data in PharmacoSet
 
-\item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the PharmacoSet
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the PharmacoSet
 
 \item \code{molecularProfiles}: Return the given type of molecular data from the PharmacoSet
+
+\item \code{molecularProfiles<-}: Update the given type of molecular data from the PharmacoSet
 
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the PharmacoSet
 
@@ -145,7 +232,7 @@ sensitivity
 \item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
 
-\item \code{sensitivityMeasures}: Returns the available sensitivity profile
+\item \code{sensitivityMeasures}: returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
 \item \code{drugNames}: Return the names of the drugs used in the PharmacoSet
@@ -160,7 +247,7 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{dateCreated}: Return the date the PharmacoSet was created
 
-\item \code{pSetName}: Return the name of the PharmacoSet
+\item \code{name}: Return the name of the PharmacoSet
 
 \item \code{pertNumber}: Return the summary of available perturbation
 experiments
@@ -182,12 +269,12 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{Biobase::ExpressionSet} 
-type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-measurements respectively, with associated \code{fData} and \code{pData} 
+\item{\code{molecularProfiles}}{A \code{list} containing \code{SummarizedExperiment} 
+type object for holding data for RNA, DNA, SNP and CNV 
+measurements, with associated \code{fData} and \code{pData} 
 containing the row and column metadata}
 
-\item{\code{cell}}{A \code{data.frame} containg the annotations for all the cell 
+\item{\code{cell}}{A \code{data.frame} containing the annotations for all the cell 
 lines profiled in the data set, across all data types}
 
 \item{\code{drug}}{A \code{data.frame} containg the annotations for all the drugs 
@@ -212,3 +299,68 @@ identifiers used between different PharmacoSet objects}
 PharmacoSet, for proper processing of the data}
 }}
 
+\examples{
+data(CCLEsmall)
+cellInf <- cellInfo(CCLEsmall)
+
+data(CCLEsmall)
+phenoInf <- phenoInfo(CCLEsmall, mDataType="rna")
+
+data(CCLEsmall)
+phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
+
+data(CCLEsmall)
+molProf <- molecularProfiles(CCLEsmall, "rna")
+
+data(CCLEsmall)
+molecularProfiles(CCLEsmall, "rna") <- molecularProfiles(CCLEsmall, "rna")
+
+data(CCLEsmall)
+featInf <- featureInfo(CCLEsmall, "rna")
+
+data(CCLEsmall)
+featureInfo(CCLEsmall, "rna") <- featureInfo(CCLEsmall, "rna")
+
+data(CCLEsmall)
+sensInf <- sensitivityInfo(CCLEsmall)
+
+data(CCLEsmall)
+sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
+
+data(CCLEsmall)
+sensProf <- sensitivityProfiles(CCLEsmall)
+
+data(CCLEsmall)
+sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
+
+data(CCLEsmall)
+sensMeas <- sensitivityMeasures(CCLEsmall)
+
+data(CCLEsmall)
+cellNames(CCLEsmall)
+
+data(CCLEsmall)
+cellNames(CCLEsmall) <- cellNames(CCLEsmall)
+
+data(CCLEsmall)
+fNames(CCLEsmall, "rna")
+
+data(CCLEsmall)
+dateCreated(CCLEsmall)
+
+data(CCLEsmall)
+name(CCLEsmall)
+
+data(CCLEsmall)
+pertNumber(CCLEsmall)
+
+data(CCLEsmall)
+sensNumber(CCLEsmall)
+
+data(CCLEsmall)
+pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
+
+data(CCLEsmall)
+sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
+
+}

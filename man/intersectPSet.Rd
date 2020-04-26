@@ -16,29 +16,30 @@ intersectPSet(
 )
 }
 \arguments{
-\item{pSets}{[list] a list of PharmacoSet objects, of which the function
+\item{pSets}{\code{list} a list of PharmacoSet objects, of which the function
 should find the intersection}
 
-\item{intersectOn}{[character] which identifiers to intersect on, 
+\item{intersectOn}{\code{character} which identifiers to intersect on, 
 drugs, cell lines, or concentrations}
 
-\item{cells}{a vector of common cell lines between pSets.
+\item{cells}{a \code{character}vector of common cell lines between pSets.
 In case user is intersted on getting intersection on certain cell lines,
 they can provide their list of cell lines}
 
-\item{drugs}{a vector of common drugs between pSets.
+\item{drugs}{a \code{character} vector of common drugs between pSets.
 In case user is intersted on getting intersection on certain drugs,
 they can provide their list of drugs.}
 
-\item{strictIntersect}{[boolean] Should the intersection keep only the drugs 
+\item{strictIntersect}{\code{boolean} Should the intersection keep only the drugs 
 and cell lines that have been tested on together?}
 
-\item{verbose}{[boolean] Should the function announce its key steps?}
+\item{verbose}{\code{boolean} Should the function announce its key steps?}
 
-\item{nthread}{[numeric] The number of cores to use to run intersection on concentrations}
+\item{nthread}{\code{numeric} The number of cores to use to run intersection on 
+concentrations}
 }
 \value{
-[list] a list of pSets, contatining only the intersection
+A \code{list} of pSets, contatining only the intersection
 }
 \description{
 Given a list of PharmacoSets, the function will find the common drugs,
@@ -47,13 +48,7 @@ to the common drugs, and/or cell lines. The mapping between dataset
 drug and cell names is done using annotations found in the 
 PharmacoSet object's internal curation slot
 }
-\examples{
-data(GDSCsmall)
-data(CCLEsmall)
-common <- intersectPSet(list('GDSC'=GDSCsmall,
-  'CCLE'=CCLEsmall), intersectOn = c("drugs", "cell.lines"))
-common$CGP
-common$CCLE
-
-
+\details{
+intersectOn = c("drugs", "cell.lines")
+                        )
 }

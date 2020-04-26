@@ -3,8 +3,8 @@ library(PharmacoGx)
 context("Checking subsetTo.")
 
 test_that("Intersection result did not change since last time", {
-	data(CMAPsmall)
-	CMAPsmaller <- subsetTo(CMAPsmall, drugs=drugNames(CMAPsmall)[1:5], cells=cellNames(CMAPsmall)[1:5])
-	expect_equal_to_reference(CMAPsmaller, "subsetTo.CMAPsmaller.rds")
+data(CCLEsmall)
+CCLEsmaller <- subsetTo(CCLEsmall, drugs=drugNames(CCLEsmall), cells=cellNames(CCLEsmall))
+expect_equal(CCLEsmaller@annotation, CCLEsmall@annotation)
+expect_equal(attributes(CCLEsmaller@molecularProfiles$rna), attributes(CCLEsmall@molecularProfiles$rna))
 })
-
