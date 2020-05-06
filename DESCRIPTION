@@ -1,7 +1,7 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 1.17.3
+Version: 1.99.0
 Date: 2020-04-23
 Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
@@ -31,7 +31,6 @@ Imports:
     reshape2,
     testthat,
     jsonlite
-Remotes: bhklab/CoreGx@master
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
