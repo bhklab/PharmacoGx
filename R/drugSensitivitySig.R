@@ -67,6 +67,7 @@ drugSensitivitySig <- function(pSet,
  molecular.cutoff = NA,
  molecular.cutoff.direction = c("less", "greater"),
  nthread = 1,
+ parallel.on = c("drug", "gene"),
  verbose=TRUE, 
  ...) 
 {
@@ -83,9 +84,10 @@ drugSensitivitySig <- function(pSet,
   sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
   standardize <- match.arg(standardize)
   molecular.cutoff.direction <- match.arg(molecular.cutoff.direction)
+  parallel.on <- match.arg(parallel.on)
   dots <- list(...)
   ndots <- length(dots)
-  
+
   
   if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
@@ -146,10 +148,19 @@ drugSensitivitySig <- function(pSet,
   }
 
   availcore <- parallel::detectCores()
+  
   if ( nthread > availcore) {
     nthread <- availcore
   }
   
+  if(parallel.on == "drug"){
+    nthread_drug <- nthread
+    nthread_gene <- 1
+  } else {
+    nthread_gene <- nthread
+    nthread_drug <- 1
+  }
+
   if (missing(features)) {
     features <- rownames(featureInfo(pSet, mDataType))
   } else {
@@ -255,9 +266,9 @@ drugSensitivitySig <- function(pSet,
     }
     
 
-    splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
-    splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method, req_alpha) {
+    # splitix <- parallel::splitIndices(nx = length(drugn), ncl = nthread_drug)
+    # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
+    mcres <-  parallel::mclapply(seq_along(drugn), function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method, req_alpha) {
       res <- NULL
       for(i in drugn[x]) {
         ## using a linear model (x ~ concentration + cell + batch)
@@ -273,9 +284,9 @@ drugSensitivitySig <- function(pSet,
       names(res) <- drugn[x]
       return(res)
     }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]),
-       drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize,
+       drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread_gene, standardize=standardize,
        modeling.method=modeling.method, inference.method=inference.method, 
-       req_alpha = req_alpha)
+       req_alpha = req_alpha, mc.cores = nthread_drug, mc.preschedule = FALSE)
     
     res <- do.call(c, mcres)
     res <- res[!vapply(res, is.null, FUN.VALUE=logical(1))]

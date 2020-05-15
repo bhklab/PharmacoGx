@@ -113,9 +113,10 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
       rest <- list(matrix(NA, nrow=ncol(data), ncol=length(nc), dimnames=list(colnames(data), nc)))
       res <- c(res, rest)
     } else {
-      splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
-      splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method, req_alpha) {
+      # splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
+      # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
+      mcres <- parallel::mclapply(seq_len(ncol(data)), function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method, req_alpha) {
+        print(Sys.getpid())
         if(modeling.method == "anova"){
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         } else if(modeling.method == "pearson") {
@@ -135,10 +136,10 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
       }, data=data[iix, , drop=FALSE],
          type=type[iix], batch=batch[iix],
          drugpheno=drugpheno[iix,,drop=FALSE], 
-         standardize=standardize, mc.cores=nthread, 
+         standardize=standardize, 
          modeling.method = modeling.method, 
          inference.method = inference.method,
-         req_alpha = req_alpha)
+         req_alpha = req_alpha, mc.cores = nthread, mc.preschedule = FALSE)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
