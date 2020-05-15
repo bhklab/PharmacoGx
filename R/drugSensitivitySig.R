@@ -171,6 +171,7 @@ drugSensitivitySig <- function(pSet,
     inference.method <- dots[["inference.method"]]
   }
 
+
   if(is.null(dots[["sProfiles"]])){
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
       
@@ -239,10 +240,24 @@ drugSensitivitySig <- function(pSet,
     if (verbose) {
       message("Computing drug sensitivity signatures...")
     }
+      
+    ### Calculate approximate number of perms needed
+
+
+    if(inference.method == "resampling"){
+      if(is.null(dots[["req_alpha"]])){
+        req_alpha <- 0.05/(nrow(pSet@molecularProfiles[[mDataType]])) ## bonferonni correction
+      } else {
+        req_alpha <- dots[["req_alpha"]]
+      }
+    } else {
+      req_alpha <- NA_real_
+    }
     
+
     splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
     splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method) {
+    mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method, req_alpha) {
       res <- NULL
       for(i in drugn[x]) {
         ## using a linear model (x ~ concentration + cell + batch)
@@ -252,14 +267,15 @@ drugSensitivitySig <- function(pSet,
         if(!is.na(sensitivity.cutoff)) {
           dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels=c(0, 1))
         }
-        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose, modeling.method=modeling.method, inference.method=inference.method)
+        rr <- rankGeneDrugSensitivity(data=expr, drugpheno=dd, type=type, batch=batch, single.type=FALSE, standardize=standardize, nthread=nthread, verbose=verbose, modeling.method=modeling.method, inference.method=inference.method, req_alpha)
         res <- c(res, list(rr$all))
       }
       names(res) <- drugn[x]
       return(res)
     }, drugn=drugn, expr=t(molecularProfiles(pSet, mDataType)[features, molcellx, drop=FALSE]),
        drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize,
-       modeling.method=modeling.method, inference.method=inference.method)
+       modeling.method=modeling.method, inference.method=inference.method, 
+       req_alpha = req_alpha)
     
     res <- do.call(c, mcres)
     res <- res[!vapply(res, is.null, FUN.VALUE=logical(1))]

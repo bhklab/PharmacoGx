@@ -24,7 +24,8 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
                                      single.type=FALSE, standardize = "SD",
                                      nthread=1, verbose=FALSE, 
                                      modeling.method = c("anova", "pearson"),
-                                     inference.method = c("analytic", "resampling")) {
+                                     inference.method = c("analytic", "resampling"), req_alpha = 0.05) {
+
   if (nthread != 1) {
     availcore <- parallel::detectCores()
     if ((missing(nthread) || nthread < 1 || nthread > availcore) && verbose) {
@@ -94,9 +95,8 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
       nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
     }  
   } else if (modeling.method == "pearson") {
-    nc <- c("estimate", "n", "df", "pvalue", "lower", "upper")
+    nc <- c("estimate", "n", "df", "significant", "pvalue", "lower", "upper")
   }
-
   
   for (ll in seq_len(length(ltype))) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
@@ -115,22 +115,30 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
     } else {
       splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method) {
+      mcres <- parallel::mclapply(splitix, function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method, req_alpha) {
         if(modeling.method == "anova"){
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         } else if(modeling.method == "pearson") {
+          
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr, 
                                                     type=type,
                                                     batch=batch, 
                                                     drugpheno=drugpheno, 
                                                     verbose=verbose, 
-                                                    test=inference.method))
+                                                    test=inference.method, 
+                                                    req_alpha = req_alpha))
       ## TODO:: insert logic about computing the appropriate number of permutations. 
         }
 
 
         return(res)
-      }, data=data[iix, , drop=FALSE], type=type[iix], batch=batch[iix], drugpheno=drugpheno[iix,,drop=FALSE], standardize=standardize, mc.cores=nthread, modeling.method = modeling.method, inference.method = inference.method)
+      }, data=data[iix, , drop=FALSE],
+         type=type[iix], batch=batch[iix],
+         drugpheno=drugpheno[iix,,drop=FALSE], 
+         standardize=standardize, mc.cores=nthread, 
+         modeling.method = modeling.method, 
+         inference.method = inference.method,
+         req_alpha = req_alpha)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
