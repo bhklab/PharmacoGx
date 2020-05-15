@@ -17,7 +17,11 @@
 #' @export
 #' @keywords internal
 .convertPsetMolecularProfilesToSE <- function(pSet) {
-  
+
+  if (!is.null(pSet@annotation$version) && pSet@annotation$version >= 2 ){
+    return(pSet)
+  }
+
   eSets <- pSet@molecularProfiles # Extract eSet data
   
   pSet@molecularProfiles <-
@@ -54,6 +58,7 @@
              pSet@molecularProfiles[[mDataType]] <- SE
            })
   setNames(pSet@molecularProfiles, names(eSets))
+  pSet@annotation$version <- 2
   pSet
 }
 
