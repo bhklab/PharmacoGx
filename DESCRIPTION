@@ -66,6 +66,7 @@ Collate:
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
+    'geneDrugSensitivityPCorr.R'
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'

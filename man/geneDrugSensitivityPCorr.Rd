@@ -2,7 +2,7 @@
 % Please edit documentation in R/geneDrugSensitivityPCorr.R
 \name{geneDrugSensitivityPCorr}
 \alias{geneDrugSensitivityPCorr}
-\title{Calcualte The Gene Drug Sensitivity}
+\title{Calculate The Gene Drug Sensitivity}
 \usage{
 geneDrugSensitivityPCorr(
   x,
@@ -10,7 +10,7 @@ geneDrugSensitivityPCorr(
   batch,
   drugpheno,
   test = c("resampling", "analytic"),
-  nPerm = 1000,
+  req_alpha = 0.05,
   nBoot = 1000,
   conf.level = 0.95,
   verbose = FALSE
@@ -28,7 +28,7 @@ IC50 or AUC)}
 
 \item{test}{A \code{character} string indicating whether resampling or analytic based tests should be used}
 
-\item{nPerm}{\code{numeric}, number of permutations for p value calculation}
+\item{req_alpha}{\code{numeric}, number of permutations for p value calculation}
 
 \item{nBoot}{\code{numeric}, number of bootstrap resamplings for confidence interval estimation}
 
