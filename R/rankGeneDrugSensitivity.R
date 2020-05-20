@@ -116,7 +116,6 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
       # splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
       # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
       mcres <- parallel::mclapply(seq_len(ncol(data)), function(x, data, type, batch, drugpheno, standardize, modeling.method, inference.method, req_alpha) {
-        print(Sys.getpid())
         if(modeling.method == "anova"){
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         } else if(modeling.method == "pearson") {
