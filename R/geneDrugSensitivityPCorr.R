@@ -204,11 +204,11 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   dd <- data.frame(drugpheno, "x"=xx)
 
   ## control for tissue type
-  if(length(sort(unique(type))) > 1) { 
+  if(length(sort(unique(type[ccix]))) > 1) { 
     dd <- cbind(dd, type=type[ccix])
   }
   ## control for batch
-  if(length(sort(unique(batch))) > 1) {
+  if(length(sort(unique(batch[ccix]))) > 1) {
     dd <- cbind(dd, batch=batch[ccix])
   }
   ## control for duration
