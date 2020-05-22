@@ -70,6 +70,7 @@ Collate:
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
+    'mergePSets.R'
     'signatureClass.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'

@@ -237,7 +237,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       lm1 <- lm(formula(ffd), dd)
       var1 <- residuals(lm1)
       var2 <- residuals(lm(formula(ffx), dd))
-      df <- lm1$df[2] - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor. 
+      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor. 
     } else { ## doing this if statement in the case there are some numerical differences between mean centred values and raw values
       var1 <- dd[,"drugpheno.1"]
       var2 <- dd[,"x"]
