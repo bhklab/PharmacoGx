@@ -255,15 +255,13 @@ drugSensitivitySig <- function(pSet,
     ### Calculate approximate number of perms needed
 
 
-    if(inference.method == "resampling"){
-      if(is.null(dots[["req_alpha"]])){
-        req_alpha <- 0.05/(nrow(pSet@molecularProfiles[[mDataType]])) ## bonferonni correction
-      } else {
-        req_alpha <- dots[["req_alpha"]]
-      }
+
+    if(is.null(dots[["req_alpha"]])){
+      req_alpha <- 0.05/(nrow(pSet@molecularProfiles[[mDataType]])) ## bonferonni correction
     } else {
-      req_alpha <- NA_real_
+      req_alpha <- dots[["req_alpha"]]
     }
+
     
 
     # splitix <- parallel::splitIndices(nx = length(drugn), ncl = nthread_drug)
