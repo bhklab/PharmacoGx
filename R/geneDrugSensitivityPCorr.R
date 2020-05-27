@@ -285,7 +285,15 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
           return(coop::pcor(partial.dp, partial.x, use="complete.obs"))
         }
         boot.out <- boot(dd, pcor.boot, R=nBoot)
-        cint <- boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5]
+        cint <- tryCatch(boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5],
+                  error = function(e) {
+                    if(e$message == "estimated adjustment 'w' is infinite"){
+                      warning("estimated adjustment 'w' is infinite for some features")
+                      return(c(NA_real_,NA_real_))
+                    } else {
+                      stop(e)
+                    }
+                  })
       } else {
 
         sample_function <- function(){
@@ -299,7 +307,15 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         significant <- p.value$significant
         p.value <- p.value$p.value
         boot.out <- boot(data.frame(var1, var2), cor.boot, R=nBoot)
-        cint <- boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5]
+        cint <- tryCatch(boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5],
+          error = function(e) {
+            if(e$message == "estimated adjustment 'w' is infinite"){
+              warning("estimated adjustment 'w' is infinite for some features")
+              return(c(NA_real_,NA_real_))
+            } else {
+              stop(e)
+            }
+          })
       }
 
       ## Think about if the partial cor should also be refit for each (Probably, different lines would be fit if points are missing...) 
