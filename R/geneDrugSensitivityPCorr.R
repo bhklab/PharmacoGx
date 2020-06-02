@@ -182,7 +182,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
 
   rest <- c("estimate"=NA_real_, "n"=as.numeric(nn), "df"=NA_real_, significant = NA_real_,"pvalue"=NA_real_, "lower" = NA_real_, "upper" = NA_real_)
 
-  if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
+  if(nn <= 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
@@ -309,7 +309,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         boot.out <- boot(data.frame(var1, var2), cor.boot, R=nBoot)
         cint <- tryCatch(boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5],
           error = function(e) {
-            if(e$message == "estimated adjustment 'w' is infinite"){
+            if(e$message == "estimated adjustment 'w' is infinite" || e$message == "Error in if (const(t, min(1e-08, mean(t, na.rm = TRUE)/1e+06))) { : \n  missing value where TRUE/FALSE needed\n"){
               warning("estimated adjustment 'w' is infinite for some features")
               return(c(NA_real_,NA_real_))
             } else {
