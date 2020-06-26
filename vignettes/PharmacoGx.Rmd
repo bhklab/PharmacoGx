@@ -481,7 +481,7 @@ as drug *PD-0325901* and gene *BRAF*:
   features <- fNames(CCLEsmall, "rna")[
                           which(featureInfo(CCLEsmall,
                                             "rna")$Symbol == "NQO1")]
-  sig.rna <- drugSensitivitySig(pSet=CCLEsmall, 
+  sig.rna <- drugSensitivitySig(object=CCLEsmall,
                             mDataType="rna", 
                             drugs=c("17-AAG"), 
                             features=features, 
@@ -489,7 +489,7 @@ as drug *PD-0325901* and gene *BRAF*:
                             molecular.summary.stat="median", 
                             sensitivity.summary.stat="median",
                             verbose=FALSE)
-  sig.mut <- drugSensitivitySig(pSet=CCLEsmall, 
+  sig.mut <- drugSensitivitySig(object=CCLEsmall,
                             mDataType="mutation", 
                             drugs=c("PD-0325901"), 
                             features="BRAF", 

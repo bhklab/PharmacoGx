@@ -14,7 +14,7 @@
 #'                     summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
 #' GDSCsmall
 #'
-#' @param pSet \code{PharmacoSet} The PharmacoSet to summarize
+#' @param object \code{PharmacoSet} The PharmacoSet to summarize
 #' @param mDataType \code{character} which one of the molecular data types
 #' to use in the analysis, out of all the molecular data types available for the pset
 #' for example: rna, rnaseq, snp
