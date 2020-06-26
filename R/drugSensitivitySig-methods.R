@@ -51,15 +51,15 @@
 #'
 #' @importMethodsFrom CoreGx drugSensitivitySig
 #' @export
-setMethod("durgSensitivitySig",
+setMethod("drugSensitivitySig",
           signature(object="PharmacoSet"),
-          function( mDataType, drugs, features, cells, tissues, sensitivity.measure = "auc_recomputed",
+          function(object, mDataType, drugs, features, cells, tissues, sensitivity.measure = "auc_recomputed",
                     molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
                     sensitivity.summary.stat = c("mean", "median", "first", "last"),
                     returnValues = c("estimate", "pvalue", "fdr"),
                     sensitivity.cutoff, standardize = c("SD", "rescale", "none"), molecular.cutoff = NA,
                     molecular.cutoff.direction = c("less", "greater"), nthread = 1, verbose=TRUE, ...){
-            .drugSensitivitySigPharmacoSet(mDataType, drugs, features, cells, tissues, sensitivity.measure,
+            .drugSensitivitySigPharmacoSet(object, mDataType, drugs, features, cells, tissues, sensitivity.measure,
                                            molecular.summary.stat, sensitivity.summary.stat, returnValues,
                                            sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction,
                                            nthread, verbose, ...)
@@ -102,7 +102,7 @@ setMethod("durgSensitivitySig",
   ndots <- length(dots)
   
   
-  if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(pSet)))) {
+  if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
   
@@ -282,7 +282,7 @@ setMethod("durgSensitivitySig",
     }
     
     drug.sensitivity <- PharmacoSig(drug.sensitivity, 
-                                    pSetName = name(object),
+                                    PSetName = name(object),
                                     Call = as.character(match.call()), 
                                     SigType='Sensitivity',
                                     Arguments = list(

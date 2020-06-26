@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.0
-Date: 2020-04-23
+Version: 2.1.1
+Date: 2020-06-26
 Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
@@ -62,7 +62,7 @@ Collate:
     'downloadSignatures.R'
     'drugDoseResponseCurve.R'
     'drugPerturbationSig.R'
-    'drugSensitivitySig.R'
+    'drugSensitivitySig-methods.R'
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
@@ -73,6 +73,6 @@ Collate:
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'summarizeMolecularProfiles.R'
-    'summarizeSensitivityProfiles.R'
+    'summarizeMolecularProfiles-methods.R'
+    'summarizeSensitivityProfiles-methods.R'
     'utilities.R'

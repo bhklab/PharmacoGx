@@ -9,11 +9,24 @@ setOldClass('sessionInfo', sessionInfo)
             SessionInfo = 'sessionInfo',
             Call = 'character'), contains='array')
 
-PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity', SessionInfo=sessionInfo(), Call='No Call Recorded', Arguments = list()){
-
-#attr(SessionInfo, 'class') <- NULL
-
-return(.PharmacoSig(Data, Arguments = Arguments, PSetName=PSetName, DateCreated=DateCreated, SigType=SigType, SessionInfo=SessionInfo, Call=Call))}
+#' Contructor for the PharmacoSig S4 class
+#'
+#' @param Data [`array`] of data to build the signature from
+#' @param PSetName [`character`] vector containing name of PSet, defaults to ''
+#' @param DateCreated [`date`] date the signature was created, defaults to `date()`
+#' @param SigType [`character`] vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
+#' @param SessionsInfo [`sessionInfo`] object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`
+#' @param Call [`character` or `call`] specifying the constructor call used to make the object, defaults to 'No Call Recorded'
+#' @param Arguments [`list] a list of additional arguments to the constructure
+#'
+#' @return A [`PharmacoSig`] object build from the provided signature data
+#'
+#' @export
+PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity',
+                        SessionInfo=sessionInfo(), Call='No Call Recorded', Arguments = list()){
+    return(.PharmacoSig(Data, Arguments = Arguments, PSetName=PSetName, DateCreated=DateCreated, SigType=SigType,
+                        SessionInfo=SessionInfo, Call=Call))
+}
 
 
 #' Show PharmacoGx Signatures  

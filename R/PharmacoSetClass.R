@@ -928,7 +928,7 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object, cells=NU
 })
 
 #' @importFrom CoreGx .intersectList
-#' @keywrods internal
+#' @keywords internal
 .subsetToPharmacoSet <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL,
                      keep.controls=TRUE, ...) {
   drop=FALSE #TODO:: Is this supposed to be here?
