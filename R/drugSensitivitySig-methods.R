@@ -48,11 +48,9 @@
 #' 
 #' @return \code{list} a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
-#' 
+#'
+#' @importMethodsFrom CoreGx drugSensitivitySig
 #' @export
-#' 
-#' @import parallel
-#' @importFrom SummarizedExperiment assayNames assay
 setMethod("durgSensitivitySig",
           signature(object="PharmacoSet"),
           function( mDataType, drugs, features, cells, tissues, sensitivity.measure = "auc_recomputed",
@@ -67,7 +65,8 @@ setMethod("durgSensitivitySig",
                                            nthread, verbose, ...)
           })
 
-
+#' @import parallel
+#' @importFrom SummarizedExperiment assayNames assay
 #' @keywords internal
 .drugSensitivitySigPharmacoSet <- function(object,
  mDataType,
