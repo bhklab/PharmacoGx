@@ -53,12 +53,13 @@ summarizeMolecularProfiles <- function(pSet,
                                        summarize = TRUE, 
                                        verbose = TRUE,
                                        binarize.threshold = NA, 
-                                       binarize.direction = c("less", "greater")
+                                       binarize.direction = c("less", "greater"),
+                                       removeTreated=TRUE
                                        ) {
   
   
   ### Placed here to make sure the pSet argument gets checked first by R. 
-  mDataTypes <- names(pSet@molecularProfiles)
+  mDataTypes <- mDataNames(pSet)
   if (!(mDataType %in% mDataTypes)) {
     stop (sprintf("Invalid mDataType, choose among: %s", paste(names(pSet@molecularProfiles), collapse=", ")))
   }
@@ -91,6 +92,21 @@ summarizeMolecularProfiles <- function(pSet,
     cell.lines <- cellNames(pSet)
   }
   
+  if(pSet@datasetType %in% c("perturbation", "both") && removeTreated){
+    if(!"xptype" %in% colnames(phenoInfo(pSet, mDataType))) {
+      warning("The passed in molecular data had no column: xptype.
+               \rEither the mDataType does not include perturbations, or the PSet is malformed.
+               \rAssuming the former and continuing.")
+    } else {
+      keepCols <- phenoInfo(pSet, mDataType)$xptype %in% c("control", "untreated")
+      molecularProfilesSlot(pSet)[[mDataType]] <- molecularProfilesSlot(pSet)[[mDataType]][,keepCols]      
+    }
+
+  }
+
+
+
+
   ##TODO:: have less confusing variable names
   dd <- molecularProfiles(pSet, mDataType)
   pp <- phenoInfo(pSet, mDataType)
