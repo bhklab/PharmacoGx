@@ -924,7 +924,7 @@ setMethod("dim", signature=signature(x="PharmacoSet"), function(x){
 setMethod('subsetTo', signature(object='PharmacoSet'), function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL,
                      keep.controls=TRUE, ...){
   .subsetToPharmacoSet(object=object, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells,
-                       keep.control=keep.control)
+                       keep.controls=keep.controls)
 })
 
 #' @importFrom CoreGx .intersectList

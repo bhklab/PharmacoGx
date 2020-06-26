@@ -19,6 +19,8 @@ into one entry per drug}
 )
 }
 \arguments{
+\item{object}{\code{PharmacoSet} The PharmacoSet to summarize}
+
 \item{mDataType}{\code{character} which one of the molecular data types
 to use in the analysis, out of all the molecular data types available for the pset
 for example: rna, rnaseq, snp}
@@ -45,8 +47,6 @@ If NA, no binarization is done.}
 
 \item{binarize.direction}{\code{character} One of "less" or "greater", the direction of binarization on 
 binarize.threshold, if it is not NA.}
-
-\item{pSet}{\code{PharmacoSet} The PharmacoSet to summarize}
 }
 \value{
 \code{matrix} An updated PharmacoSet with the molecular data summarized
