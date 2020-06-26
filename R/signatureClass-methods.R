@@ -47,14 +47,22 @@ setMethod("show", signature=signature(object='PharmacoSig'),
 #'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' showSigAnnot(drug.sensitivity)
 #' 
-#' @param Sigs An object of the \code{PharmacoSig} Class, as
+#' @param object An object of the \code{PharmacoSig} Class, as
 #' returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}
+#'
 #' @return Prints the PharmacoGx Signatures annotations to the output stream, and returns invisible NULL. 
+#'
+#' @importMethodsFrom CoreGx showSigAnnot
 #' @export
-showSigAnnot <- function(Sigs){
+setMethod("showSigAnnot", signature(object="PharmacoSig"), function(object){
+  .showSigAnnotPharmacoSig(object)
+})
 
-  print(Sigs@Call)
-  print(Sigs@SessionInfo)
+
+#' @keywords internal
+.showSigAnnotPharmacoSig <- function(object){
+  print(object@Call)
+  print(object@SessionInfo)
   return(invisible(NULL))
 } 
 
