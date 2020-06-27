@@ -100,14 +100,14 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
     cell.lines <- cellNames(object)
   }
   
-  if(pSet@datasetType %in% c("perturbation", "both") && removeTreated){
-    if(!"xptype" %in% colnames(phenoInfo(pSet, mDataType))) {
+  if(object@datasetType %in% c("perturbation", "both") && removeTreated){
+    if(!"xptype" %in% colnames(phenoInfo(object, mDataType))) {
       warning("The passed in molecular data had no column: xptype.
                \rEither the mDataType does not include perturbations, or the PSet is malformed.
                \rAssuming the former and continuing.")
     } else {
-      keepCols <- phenoInfo(pSet, mDataType)$xptype %in% c("control", "untreated")
-      molecularProfilesSlot(pSet)[[mDataType]] <- molecularProfilesSlot(pSet)[[mDataType]][,keepCols]      
+      keepCols <- phenoInfo(object, mDataType)$xptype %in% c("control", "untreated")
+      molecularProfilesSlot(object)[[mDataType]] <- molecularProfilesSlot(object)[[mDataType]][,keepCols]      
     }
 
   }
