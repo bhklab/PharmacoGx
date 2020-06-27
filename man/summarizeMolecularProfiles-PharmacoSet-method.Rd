@@ -15,7 +15,8 @@ into one entry per drug}
   summarize = TRUE,
   verbose = TRUE,
   binarize.threshold = NA,
-  binarize.direction = c("less", "greater")
+  binarize.direction = c("less", "greater"),
+  removeTreated = TRUE
 )
 }
 \arguments{
@@ -47,6 +48,9 @@ If NA, no binarization is done.}
 
 \item{binarize.direction}{\code{character} One of "less" or "greater", the direction of binarization on 
 binarize.threshold, if it is not NA.}
+
+\item{removeTreated}{\code{logical} If treated/perturbation experiments are present, should they
+be removed? Defaults to yes.}
 }
 \value{
 \code{matrix} An updated PharmacoSet with the molecular data summarized

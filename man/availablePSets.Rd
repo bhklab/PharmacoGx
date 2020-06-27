@@ -18,7 +18,7 @@ function.
 }
 \details{
 Much more information on the processing of the data and data provenance can be found at:
-orcestra.ca
+www.orcestra.ca
 }
 \examples{
 if (interactive()){
