@@ -67,7 +67,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
   
   
   ### Placed here to make sure the pSet argument gets checked first by R. 
-  mDataTypes <- mDataNames(pSet)
+  mDataTypes <- mDataNames(object)
   if (!(mDataType %in% mDataTypes)) {
     stop (sprintf("Invalid mDataType, choose among: %s", paste(names(object@molecularProfiles), collapse=", ")))
   }
