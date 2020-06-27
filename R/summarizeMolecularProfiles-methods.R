@@ -42,9 +42,9 @@
 setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
           function(object, mDataType, cell.lines, features, summary.stat = c("mean", "median", "first", "last", "and", "or"),
                    fill.missing = TRUE, summarize = TRUE, verbose = TRUE, binarize.threshold = NA,
-                   binarize.direction = c("less", "greater")){
+                   binarize.direction = c("less", "greater"), removeTreated=TRUE){
             .summarizeMolecularProfilesPharmacoSet(object, mDataType, cell.lines, features, summary.stat, fill.missing,
-                                                   summarize, verbose, binarize.threshold, binarize.direction)
+                                                   summarize, verbose, binarize.threshold, binarize.direction, removeTreated)
           })
 
 
