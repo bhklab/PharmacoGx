@@ -9,9 +9,9 @@
 #' data(GDSCsmall)
 #' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
 #'
-#' @param pSet [PharmacoSet] The PharmacoSet from which to extract the data
+#' @param object [PharmacoSet] The PharmacoSet from which to extract the data
 #' @param sensitivity.measure [character] which sensitivity sensitivity.measure to use? Use the 
-#'   sensitivityMeasures function to find out what measures are available for each PSet.
+#'   sensitivityMeasures function to find out what measures are available for each object.
 #' @param cell.lines \code{character} The cell lines to be summarized. 
 #'    If any cell lines has no data, it will be filled with
 #'   missing values
@@ -27,11 +27,21 @@
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
 #'   
+#' @importMethodsFrom CoreGx summarizeSensitivityProfiles
+#' @export
+setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
+          function(object, sensitivity.measure="auc_recomputed", cell.lines, drugs,
+                   summary.stat=c("mean", "median", "first", "last", "max", "min"), fill.missing=TRUE, verbose=TRUE){
+            .summarizeSensitivityProfilesPharmacoSet(object, sensitivity.measure, cell.lines, drugs, summary.stat,
+                                                     fill.missing, verbose)
+          })
+
+
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom stats median
 #' @importFrom reshape2 acast
-#' @export
-summarizeSensitivityProfiles <- function(pSet, 
+#' @keywords internal
+.summarizeSensitivityProfilesPharmacoSet <- function(object,
                                          sensitivity.measure="auc_recomputed", 
                                          cell.lines, 
                                          drugs, 
@@ -40,33 +50,33 @@ summarizeSensitivityProfiles <- function(pSet,
   
 	summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
-  if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(pSet)),"max.conc"))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", pSet@annotation$name, paste(colnames(sensitivityProfiles(pSet)), collapse=", ")))
+  if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(object)),"max.conc"))) {
+    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
   if (missing(cell.lines)) {
-    cell.lines <- cellNames(pSet)
+    cell.lines <- cellNames(object)
   }
   if (missing(drugs)) {
     if (sensitivity.measure != "Synergy_score")
     {
-      drugs <- drugNames(pSet)
+      drugs <- drugNames(object)
     }else{
-      drugs <- sensitivityInfo(pSet)[grep("///", sensitivityInfo(pSet)$drugid), "drugid"]
+      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$drugid), "drugid"]
     }
   }
   
-  pp <- sensitivityInfo(pSet)
+  pp <- sensitivityInfo(object)
   ppRows <- which(pp$cellid %in% cell.lines & pp$drugid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
   if(sensitivity.measure != "max.conc") {
-    dd <- sensitivityProfiles(pSet)
+    dd <- sensitivityProfiles(object)
   } else {
 
-    if(!"max.conc"%in% colnames(sensitivityInfo(pSet))){
+    if(!"max.conc"%in% colnames(sensitivityInfo(object))){
 
-      pSet <- updateMaxConc(pSet)
+      object <- updateMaxConc(object)
 
     }
-    dd <- sensitivityInfo(pSet)
+    dd <- sensitivityInfo(object)
 
   }
 
@@ -76,7 +86,7 @@ summarizeSensitivityProfiles <- function(pSet,
 
   # if(verbose){
 
-  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, pSet@annotation$name))
+  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, object@annotation$name))
   #   total <- length(drugs)*length(cell.lines)
   #   # create progress bar 
   #   pb <- utils::txtProgressBar(min=0, max=total, style=3)
@@ -85,7 +95,7 @@ summarizeSensitivityProfiles <- function(pSet,
 
   # }
   if(is.factor(dd[, sensitivity.measure]) | is.character(dd[, sensitivity.measure])){
-    warning("Sensitivity measure is stored as a factor or character in the PSet. This is incorrect.\n 
+    warning("Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
              Please correct this and/or file an issue. Fixing in the call of this function.")
     dd[, sensitivity.measure] <- as.numeric(as.character(dd[, sensitivity.measure]))
   }

@@ -14,7 +14,7 @@
 #'                     summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
 #' GDSCsmall
 #'
-#' @param pSet \code{PharmacoSet} The PharmacoSet to summarize
+#' @param object \code{PharmacoSet} The PharmacoSet to summarize
 #' @param mDataType \code{character} which one of the molecular data types
 #' to use in the analysis, out of all the molecular data types available for the pset
 #' for example: rna, rnaseq, snp
@@ -33,18 +33,28 @@
 #'   If NA, no binarization is done.
 #' @param binarize.direction \code{character} One of "less" or "greater", the direction of binarization on 
 #'   binarize.threshold, if it is not NA. 
-#'   
+#' @param removeTreated \code{logical} If treated/perturbation experiments are present, should they
+#'   be removed? Defaults to yes.  
+#' 
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
 #'  
+#' @importMethodsFrom CoreGx summarizeMolecularProfiles
+#' @export
+setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
+          function(object, mDataType, cell.lines, features, summary.stat = c("mean", "median", "first", "last", "and", "or"),
+                   fill.missing = TRUE, summarize = TRUE, verbose = TRUE, binarize.threshold = NA,
+                   binarize.direction = c("less", "greater"), removeTreated=TRUE){
+            .summarizeMolecularProfilesPharmacoSet(object, mDataType, cell.lines, features, summary.stat, fill.missing,
+                                                   summarize, verbose, binarize.threshold, binarize.direction, removeTreated)
+          })
+
+
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- colData colData<- assays assays<- assayNames assayNames<-
 #' @importFrom Biobase AnnotatedDataFrame
-#' @export
-
-##TODO:: Add features parameter
-
-summarizeMolecularProfiles <- function(pSet, 
+#' @keywords internal
+.summarizeMolecularProfilesPharmacoSet <- function(object,
                                        mDataType, 
                                        cell.lines, 
                                        features, 
@@ -53,24 +63,25 @@ summarizeMolecularProfiles <- function(pSet,
                                        summarize = TRUE, 
                                        verbose = TRUE,
                                        binarize.threshold = NA, 
-                                       binarize.direction = c("less", "greater")
+                                       binarize.direction = c("less", "greater"),
+                                       removeTreated=TRUE
                                        ) {
   
   
   ### Placed here to make sure the pSet argument gets checked first by R. 
-  mDataTypes <- names(pSet@molecularProfiles)
+  mDataTypes <- mDataNames(object)
   if (!(mDataType %in% mDataTypes)) {
-    stop (sprintf("Invalid mDataType, choose among: %s", paste(names(pSet@molecularProfiles), collapse=", ")))
+    stop (sprintf("Invalid mDataType, choose among: %s", paste(names(object@molecularProfiles), collapse=", ")))
   }
   
   if(summarize==FALSE){
-    return(pSet@molecularProfiles[[mDataType]])
+    return(object@molecularProfiles[[mDataType]])
   }
   
   if (missing(features)) {
-    features <- rownames(featureInfo(pSet, mDataType))
+    features <- rownames(featureInfo(object, mDataType))
   } else {
-    fix <- is.element(features, rownames(featureInfo(pSet, mDataType)))
+    fix <- is.element(features, rownames(featureInfo(object, mDataType)))
     if (verbose && !all(fix)) {
       warning (sprintf("Only %i/%i features can be found", sum(fix), length(features)))
     }
@@ -80,22 +91,37 @@ summarizeMolecularProfiles <- function(pSet,
   summary.stat <- match.arg(summary.stat)
   binarize.direction <- match.arg(binarize.direction)
   
-  if((!S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
+  if((!S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("mean", "median", "first", "last"))) {
     stop ("Invalid summary.stat, choose among: mean, median, first, last" )
   }
-  if((S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("and", "or"))) {
+  if((S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation %in% c("mutation","fusion")) & (!summary.stat %in% c("and", "or"))) {
     stop ("Invalid summary.stat, choose among: and, or" )
   }
   
   if (missing(cell.lines)) {
-    cell.lines <- cellNames(pSet)
+    cell.lines <- cellNames(object)
   }
   
+  if(object@datasetType %in% c("perturbation", "both") && removeTreated){
+    if(!"xptype" %in% colnames(phenoInfo(object, mDataType))) {
+      warning("The passed in molecular data had no column: xptype.
+               \rEither the mDataType does not include perturbations, or the PSet is malformed.
+               \rAssuming the former and continuing.")
+    } else {
+      keepCols <- phenoInfo(object, mDataType)$xptype %in% c("control", "untreated")
+      molecularProfilesSlot(object)[[mDataType]] <- molecularProfilesSlot(object)[[mDataType]][,keepCols]      
+    }
+
+  }
+
+
+
+
   ##TODO:: have less confusing variable names
-  dd <- molecularProfiles(pSet, mDataType)
-  pp <- phenoInfo(pSet, mDataType)
+  dd <- molecularProfiles(object, mDataType)
+  pp <- phenoInfo(object, mDataType)
   
-  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation == "mutation") {
+  if(S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation == "mutation") {
     tt <- dd
     tt[which(!is.na(dd) & dd =="wt")] <- FALSE
     tt[which(!is.na(dd) & dd !="wt")] <- TRUE
@@ -103,7 +129,7 @@ summarizeMolecularProfiles <- function(pSet,
     dimnames(tt) <- dimnames(dd)
     dd <- tt
   }
-  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation == "fusion") {
+  if(S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation == "fusion") {
     tt <- dd
     tt[which(!is.na(dd) & dd =="0")] <- FALSE
     tt[which(!is.na(dd) & dd !="0")] <- TRUE
@@ -111,7 +137,7 @@ summarizeMolecularProfiles <- function(pSet,
     dimnames(tt) <- dimnames(dd)
     dd <- tt
   }
-  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("cnv", "rna", "rnaseq", "isoform") 
+  if(S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation %in% c("cnv", "rna", "rnaseq", "isoform")
      && !is.na(binarize.threshold)) {
     tt <- dd
     switch(binarize.direction, "less" = {
@@ -145,7 +171,7 @@ summarizeMolecularProfiles <- function(pSet,
   pp2 <- pp[match(ucell, pp[ , "cellid"]), , drop=FALSE]
   if (length(duplix) > 0) {
     if (verbose) {
-      message(sprintf("Summarizing %s molecular data for:\t%s", mDataType, pSet@annotation$name))
+      message(sprintf("Summarizing %s molecular data for:\t%s", mDataType, object@annotation$name))
       total <- length(duplix)
       # create progress bar 
       pb <- utils::txtProgressBar(min=0, max=total, style=3)
@@ -204,8 +230,8 @@ summarizeMolecularProfiles <- function(pSet,
   dd2 <- dd2[ , cell.lines, drop=FALSE]
   pp2 <- pp2[cell.lines, , drop=FALSE]
   pp2[ , "cellid"] <- cell.lines
-  res <- pSet@molecularProfiles[[mDataType]]
-  if(S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation %in% c("mutation", "fusion")) {
+  res <- object@molecularProfiles[[mDataType]]
+  if(S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation %in% c("mutation", "fusion")) {
     tt <- dd2
     tt[which(!is.na(dd2) & dd2)] <- "1"
     tt[which(!is.na(dd2) & !dd2)] <- "0"
@@ -213,9 +239,9 @@ summarizeMolecularProfiles <- function(pSet,
   }
   res <- SummarizedExperiment::SummarizedExperiment(dd2)
   pp2 <- S4Vectors::DataFrame(pp2, row.names=rownames(pp2))
-  pp2$tissueid <- cellInfo(pSet)[pp2$cellid, "tissueid"]
+  pp2$tissueid <- cellInfo(object)[pp2$cellid, "tissueid"]
   SummarizedExperiment::colData(res) <- pp2
-  SummarizedExperiment::rowData(res) <- featureInfo(pSet, mDataType)
+  SummarizedExperiment::rowData(res) <- featureInfo(object, mDataType)
   ##TODO:: Generalize this to multiple assay SummarizedExperiments!
   if(!is.null(SummarizedExperiment::assay(res, 1))) {
     SummarizedExperiment::assay(res, 2) <- matrix(rep(NA, 
@@ -226,8 +252,8 @@ summarizeMolecularProfiles <- function(pSet,
                                                   dimnames=dimnames(assay(res, 1))
                                                   )
   }
-  assayNames(res) <- assayNames(pSet@molecularProfiles[[mDataType]])
+  assayNames(res) <- assayNames(object@molecularProfiles[[mDataType]])
   res <- res[features,]
-  S4Vectors::metadata(res) <- S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])
+  S4Vectors::metadata(res) <- S4Vectors::metadata(object@molecularProfiles[[mDataType]])
   return(res)
 }

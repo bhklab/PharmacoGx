@@ -7,7 +7,7 @@
 #' function.  
 #' 
 #' Much more information on the processing of the data and data provenance can be found at:
-#' orcestra.ca 
+#' www.orcestra.ca 
 #' 
 #'
 #' @examples
@@ -20,7 +20,7 @@
 #' @import jsonlite
 availablePSets <- function(){
   
-  avail.psets <- fromJSON("http://orcestra.ca/api/psets/available")
+  avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/available")
 
   pSetTable <- data.frame("Dataset Name" = avail.psets$dataset$name,
                           "Date Created" = avail.psets$dateCreated,
