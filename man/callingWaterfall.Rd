@@ -17,10 +17,8 @@ callingWaterfall(
 \item{x}{What type of object does this take in?}
 
 \item{type}{ic50: IC50 values in micro molar (positive values)
-
-  actarea: Activity Area, that is area under the drug activity curve (positive values)
- 
-  amax: Activity at max concentration (positive values)}
+actarea: Activity Area, that is area under the drug activity curve (positive values)
+amax: Activity at max concentration (positive values)}
 
 \item{intermediate.fold}{vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively}
 
@@ -32,7 +30,7 @@ require?}
 \item{plot}{\code{boolean} Whether to plot the results}
 }
 \value{
-\code{factor} Containing the status drug sensitivity status of each
+\code{factor} Containing the drug sensitivity status of each
   cellline.
 }
 \description{
@@ -60,4 +58,8 @@ require?}
   
 5. Require at least x sensitive and x insensitive cell lines after applying 
   these criteria (x=5 in our case).
+}
+\examples{
+# Dummy example
+1 + 1
 }

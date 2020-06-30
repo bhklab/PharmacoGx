@@ -74,6 +74,7 @@ Collate:
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
     'sensitivityRaw-methods.R'
+    'sensitivitySlot-methods.R'
     'summarizeMolecularProfiles-methods.R'
     'summarizeSensitivityProfiles-methods.R'
     'utilities.R'
