@@ -73,6 +73,7 @@ Collate:
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
+    'sensitivityRaw-methods.R'
     'summarizeMolecularProfiles-methods.R'
     'summarizeSensitivityProfiles-methods.R'
     'utilities.R'
