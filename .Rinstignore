@@ -7,3 +7,6 @@ REVISIONS
 .docker/*
 .travis.yml
 codecover.R
+Psets/*
+scripts/*
+.idea/*

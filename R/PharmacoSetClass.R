@@ -527,13 +527,13 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value){
   callNextMethod(object=object, value=value)
 })
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
+setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet", value="matrix"), function(object, value){
   callNextMethod(object=object, value=value)
 })
 
