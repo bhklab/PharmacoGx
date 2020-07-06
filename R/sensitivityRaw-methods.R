@@ -12,7 +12,7 @@
 #' @importMethodsFrom CoreGx sensitivityRaw
 #' @export
 setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 

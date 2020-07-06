@@ -14,7 +14,7 @@
 #' @importMethodsFrom CoreGx sensitivitySlot
 #' @export
 setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 ##TODO:: Migrate this to CoreGx

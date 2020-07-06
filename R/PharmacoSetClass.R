@@ -221,7 +221,7 @@ PharmacoSet <-  function(name,
 #' @importFrom methods callNextMethod
 #' @export
 setMethod(cellInfo, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' cellInfo<- Generic
@@ -240,7 +240,7 @@ setMethod(cellInfo, "PharmacoSet", function(object){
 #' @importFrom methods callNextMethod
 #' @export
 setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 
 #####
@@ -314,7 +314,7 @@ setReplaceMethod("drugInfo", signature = signature(object="PharmacoSet", value="
 #'
 #' @export
 setMethod(phenoInfo, "PharmacoSet", function(object, mDataType){
-    callNextMethod(object, mDataType)
+    callNextMethod(object=object, mDataType=mDataType)
 })
 
 #' phenoInfo<- Generic
@@ -337,7 +337,7 @@ setMethod(phenoInfo, "PharmacoSet", function(object, mDataType){
 #' @importFrom CoreGx phenoInfo<-
 #' @export 
 setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
-  callNextMethod(object, mDataType, value)
+  callNextMethod(object=object, mDataType=mDataType, value=value)
 })
 
 #' molecularProfiles Generic
@@ -361,7 +361,7 @@ setReplaceMethod("phenoInfo", signature = signature(object="PharmacoSet", mDataT
 #' @importFrom methods callNextMethod
 #' @export
 setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay){
-  callNextMethod(object, mDataType, assay)
+  callNextMethod(object=object, mDataType=mDataType, assay=assay)
 })
 
 #' molecularProfiles<- Generic
@@ -385,12 +385,12 @@ setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay){
 #' @importFrom CoreGx molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
-  callNextMethod(object, mDataType, assay, value)
+  callNextMethod(object=object, mDataType=mDataType, assay=assay, value=value)
 })
 #' @describeIn PharmacoSet Update the given type of molecular data from the PharmacoSet 
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
-  callNextMethod(object, mDataType, assay, value)
+  callNextMethod(object=object, mDataType=mDataType, assay=assay, value=value)
 })
 
 #' featureInfo Generic
@@ -411,7 +411,7 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PharmacoSet"
 #' @importFrom CoreGx featureInfo
 #' @export
 setMethod(featureInfo, "PharmacoSet", function(object, mDataType){
-  callNextMethod(object, mDataType)
+  callNextMethod(object=object, mDataType=mDataType)
 })
 
 #' featureInfo<- Generic
@@ -435,7 +435,7 @@ setMethod(featureInfo, "PharmacoSet", function(object, mDataType){
 #' 
 #' @export
 setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDataType ="character", value="DataFrame"), function(object, mDataType, value){
-  callNextMethod(object, mDataType, value)
+  callNextMethod(object=object, mDataType=mDataType, value=value)
 })
 
 #####
@@ -461,7 +461,7 @@ setReplaceMethod("featureInfo", signature = signature(object="PharmacoSet", mDat
 #'
 #' @export
 setMethod(sensitivityInfo, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' sensitivityInfo<- Generic
@@ -483,7 +483,7 @@ setMethod(sensitivityInfo, "PharmacoSet", function(object){
 #' @describeIn PharmacoSet Update the sensitivity experiment info
 #' @export
 setReplaceMethod("sensitivityInfo", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 
 
@@ -505,7 +505,7 @@ setReplaceMethod("sensitivityInfo", signature = signature(object="PharmacoSet",v
 #' @describeIn PharmacoSet Return the phenotypic data for the drug dose sensitivity
 #' @export
 setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' sensitivityProfiles<-
@@ -528,13 +528,13 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="data.frame"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 #' @describeIn PharmacoSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
 setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 
 #' sensitivityMeasures Generic
@@ -556,7 +556,7 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="PharmacoSe
 #'   summaries, for example, whether there are IC50 values available
 #' @export
 setMethod(sensitivityMeasures, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 ##TODO:: Arrange slot accessors to be together!
@@ -615,7 +615,7 @@ setReplaceMethod("drugNames", signature = signature(object="PharmacoSet",value="
 #' @export
 #' 
 setMethod(cellNames, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' cellNames<- Generic
@@ -637,7 +637,7 @@ setMethod(cellNames, "PharmacoSet", function(object){
 #' @describeIn PharmacoSet Update the cell names used in the dataset
 #' @export
 setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="character"), function(object, value){
-    callNextMethod(object, value)
+    callNextMethod(object=object, value=value)
 })
 
 #' fNames
@@ -658,7 +658,7 @@ setReplaceMethod("cellNames", signature = signature(object="PharmacoSet",value="
 #' @describeIn PharmacoSet Return the feature names used in the dataset
 #' @export
 setMethod(fNames, signature=signature(object="PharmacoSet", mDataType="character"), function(object, mDataType){
-  callNextMethod(object, mDataType)
+  callNextMethod(object=object, mDataType=mDataType)
 })
 
 #' fNames<-
@@ -685,7 +685,7 @@ setReplaceMethod("fNames",
                                        value="character"), 
                  function(object, mDataType, value)
 {
-  callNextMethod(object, mDataType, value)
+  callNextMethod(object=object, mDataType=mDataType, value=value)
 })
 
 #' dateCreated Generic
@@ -705,7 +705,7 @@ setReplaceMethod("fNames",
 #' @describeIn PharmacoSet Return the date the PharmacoSet was created
 #' @export
 setMethod(dateCreated, "PharmacoSet", function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' name getter method
@@ -725,7 +725,7 @@ setMethod(dateCreated, "PharmacoSet", function(object) {
 #' @describeIn PharmacoSet Return the name of the PharmacoSet 
 #' @export
 setMethod(name, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' pertNumber Generic
@@ -747,7 +747,7 @@ setMethod(name, "PharmacoSet", function(object){
 #'   experiments
 #' @export
 setMethod(pertNumber, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 
@@ -770,7 +770,7 @@ setMethod(pertNumber, "PharmacoSet", function(object){
 #' @importFrom methods callNextMethod
 #' @export
 setMethod(sensNumber, "PharmacoSet", function(object){
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' pertNumber<- Generic
@@ -793,7 +793,7 @@ setMethod(sensNumber, "PharmacoSet", function(object){
 #' @importFrom methods callNextMethod
 #' @export
 setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet", value="array"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 
 #' sensNumber<- Generic
@@ -817,7 +817,7 @@ setReplaceMethod('pertNumber', signature = signature(object="PharmacoSet", value
 #' @importFrom methods callNextMethod
 #' @export
 setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value="matrix"), function(object, value){
-  callNextMethod(object, value)
+  callNextMethod(object=object, value=value)
 })
 
 #' Show a PharamcoSet
@@ -836,7 +836,7 @@ setReplaceMethod('sensNumber', signature = signature(object="PharmacoSet",value=
 #'
 #' @export
 setMethod("show", signature=signature(object="PharmacoSet"), function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 #' mDataNames
@@ -855,7 +855,7 @@ setMethod("show", signature=signature(object="PharmacoSet"), function(object) {
 #' @importFrom methods callNextMethod
 #' @export
 setMethod('mDataNames', "PharmacoSet", function(object) {
-  callNextMethod(object)
+  callNextMethod(object=object)
 })
 
 
