@@ -48,7 +48,12 @@ to the common drugs, and/or cell lines. The mapping between dataset
 drug and cell names is done using annotations found in the 
 PharmacoSet object's internal curation slot
 }
-\details{
-intersectOn = c("drugs", "cell.lines")
-                        )
+\examples{
+data(GDSCsmall)
+data(CCLEsmall)
+common <- intersectPSet(list('GDSC'=GDSCsmall,'CCLE'=CCLEsmall),
+                        intersectOn = c("drugs", "cell.lines"))
+common$CGP
+common$CCLE
+
 }

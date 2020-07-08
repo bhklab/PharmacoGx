@@ -7,14 +7,13 @@
 #' drug and cell names is done using annotations found in the 
 #' PharmacoSet object's internal curation slot
 #' 
-# @examples 
-# data(GDSCsmall)
-# data(CCLEsmall)
-# common <- intersectPSet(list('GDSC'=GDSCsmall,'CCLE'=CCLEsmall), 
-#'                         intersectOn = c("drugs", "cell.lines")
-#'                         )
-# common$CGP
-# common$CCLE
+#' @examples
+#' data(GDSCsmall)
+#' data(CCLEsmall)
+#' common <- intersectPSet(list('GDSC'=GDSCsmall,'CCLE'=CCLEsmall),
+#'                         intersectOn = c("drugs", "cell.lines"))
+#' common$CGP
+#' common$CCLE
 #' 
 #' @param pSets \code{list} a list of PharmacoSet objects, of which the function
 #'   should find the intersection
@@ -39,8 +38,7 @@
 #' @importFrom CoreGx .intersectList
 #' 
 #' @export
-intersectPSet <- 
-  function(pSets, 
+intersectPSet <- function(pSets,
            intersectOn=c("drugs", "cell.lines", "concentrations"), 
            cells, 
            drugs, 

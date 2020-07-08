@@ -1,11 +1,16 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.5
-Date: 2020-06-26
-Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
-Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
-Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
+Version: 2.1.6
+Date: 2020-07-08
+Authors@R: c(
+  person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
+  person("Zhaleh", "Safikhani", role=c("aut")),
+  person("Christopher", "Eeles", email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+  person("Mark", "Freeman", role=c("aut")),
+  person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
+  )
+Description: Contains a set of functions to perform large-scale analysis of pharmaco-genomic data.
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
@@ -43,9 +48,10 @@ Collate:
     'GWC.R'
     'LogLogisticRegression.R'
     'MatthewCor.R'
-    'PharmacoSetClass.R'
     'SanityCheck.R'
     'callingWaterfall.R'
+    'class-PharmacoSet.R'
+    'class-SignatureClass.R'
     'computeABC.R'
     'computeAUC.R'
     'computeAUC_old.R'
@@ -62,19 +68,37 @@ Collate:
     'downloadSignatures.R'
     'drugDoseResponseCurve.R'
     'drugPerturbationSig.R'
-    'drugSensitivitySig-methods.R'
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
+    'generics.R'
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
-    'signatureClass.R'
+    'methods-cellInfo.R'
+    'methods-cellNames.R'
+    'methods-dateCreated.R'
+    'methods-drugInfo.R'
+    'methods-drugNames.R'
+    'methods-drugSensitivitySig.R'
+    'methods-fNames.R'
+    'methods-featureInfo.R'
+    'methods-mDataNames.R'
+    'methods-molecularProfiles.R'
+    'methods-molecularProfilesSlot.R'
+    'methods-name.R'
+    'methods-pertNumber.R'
+    'methods-phenoInfo.R'
+    'methods-sensNumber.R'
+    'methods-sensitivityInfo.R'
+    'methods-sensitivityMeasures.R'
+    'methods-sensitivityProfiles.R'
+    'methods-sensitivityRaw.R'
+    'methods-sensitivitySlot.R'
+    'methods-subsetTo.R'
+    'methods-summarizeMolecularProfiles.R'
+    'methods-summarizeSensitivityProfiles.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'sensitivityRaw-methods.R'
-    'sensitivitySlot-methods.R'
-    'summarizeMolecularProfiles-methods.R'
-    'summarizeSensitivityProfiles-methods.R'
     'utilities.R'

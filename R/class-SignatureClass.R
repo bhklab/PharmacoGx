@@ -9,6 +9,7 @@ setOldClass('sessionInfo', sessionInfo)
             SessionInfo = 'sessionInfo',
             Call = 'character'), contains='array')
 
+
 #' Contructor for the PharmacoSig S4 class
 #'
 #' @param Data [`array`] of data to build the signature from
@@ -17,7 +18,7 @@ setOldClass('sessionInfo', sessionInfo)
 #' @param SigType [`character`] vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
 #' @param SessionInfo [`sessionInfo`] object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`
 #' @param Call [`character` or `call`] specifying the constructor call used to make the object, defaults to 'No Call Recorded'
-#' @param Arguments [`list] a list of additional arguments to the constructure
+#' @param Arguments [`list`] a list of additional arguments to the constructure
 #'
 #' @return A [`PharmacoSig`] object build from the provided signature data
 #'
@@ -49,6 +50,7 @@ setMethod("show", signature=signature(object='PharmacoSig'),
         cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
            })
 
+
 #' Show the Annotations of a signature object
 #' 
 #' This funtion prints out the information about the call used to compute the drug signatures, and the session info 
@@ -78,8 +80,3 @@ setMethod("showSigAnnot", signature(object="PharmacoSig"), function(object){
   print(object@SessionInfo)
   return(invisible(NULL))
 } 
-
-
-
-
-
