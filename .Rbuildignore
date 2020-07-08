@@ -13,3 +13,6 @@ old_data
 vignettes/figure
 ^doc$
 ^Meta$
+.idea*
+^PSets/*
+^scripts/*

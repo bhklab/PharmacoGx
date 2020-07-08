@@ -38,8 +38,7 @@
 #' @importFrom CoreGx .intersectList
 #' 
 #' @export
-intersectPSet <- 
-  function(pSets, 
+intersectPSet <- function(pSets,
            intersectOn=c("drugs", "cell.lines", "concentrations"), 
            cells, 
            drugs, 

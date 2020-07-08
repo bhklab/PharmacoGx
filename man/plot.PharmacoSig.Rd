@@ -16,17 +16,17 @@
 )
 }
 \arguments{
-\item{x}{[PharmacoSig] a PharmacoSig object, result of drugSensitivitySig
+\item{x}{[`PharmacoSig`] a PharmacoSig object, result of drugSensitivitySig
 or drugPerturbationSig}
 
-\item{adjust.method}{[character] or [boolean] either FALSE for no adjustment,
+\item{adjust.method}{[`character`] or [`boolean`] either FALSE for no adjustment,
 or one of the methods implemented by p.adjust. Defaults to FALSE for no 
 correction}
 
-\item{drugs}{[character] a vector of drug names for which to plot the estimated
+\item{drugs}{[`character`] a vector of drug names for which to plot the estimated
 associations with gene expression}
 
-\item{features}{[character] a vector of features for which to plot the estimated
+\item{features}{[`character`] a vector of features for which to plot the estimated
 associations with drug treatment}
 
 \item{effect_cutoff}{the cutoff to use for coloring significant effect sizes.}
