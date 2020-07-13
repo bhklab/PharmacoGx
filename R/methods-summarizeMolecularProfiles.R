@@ -243,16 +243,16 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
   SummarizedExperiment::colData(res) <- pp2
   SummarizedExperiment::rowData(res) <- featureInfo(object, mDataType)
   ##TODO:: Generalize this to multiple assay SummarizedExperiments!
-  if(!is.null(SummarizedExperiment::assay(res, 1))) {
-    SummarizedExperiment::assay(res, 2) <- matrix(rep(NA, 
-                                                      length(assay(res, 1))
-                                                      ), 
-                                                      nrow=nrow(assay(res, 1)), 
-                                                      ncol=ncol(assay(res, 1)),
-                                                  dimnames=dimnames(assay(res, 1))
-                                                  )
-  }
-  assayNames(res) <- assayNames(object@molecularProfiles[[mDataType]])
+  # if(!is.null(SummarizedExperiment::assay(res, 1))) {
+  #   SummarizedExperiment::assay(res, 2) <- matrix(rep(NA, 
+  #                                                     length(assay(res, 1))
+  #                                                     ), 
+  #                                                     nrow=nrow(assay(res, 1)), 
+  #                                                     ncol=ncol(assay(res, 1)),
+  #                                                 dimnames=dimnames(assay(res, 1))
+  #                                                 )
+  # }
+  assayNames(res) <- assayNames(object@molecularProfiles[[mDataType]])[[1]]
   res <- res[features,]
   S4Vectors::metadata(res) <- S4Vectors::metadata(object@molecularProfiles[[mDataType]])
   return(res)
