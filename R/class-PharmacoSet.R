@@ -366,7 +366,7 @@ checkPsetStructure <-
       }
 
       # Check that all cellids from the object are included in molecularProfiles
-      if('cellid' %in% colnames(rowData(profile))) {
+      if('cellid' %in% colnames(colData(profile))) {
         if(!all(colData(profile)[,'cellid'] %in% rownames(object@cell))) {
           warning(sprintf('%s: not all the cell lines in this profile are in
                           cell lines slot', nn))
