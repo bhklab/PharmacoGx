@@ -80,10 +80,11 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRU
   if(is.null(pSetFileName)){
     pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
   }
-  if(!file.exists(file.path(saveDir, pSetFileName))){
+  if(!file.exists(file.path(saveDir, pSetFileName))) {
     downloader::download(url = as.character(pSetTable[whichx,"Download"]), 
                          destfile=file.path(saveDir, pSetFileName), 
-                         quiet=!verbose)
+                         quiet=!verbose,
+                         mode='wb')
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
   #TODO:: Update this to use annotation accessor method once it is in CoreGx
