@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.8
-Date: 2020-07-08
+Version: 2.1.9
+Date: 2020-09-04
 Authors@R: c(
   person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
   person("Zhaleh", "Safikhani", role=c("aut")),
@@ -101,4 +101,5 @@ Collate:
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
+    'summarizeMolecularProfiles.R'
     'utilities.R'

@@ -4,7 +4,11 @@
 \alias{availablePSets}
 \title{Return a table of PharmacoSets available for download}
 \usage{
-availablePSets()
+availablePSets(canonical = TRUE)
+}
+\arguments{
+\item{canonical}{[`logical`] Should available PSets show only official PSets, or should
+user generated PSets be included?}
 }
 \value{
 A data.frame with details about the available PharmacoSet objects
