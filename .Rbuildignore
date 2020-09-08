@@ -16,3 +16,5 @@ vignettes/figure
 .idea*
 ^PSets/*
 ^scripts/*
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md

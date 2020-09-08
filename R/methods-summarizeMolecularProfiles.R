@@ -40,35 +40,16 @@
 #'   per cell line.
 #'  
 #' @importMethodsFrom CoreGx summarizeMolecularProfiles
-#' @export
-setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
-          function(object, mDataType, cell.lines, features, summary.stat = c("mean", "median", "first", "last", "and", "or"),
-                   fill.missing = TRUE, summarize = TRUE, verbose = TRUE, binarize.threshold = NA,
-                   binarize.direction = c("less", "greater"), removeTreated=TRUE){
-            .summarizeMolecularProfilesPharmacoSet(object, mDataType, cell.lines, features, summary.stat, fill.missing,
-                                                   summarize, verbose, binarize.threshold, binarize.direction, removeTreated)
-          })
-
-
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- colData colData<- assays assays<- assayNames assayNames<-
 #' @importFrom Biobase AnnotatedDataFrame
 #' @keywords internal
-.summarizeMolecularProfilesPharmacoSet <- function(object,
-                                       mDataType, 
-                                       cell.lines, 
-                                       features, 
-                                       summary.stat = c("mean", "median", "first", "last", "and", "or"), 
-                                       fill.missing = TRUE, 
-                                       summarize = TRUE, 
-                                       verbose = TRUE,
-                                       binarize.threshold = NA, 
-                                       binarize.direction = c("less", "greater"),
-                                       removeTreated=TRUE
-                                       ) {
+#' @export
+setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
+          function(object, mDataType, cell.lines, features, summary.stat = c("mean", "median", "first", "last", "and", "or"),
+                   fill.missing = TRUE, summarize = TRUE, verbose = TRUE, binarize.threshold = NA,
+                   binarize.direction = c("less", "greater"), removeTreated=TRUE) {
   
-  
-  ### Placed here to make sure the pSet argument gets checked first by R. 
   mDataTypes <- mDataNames(object)
   if (!(mDataType %in% mDataTypes)) {
     stop (sprintf("Invalid mDataType, choose among: %s", paste(names(object@molecularProfiles), collapse=", ")))
@@ -256,4 +237,6 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
   res <- res[features,]
   S4Vectors::metadata(res) <- S4Vectors::metadata(object@molecularProfiles[[mDataType]])
   return(res)
-}
+          })
+
+

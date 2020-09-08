@@ -17,3 +17,4 @@ test_that("Sensitivity result did not change since last time", {
 	expect_equal_to_reference(drug.sensitivity@.Data, "drug.sensitivity.MANOVAGDSCSmall.rds")
 
 })
+

@@ -71,3 +71,4 @@ GDSCsmall <- summarizeMolecularProfiles(GDSCsmall,
 GDSCsmall
 
 }
+\keyword{internal}
