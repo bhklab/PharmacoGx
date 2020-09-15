@@ -1,108 +1,135 @@
-#' LongTable class for storing
+#' LongTable class definition
 #'
+#' Define a private constructor method to be used to build a `LongTable` object.
 #'
 #' @param drugs [`data.table`]
 #' @param cells [`data.table`]
 #' @param dataList [`list`]
 #'
-#' @return [`LongTable`] object containing the viability data from a treatment response experiment, indexes by a primary
-#'  key
+#' @return [`LongTable`] object containing the assay data from a
 #'
+#' @import data.table
 #' @keywords internal
 .LongTable <- setClass("LongTable",
-                       slots=list(drugs="data.table",
-                                  cells="data.table",
-                                  dataList="list"))
+                       slots=list(rowData="data.table",
+                                  colData="data.table",
+                                  assays="list",
+                                  metadata='list'))
 
+#' LongTable constructor method
 #'
 #'
 #'
+#' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
+#'   coercible to a `data.table` containing the a unique `rowID` column which
+#'   is used to key assays, as well as additional row metadata to subset on.
+#' @param colData [`data.table`, `data.frame`, `matrix`] A table like object
+#'   coercible to a `data.table` containing the a unique `colID` column which
+#'   is used to key assays, as well as additional column metadata to subset on.
+#' @param assays A [`list`] containing one or more objects coercible to a
+#'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
+#'   colID columns in colData and rowData.
+#' @param keep.rownames [`logical` or `character`] Logical: whether rownames
+#'   should be added as a column if coercing to a `data.table`, default is FALSE.
+#'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
+#'   column name to store the rownames in.
 #'
 #'
+#' @return [`LongTable`] object
 #'
-LongTable <- function(drugs, cells, dataList) {
+#' @import data.table
+#' @export
+LongTable <- function(rowData, colData, assays, keep.rownames=FALSE) {
 
-    if (!is(drugs, 'data.table')) {
-        drugs <- data.table(drugs, keep.rownames='rownames')
+    if (!is(colData, 'data.table')) {
+        colData <- data.table(colData, keep.rownames=keep.rownames)
     }
 
-    if (!is(cells, 'data.table')) {
-        cells <- data.table(cells, keep.rownames='rownames')
+    if (!is(rowData, 'data.table')) {
+        rowData <- data.table(rowData, keep.rownames=keep.rownames)
     }
 
-    if (!all(vapply(dataList, FUN=is.data.table, FUN.VALUE=logical(1)))) {
+    if (!all(vapply(assays, FUN=is.data.table, FUN.VALUE=logical(1)))) {
         tryCatch({
-            dataList <- lapply(data, FUN=data.table, keep.rownames='rownames')
+            assays <- lapply(data, FUN=data.table, keep.rownames=keep.rownames)
         }, warning = function(w) {
             warning(w)
         }, error = function(e, dataList) {
             message(e)
             types <- lapply(dataList, typeof)
-            stop(paste0("List items are types: ",
+            stop(paste0('List items are types: ',
                         paste0(types, collapse=', '),
-                        '\nPlease ensure all items in dataList are can be coerced to data.table!'))
+                        '\nPlease ensure all items in dataList are can be
+                        coerced to data.table!'))
         })
     }
 
-    return(.LongTable(drugs=drugs, cells=cells, dataList=dataList))
+    return(.LongTable(rowData=rowData, colData=colData, assays=assays, metadata=list()))
 }
 
-cellCols <- list(c("cell_line"), c("BatchID"))
-drugCols <- list(c("drugA_name", "drugB_name"))
+rowDataCols <- list(c("cell_line"), c("BatchID"))
+colDataCols <- list(c("drugA_name", "drugB_name"))
 filePath <- 'data/drug_combo_merck.csv'
-valueCols <- list(dose=c('drugA Conc (µM)', 'drugB Conc (µM)'),
-                  viability=c(paste0('viability', seq_len(4)), 'mu/muMax', 'X/X0'))
+assayCols <- list(dose=c('drugA Conc (µM)', 'drugB Conc (µM)'),
+                  viability=c(paste0('viability', seq_len(4)),
+                    'mu/muMax', 'X/X0'))
 
 #' Create a LongTable object from a single .csv file
 #'
-#' @param filePath [`character`] Path to the .csv file containing the data and metadata from which to build the
-#'  LongTable.
-#' @param cellCols [`list`] List with two `character` vectors, the first specifying one or more columns to be used as
-#'   cell identifiers (e.g., cell-line names columns) and the second containing any additional metadata columns related
-#'   to the cell identifiers.
-#' @param drugCols [`list`] List with two `character` vectors, the first specifying one or more columns to be used as
-#'   cell identifiers (e.g., cell-line names columns) and the second containing any additional metadata columns related
-#'   to the cell identifiers.
-#' @param valueCols [`list`] A named list of character vectors specifying how to parse value columns into a list of
-#'   `data.table`s. Each list data.table will be named for the name of corresponding list item and contain the columns
+#' @param filePath [`character`] Path to the .csv file containing the data and
+#'   metadata from which to build the `LongTable`.
+#' @param colDataCols [`list`] List with two `character` vectors, the first
+#'   specifying one or more columns to be used as cell identifiers (e.g.,
+#'   cell-line names columns) and the second containing any additional metadata
+#'   columns related to the cell identifiers.
+#' @param rowDataCols [`list`] List with two `character` vectors, the first
+#'   specifying one or more columns to be used as cell identifiers (e.g.,
+#'   cell-line name columns) and the second containing any additional metadata
+#'   columns related to the cell identifiers.
+#' @param assayCols [`list`] A named list of character vectors specifying how to
+#'   parse assay columns into a list of `data.table`s. Each list data.table
+#'   will be named for the name of corresponding list item and contain the columns
 #'   specified in the character vector of column names in each list item.
 #'
-#' @return [`LongTable`] A long table object containing
+#' @return A [`LongTable`] object containing one or more assays, indexed by
+#'   rowID and colID.
 #'
 #' @import data.table
 #' @export
-buildLongTableFromCSV <- function(filePath, cellCols, drugCols, valueCols) {
+buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols) {
 
     # read in data
-    rawData <- fread(filePath)
+    tableData <- fread(filePath)
 
     # build drug and cell metadata tables and index by the appropriate ID
-    drugData <- unique(rawData[, .SD, .SDcols=unlist(drugCols)])[, colID := .I]
-    cellData <- unique(rawData[, .SD, .SDcols=unlist(cellCols)])[, rowID := .I]
+    colData <- unique(tableData[, .SD, .SDcols=unlist(colDataCols)])[, colID := .I]
+    rowData <- unique(tableData[, .SD, .SDcols=unlist(rowDataCols)])[, rowID := .I]
 
     # add the row and column ids to the value data
-    valueData <- rawData[drugData, on=unlist(drugCols)][cellData, on=unlist(cellCols)]
-    rm(rawData)
-    valueData[, c(unlist(cellCols), unlist(drugCols)) := NULL]
-    setkey(valueData, rowID, colID)
-    setkey(drugData, colID)
-    setkey(cellData, rowID)
+    assayData <- tableData[rowData, on=unlist(rowDataCols)][colData, on=unlist(colDataCols)]
+    rm(tableData)
+    assayData[, c(unlist(rowDataCols), unlist(colDataCols)) := NULL]
+    setkey(assayData, rowID, colID)
 
-    setnames(drugData, drugCols[[1]], paste0('drug', seq_along(drugCols[[1]])))
-    setnames(cellData, cellCols[[1]], paste0('cellLine', seq_along(cellCols[[1]])))
+    setkey(rowData, rowID)
+    setkey(colData, colID)
+
+    setnames(colData, colDataCols[[1]], paste0('drug', seq_along(colDataCols[[1]])))
+    setnames(rowData, rowDataCols[[1]], paste0('cellLine', seq_along(rowDataCols[[1]])))
 
     # add the index columns to the different value column vectors
     # this allows the .selectDataTable helper to be more general
     .prependToVector <- function(vector, values) c(values, vector)
-    valueCols <- lapply(valueCols, FUN=.prependToVector, values=c('rowID', 'colID'))
-    dataList <- lapply(valueCols, .selectDataTable, DT=valueData)
+    assayCols <- lapply(assayCols, FUN=.prependToVector, values=c('rowID', 'colID'))
+    assays <- lapply(assayCols, .selectDataTable, DT=assayData)
 
-    return(LongTable(drugs=drugData, cells=cellData, dataList=dataList))
+    return(LongTable(colData=colData, rowData=rowData, assays=assays))
 }
 
 # ---- buildLongTableFromCSV helpers
 
-#' Select a set of column names from a data.table, returning a copy of the data.table with duplicate rows removed
+#' Select a set of column names from a data.table, returning a copy of the
+#'   data.table with duplicate rows removed
 #'
 #' @param colNames [`character`] The column names to select from the data.table
 #' @param DT [`data.table`, `data.frame`, `matrix`] An object coercible to a `data.table`.
@@ -121,7 +148,7 @@ buildLongTableFromCSV <- function(filePath, cellCols, drugCols, valueCols) {
     if (!is.data.table(DT)) {
         tryCatch({
             DT <- data.table(DT, keep.rownames=keep.rownames)
-        }, warning=function(w){
+        }, warning=function(w) {
             warning(w)
         }, error=function(e) {
             message(e)
@@ -184,61 +211,176 @@ buildLongTableFromCSV <- function(filePath, cellCols, drugCols, valueCols) {
 #' @import data.table
 #' @export
 setMethod('subset', signature(x='LongTable'),
-          function(x, rowQuery, columnQuery, values) {
+          function(x, rowQuery, columnQuery, assays) {
 
     longTable <- x
     rm(x)
 
     if (!missing(rowQuery)) {
-        #if (tryCatch(is.character(rowQuery), error=function(e) FALSE)) {
-        #
-        #    select <- grep('^drug[\s')
-        #    cellDTSubset <-
-        #} else {
+        if (tryCatch(is.character(rowQuery), error=function(e) FALSE)) {
+            ## TODO:: Add a metadata field to LongTable that stores the column and row identifier string
+            select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
+            rowQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(rowQuery)), collapse=' | ')
+            rowQuery <- str2lang(rowQueryString)
+        } else {
             rowQuery <- substitute(rowQuery)
-            print(rowQuery)
-            cellDTSubset <- longTable@cells[eval(rowQuery), ]
         }
-    #} else {
-    #    cellDTSubset <- longTable@cells
-    #}
-
-    if (!missing(columnQuery)) {
-        columnQuery <- substitute(columnQuery)
-        print(columnQuery)
-        drugDTSubset <- longTable@drugs[eval(columnQuery), ]
+        rowDataSubset <- rowData(longTable)[eval(rowQuery), ]
     } else {
-        drugDTSubset <- longTable@drugs
+        rowDataSubset <- rowData(longTable)
     }
 
-    rowIDs <- cellDTSubset$rowID
-    colIDs <- drugDTSubset$colID
+    if (!missing(columnQuery)) {
+        if (tryCatch(is.character(columnQuery), error=function(e) FALSE)) {
+            select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
+            columnQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(columnQuery)), collapse=' | ')
+            columnQuery <- str2lang(columnQueryString)
+        } else {
+            columnQuery <- substitute(columnQuery)
+        }
+        colDataSubset <- colData(longTable)[eval(columnQuery), ]
+    } else {
+        colDataSubset <- colData(longTable)
+    }
 
-    if (missing(values)) { values <- names(longTable@dataList) }
-    dataListIndexes <- values %in% names(longTable@dataList)
+    rowIDs <- rowDataSubset$rowID
+    colIDs <- colDataSubset$colID
 
-    valueData <- lapply(longTable@dataList[dataListIndexes],
-                        FUN=.filterDataTable,
-                        indexList=list(rowIDs, colIDs))
+    if (missing(assays)) { assays <- assayNames(longTable) }
+    keepAssays <- assayNames(longTable) %in% assays
 
-    return(LongTable(drugs=drugDTSubset, cells=cellDTSubset, dataList=valueData))
+    assayData <- lapply(assays(longTable)[keepAssays],
+                     FUN=.filterLongDataTable,
+                     indexList=list(rowIDs, colIDs))
+
+    return(LongTable(colData=colDataSubset, rowData=rowDataSubset, assays=assayData))
 })
 
-.filterDataTable <- function(DT, indexList) {
+#'
+#'
+#'
+#'
+.variableToCodeString <- function(variable) {
+    codeString <- capture.output(dput(variable))
+    codeString <- gsub('\"', "'", codeString)
+    return(codeString)
+}
+
+
+#' Filter a data.table object based on the rowID and colID columns
+#'
+#' @param DT [`data.table`] Object with the columns rowID and colID, preferably
+#'  as the key columns.
+#' @param indexList [`list`] Two integer vectors, one indicating the rowIDs and
+#'  one indicating the colIDs to filter the `data.table` on.
+#'
+#' @return [`data.table`] A copy of `DT` subset on the row and column IDs specified
+#'  in `indexList`.
+#'
+#' @import data.table
+#' @keywords internal
+.filterLongDataTable <- function(DT, indexList) {
+
+    # validate input
     if (length(indexList) > 2)
         stop("This object is 2D, please only pass in two ID vectors, one for
              rows and one for columns!")
 
+    if (!all(vapply(unlist(indexList), is.numeric, FUN.VALUE=logical(1))))
+        stop('Please ensure indexList only contains integer vectors!')
+
+    # extract indices
     rowIndices <- indexList[[1]]
     colIndices <- indexList[[2]]
 
+    # return filtered data.table
     return(copy(DT[rowID %in% rowIndices & colID %in% colIndices, ]))
 }
 
+# ---- LongTable Getter and Setter Methods
+
+#' Retrieve the row metadata table from a LongTable object
+#'
+#' @param x A [`LongTable`] object to retrieve the row metadata from.
+#'
+#' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
+#'
+#' @importMethodsFrom SummarizedExperiment rowData
+#' @export
+setMethod('rowData', signature(x='LongTable'), function(x) {
+    return(x@rowData)
+})
+
+
+#' Retrieve the column metadata table from a LongTable object
+#'
+#' @param x [`LongTable`]
+#'
+#' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
+#'
+#' @importMethodsFrom SummarizedExperiment rowData
+#' @export
+setMethod('colData', signature(x='LongTable'), function(x) {
+    return(x@colData)
+})
 
 #'
 #'
 #'
 #'
-#' @importFrom
-setMethod('rowData')
+#' @importMethodsFrom SummarizedExperiment assays
+#' @export
+setMethod('assays', signature(x='LongTable'), function(x) {
+    return(x@assays)
+})
+
+#'
+#'
+#'
+#' @importMethodsFrom SummarizedExperiment assay
+#' @export
+setMethod('assay',
+          signature(x='LongTable', i='character'),
+          function(x, i) {
+
+    # validate input
+    if (length(i) > 1 || !is.character(i))
+        stop(paste0('Please specifying a single character assay name.'))
+
+    keepAssay <- assayNames(x) == i
+    if (all(keepAssay == FALSE))
+        stop(paste0('There is no assay named ',
+                    i,
+                    ' in this LongTable. Use assayNames(longTable) for a list of
+                    valid assay names.'))
+
+    # get specified assay
+    return(assays(x)[keepAssay])
+})
+
+#'
+#'
+#'
+#'
+#' @importMethodsFrom SummarizedExperiment assayNames
+#' @export
+setMethod('assayNames', signature(x='LongTable'), function(x) {
+    return(names(assays(x)))
+})
+
+#'
+#'
+#'
+#' @importMethodsFrom SummarizedExperiment dim
+#' @export
+setMethod('dim', signature(x='LongTable'), function(x) {
+    return(c(nrow(rowData(x)), nrow(colData(x))))
+})
+
+#'
+#'
+#' @importMethodsFrom SummarizedExperiment dimnames
+#'
+setMethod('dimNames', signature(x='LongTable'), function(x) {
+
+})
