@@ -79,7 +79,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
     # Initialize the .internals object to store private metadata for a LongTable
     internals <- new.env()
+
     ## TODO:: Implement error handling
+
     internals$rowIDs <-
         if (is.numeric(rowIDs) & max(rowIDs) < ncol(rowData))
             rowIDs
@@ -318,9 +320,84 @@ setMethod('subset', signature(x='LongTable'),
 #'
 #'
 #' @importFrom crayon blue green red
+#' @importMethodsFrom CoreGx show
 #' @export
-setMethod('show', signature(x='LongTable'), function(x) {
+setMethod('show', signature(object='LongTable'), function(object) {
 
+    ## FIXME:: Function too long. Can I refacter to a helper that prints each slot?
+    .collapse <- function(...) paste0(..., collapse=' ')
+    # ---- class descriptions
+    cat(yellow$bold$italic('\n< LongTable >', '\n'))
+    cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
+
+    # --- assays slot
+    assayLength <- length(assays(object))
+    assaysString <- paste0('assays(', assayLength, '): ')
+    assayNames <- assayNames(object)
+    assayNamesString <-
+        if (length(assayNames(object)) > 6)
+            paste0(.collapse(head(assayNames, 3), ' ... ', .collapse(tail(assayNames, 3))))
+        else
+            .collapse(assayNames(object))
+    cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
+
+    # --- rownames
+    rows <- nrow(rowData(object))
+    rowsString <- paste0('rownames(', rows, '): ')
+    rownames <- rownames(object)
+    rownamesString <-
+        if (length(rownames) > 6)
+            paste0(.collapse(head(rownames, 3)), ' ... ', .collapse(tail(rownames, 3)))
+        else
+            .collapse(rownames)
+    cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
+
+    # ---- rowData slot
+    rowCols <- ncol(rowData(object))
+    rowDataString <- paste0('rowData(', rowCols, '): ')
+    rowColnames <- colnames(rowData(object))
+    rowDataNamesString <-
+        if (length(rowColnames) > 6)
+            paste0(.collapse(head(rowColnames, 3)), ' ... ', .collapse(tail(rowColnames, 3)))
+        else
+            .collapse(rowColnames)
+    cat(yellow$bold(rowDataString) %+% green(rowDataNamesString), '\n')
+
+    # ---- colnames
+    cols <- nrow(colData(object))
+    colsString <- paste0('colnames(', cols, '): ')
+    colnames <- colnames(object)
+    colnamesString <-
+        if (length(colnames) > 6)
+            paste0(.collapse(head(colnames, 3)), ' ... ', .collapse(tail(colnames, 3)))
+        else
+            .collapse(colnames)
+    cat(yellow$bold(colsString) %+% green(colnamesString), '\n')
+
+    # ---- colData slot
+    colCols <- ncol(colData(object))
+    colDataString <- paste0('colData(', colCols, '): ')
+    colColnames <- colnames(colData(object))
+    colDataNamesString <-
+        if (length(colColnames) > 6)
+            paste0(.collapse(head(colColnames, 3)), ' ... ', .collapse(tail(colColnames, 3)))
+        else
+            .collapse(colColnames)
+    cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
+
+    ## FIXME:: Why does this block add ~4s to the exectuion of this function?
+    # --- metadata slot
+    metadataLength <- length(metadata(object))
+    if (metadataLength > 0) {
+        metadataString <- paste0('metadata(', metadataLength, '): ')
+        metadataNames <- names(metadata(object))
+        metadataNamesString <-
+            if (length(metadatNames) > 6)
+                paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
+            else
+                .collapse(metadataNames)
+        cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
+    }
 })
 
 #'
@@ -392,7 +469,6 @@ setMethod('colData', signature(x='LongTable'), function(x) {
 })
 
 
-
 #'
 #'
 #'
@@ -461,7 +537,15 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
 #'
 #'
 #' @importMethodsFrom Biobase dimnames
-#'
+#' @export
 setMethod('dimnames', signature(x='LongTable'), function(x) {
     return(list(rownames(x), colnames(x)))
+})
+
+#'
+#'
+#' @importFrom SummarizedExperiment metadata
+#' @export
+setMethod('metadata', signature(x='LongTable'), function(x) {
+    return(x@metadata)
 })
