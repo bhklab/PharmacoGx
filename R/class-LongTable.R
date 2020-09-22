@@ -326,6 +326,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
     ## FIXME:: Function too long. Can I refacter to a helper that prints each slot?
     .collapse <- function(...) paste0(..., collapse=' ')
+
     # ---- class descriptions
     cat(yellow$bold$italic('\n< LongTable >', '\n'))
     cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
@@ -385,7 +386,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
             .collapse(colColnames)
     cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
 
-    ## FIXME:: Why does this block add ~4s to the exectuion of this function?
     # --- metadata slot
     metadataLength <- length(metadata(object))
     if (metadataLength > 0) {
@@ -400,10 +400,15 @@ setMethod('show', signature(object='LongTable'), function(object) {
     }
 })
 
+#' Convert an R object in a variable into a string of the code necessary to
+#'   create that object
 #'
+#' @param variable [`Symbol`] A symbol containing an R variable
 #'
+#' @return [`string`] A string representation of the code necessary to
+#'   reconstruct the variable.
 #'
-#'
+#' @keywords internal
 .variableToCodeString <- function(variable) {
     codeString <- capture.output(dput(variable))
     codeString <- gsub('\"', "'", codeString)
@@ -480,13 +485,15 @@ setMethod('assays', signature(x='LongTable'), function(x) {
 })
 
 #'
-#'
+#' @param x
+#' @param i
+#' @param withDimnames
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @export
 setMethod('assay',
           signature(x='LongTable', i='character'),
-          function(x, i) {
+          function(x, i, withDimnames=FALSE) {
 
     # validate input
     if (length(i) > 1 || !is.character(i))
@@ -499,9 +506,23 @@ setMethod('assay',
                     ' in this LongTable. Use assayNames(longTable) for a list of
                     valid assay names.'))
 
+    assayData <- assays(x)[keepAssay]
+    if (withDimnames) {
+        assayData <- colData(x)[, c(colnames(colData(x)[x@.intern$colID]), 'colKey')][assayData, on='colKey'][, -'colKey']
+        assayData <- rowData(x)[, c(colnames(rowData(x)[x@.intern$rowID]), 'rowKey')][assayData, on='rowKey'][, -'rowKey']
+    }
+
     # get specified assay
-    return(assays(x)[keepAssay])
+    return(assayData)
 })
+
+#'
+#'
+#'
+#'
+#'
+#'
+setMethod('.col')
 
 #'
 #'
