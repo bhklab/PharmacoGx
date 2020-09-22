@@ -1,3 +1,5 @@
+# ==== PharmacoSet accessor methods
+
 # ---- drugInfo
 
 #' drugInfo Generic
@@ -56,7 +58,20 @@ setGeneric("drugNames", function(object) standardGeneric("drugNames"))
 #' @export
 setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))
 
+# ==== LongTable Accessor Methods
+
+# ----
+
+## TODO:: Should we implement type dispatch for our constructor?
+setGeneric("LongTable", function(object, ...) standardGeneric('LongTable'))
+
+
+
+# ===== Other Generics
+
 # ---- plot
 
 # FIXME:: Surely we can import this generic from somewhere?
 setGeneric("plot")
+
+

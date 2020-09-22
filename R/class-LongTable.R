@@ -11,24 +11,34 @@
 #' @import data.table
 #' @keywords internal
 .LongTable <- setClass("LongTable",
-                       slots=list(rowData="data.table",
-                                  colData="data.table",
-                                  assays="list",
-                                  metadata='list'))
+                       slots=list(rowData='data.table',
+                                  colData='data.table',
+                                  assays='list',
+                                  metadata='list',
+                                  .intern='environment'))
 
 #' LongTable constructor method
-#'
 #'
 #'
 #' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
 #'   coercible to a `data.table` containing the a unique `rowID` column which
 #'   is used to key assays, as well as additional row metadata to subset on.
+#' @param rowIDs [`character`, `integer`] A vector specifying
+#'   the names or integer indexes of the row data identifier columns. These
+#'   columns will be pasted together to make up the row.names of the
+#'   `LongTable` object.
 #' @param colData [`data.table`, `data.frame`, `matrix`] A table like object
 #'   coercible to a `data.table` containing the a unique `colID` column which
 #'   is used to key assays, as well as additional column metadata to subset on.
+#' @param colIDs [`character`, `integer`] A vector specifying
+#'   the names or integer indexes of the col data identifier columns. These
+#'   columns will be pasted together to make up the col.names of the
+#'   `LongTable` object.
 #' @param assays A [`list`] containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
 #'   colID columns in colData and rowData.
+#' @param metadata A [`list`] of metadata associated with the `LongTable`
+#'   object being constructed
 #' @param keep.rownames [`logical` or `character`] Logical: whether rownames
 #'   should be added as a column if coercing to a `data.table`, default is FALSE.
 #'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
@@ -39,7 +49,10 @@
 #'
 #' @import data.table
 #' @export
-LongTable <- function(rowData, colData, assays, keep.rownames=FALSE) {
+LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
+                      metadata, keep.rownames=FALSE) {
+
+    ## TODO:: Handle missing parameters
 
     if (!is(colData, 'data.table')) {
         colData <- data.table(colData, keep.rownames=keep.rownames)
@@ -51,7 +64,7 @@ LongTable <- function(rowData, colData, assays, keep.rownames=FALSE) {
 
     if (!all(vapply(assays, FUN=is.data.table, FUN.VALUE=logical(1)))) {
         tryCatch({
-            assays <- lapply(data, FUN=data.table, keep.rownames=keep.rownames)
+            assays <- lapply(assays, FUN=data.table, keep.rownames=keep.rownames)
         }, warning = function(w) {
             warning(w)
         }, error = function(e, dataList) {
@@ -59,12 +72,52 @@ LongTable <- function(rowData, colData, assays, keep.rownames=FALSE) {
             types <- lapply(dataList, typeof)
             stop(paste0('List items are types: ',
                         paste0(types, collapse=', '),
-                        '\nPlease ensure all items in dataList are can be
-                        coerced to data.table!'))
+                        '\nPlease ensure all items in the assays list are
+                        coerced to data.tables!'))
         })
     }
 
-    return(.LongTable(rowData=rowData, colData=colData, assays=assays, metadata=list()))
+    # Initialize the .internals object to store private metadata for a LongTable
+    internals <- new.env()
+    ## TODO:: Implement error handling
+    internals$rowIDs <-
+        if (is.numeric(rowIDs) & max(rowIDs) < ncol(rowData))
+            rowIDs
+        else
+            which(colnames(rowData) %in% rowIDs)
+    lockBinding('rowIDs', internals)
+
+    internals$colIDs <-
+        if (is.numeric(colIDs) & max(colIDs) < ncol(colData))
+            colIDs
+        else
+            which(colnames(colData) %in% colIDs)
+    lockBinding('colIDs', internals)
+
+    # Assemble the pseudo row and column names for the LongTable
+    .pasteColons <- function(...) paste(..., collapse=':')
+    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))), .SDcols=internals$rowIDs]
+    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))), .SDcols=internals$colIDs]
+
+    return(.LongTable(rowData=rowData, colData=colData,
+                      assays=assays, metadata=list(),
+                      .intern=internals))
+}
+
+
+#' Ensure that all rowID and colID keys are valid
+#'
+#' @param rowData [`data.table`]
+#' @param colData [`data.table`]
+#' @param assays [`list`]
+#'
+#' @keywords internal
+.verifyKeyIntegrity <- function(rowData, colData, assays) {
+    if (!('rowID' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
+        stop()
+    if (!('colID' %in% colnames(colData)) || !is.numeric(colData$colID))
+        stop()
+
 }
 
 rowDataCols <- list(c("cell_line"), c("BatchID"))
@@ -79,9 +132,9 @@ assayCols <- list(dose=c('drugA Conc (µM)', 'drugB Conc (µM)'),
 #' @param filePath [`character`] Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
 #' @param colDataCols [`list`] List with two `character` vectors, the first
-#'   specifying one or more columns to be used as cell identifiers (e.g.,
-#'   cell-line names columns) and the second containing any additional metadata
-#'   columns related to the cell identifiers.
+#'   specifying one or more columns to be used as column identifiers (e.g.,
+#'   drug name columns) and the second containing any additional metadata
+#'   columns related to the column identifiers.
 #' @param rowDataCols [`list`] List with two `character` vectors, the first
 #'   specifying one or more columns to be used as cell identifiers (e.g.,
 #'   cell-line name columns) and the second containing any additional metadata
@@ -102,17 +155,17 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
     tableData <- fread(filePath)
 
     # build drug and cell metadata tables and index by the appropriate ID
-    colData <- unique(tableData[, .SD, .SDcols=unlist(colDataCols)])[, colID := .I]
-    rowData <- unique(tableData[, .SD, .SDcols=unlist(rowDataCols)])[, rowID := .I]
+    colData <- unique(tableData[, .SD, .SDcols=unlist(colDataCols)])[, colKey := .I]
+    rowData <- unique(tableData[, .SD, .SDcols=unlist(rowDataCols)])[, rowKey := .I]
 
     # add the row and column ids to the value data
     assayData <- tableData[rowData, on=unlist(rowDataCols)][colData, on=unlist(colDataCols)]
     rm(tableData)
     assayData[, c(unlist(rowDataCols), unlist(colDataCols)) := NULL]
-    setkey(assayData, rowID, colID)
+    setkey(assayData, rowKey, colKey)
 
-    setkey(rowData, rowID)
-    setkey(colData, colID)
+    setkey(rowData, rowKey)
+    setkey(colData, colKey)
 
     setnames(colData, colDataCols[[1]], paste0('drug', seq_along(colDataCols[[1]])))
     setnames(rowData, rowDataCols[[1]], paste0('cellLine', seq_along(rowDataCols[[1]])))
@@ -120,10 +173,12 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
     # add the index columns to the different value column vectors
     # this allows the .selectDataTable helper to be more general
     .prependToVector <- function(vector, values) c(values, vector)
-    assayCols <- lapply(assayCols, FUN=.prependToVector, values=c('rowID', 'colID'))
+    assayCols <- lapply(assayCols, FUN=.prependToVector, values=c('rowKey', 'colKey'))
     assays <- lapply(assayCols, .selectDataTable, DT=assayData)
 
-    return(LongTable(colData=colData, rowData=rowData, assays=assays))
+    return(LongTable(colData=colData, colIDs=paste0('drug', seq_along(colDataCols[[1]])),
+                     rowData=rowData, rowIDs= paste0('cellLine', seq_along(rowDataCols[[1]])),
+                     assays=assays))
 }
 
 # ---- buildLongTableFromCSV helpers
@@ -253,7 +308,19 @@ setMethod('subset', signature(x='LongTable'),
                      FUN=.filterLongDataTable,
                      indexList=list(rowIDs, colIDs))
 
-    return(LongTable(colData=colDataSubset, rowData=rowDataSubset, assays=assayData))
+    return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
+                     rowData=rowDataSubset, rowIDs=longTable@intern$rowIDS,
+                     assays=assayData))
+})
+
+#'
+#'
+#'
+#'
+#' @importFrom crayon blue green red
+#' @export
+setMethod('show', signature(x='LongTable'), function(x) {
+
 })
 
 #'
@@ -308,7 +375,7 @@ setMethod('subset', signature(x='LongTable'),
 #' @importMethodsFrom SummarizedExperiment rowData
 #' @export
 setMethod('rowData', signature(x='LongTable'), function(x) {
-    return(x@rowData)
+    return(x@rowData[, -'.rownames'])
 })
 
 
@@ -321,8 +388,10 @@ setMethod('rowData', signature(x='LongTable'), function(x) {
 #' @importMethodsFrom SummarizedExperiment rowData
 #' @export
 setMethod('colData', signature(x='LongTable'), function(x) {
-    return(x@colData)
+    return(x@colData[, -'.colnames'])
 })
+
+
 
 #'
 #'
@@ -379,8 +448,20 @@ setMethod('dim', signature(x='LongTable'), function(x) {
 
 #'
 #'
-#' @importMethodsFrom SummarizedExperiment dimnames
 #'
-setMethod('dimNames', signature(x='LongTable'), function(x) {
+#' @importMethodsFrom BiocGenerics colnames
+setMethod('colnames', signature(x='LongTable'), function(x) {
+    return(x@colData$.colnames)
+})
 
+setMethod('rownames', signature(x='LongTable'), function(x) {
+    return(x@rowData$.rownames)
+})
+
+#'
+#'
+#' @importMethodsFrom Biobase dimnames
+#'
+setMethod('dimnames', signature(x='LongTable'), function(x) {
+    return(list(rownames(x), colnames(x)))
 })
