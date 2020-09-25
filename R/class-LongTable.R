@@ -1,10 +1,27 @@
+library(data.table)
+library(SummarizedExperiment)
+library(Biobase)
+library(BiocGenerics)
+library(crayon)
+
+source('R/generics.R')
+
+
+#' Define an S3 Class
+#'
+#' Allows use of S3 methods with new S4 class. This is required to overcome
+#' limitations of the `[` S4 method.
+#'
+setOldClass('long.table')
+
 #' LongTable class definition
 #'
 #' Define a private constructor method to be used to build a `LongTable` object.
 #'
 #' @param drugs [`data.table`]
 #' @param cells [`data.table`]
-#' @param dataList [`list`]
+#' @param assays [`list`]
+#' @param metadata [`list`]
 #'
 #' @return [`LongTable`] object containing the assay data from a
 #'
@@ -15,10 +32,10 @@
                                   colData='data.table',
                                   assays='list',
                                   metadata='list',
-                                  .intern='environment'))
+                                  .intern='environment'),
+                       contains='long.table')
 
 #' LongTable constructor method
-#'
 #'
 #' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
 #'   coercible to a `data.table` containing the a unique `rowID` column which
@@ -44,13 +61,12 @@
 #'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
 #'   column name to store the rownames in.
 #'
-#'
 #' @return [`LongTable`] object
 #'
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
-                      metadata, keep.rownames=FALSE) {
+                      metadata=list(), keep.rownames=FALSE) {
 
     ## TODO:: Handle missing parameters
 
@@ -67,9 +83,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
             assays <- lapply(assays, FUN=data.table, keep.rownames=keep.rownames)
         }, warning = function(w) {
             warning(w)
-        }, error = function(e, dataList) {
+        }, error = function(e, assays) {
             message(e)
-            types <- lapply(dataList, typeof)
+            types <- lapply(assays, typeof)
             stop(paste0('List items are types: ',
                         paste0(types, collapse=', '),
                         '\nPlease ensure all items in the assays list are
@@ -81,16 +97,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     internals <- new.env()
 
     ## TODO:: Implement error handling
-
     internals$rowIDs <-
-        if (is.numeric(rowIDs) & max(rowIDs) < ncol(rowData))
+        if (is.numeric(rowIDs) && max(rowIDs) < ncol(rowData))
             rowIDs
         else
             which(colnames(rowData) %in% rowIDs)
     lockBinding('rowIDs', internals)
 
     internals$colIDs <-
-        if (is.numeric(colIDs) & max(colIDs) < ncol(colData))
+        if (is.numeric(colIDs) && max(colIDs) < ncol(colData))
             colIDs
         else
             which(colnames(colData) %in% colIDs)
@@ -102,7 +117,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))), .SDcols=internals$colIDs]
 
     return(.LongTable(rowData=rowData, colData=colData,
-                      assays=assays, metadata=list(),
+                      assays=assays, metadata=metadata,
                       .intern=internals))
 }
 
@@ -115,9 +130,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #'
 #' @keywords internal
 .verifyKeyIntegrity <- function(rowData, colData, assays) {
-    if (!('rowID' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
-        stop()
-    if (!('colID' %in% colnames(colData)) || !is.numeric(colData$colID))
+    if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
+        message(blue('The rowKey column is missing from rowData! Please try rebuilding the LongTable object with the constructor.'))
+    if (!('colKey' %in% colnames(colData)) || !is.numeric(colData$colID))
         stop()
 
 }
@@ -157,8 +172,10 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
     tableData <- fread(filePath)
 
     # build drug and cell metadata tables and index by the appropriate ID
-    colData <- unique(tableData[, .SD, .SDcols=unlist(colDataCols)])[, colKey := .I]
-    rowData <- unique(tableData[, .SD, .SDcols=unlist(rowDataCols)])[, rowKey := .I]
+    colData <- unique(tableData[, unlist(colDataCols), with=FALSE])
+    colData[, colKey := seq_len(nrow(colData))]
+    rowData <- unique(tableData[, unlist(rowDataCols), with=FALSE])
+    rowData[, rowKey := seq_len(nrow(rowData))]
 
     # add the row and column ids to the value data
     assayData <- tableData[rowData, on=unlist(rowDataCols)][colData, on=unlist(colDataCols)]
@@ -209,14 +226,14 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
             warning(w)
         }, error=function(e) {
             message(e)
-            stop("Argument to DT paramater must be coercible to a data.table!")
+            stop("Argument to DT parameter must be coercible to a data.table!")
         })
     }
     if (!is.character(colnames(DT))) stop("Currently only character column ids are supported!")
     missingColumns <- setdiff(colNames, colnames(DT))
     if (length(missingColumns) > 0)
-        warning(paste0("There are no columns named ", paste0(missingColumns, collapse=", ", 'in DT.
-            Continuing subset without these columns.')))
+        warning(paste0("There are no columns named ", paste0(missingColumns, collapse=", "), 'in DT.
+            Continuing subset without these columns.'))
 
     # perform subset and copy to prevent modify by refence issues
     selectedDT <- copy(unique(DT[, .SD, .SDcols=colnames(DT) %in% colNames]))
@@ -237,9 +254,9 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #' @param x [`LongTable`] The object to subset.
 #' @param rowQuery [`character`, `numeric`, `logical` or `expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
-#'      object on all drug id columns matching the vector.
+#'      object on all row id columns matching the vector.
 #'
-#'  Numeric or Logical: these select base don the rowID from the `rowData`
+#'  Numeric or Logical: these select based on the rowKey from the `rowData`
 #'      method for the `LongTable`.
 #'
 #'  Expression: Accepts valid query statements to the `data.table` i parameter,
@@ -267,15 +284,13 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #' @importMethodsFrom BiocGenerics subset
 #' @import data.table
 #' @export
-setMethod('subset', signature(x='LongTable'),
-          function(x, rowQuery, columnQuery, assays) {
+subset.long.table <- function(x, rowQuery, columnQuery, assays) {
 
     longTable <- x
     rm(x)
 
     if (!missing(rowQuery)) {
         if (tryCatch(is.character(rowQuery), error=function(e) FALSE)) {
-            ## TODO:: Add a metadata field to LongTable that stores the column and row identifier string
             select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
             rowQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(rowQuery)), collapse=' | ')
             rowQuery <- str2lang(rowQueryString)
@@ -300,20 +315,25 @@ setMethod('subset', signature(x='LongTable'),
         colDataSubset <- colData(longTable)
     }
 
-    rowIDs <- rowDataSubset$rowID
-    colIDs <- colDataSubset$colID
+    rowKeys <- rowDataSubset$rowKey
+    colKeys <- colDataSubset$colKey
 
     if (missing(assays)) { assays <- assayNames(longTable) }
     keepAssays <- assayNames(longTable) %in% assays
 
     assayData <- lapply(assays(longTable)[keepAssays],
                      FUN=.filterLongDataTable,
-                     indexList=list(rowIDs, colIDs))
+                     indexList=list(rowKeys, colKeys))
 
     return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
-                     rowData=rowDataSubset, rowIDs=longTable@intern$rowIDS,
-                     assays=assayData))
-})
+                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
+                     assays=assayData, metadata=metadata(longTable)))
+}
+
+#' S4 Method for subset.long.table
+#'
+#' @export
+setMethod('subset', 'LongTable', subset.long.table)
 
 #'
 #'
@@ -328,7 +348,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     .collapse <- function(...) paste0(..., collapse=' ')
 
     # ---- class descriptions
-    cat(yellow$bold$italic('\n< LongTable >', '\n'))
+    cat(yellow$bold$italic('< LongTable >', '\n'))
     cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
@@ -443,7 +463,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     colIndices <- indexList[[2]]
 
     # return filtered data.table
-    return(copy(DT[rowID %in% rowIndices & colID %in% colIndices, ]))
+    return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
 }
 
 # ---- LongTable Getter and Setter Methods
@@ -474,20 +494,36 @@ setMethod('colData', signature(x='LongTable'), function(x) {
 })
 
 
+#' Return a list of `data.table` objects with the assay measurements from a
+#'  `LongTable` object.
 #'
+#' @param x [`LongTable`] What to extract the assay data from.
+#' @param withDimnames [`logical`] Should the returned assays be joined to
+#'   the row and column identifiers (i.e., the pseudo dimnames of the object).
 #'
-#'
+#' @return
 #'
 #' @importMethodsFrom SummarizedExperiment assays
 #' @export
-setMethod('assays', signature(x='LongTable'), function(x) {
-    return(x@assays)
+setMethod('assays', signature(x='LongTable'), function(x, withDimnames=FALSE) {
+    if (withDimnames)
+        return(structure(
+            lapply(assayNames(x), assay, x=x, withDimnames=withDimnames),
+            .Names=assayNames(x))
+            )
+    else
+        return(x@assays)
 })
 
+#' Retrieve an assay `data.table` object from the `assays` slot of a `LongTable`
+#'    object
 #'
-#' @param x
-#' @param i
-#' @param withDimnames
+#' @param x [`LongTable`] The `LongTable` object to get the assay from.
+#' @param i [`integer`] or [`character`] vector containing the index or name
+#'   of the assay, respectively.
+#' @param withDimnames [`logical`] Should the dimension names be returned
+#'   joined to the assay. This retrieves both the row and column identifiers
+#'   and returns them attached to the
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @export
@@ -499,34 +535,107 @@ setMethod('assay',
     if (length(i) > 1 || !is.character(i))
         stop(paste0('Please specifying a single character assay name.'))
 
-    keepAssay <- assayNames(x) == i
-    if (all(keepAssay == FALSE))
+    keepAssay <- which(assayNames(x) == i)
+    if (length(keepAssay) < 1)
         stop(paste0('There is no assay named ',
                     i,
                     ' in this LongTable. Use assayNames(longTable) for a list of
                     valid assay names.'))
 
-    assayData <- assays(x)[keepAssay]
+    # extract the specified assay
+    assayData <- assays(x)[[keepAssay]]
+
+    # optionally join to rowData and colData
     if (withDimnames) {
-        assayData <- colData(x)[, c(colnames(colData(x)[x@.intern$colID]), 'colKey')][assayData, on='colKey'][, -'colKey']
-        assayData <- rowData(x)[, c(colnames(rowData(x)[x@.intern$rowID]), 'rowKey')][assayData, on='rowKey'][, -'rowKey']
+        assayData <- .colIDData(x)[assayData, on='colKey'][, -'colKey']
+        assayData <- .rowIDData(x)[assayData, on='rowKey'][, -'rowKey']
     }
 
-    # get specified assay
     return(assayData)
 })
 
-#'
-#'
-#'
-#'
-#'
-#'
-setMethod('.col')
+# ----  LongTable Private Helpers
 
+#' Extract the row ID columns from `rowDat` of a `LongTable`
 #'
+#' @param object [`LongTable`] What to get the colIDData from.
+#' @param key [`logical`] Should the `colKey` column also be returned? Default
+#'     is TRUE.
 #'
+#' @export
+#' @keywords internal
+setMethod('.rowIDData', signature(object='LongTable'), function(object, key=TRUE) {
+    colNames <- colnames(rowData(object))[.rowIDs(object)]
+    keepCols <- if (key) c(colNames, 'rowKey') else colNames
+
+    return(rowData(object)[, keepCols, with=FALSE])
+})
+
+#' Extract the column ID columns from colData of a LongTable
 #'
+#' @param object [`LongTable`] What to get the colIDData from
+#' @param key [`logical`] Should the colKey also be returned? Default is TRUE.
+#'
+#' @export
+#' @keywords internal
+setMethod('.colIDData', signature(object='LongTable'), function(object, key=TRUE) {
+    colNames <- colnames(colData(object))[.colIDs(object)]
+    keepCols <- if (key) c(colNames, 'colKey') else colNames
+
+    return(colData(object)[, keepCols, with=FALSE])
+})
+
+#' Developer accessor method to determine which columns hold the column identifiers
+#'   in the `colData` slot of a `LongTable` object.
+#'
+#' @param A [`object`] `LongTable` object to retrieve the column identifier
+#'    column indexes from.
+#'
+#' @return [`numeric`] A numeric vector of integer column indexes for the ID
+#'   columns in `colData`.
+#'
+#' @export
+#' @keywords internal
+setMethod('.colIDs', signature(object='LongTable'), function(object) {
+    object@.intern$colIDs
+})
+
+#' Developer accessor method to determine which columns hold the row identifiers
+#'   in the `rowData` slot of a `LongTable` object.
+#'
+#' @param A [`object`] `LongTable` object to retrieve the row identifier column
+#'   indexes from.
+#'
+#' @return [`numeric`] A numeric vector of integer column indexes for the ID
+#'   columns in `rowData`.
+#'
+#' @export
+#' @keywords internal
+setMethod('.rowIDs', signature(object='LongTable'), function(object) {
+    object@.intern$rowIDs
+})
+
+#' Developer accessor method to determine which columns hold the row identifiers
+#'   in the `rowData` slot of a `LongTable` object.
+#'
+#' @param A [`object`] `LongTable` object to retrieve the row identifier column
+#'   indexes from.
+#'
+#' @return [`list`] A list containing two `numeric` vectors, the first for the
+#'    identifier columns for the `rowData` slot and the second with the same
+#'    for the `colData` slot
+#'
+#' @export
+#' @keywords internal
+setMethod('.dimIDs', signature(object='LongTable'), function(object) {
+    list(.rowIDs(object), .colIDs(object))
+})
+
+#' Retrieve the assay names from a `LongTable` object.
+#'
+#' @param x A [`LongTable`] object to retrieve the assay names from.
+#'
+#' @return [`character`] Names of the assays contained in the `LongTable`.
 #'
 #' @importMethodsFrom SummarizedExperiment assayNames
 #' @export
@@ -534,8 +643,11 @@ setMethod('assayNames', signature(x='LongTable'), function(x) {
     return(names(assays(x)))
 })
 
+#' Get the dimensions of a `LongTable` object.
 #'
+#' @param x A [`LongTable`] object to retrieve dimensions for.
 #'
+#' @return [`numeric`] Vector of object dimensions.
 #'
 #' @importMethodsFrom SummarizedExperiment dim
 #' @export
@@ -555,7 +667,9 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
     return(x@rowData$.rownames)
 })
 
+#' Getter for the dimnames of a `LongTable` object
 #'
+#' @param x The [`LongTable`] object to retrieve the dimnames for
 #'
 #' @importMethodsFrom Biobase dimnames
 #' @export
@@ -565,8 +679,42 @@ setMethod('dimnames', signature(x='LongTable'), function(x) {
 
 #'
 #'
+#' @importFrom BiocGenerics dimnames
+#' @import crayon
+#' @export
+setReplaceMethod('dimnames', signature(x='LongTable'), function(x, value) {
+    stop(magenta$bold("The dimnames of a `LongTable` object cannot be directly
+        modified. Please use the `<method_name>` instead."))
+})
+
+#' Getter method for the metadata slot of a `LongTable` object
+#'
+#' @param x The [`LongTable`] object from which to retrieve the metadata list.
+#'
+#' @return [`list`] The contents of the `metadata` slot of the `LongTable`
+#'   object.
+#'
 #' @importFrom SummarizedExperiment metadata
 #' @export
 setMethod('metadata', signature(x='LongTable'), function(x) {
     return(x@metadata)
+})
+
+#' Setter method for the metadata slot of a `LongTable` object
+#'
+#' @param x [`LongTable`] The LongTable to update
+#' @param value [`list`] A list of new metadata associated with a `LongTable`
+#'   object.
+#'
+#' @return [`LongTable`] A copy of the `LongTable` object with the `value` in
+#'   the metadata slot.
+#'
+#' @importFrom SummarizedExperiment `metadata<-`
+#' @import crayon
+#' @export
+setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
+    if (!is(value, 'list'))
+        stop(magenta$bold('The `metadata` slot must be a list!'))
+    x@metadata <- value
+    return(x)
 })

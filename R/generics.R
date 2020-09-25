@@ -60,10 +60,45 @@ setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-")
 
 # ==== LongTable Accessor Methods
 
-# ----
+# ---- Private Helper Methods
 
-## TODO:: Should we implement type dispatch for our constructor?
-setGeneric("LongTable", function(object, ...) standardGeneric('LongTable'))
+#' Return the identifiers for the column meta data in an object
+#'
+#' @export
+#' @keywords internal
+setGeneric('.colIDData', function(object, ...) standardGeneric('.colIDData'))
+
+#' Return the identifiers for the row metadata columns in an object
+#'
+#'
+#' @export
+#' @keywords
+setGeneric('.rowIDData', function(object, ...) standardGeneric('.rowIDData'))
+
+
+#' Private method to retrieve the .colIDs property from an object
+#'
+#' @export
+#' @keywords internal
+setGeneric('.colIDs', function(object, ...) standardGeneric('.colIDs'))
+
+#' Private method to retrieve the .rowIDs property from an object
+#'
+#' @export
+#' @keywords internal
+setGeneric('.rowIDs', function(object, ...) standardGeneric('.rowIDs'))
+
+#' Private method to retrieve the both the .rowIDs and .colIDs properties from
+#'   an object in a list.
+#'
+#' @param object [`any`] An object with a .intern slot with the items .rowIDs
+#'   and .colIDs
+#'
+#' @return A [`list`] v
+#'
+#' @export
+#' @keywords internal
+setGeneric('.dimIDs', function(object, ...) standardGeneric('.dimIDs'))
 
 
 
