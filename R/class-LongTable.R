@@ -6,7 +6,6 @@ library(crayon)
 
 source('R/generics.R')
 
-
 #' Define an S3 Class
 #'
 #' Allows use of S3 methods with new S4 class. This is required to overcome
@@ -284,7 +283,7 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #' @importMethodsFrom BiocGenerics subset
 #' @import data.table
 #' @export
-subset.long.table <- function(x, rowQuery, columnQuery, assays) {
+setMethod('subset', signature('LongTable'), function(x, rowQuery, columnQuery, assays) {
 
     longTable <- x
     rm(x)
@@ -328,12 +327,60 @@ subset.long.table <- function(x, rowQuery, columnQuery, assays) {
     return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
                      rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
                      assays=assayData, metadata=metadata(longTable)))
-}
+})
 
-#' S4 Method for subset.long.table
 #'
-#' @export
-setMethod('subset', 'LongTable', subset.long.table)
+#'
+#'
+#'
+#'
+#`[.long.table` <- function(x, i, j) {
+#
+#    print('[.long.table')
+#    longTable <- x
+#    rm(x)
+#
+#    if (!missing(i)) {
+#        if (tryCatch(is.character(i), error=function(e) FALSE)) {
+#            select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
+#            rowQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(i)), collapse=' | ')
+#            i <- str2lang(rowQueryString)
+#        } else {
+#            i <- substitute(i)
+#        }
+#        rowDataSubset <- rowData(longTable)[eval(i), ]
+#    } else {
+#        rowDataSubset <- rowData(i)
+#    }
+#
+#    if (!missing(j)) {
+#        if (tryCatch(is.character(j), error=function(e) FALSE)) {
+#            select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
+#            columnQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(j)), collapse=' | ')
+#            columnQuery <- str2lang(columnQueryString)
+#        } else {
+#            columnQuery <- substitute(j)
+#        }
+#        colDataSubset <- colData(longTable)[eval(j), ]
+#    } else {
+#        colDataSubset <- colData(longTable)
+#    }
+#
+#    rowKeys <- rowDataSubset$rowKey
+#    colKeys <- colDataSubset$colKey
+#
+#    keepAssays <- assayNames(longTable) %in% assays
+#
+#    assayData <- lapply(assays(longTable)[keepAssays],
+#                     FUN=.filterLongDataTable,
+#                     indexList=list(rowKeys, colKeys))
+#
+#    return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
+#                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
+#                     assays=assayData, metadata=metadata(longTable)))
+#}
+#
+#setMethod('[', 'LongTable', `[.long.table`)
 
 #'
 #'
@@ -643,6 +690,8 @@ setMethod('assayNames', signature(x='LongTable'), function(x) {
     return(names(assays(x)))
 })
 
+# ---- Long Table Accessor Methods
+
 #' Get the dimensions of a `LongTable` object.
 #'
 #' @param x A [`LongTable`] object to retrieve dimensions for.
@@ -655,14 +704,24 @@ setMethod('dim', signature(x='LongTable'), function(x) {
     return(c(nrow(rowData(x)), nrow(colData(x))))
 })
 
+#' Get the column names from a `LongTable` object.
 #'
+#' @param x A [`LongTable`] object to get the column names from
 #'
+#' @return [`character`] Vector of column names.
 #'
-#' @importMethodsFrom BiocGenerics colnames
+#' @export
 setMethod('colnames', signature(x='LongTable'), function(x) {
     return(x@colData$.colnames)
 })
 
+#' Get the row names from a `LongTable` object.
+#'
+#' @param x A [`LongTable`] object to get the row names from
+#'
+#' @return [`character`] Vector of row names.
+#'
+#' @export
 setMethod('rownames', signature(x='LongTable'), function(x) {
     return(x@rowData$.rownames)
 })
@@ -671,20 +730,28 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
 #'
 #' @param x The [`LongTable`] object to retrieve the dimnames for
 #'
+#' @return [`list`] List with two character vectors, one for row and one for
+#'     column names.
+#'
 #' @importMethodsFrom Biobase dimnames
 #' @export
 setMethod('dimnames', signature(x='LongTable'), function(x) {
     return(list(rownames(x), colnames(x)))
 })
 
+#' This method only throws an error. You may no edit the dimnames of a
+#'    `LongTable` object this way.
 #'
+#' @param x [`LongTable`]
 #'
-#' @importFrom BiocGenerics dimnames
+#' @warning This function only trhows a warning then returns the original object.
+#'
 #' @import crayon
 #' @export
 setReplaceMethod('dimnames', signature(x='LongTable'), function(x, value) {
-    stop(magenta$bold("The dimnames of a `LongTable` object cannot be directly
+    warning(cyan$bold("The dimnames of a `LongTable` object cannot be directly
         modified. Please use the `<method_name>` instead."))
+    return(x)
 })
 
 #' Getter method for the metadata slot of a `LongTable` object
