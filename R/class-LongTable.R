@@ -120,7 +120,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       .intern=internals))
 }
 
-
 #' Ensure that all rowID and colID keys are valid
 #'
 #' @param rowData [`data.table`]
@@ -329,58 +328,6 @@ setMethod('subset', signature('LongTable'), function(x, rowQuery, columnQuery, a
                      assays=assayData, metadata=metadata(longTable)))
 })
 
-#'
-#'
-#'
-#'
-#'
-#`[.long.table` <- function(x, i, j) {
-#
-#    print('[.long.table')
-#    longTable <- x
-#    rm(x)
-#
-#    if (!missing(i)) {
-#        if (tryCatch(is.character(i), error=function(e) FALSE)) {
-#            select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
-#            rowQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(i)), collapse=' | ')
-#            i <- str2lang(rowQueryString)
-#        } else {
-#            i <- substitute(i)
-#        }
-#        rowDataSubset <- rowData(longTable)[eval(i), ]
-#    } else {
-#        rowDataSubset <- rowData(i)
-#    }
-#
-#    if (!missing(j)) {
-#        if (tryCatch(is.character(j), error=function(e) FALSE)) {
-#            select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
-#            columnQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(j)), collapse=' | ')
-#            columnQuery <- str2lang(columnQueryString)
-#        } else {
-#            columnQuery <- substitute(j)
-#        }
-#        colDataSubset <- colData(longTable)[eval(j), ]
-#    } else {
-#        colDataSubset <- colData(longTable)
-#    }
-#
-#    rowKeys <- rowDataSubset$rowKey
-#    colKeys <- colDataSubset$colKey
-#
-#    keepAssays <- assayNames(longTable) %in% assays
-#
-#    assayData <- lapply(assays(longTable)[keepAssays],
-#                     FUN=.filterLongDataTable,
-#                     indexList=list(rowKeys, colKeys))
-#
-#    return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
-#                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
-#                     assays=assayData, metadata=metadata(longTable)))
-#}
-#
-#setMethod('[', 'LongTable', `[.long.table`)
 
 #'
 #'
@@ -785,3 +732,95 @@ setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
     x@metadata <- value
     return(x)
 })
+
+
+#' Updates the `rowData` slot as long as the ID columns are not changed.
+#'
+#' @param x A [`LongTable`] object to modify.
+#'
+#' @return A copy of the [`LongTable`] object with the `rowData`
+#'   slot updated.
+#'
+#' @importFrom SummarizedExperiment `rowData<-`
+#' @export
+setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
+
+    # type check input
+    if (is(value, 'data.frame'))
+        value <- data.table(value, keep.rownames=FALSE)
+    if (!is(value, 'data.table'))
+        stop(magenta$bold('Please pass a data.frame or data.table to update
+            the rowData slot. We recommend modifying the object returned by
+            rowData(x) then reassigning it with rowData(x) <- newRowData'))
+
+    # remove key column
+    if ('rowKey' %in% colnames(value)) {
+        value[, rowKey := NULL]
+        warning(cyan$bold('Dropping rowKey from replacemetn value, this
+            function will deal with mapping the rowKey automatically.'))
+    }
+
+    # assemble information to select proper update method
+    rowIDCols <- colnames(.rowIDData(x))
+    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
+
+    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
+    sharedMetadataCols <- intersect(metadataCols, colnames(value))
+
+    # case where no row ids are in update
+    if (length(sharedRowIDCols) > 0) {
+        if (length(sharedMetadataCols) > 0) {
+
+        } else {
+
+        }
+    }
+
+    # case where row ids are in the updated table
+    if (all(rowIDCols %in% sharedRowIDCols)) {
+
+    } else {
+
+    }
+
+
+})
+
+
+
+#'
+#'
+#' @param rowIDs [`LongTable`]
+#' @param rowData [`data.table`]
+#'
+#' @export
+#' @keywords internal
+.joinOnRowIDs <- function(rowIDs, rowData) {
+    if (!('rowKey' %in% colnames(rowIDs)))
+        stop(magenta$bold("No rowKey column in rowIDs?"))
+    row_data <- rowIDs[rowData, on=colnames(rowIDs)]
+    setkeyv(row_data, 'rowKey')
+    return(row_data)
+}
+
+#' Helper to determine if the rowData rowIDs are identical between a new
+#'   rowData data.table object and an existing `LongTable`
+#'
+#' @export
+#' @keywords internal
+.row_IDs_are_identical <- function(rowIDs, newRowData) {
+    if ('rowKey' %in% colnames(rowIDs)) rowIDs[, rowKey := NULL]
+    return(all(colnames(rowIDs) %in% colnames(newRowData)) &&
+        all.equal(rowIDs, newRowData[, colnames(rowIDs), with=FALSE]))
+}
+
+
+#'
+#' @param x [`LongTable`]
+#'
+#' @importFrom SummarizedExperiemnt `colData<-`
+#' @export
+setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
+
+})
+
