@@ -1,11 +1,3 @@
-library(data.table)
-library(SummarizedExperiment)
-library(Biobase)
-library(BiocGenerics)
-library(crayon)
-
-source('R/generics.R')
-
 #' Define an S3 Class
 #'
 #' Allows use of S3 methods with new S4 class. This is required to overcome
@@ -135,13 +127,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
 }
 
-rowDataCols <- list(c("cell_line"), c("BatchID"))
-colDataCols <- list(c("drugA_name", "drugB_name"))
-filePath <- 'data/drug_combo_merck.csv'
-assayCols <- list(dose=c('drugA Conc (µM)', 'drugB Conc (µM)'),
-                  viability=c(paste0('viability', seq_len(4)),
-                    'mu/muMax', 'X/X0'))
-
 #' Create a LongTable object from a single .csv file
 #'
 #' @param filePath [`character`] Path to the .csv file containing the data and
@@ -171,9 +156,9 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 
     # build drug and cell metadata tables and index by the appropriate ID
     colData <- unique(tableData[, unlist(colDataCols), with=FALSE])
-    colData[, colKey := seq_len(nrow(colData))]
+    colData[, colKey := seq_len(nrow(.SD))]
     rowData <- unique(tableData[, unlist(rowDataCols), with=FALSE])
-    rowData[, rowKey := seq_len(nrow(rowData))]
+    rowData[, rowKey := seq_len(nrow(.SD))]
 
     # add the row and column ids to the value data
     assayData <- tableData[rowData, on=unlist(rowDataCols)][colData, on=unlist(colDataCols)]
@@ -250,7 +235,7 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @param x [`LongTable`] The object to subset.
-#' @param rowQuery [`character`, `numeric`, `logical` or `expression`]
+#' @param i [`character`, `numeric`, `logical` or `expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all row id columns matching the vector.
 #'
@@ -261,7 +246,7 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #'      this can be used to make complex queries using the `data.table` API
 #'      for the `rowData` data.table.
 #'
-#' @param columnQuery [`character`, `numeric`, `logical` or `expression`]
+#' @param j [`character`, `numeric`, `logical` or `expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all drug id columns matching the vector.
 #'
@@ -282,33 +267,33 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 #' @importMethodsFrom BiocGenerics subset
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, rowQuery, columnQuery, assays) {
+setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
 
     longTable <- x
     rm(x)
 
-    if (!missing(rowQuery)) {
-        if (tryCatch(is.character(rowQuery), error=function(e) FALSE)) {
+    if (!missing(i)) {
+        if (tryCatch(is.character(i), error=function(e) FALSE)) {
             select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
-            rowQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(rowQuery)), collapse=' | ')
-            rowQuery <- str2lang(rowQueryString)
+            iString <- paste0(paste0(select, ' %in% ', .variableToCodeString(i)), collapse=' | ')
+            i <- str2lang(iString)
         } else {
-            rowQuery <- substitute(rowQuery)
+            i <- substitute(i)
         }
-        rowDataSubset <- rowData(longTable)[eval(rowQuery), ]
+        rowDataSubset <- rowData(longTable)[eval(i), ]
     } else {
         rowDataSubset <- rowData(longTable)
     }
 
-    if (!missing(columnQuery)) {
-        if (tryCatch(is.character(columnQuery), error=function(e) FALSE)) {
+    if (!missing(j)) {
+        if (tryCatch(is.character(j), error=function(e) FALSE)) {
             select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
-            columnQueryString <- paste0(paste0(select, ' %in% ', .variableToCodeString(columnQuery)), collapse=' | ')
-            columnQuery <- str2lang(columnQueryString)
+            jString <- paste0(paste0(select, ' %in% ', .variableToCodeString(j)), collapse=' | ')
+            j <- str2lang(jString)
         } else {
-            columnQuery <- substitute(columnQuery)
+            j <- substitute(j)
         }
-        colDataSubset <- colData(longTable)[eval(columnQuery), ]
+        colDataSubset <- colData(longTable)[eval(j), ]
     } else {
         colDataSubset <- colData(longTable)
     }
@@ -329,17 +314,22 @@ setMethod('subset', signature('LongTable'), function(x, rowQuery, columnQuery, a
 })
 
 
+## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #'
 #'
 #'
 #'
-#' @importFrom crayon blue green red
+#' @import crayon
+#' @importFrom crayon %+%
+#' @import data.table
 #' @importMethodsFrom CoreGx show
 #' @export
 setMethod('show', signature(object='LongTable'), function(object) {
 
     ## FIXME:: Function too long. Can I refacter to a helper that prints each slot?
     .collapse <- function(...) paste0(..., collapse=' ')
+
+    #`%+%` <- crayon::`%+%`
 
     # ---- class descriptions
     cat(yellow$bold$italic('< LongTable >', '\n'))
@@ -400,6 +390,8 @@ setMethod('show', signature(object='LongTable'), function(object) {
             .collapse(colColnames)
     cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
 
+
+    ## FIXME:: Why is this so slow? Also why doesn't it work?
     # --- metadata slot
     metadataLength <- length(metadata(object))
     if (metadataLength > 0) {
@@ -469,6 +461,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
 #'
 #' @importMethodsFrom SummarizedExperiment rowData
+#' @import data.table
 #' @export
 setMethod('rowData', signature(x='LongTable'), function(x) {
     return(x@rowData[, -'.rownames'])
@@ -482,6 +475,7 @@ setMethod('rowData', signature(x='LongTable'), function(x) {
 #' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
 #'
 #' @importMethodsFrom SummarizedExperiment rowData
+#' @import data.table
 #' @export
 setMethod('colData', signature(x='LongTable'), function(x) {
     return(x@colData[, -'.colnames'])
@@ -548,7 +542,49 @@ setMethod('assay',
     return(assayData)
 })
 
+
+
 # ----  LongTable Private Helpers
+
+# ==== LongTable Accessor Methods
+
+# ---- Private Helper Methods
+
+#' Return the identifiers for the column meta data in an object
+#'
+#' @export
+setGeneric('.colIDData', function(object, ...) standardGeneric('.colIDData'))
+
+#' Return the identifiers for the row metadata columns in an object
+#'
+#'
+#' @export
+setGeneric('.rowIDData', function(object, ...) standardGeneric('.rowIDData'))
+
+
+#' Private method to retrieve the .colIDs property from an object
+#'
+#' @export
+setGeneric('.colIDs', function(object, ...) standardGeneric('.colIDs'))
+
+#' Private method to retrieve the .rowIDs property from an object
+#'
+#' @export
+#' @keywords internal
+setGeneric('.rowIDs', function(object, ...) standardGeneric('.rowIDs'))
+
+#' Private method to retrieve the both the .rowIDs and .colIDs properties from
+#'   an object in a list.
+#'
+#' @param object [`any`] An object with a .intern slot with the items .rowIDs
+#'   and .colIDs
+#'
+#' @return A [`list`] v
+#'
+#' @export
+#' @keywords internal
+setGeneric('.dimIDs', function(object, ...) standardGeneric('.dimIDs'))
+
 
 #' Extract the row ID columns from `rowDat` of a `LongTable`
 #'
@@ -708,7 +744,7 @@ setReplaceMethod('dimnames', signature(x='LongTable'), function(x, value) {
 #' @return [`list`] The contents of the `metadata` slot of the `LongTable`
 #'   object.
 #'
-#' @importFrom SummarizedExperiment metadata
+#' @importFrom S4Vectors metadata
 #' @export
 setMethod('metadata', signature(x='LongTable'), function(x) {
     return(x@metadata)
@@ -723,7 +759,7 @@ setMethod('metadata', signature(x='LongTable'), function(x) {
 #' @return [`LongTable`] A copy of the `LongTable` object with the `value` in
 #'   the metadata slot.
 #'
-#' @importFrom SummarizedExperiment `metadata<-`
+#' @importFrom S4Vectors `metadata<-`
 #' @import crayon
 #' @export
 setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
@@ -743,48 +779,48 @@ setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
 #'
 #' @importFrom SummarizedExperiment `rowData<-`
 #' @export
-setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
-
-    # type check input
-    if (is(value, 'data.frame'))
-        value <- data.table(value, keep.rownames=FALSE)
-    if (!is(value, 'data.table'))
-        stop(magenta$bold('Please pass a data.frame or data.table to update
-            the rowData slot. We recommend modifying the object returned by
-            rowData(x) then reassigning it with rowData(x) <- newRowData'))
-
-    # remove key column
-    if ('rowKey' %in% colnames(value)) {
-        value[, rowKey := NULL]
-        warning(cyan$bold('Dropping rowKey from replacemetn value, this
-            function will deal with mapping the rowKey automatically.'))
-    }
-
-    # assemble information to select proper update method
-    rowIDCols <- colnames(.rowIDData(x))
-    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
-
-    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
-    sharedMetadataCols <- intersect(metadataCols, colnames(value))
-
-    # case where no row ids are in update
-    if (length(sharedRowIDCols) > 0) {
-        if (length(sharedMetadataCols) > 0) {
-
-        } else {
-
-        }
-    }
-
-    # case where row ids are in the updated table
-    if (all(rowIDCols %in% sharedRowIDCols)) {
-
-    } else {
-
-    }
-
-
-})
+#setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
+#
+#    # type check input
+#    if (is(value, 'data.frame'))
+#        value <- data.table(value, keep.rownames=FALSE)
+#    if (!is(value, 'data.table'))
+#        stop(magenta$bold('Please pass a data.frame or data.table to update
+#            the rowData slot. We recommend modifying the object returned by
+#            rowData(x) then reassigning it with rowData(x) <- newRowData'))
+#
+#    # remove key column
+#    if ('rowKey' %in% colnames(value)) {
+#        value[, rowKey := NULL]
+#        warning(cyan$bold('Dropping rowKey from replacemetn value, this
+#            function will deal with mapping the rowKey automatically.'))
+#    }
+#
+#    # assemble information to select proper update method
+#    rowIDCols <- colnames(.rowIDData(x))
+#    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
+#
+#    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
+#    sharedMetadataCols <- intersect(metadataCols, colnames(value))
+#
+#    # case where no row ids are in update
+#    if (length(sharedRowIDCols) > 0) {
+#        if (length(sharedMetadataCols) > 0) {
+#
+#        } else {
+#
+#        }
+#    }
+#
+#    # case where row ids are in the updated table
+#    if (all(rowIDCols %in% sharedRowIDCols)) {
+#
+#    } else {
+#
+#    }
+#
+#
+#})
 
 
 
@@ -815,12 +851,11 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 }
 
 
-#'
-#' @param x [`LongTable`]
-#'
-#' @importFrom SummarizedExperiemnt `colData<-`
-#' @export
-setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
-
-})
-
+##'
+##' @param x [`LongTable`]
+##'
+##' @importFrom SummarizedExperiment `colData<-`
+##' @export
+#setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
+#
+#})

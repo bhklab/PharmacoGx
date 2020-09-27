@@ -35,7 +35,8 @@ Imports:
     grDevices, 
     reshape2,
     testthat,
-    jsonlite
+    jsonlite,
+    crayon
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
@@ -50,6 +51,7 @@ Collate:
     'MatthewCor.R'
     'SanityCheck.R'
     'callingWaterfall.R'
+    'class-LongTable.R'
     'class-PharmacoSet.R'
     'class-SignatureClass.R'
     'computeABC.R'
@@ -98,6 +100,7 @@ Collate:
     'methods-subsetTo.R'
     'methods-summarizeMolecularProfiles.R'
     'methods-summarizeSensitivityProfiles.R'
+    'onLoad.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
