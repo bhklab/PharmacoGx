@@ -32,7 +32,7 @@ test_that("Summarize Molecular Profiles correctly summarizes replicates", {
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna", summary.stat = "last")
   expect_equal(SummarizedExperiment::assay(testSummary, 1)[,"647-V"], testCells[,-1])
   
-  GDSCsmall2 <- subsetTo(GDSCsmall, cells = c("22RV1", "23132-87"))
+  GDSCsmall2 <- subset(GDSCsmall, cells = c("22RV1", "23132-87"))
   colData(GDSCsmall2@molecularProfiles$mutation)$cellid <- "22RV1"
   testCells <- SummarizedExperiment::assay(GDSCsmall2@molecularProfiles$mutation, 1)
   

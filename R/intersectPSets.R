@@ -204,16 +204,16 @@ intersectPSet <- function(pSets,
     for (i in seq_along(pSets)) {
       if(("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn)){
         if(strictIntersect){
-          pSets[[i]] <- subsetTo(pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
+          pSets[[i]] <- subset(pSets[[i]], drugs=common.drugs, cells=common.cells, exps=expMatch, molecular.data.cells=common.molecular.cells)
           
         } else {
-          pSets[[i]] <- subsetTo(pSets[[i]], drugs=common.drugs, cells=common.cells, molecular.data.cells=common.molecular.cells)
+          pSets[[i]] <- subset(pSets[[i]], drugs=common.drugs, cells=common.cells, molecular.data.cells=common.molecular.cells)
         } 
       } else if(("cell.lines" %in% intersectOn)) {
-        pSets[[i]] <- subsetTo(pSets[[i]], cells=common.cells, molecular.data.cells=common.molecular.cells)
+        pSets[[i]] <- subset(pSets[[i]], cells=common.cells, molecular.data.cells=common.molecular.cells)
         
       } else if(("drugs" %in% intersectOn)) {
-        pSets[[i]] <- subsetTo(pSets[[i]], drugs=common.drugs)
+        pSets[[i]] <- subset(pSets[[i]], drugs=common.drugs)
         
       }
     }
