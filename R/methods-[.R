@@ -20,7 +20,7 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE){
                                           # direct pass through of unevaluated
                                           # function arguments. Stops attempts
                                           # to evaluate arguments in current
-                                          # scope
+                                          # scope.
 })
 
 # ==== LongTable Class
