@@ -35,7 +35,8 @@
 #'
 #' @importMethodsFrom BiocGenerics subset
 #' @export
-setMethod('subset', signature(x='PharmacoSet'), function(x, ...) eval(.subsetPharmacoSet(x, ...)))
+setMethod('subset', signature(x='PharmacoSet'),
+          function(x, ...) eval(.subsetPharmacoSet(x, ...)))
 
 #function(object, cells, drugs, molecular.data.cells,
 #                     keep.controls=TRUE, ...){
@@ -265,6 +266,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
     longTable <- x
     rm(x)
 
+    # subset rowData
     ## FIXME:: Can I parameterize this into a helper that works for both row
     ## and column data?
     if (!missing(i)) {
@@ -289,6 +291,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
         rowDataSubset <- rowData(longTable)
     }
 
+    # subset colData
     if (!missing(j)) {
         if (tryCatch(is.character(j), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
@@ -309,6 +312,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
         colDataSubset <- colData(longTable)
     }
 
+    # Subset assays to only keys in remaining in rowData/colData
     rowKeys <- rowDataSubset$rowKey
     colKeys <- colDataSubset$colKey
 
@@ -319,7 +323,8 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
                      FUN=.filterLongDataTable,
                      indexList=list(rowKeys, colKeys))
 
-    if (any(assays != assayNames(longTable))) {
+    # Subset rowData and colData to only keys contained in remaining assays
+    if (!all(assays %in% assayNames(longTable))) {
         ## TODO:: Implement message telling users which rowData and colData
         ## columns are being dropped when selecting a specific assay.
         assayRowIDs <- unique(Reduce(c, lapply(assayData, `$`, name='rowKey')))
@@ -359,6 +364,3 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
     codeString <- gsub('\"', "'", codeString)
     return(codeString)
 }
-
-
-# ==== PharmacoSet Class

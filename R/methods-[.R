@@ -30,10 +30,11 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE){
 #' @param x object
 #' @param i row query
 #' @param j col query
+#' @param assays [`character`]
 #' @param ... ad args
 #' @param drop does nothing
 #'
 #' @export
-setMethod('[', signature('LongTable'), function(x, i, j, ..., drop=FALSE) {
-    eval(substitute(subset(x, i, j)))
+setMethod('[', signature('LongTable'), function(x, i, j, assays, ..., drop=FALSE) {
+    eval(substitute(subset(x, i, j, assays)))
 })
