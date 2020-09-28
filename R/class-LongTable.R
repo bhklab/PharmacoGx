@@ -28,6 +28,8 @@ setOldClass('long.table')
 
 #' LongTable constructor method
 #'
+#' Constrcuts a long table #FIXME:: Better description
+#'
 #' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
 #'   coercible to a `data.table` containing the a unique `rowID` column which
 #'   is used to key assays, as well as additional row metadata to subset on.
@@ -178,6 +180,9 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
     assayCols <- lapply(assayCols, FUN=.prependToVector, values=c('rowKey', 'colKey'))
     assays <- lapply(assayCols, .selectDataTable, DT=assayData)
 
+    ## TODO:: Remove drug and cellline specific column names to make LongTable
+    ## applicable to any type of data. Maybe allow user to specify? For example
+    ## by naming the elements of rowDataCols and colDataCols?
     return(LongTable(colData=colData, colIDs=paste0('drug', seq_along(colDataCols[[1]])),
                      rowData=rowData, rowIDs= paste0('cellLine', seq_along(rowDataCols[[1]])),
                      assays=assays))
@@ -226,96 +231,22 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 
 # ---- LongTable Class Methods
 
-#' Subset method for a LongTable object.
-#'
-#' Allows use of the colData and rowData `data.table` objects to query based on
-#'  rowID and colID, which is then used to subset all value data.tables stored
-#'  in the dataList slot.
-#'
-#' This function is endomorphic, it always returns a LongTable object.
-#'
-#' @param x [`LongTable`] The object to subset.
-#' @param i [`character`, `numeric`, `logical` or `expression`]
-#'  Character: pass in a character vector of drug names, which will subset the
-#'      object on all row id columns matching the vector.
-#'
-#'  Numeric or Logical: these select based on the rowKey from the `rowData`
-#'      method for the `LongTable`.
-#'
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `rowData` data.table.
-#'
-#' @param j [`character`, `numeric`, `logical` or `expression`]
-#'  Character: pass in a character vector of drug names, which will subset the
-#'      object on all drug id columns matching the vector.
-#'
-#'  Numeric or Logical: these select base don the rowID from the `rowData`
-#'      method for the `LongTable`.
-#'
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `rowData` data.table.
-#'
-#' @param values [`character`, `numeric` or `logical`] Optional list of value
-#'      names to subset. Can be used to subset the dataList column further,
-#'      returning only the selected items in the new LongTable.
-#'
-#' @return [`LongTable`] A new `LongTable` object subset based on the specified
-#'      parameters.
-#'
-#' @importMethodsFrom BiocGenerics subset
-#' @import data.table
-#' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
 
-    longTable <- x
-    rm(x)
 
-    if (!missing(i)) {
-        if (tryCatch(is.character(i), error=function(e) FALSE)) {
-            select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
-            iString <- paste0(paste0(select, ' %in% ', .variableToCodeString(i)), collapse=' | ')
-            i <- str2lang(iString)
-        } else {
-            i <- substitute(i)
-        }
-        rowDataSubset <- rowData(longTable)[eval(i), ]
-    } else {
-        rowDataSubset <- rowData(longTable)
-    }
 
-    if (!missing(j)) {
-        if (tryCatch(is.character(j), error=function(e) FALSE)) {
-            select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
-            jString <- paste0(paste0(select, ' %in% ', .variableToCodeString(j)), collapse=' | ')
-            j <- str2lang(jString)
-        } else {
-            j <- substitute(j)
-        }
-        colDataSubset <- colData(longTable)[eval(j), ]
-    } else {
-        colDataSubset <- colData(longTable)
-    }
 
-    rowKeys <- rowDataSubset$rowKey
-    colKeys <- colDataSubset$colKey
+#'
+#'
+#'
+#'
+#'
+reindex.long.table <- function(longTable) {
 
-    if (missing(assays)) { assays <- assayNames(longTable) }
-    keepAssays <- assayNames(longTable) %in% assays
 
-    assayData <- lapply(assays(longTable)[keepAssays],
-                     FUN=.filterLongDataTable,
-                     indexList=list(rowKeys, colKeys))
-
-    return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
-                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
-                     assays=assayData, metadata=metadata(longTable)))
-})
-
+}
 
 ## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
-#'
+#' Show method for the LongTable class
 #'
 #'
 #'
@@ -405,22 +336,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
         cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
     }
 })
-
-#' Convert an R object in a variable into a string of the code necessary to
-#'   create that object
-#'
-#' @param variable [`Symbol`] A symbol containing an R variable
-#'
-#' @return [`string`] A string representation of the code necessary to
-#'   reconstruct the variable.
-#'
-#' @keywords internal
-.variableToCodeString <- function(variable) {
-    codeString <- capture.output(dput(variable))
-    codeString <- gsub('\"', "'", codeString)
-    return(codeString)
-}
-
 
 #' Filter a data.table object based on the rowID and colID columns
 #'
