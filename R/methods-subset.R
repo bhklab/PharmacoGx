@@ -258,13 +258,17 @@ setMethod('subset', signature(x='PharmacoSet'),
 #'      parameters.
 #'
 #' @importMethodsFrom BiocGenerics subset
-#' @import crayon
+#' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
 setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
 
     longTable <- x
     rm(x)
+
+    # alias to desired arguments
+    .rowData <- function(...) rowData(..., key=TRUE)
+    .colData <- function(...) colData(..., key=TRUE)
 
     # subset rowData
     ## FIXME:: Can I parameterize this into a helper that works for both row
@@ -274,7 +278,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
             ## TODO:: Add support for character vector subsetting
             ## TODO:: Implement diagnosis for failed regex queries
             ## TODO:: Clean up implementation of regex columns
-            select <- grep('^cellLine[:digit:]*', colnames(rowData(longTable)), value=TRUE)
+            select <- grep('^cellLine[:digit:]*', colnames(.rowData(longTable)), value=TRUE)
             if (length(strsplit(i, ':')) > length(select))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
@@ -286,16 +290,16 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
         } else {
             i <- substitute(i)
         }
-        rowDataSubset <- rowData(longTable)[eval(i), ]
+        rowDataSubset <- .rowData(longTable)[eval(i), ]
     } else {
-        rowDataSubset <- rowData(longTable)
+        rowDataSubset <- .rowData(longTable)
     }
 
     # subset colData
     if (!missing(j)) {
         if (tryCatch(is.character(j), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            select <- grep('^drug[:digit:]*', colnames(colData(longTable)), value=TRUE)
+            select <- grep('^drug[:digit:]*', colnames(.colData(longTable)), value=TRUE)
             if (length(strsplit(j, ':')) > length(select))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',
@@ -307,9 +311,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
         } else {
             j <- substitute(j)
         }
-        colDataSubset <- colData(longTable)[eval(j), ]
+        colDataSubset <- .colData(longTable)[eval(j), ]
     } else {
-        colDataSubset <- colData(longTable)
+        colDataSubset <- .colData(longTable)
     }
 
     # Subset assays to only keys in remaining in rowData/colData

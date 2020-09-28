@@ -129,6 +129,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
 }
 
+## TODO:: Do we want to pass ... through to fread to deal with weird formats?
 #' Create a LongTable object from a single .csv file
 #'
 #' @param filePath [`character`] Path to the .csv file containing the data and
@@ -154,7 +155,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols) {
 
     # read in data
-    tableData <- fread(filePath)
+    tableData <- fread(filePath,
+                na.strings=unique(c(getOption('datatable.na.string'),
+                                  c('NA', 'NULL', 'NaN', 'missing', 'None',
+                                    'none', 'na', 'null', 'Null', 'Na'))))
 
     # build drug and cell metadata tables and index by the appropriate ID
     colData <- unique(tableData[, unlist(colDataCols), with=FALSE])
@@ -231,29 +235,13 @@ buildLongTableFromCSV <- function(filePath, rowDataCols, colDataCols, assayCols)
 
 # ---- LongTable Class Methods
 
-
-
-
-
-#'
-#'
-#'
-#'
-#'
-reindex.long.table <- function(longTable) {
-
-
-}
-
 ## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #' Show method for the LongTable class
 #'
+#' @param object A [`LongTable`] object to print the results for.
 #'
-#'
-#' @import crayon
-#' @importFrom crayon %+%
+#' @importFrom crayon %+% yellow red green blue cyan magenta
 #' @import data.table
-#' @importMethodsFrom CoreGx show
 #' @export
 setMethod('show', signature(object='LongTable'), function(object) {
 
@@ -324,17 +312,16 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
     ## FIXME:: Why is this so slow? Also why doesn't it work?
     # --- metadata slot
-    metadataLength <- length(metadata(object))
-    if (metadataLength > 0) {
-        metadataString <- paste0('metadata(', metadataLength, '): ')
-        metadataNames <- names(metadata(object))
-        metadataNamesString <-
-            if (length(metadatNames) > 6)
-                paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
-            else
-                .collapse(metadataNames)
-        cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
-    }
+    metadataString <- paste0('metadata(', length(metadata(object)), '): ')
+    metadataNames <- names(metadata(object))
+    metadataNamesString <-
+        if (length(metadataNames) > 6)
+            paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
+        else if (length(metadataNames) > 1)
+            .collapse(metadataNames)
+        else
+            'none'
+    cat(yellow$bold(metadataString) %+% green(metadataNamesString))
 })
 
 #' Filter a data.table object based on the rowID and colID columns
@@ -367,12 +354,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
     return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
 }
 
-# ---- LongTable Getter and Setter Methods
-
-
-
-
-# ----  LongTable Private Helpers
 
 # ==== LongTable Accessor Methods
 
@@ -489,31 +470,8 @@ setMethod('.dimIDs', signature(object='LongTable'), function(object) {
     list(.rowIDs(object), .colIDs(object))
 })
 
-#' Retrieve the assay names from a `LongTable` object.
-#'
-#' @param x A [`LongTable`] object to retrieve the assay names from.
-#'
-#' @return [`character`] Names of the assays contained in the `LongTable`.
-#'
-#' @importMethodsFrom SummarizedExperiment assayNames
-#' @export
-setMethod('assayNames', signature(x='LongTable'), function(x) {
-    return(names(assays(x)))
-})
-
 # ---- Long Table Accessor Methods
 
-#' Get the dimensions of a `LongTable` object.
-#'
-#' @param x A [`LongTable`] object to retrieve dimensions for.
-#'
-#' @return [`numeric`] Vector of object dimensions.
-#'
-#' @importMethodsFrom SummarizedExperiment dim
-#' @export
-setMethod('dim', signature(x='LongTable'), function(x) {
-    return(c(nrow(rowData(x)), nrow(colData(x))))
-})
 
 #' Get the column names from a `LongTable` object.
 #'
@@ -550,21 +508,6 @@ setMethod('dimnames', signature(x='LongTable'), function(x) {
     return(list(rownames(x), colnames(x)))
 })
 
-#' This method only throws an error. You may no edit the dimnames of a
-#'    `LongTable` object this way.
-#'
-#' @param x [`LongTable`]
-#'
-#' @warning This function only trhows a warning then returns the original object.
-#'
-#' @import crayon
-#' @export
-setReplaceMethod('dimnames', signature(x='LongTable'), function(x, value) {
-    warning(cyan$bold("The dimnames of a `LongTable` object cannot be directly
-        modified. Please use the `<method_name>` instead."))
-    return(x)
-})
-
 #' Getter method for the metadata slot of a `LongTable` object
 #'
 #' @param x The [`LongTable`] object from which to retrieve the metadata list.
@@ -588,7 +531,7 @@ setMethod('metadata', signature(x='LongTable'), function(x) {
 #'   the metadata slot.
 #'
 #' @importFrom S4Vectors `metadata<-`
-#' @import crayon
+#' @importFrom crayon cyan magenta
 #' @export
 setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
     if (!is(value, 'list'))
@@ -596,94 +539,3 @@ setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
     x@metadata <- value
     return(x)
 })
-
-
-#' Updates the `rowData` slot as long as the ID columns are not changed.
-#'
-#' @param x A [`LongTable`] object to modify.
-#'
-#' @return A copy of the [`LongTable`] object with the `rowData`
-#'   slot updated.
-#'
-#' @importFrom SummarizedExperiment `rowData<-`
-#' @export
-#setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
-#
-#    # type check input
-#    if (is(value, 'data.frame'))
-#        value <- data.table(value, keep.rownames=FALSE)
-#    if (!is(value, 'data.table'))
-#        stop(magenta$bold('Please pass a data.frame or data.table to update
-#            the rowData slot. We recommend modifying the object returned by
-#            rowData(x) then reassigning it with rowData(x) <- newRowData'))
-#
-#    # remove key column
-#    if ('rowKey' %in% colnames(value)) {
-#        value[, rowKey := NULL]
-#        warning(cyan$bold('Dropping rowKey from replacemetn value, this
-#            function will deal with mapping the rowKey automatically.'))
-#    }
-#
-#    # assemble information to select proper update method
-#    rowIDCols <- colnames(.rowIDData(x))
-#    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
-#
-#    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
-#    sharedMetadataCols <- intersect(metadataCols, colnames(value))
-#
-#    # case where no row ids are in update
-#    if (length(sharedRowIDCols) > 0) {
-#        if (length(sharedMetadataCols) > 0) {
-#
-#        } else {
-#
-#        }
-#    }
-#
-#    # case where row ids are in the updated table
-#    if (all(rowIDCols %in% sharedRowIDCols)) {
-#
-#    } else {
-#
-#    }
-#
-#
-#})
-
-
-
-#'
-#'
-#' @param rowIDs [`LongTable`]
-#' @param rowData [`data.table`]
-#'
-#' @export
-#' @keywords internal
-.joinOnRowIDs <- function(rowIDs, rowData) {
-    if (!('rowKey' %in% colnames(rowIDs)))
-        stop(magenta$bold("No rowKey column in rowIDs?"))
-    row_data <- rowIDs[rowData, on=colnames(rowIDs)]
-    setkeyv(row_data, 'rowKey')
-    return(row_data)
-}
-
-#' Helper to determine if the rowData rowIDs are identical between a new
-#'   rowData data.table object and an existing `LongTable`
-#'
-#' @export
-#' @keywords internal
-.row_IDs_are_identical <- function(rowIDs, newRowData) {
-    if ('rowKey' %in% colnames(rowIDs)) rowIDs[, rowKey := NULL]
-    return(all(colnames(rowIDs) %in% colnames(newRowData)) &&
-        all.equal(rowIDs, newRowData[, colnames(rowIDs), with=FALSE]))
-}
-
-
-##'
-##' @param x [`LongTable`]
-##'
-##' @importFrom SummarizedExperiment `colData<-`
-##' @export
-#setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
-#
-#})

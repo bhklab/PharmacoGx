@@ -11,7 +11,7 @@
 #'
 #' @describeIn LongTable
 #'
-#' @import crayon
+#' @importFrom crayon cyan magenta
 #' @export
 setMethod('[[', signature('LongTable'), function(x, i, keys=FALSE) {
     if (length(i) > 1)

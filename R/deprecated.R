@@ -4,7 +4,7 @@
 #'
 #' Replace by subset method
 #'
-#' @import crayon
+#' @importFrom crayon magenta cyan
 #' @export
 #' @noRd
 subsetTo <- function(...) {
@@ -16,7 +16,7 @@ subsetTo <- function(...) {
 ##'
 ##' Replaced by intersect method
 ##'
-##' @import crayon
+##' @importFrom crayon cyan magenta
 ##' @export
 ##' @noRd
 #intersectPSet <- function(...) {

@@ -58,8 +58,21 @@ setGeneric("drugNames", function(object) standardGeneric("drugNames"))
 #' @export
 setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))
 
+# ==== LongTable Class
 
-
+#' Generic method for resetting indexing in an S4 object
+#'
+#' This method allows integer indexes used to maintain referential integrity
+#'   internal to an S4 object to be reset. This is useful particularly after
+#'   subsetting an object, as certain indexes may no longer be present in the
+#'   object data. Reindexing removes gaps integer indexes and ensures that the
+#'   smallest contiguous integer values are used in an objects indexes.
+#'
+#' @param object [`S4`] An object to redo indexing for
+#' @param ... [`pairlist`] Allow definition of new parameters to this generic.
+#'
+#' @export
+setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 
 # ===== Other Generics
 
