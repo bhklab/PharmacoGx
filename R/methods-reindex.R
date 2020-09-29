@@ -25,16 +25,8 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     colIDCols <- colnames(colData(object))
 
     # extract the ID columns from the assay data
-    newRowData <- unique(rbindlist(lapply(assayDataList,
-                                          FUN=`[`,
-                                          i=TRUE, j=get('rowIDCols'))
-                                          ))[, rowKey := seq_len(.N)]
-    setkeyv(newRowData, 'rowKey')
-    newColData <- unique(rbindlist(lapply(assayDataList,
-                                          FUN=`[`,
-                                          i=TRUE, j=get('colIDCols'))
-                                          ))[, colKey := seq_len(.N)]
-    setkeyv(newColData, 'colKey')
+    newRowData <- .extractIDData(assayDataList, rowIDCols, 'rowKey')
+    newColData <- .extractIDData(assayDataList, colIDCols, 'colKey')
 
     # remap the rowKey and colKey columns to the assays
     newAssayData <- lapply(assayDataList,
@@ -50,6 +42,24 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
                      assays=newAssayData, metadata=metadata(object)))
 
 })
+
+#'
+#' @param
+#'
+#'
+#' @keywords internal
+#' @noRd
+.extractIDData <- function(assayDataList, idCols, keyName) {
+    idDT <- data.table()
+    for (assay in assayDataList) {
+        idDT <- unique(rbindlist(list(idDT, assay[, ..idCols])))
+    }
+    rm(assayDataList)
+    idDT[, eval(substitute(keyName := seq_len(.N)))]
+    setkeyv(idDT, keyName)
+    return(idDT)
+}
+
 
 #' @keywords interal
 #' @noRd

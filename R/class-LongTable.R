@@ -259,10 +259,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     assaysString <- paste0('assays(', assayLength, '): ')
     assayNames <- assayNames(object)
     assayNamesString <-
-        if (length(assayNames(object)) > 6)
+        if (length(assayNames(object)) > 6) {
             paste0(.collapse(head(assayNames, 3), ' ... ', .collapse(tail(assayNames, 3))))
-        else
+        } else {
             .collapse(assayNames(object))
+        }
     cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
 
     # --- rownames
@@ -270,10 +271,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     rowsString <- paste0('rownames(', rows, '): ')
     rownames <- rownames(object)
     rownamesString <-
-        if (length(rownames) > 6)
+        if (length(rownames) > 6) {
             paste0(.collapse(head(rownames, 3)), ' ... ', .collapse(tail(rownames, 3)))
-        else
+        } else {
             .collapse(rownames)
+        }
     cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
 
     # ---- rowData slot
@@ -281,10 +283,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     rowDataString <- paste0('rowData(', rowCols, '): ')
     rowColnames <- colnames(rowData(object))
     rowDataNamesString <-
-        if (length(rowColnames) > 6)
+        if (length(rowColnames) > 6) {
             paste0(.collapse(head(rowColnames, 3)), ' ... ', .collapse(tail(rowColnames, 3)))
-        else
+        } else {
             .collapse(rowColnames)
+        }
     cat(yellow$bold(rowDataString) %+% green(rowDataNamesString), '\n')
 
     # ---- colnames
@@ -292,10 +295,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     colsString <- paste0('colnames(', cols, '): ')
     colnames <- colnames(object)
     colnamesString <-
-        if (length(colnames) > 6)
+        if (length(colnames) > 6) {
             paste0(.collapse(head(colnames, 3)), ' ... ', .collapse(tail(colnames, 3)))
-        else
+        } else {
             .collapse(colnames)
+        }
     cat(yellow$bold(colsString) %+% green(colnamesString), '\n')
 
     # ---- colData slot
@@ -315,13 +319,17 @@ setMethod('show', signature(object='LongTable'), function(object) {
     metadataString <- paste0('metadata(', length(metadata(object)), '): ')
     metadataNames <- names(metadata(object))
     metadataNamesString <-
-        if (length(metadataNames) > 6)
+        if (length(metadataNames) > 6) {
             paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
-        else if (length(metadataNames) > 1)
+        }
+        else if (length(metadataNames) > 1) {
             .collapse(metadataNames)
-        else
+        }
+        else {
             'none'
+        }
     cat(yellow$bold(metadataString) %+% green(metadataNamesString))
+
 })
 
 #' Filter a data.table object based on the rowID and colID columns
@@ -515,7 +523,7 @@ setMethod('dimnames', signature(x='LongTable'), function(x) {
 #' @return [`list`] The contents of the `metadata` slot of the `LongTable`
 #'   object.
 #'
-#' @importFrom S4Vectors metadata
+#' @importMethodsFrom S4Vectors metadata
 #' @export
 setMethod('metadata', signature(x='LongTable'), function(x) {
     return(x@metadata)
@@ -530,7 +538,7 @@ setMethod('metadata', signature(x='LongTable'), function(x) {
 #' @return [`LongTable`] A copy of the `LongTable` object with the `value` in
 #'   the metadata slot.
 #'
-#' @importFrom S4Vectors `metadata<-`
+#' @importMethodsFrom S4Vectors metadata<-
 #' @importFrom crayon cyan magenta
 #' @export
 setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
