@@ -27,12 +27,12 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     # extract the ID columns from the assay data
     newRowData <- unique(rbindlist(lapply(assayDataList,
                                           FUN=`[`,
-                                          i=TRUE, j=..rowIDCols)
+                                          i=TRUE, j=get('rowIDCols'))
                                           ))[, rowKey := seq_len(.N)]
     setkeyv(newRowData, 'rowKey')
     newColData <- unique(rbindlist(lapply(assayDataList,
                                           FUN=`[`,
-                                          i=TRUE, j=..colIDCols)
+                                          i=TRUE, j=get('colIDCols'))
                                           ))[, colKey := seq_len(.N)]
     setkeyv(newColData, 'colKey')
 
