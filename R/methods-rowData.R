@@ -5,13 +5,15 @@
 #' @param x A [`LongTable`] object to retrieve the row metadata from.
 #' @param key [`logical`] Should the rowKey column also be returned? Defaults
 #'     to FALSE.
+#' @param use.names [`logical`] This parameter is just here to stop matching
+#'     they key argument to use.names from the rowData generic. It doesn't do
+#'     anything.
 #'
 #' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
 #'
-#' @importMethodsFrom SummarizedExperiment rowData
 #' @import data.table
 #' @export
-setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE) {
+setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=FALSE) {
     return(if (key) x@rowData[, -'.rownames'] else
         x@rowData[, -c('.rownames', 'rowKey')])
 })

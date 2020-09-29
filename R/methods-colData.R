@@ -6,7 +6,6 @@
 #'
 #' @return A [`data.table`] containing row identifiers and metadata.
 #'
-#' @importMethodsFrom SummarizedExperiment rowData
 #' @import data.table
 #' @export
 setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {

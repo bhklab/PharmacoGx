@@ -404,10 +404,10 @@ setGeneric('.dimIDs', function(object, ...) standardGeneric('.dimIDs'))
 #' @export
 #' @keywords internal
 setMethod('.rowIDData', signature(object='LongTable'), function(object, key=TRUE) {
-    colNames <- colnames(rowData(object))[.rowIDs(object)]
+    colNames <- colnames(rowData(object, key))[.rowIDs(object)]
     keepCols <- if (key) c(colNames, 'rowKey') else colNames
 
-    return(rowData(object)[, keepCols, with=FALSE])
+    return(rowData(object, key)[, keepCols, with=FALSE])
 })
 
 #' Extract the column ID columns from colData of a LongTable
@@ -421,7 +421,7 @@ setMethod('.colIDData', signature(object='LongTable'), function(object, key=TRUE
     colNames <- colnames(colData(object))[.colIDs(object)]
     keepCols <- if (key) c(colNames, 'colKey') else colNames
 
-    return(colData(object)[, keepCols, with=FALSE])
+    return(colData(object, key)[, keepCols, with=FALSE])
 })
 
 #' Developer accessor method to determine which columns hold the column identifiers
