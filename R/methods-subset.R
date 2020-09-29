@@ -219,6 +219,7 @@ setMethod('subset', signature(x='PharmacoSet'),
 
 # ==== LongTable Class
 
+## FIXME:: Update this documentation!
 #' Subset method for a LongTable object.
 #'
 #' Allows use of the colData and rowData `data.table` objects to query based on
@@ -228,27 +229,27 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @param x [`LongTable`] The object to subset.
-#' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
+#' @param i [`character`], [`numeric`], [`logical`] or [`call`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all row id columns matching the vector.
 #'
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
 #'      method for the `LongTable`.
 #'
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `rowData` data.table.
+#'  Call: Accepts R call containing a valid query to the `data.table` i parameter.
+#'      We have provided a convenience function, `.()`, for converting row R
+#'      statements into call objects for subsetting.
 #'
-#' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
+#' @param j [`character`], [`numeric`], [`logical`] or [`call`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all drug id columns matching the vector.
 #'
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
 #'      method for the `LongTable`.
 #'
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `rowData` data.table.
+#'  Call: Accepts R call containing a valid query to the `data.table` i parameter.
+#'      We have provided a convenience function, `.()`, for converting raw R
+#'      statements into call objects for subsetting.
 #'
 #' @param values [`character`, `numeric` or `logical`] Optional list of value
 #'      names to subset. Can be used to subset the dataList column further,
@@ -276,7 +277,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     ## FIXME:: Can I parameterize this into a helper that works for both row
     ## and column data?
     if (!missing(i)) {
-        if (tryCatch(is.character(i), error=function(e) FALSE)) {
+        ## TODO:: Clean up this if block
+        if (is.call(i)) {
+            i <- i
+        } else if (tryCatch(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Add support for character vector subsetting
             ## TODO:: Implement diagnosis for failed regex queries
             ## TODO:: Clean up implementation of regex columns
@@ -299,7 +303,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
     # subset colData
     if (!missing(j)) {
-        if (tryCatch(is.character(j), error=function(e) FALSE)) {
+        ## TODO:: Clean up this if block
+        if (is.call(j)) {
+            j <- j
+        } else if (tryCatch(is.character(j), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
             select <- grep('^drug[:digit:]*', colnames(.colData(longTable)), value=TRUE)
             if (length(strsplit(j, ':')) > length(select))
@@ -346,6 +353,18 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
     return(if (reindex) reindex(newLongTable) else longTable)
 })
+
+#' Convenience function for converting R code to a call
+#'
+#' This is used to pass through unevaluated R expressions into subset and
+#'   `[`, where they will be evaluated in the correct context.
+#'
+#' @param ... [`parilist`] Arbitrary R code to subsitute.
+#'
+#' @return [`call`] An R call object containing the R code from `...`
+#'
+#' @export
+. <- function(...) substitute(...)
 
 # ---- subset LongTable helpers
 

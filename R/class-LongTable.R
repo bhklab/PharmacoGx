@@ -363,10 +363,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
 }
 
-
 # ==== LongTable Accessor Methods
 
 # ---- Private Helper Methods
+
+# generics
 
 #' Return the identifiers for the column meta data in an object
 #'
@@ -403,6 +404,7 @@ setGeneric('.rowIDs', function(object, ...) standardGeneric('.rowIDs'))
 #' @keywords internal
 setGeneric('.dimIDs', function(object, ...) standardGeneric('.dimIDs'))
 
+# methods
 
 #' Extract the row ID columns from `rowDat` of a `LongTable`
 #'
@@ -466,10 +468,10 @@ setMethod('.rowIDs', signature(object='LongTable'), function(object) {
 #' Developer accessor method to determine which columns hold the row identifiers
 #'   in the `rowData` slot of a `LongTable` object.
 #'
-#' @param A [`object`] `LongTable` object to retrieve the row identifier column
+#' @param A [`LongTable`] object to retrieve the row identifier column
 #'   indexes from.
 #'
-#' @return [`list`] A list containing two `numeric` vectors, the first for the
+#' @return A [`list`] containing two `numeric` vectors, the first for the
 #'    identifier columns for the `rowData` slot and the second with the same
 #'    for the `colData` slot
 #'
@@ -477,74 +479,4 @@ setMethod('.rowIDs', signature(object='LongTable'), function(object) {
 #' @keywords internal
 setMethod('.dimIDs', signature(object='LongTable'), function(object) {
     list(.rowIDs(object), .colIDs(object))
-})
-
-# ---- Long Table Accessor Methods
-
-
-#' Get the column names from a `LongTable` object.
-#'
-#' @param x A [`LongTable`] object to get the column names from
-#'
-#' @return [`character`] Vector of column names.
-#'
-#' @export
-setMethod('colnames', signature(x='LongTable'), function(x) {
-    return(x@colData$.colnames)
-})
-
-#' Get the row names from a `LongTable` object.
-#'
-#' @param x A [`LongTable`] object to get the row names from
-#'
-#' @return [`character`] Vector of row names.
-#'
-#' @export
-setMethod('rownames', signature(x='LongTable'), function(x) {
-    return(x@rowData$.rownames)
-})
-
-#' Getter for the dimnames of a `LongTable` object
-#'
-#' @param x The [`LongTable`] object to retrieve the dimnames for
-#'
-#' @return [`list`] List with two character vectors, one for row and one for
-#'     column names.
-#'
-#' @importMethodsFrom Biobase dimnames
-#' @export
-setMethod('dimnames', signature(x='LongTable'), function(x) {
-    return(list(rownames(x), colnames(x)))
-})
-
-#' Getter method for the metadata slot of a `LongTable` object
-#'
-#' @param x The [`LongTable`] object from which to retrieve the metadata list.
-#'
-#' @return [`list`] The contents of the `metadata` slot of the `LongTable`
-#'   object.
-#'
-#' @importMethodsFrom S4Vectors metadata
-#' @export
-setMethod('metadata', signature(x='LongTable'), function(x) {
-    return(x@metadata)
-})
-
-#' Setter method for the metadata slot of a `LongTable` object
-#'
-#' @param x [`LongTable`] The LongTable to update
-#' @param value [`list`] A list of new metadata associated with a `LongTable`
-#'   object.
-#'
-#' @return [`LongTable`] A copy of the `LongTable` object with the `value` in
-#'   the metadata slot.
-#'
-#' @importMethodsFrom S4Vectors metadata<-
-#' @importFrom crayon cyan magenta
-#' @export
-setReplaceMethod('metadata', signature(x='LongTable'), function(x, value) {
-    if (!is(value, 'list'))
-        stop(magenta$bold('The `metadata` slot must be a list!'))
-    x@metadata <- value
-    return(x)
 })

@@ -29,48 +29,47 @@ setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=
 #' @importFrom crayon cyan magenta
 #' @importFrom SummarizedExperiment `rowData<-`
 #' @export
-#setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
-#
-#    # type check input
-#    if (is(value, 'data.frame'))
-#        value <- data.table(value, keep.rownames=FALSE)
-#    if (!is(value, 'data.table'))
-#        stop(magenta$bold('Please pass a data.frame or data.table to update
-#            the rowData slot. We recommend modifying the object returned by
-#            rowData(x) then reassigning it with rowData(x) <- newRowData'))
-#
-#    # remove key column
-#    if ('rowKey' %in% colnames(value)) {
-#        value[, rowKey := NULL]
-#        warning(cyan$bold('Dropping rowKey from replacement value, this
-#            function will deal with mapping the rowKey automatically.'))
-#    }
-#
-#    # assemble information to select proper update method
-#    rowIDCols <- colnames(.rowIDData(x))
-#    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
-#
-#    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
-#    sharedMetadataCols <- intersect(metadataCols, colnames(value))
-#
-#    # case where no row ids are in update
-#    if (length(sharedRowIDCols) > 0) {
-#        if (length(sharedMetadataCols) > 0) {
-#
-#        } else {
-#
-#        }
-#    }
-#
-#    # case where row ids are in the updated table
-#    if (all(rowIDCols %in% sharedRowIDCols)) {
-#
-#    } else {
-#
-#    }
-#
-#
-#})
+setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
+
+    # type check input
+    if (is(value, 'data.frame'))
+        value <- data.table(value, keep.rownames=FALSE)
+    if (!is(value, 'data.table'))
+        stop(magenta$bold('Please pass a data.frame or data.table to update
+            the rowData slot. We recommend modifying the object returned by
+            rowData(x) then reassigning it with rowData(x) <- newRowData'))
+
+    # remove key column
+    if ('rowKey' %in% colnames(value)) {
+        value[, rowKey := NULL]
+        warning(cyan$bold('Dropping rowKey from replacement value, this
+            function will deal with mapping the rowKey automatically.'))
+    }
+
+    # assemble information to select proper update method
+    rowIDCols <- colnames(.rowIDData(x))
+    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
+
+    metadataCols <- colnames(rowData(x)[, -c(rowIDCols, 'rowKey')])
+    sharedMetadataCols <- intersect(metadataCols, colnames(value))
+
+    # case where no row ids are in update
+    if (length(sharedRowIDCols) > 0) {
+        if (length(sharedMetadataCols) > 0) {
+
+        } else {
+
+        }
+    }
+
+    # case where row ids are in the updated table
+    if (all(rowIDCols %in% sharedRowIDCols)) {
+
+    } else {
+
+    }
+
+})
 
 
 

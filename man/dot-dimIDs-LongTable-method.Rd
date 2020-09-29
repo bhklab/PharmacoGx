@@ -8,11 +8,11 @@
 \S4method{.dimIDs}{LongTable}(object)
 }
 \arguments{
-\item{A}{[`object`] `LongTable` object to retrieve the row identifier column
+\item{A}{[`LongTable`] object to retrieve the row identifier column
 indexes from.}
 }
 \value{
-[`list`] A list containing two `numeric` vectors, the first for the
+A [`list`] containing two `numeric` vectors, the first for the
    identifier columns for the `rowData` slot and the second with the same
    for the `colData` slot
 }
