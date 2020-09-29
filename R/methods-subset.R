@@ -253,6 +253,8 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' @param values [`character`, `numeric` or `logical`] Optional list of value
 #'      names to subset. Can be used to subset the dataList column further,
 #'      returning only the selected items in the new LongTable.
+#' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
+#'      defaults to TRUE, but can slow down subsets for large LongTables.
 #'
 #' @return [`LongTable`] A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -261,7 +263,7 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
+setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
 
     longTable <- x
     rm(x)
@@ -338,9 +340,11 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays) {
         colDataSubset <- colDataSubset[colKey %in% assayColIDs]
     }
 
-    return(LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
+    newLongTable <- LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
                      rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
-                     assays=assayData, metadata=metadata(longTable)))
+                     assays=assayData, metadata=metadata(longTable))
+
+    return(if (reindex) reindex(newLongTable) else longTable)
 })
 
 # ---- subset LongTable helpers

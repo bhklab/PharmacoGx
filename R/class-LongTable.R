@@ -1,8 +1,9 @@
-#' Define an S3 Class
+#' S3 Class for LongTable S4 Class
 #'
 #' Allows use of S3 methods with new S4 class. This is required to overcome
 #' limitations of the `[` S4 method.
 #'
+#' @export
 setOldClass('long.table')
 
 #' LongTable class definition
@@ -328,7 +329,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
         else {
             'none'
         }
-    cat(yellow$bold(metadataString) %+% green(metadataNamesString))
+    cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
 
 })
 
