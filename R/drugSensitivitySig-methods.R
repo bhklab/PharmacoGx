@@ -58,11 +58,12 @@ setMethod("drugSensitivitySig",
                     sensitivity.summary.stat = c("mean", "median", "first", "last"),
                     returnValues = c("estimate", "pvalue", "fdr"),
                     sensitivity.cutoff, standardize = c("SD", "rescale", "none"), molecular.cutoff = NA,
-                    molecular.cutoff.direction = c("less", "greater"), nthread = 1, verbose=TRUE, ...){
+                    molecular.cutoff.direction = c("less", "greater"), 
+                    nthread = 1, parallel.on = c("gene", "drug"), verbose=TRUE, ...){
             .drugSensitivitySigPharmacoSet(object, mDataType, drugs, features, cells, tissues, sensitivity.measure,
                                            molecular.summary.stat, sensitivity.summary.stat, returnValues,
-                                           sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction,
-                                           nthread, verbose, ...)
+                                           sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction, 
+                                           nthread, parallel.on, verbose, ...)
           })
 
 #' @import parallel
