@@ -19,9 +19,25 @@ b - a
 
 longTable['VCAP', ]
 
-longTable[.(cell_line == 'VCAP' & BatchID == 1),
-          .(drugA_name == "Lapatinib" & !(drugB_name == 'Dasatinib'))]
+longTable[.(cell_line1 == 'VCAP' & BatchID == 1),
+          .(drug1 == "Lapatinib" & !(drug2 == 'Dasatinib'))]
 
 longTable[['viability']]
 
+longTable[, c('5-FU:*', 'Temozolamide:MK-8776')]
+
 longTable$viability[, colMeans(.SD, na.rm=TRUE)]
+
+# Compare runtimes of subset with and without reindexing
+a <- Sys.time()
+subset(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=FALSE))
+b <- Sys.time()
+t1 <- b - a
+
+a <- Sys.time()
+subset(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=TRUE))
+b <- Sys.time()
+t2 <- b - a
+
+
+as.numeric(t2)/as.numeric(t1)

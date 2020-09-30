@@ -2,23 +2,43 @@
 % Please edit documentation in R/methods-[.R
 \name{[,LongTable,ANY,ANY,ANY-method}
 \alias{[,LongTable,ANY,ANY,ANY-method}
-\title{`[`}
+\title{[ LongTable Method}
 \usage{
 \S4method{[}{LongTable,ANY,ANY,ANY}(x, i, j, assays, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{object}
+\item{x}{[`LongTable`] The object to subset.}
 
-\item{i}{row query}
+\item{i}{[`character`], [`numeric`], [`logical`] or [`call`]
+ Character: pass in a character vector of drug names, which will subset the
+     object on all row id columns matching the vector. This parameter also
+     supports valid R regex query strings which will match on the colnames
+     of `x`. For convenience, * is converted to .* automatically. Colon
+     can be to denote a specific part of the colnames string to query.
 
-\item{j}{col query}
+ Numeric or Logical: these select based on the rowKey from the `rowData`
+     method for the `LongTable`.
 
-\item{assays}{[`character`]}
+ Call: Accepts valid query statements to the `data.table` i parameter as
+     a call object. We have provided the function .() to conveniently
+     convert raw R statements into a call for use in this function.}
 
-\item{...}{ad args}
+\item{j}{[`character`], [`numeric`], [`logical`] or [`call`]
+ Character: pass in a character vector of drug names, which will subset the
+     object on all drug id columns matching the vector. This parameter also
+     supports regex queries. Colon can be to denote a specific part of the
+     colnames string to query.
 
-\item{drop}{does nothing}
+ Numeric or Logical: these select based on the rowID from the `rowData`
+     method for the `LongTable`.
+
+ Call: Accepts valid query statements to the `data.table` i parameter as
+     a call object. We have provided the function .() to conveniently
+     convert raw R statements into a call for use in this function.}
 }
 \description{
-`[`
+Single bracket subsetting for
+}
+\details{
+This function is endomorphic, it always returns a LongTable object.
 }

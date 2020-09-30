@@ -229,33 +229,35 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @param x [`LongTable`] The object to subset.
-#' @param i [`character`], [`numeric`], [`logical`] or [`call`]
+#' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all row id columns matching the vector.
 #'
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
 #'      method for the `LongTable`.
 #'
-#'  Call: Accepts R call containing a valid query to the `data.table` i parameter.
-#'      We have provided a convenience function, `.()`, for converting row R
-#'      statements into call objects for subsetting.
+#'  Expression: Accepts valid query statements to the `data.table` i parameter,
+#'      this can be used to make complex queries using the `data.table` API
+#'      for the `rowData` data.table.
 #'
-#' @param j [`character`], [`numeric`], [`logical`] or [`call`]
+#' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all drug id columns matching the vector.
 #'
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
 #'      method for the `LongTable`.
 #'
-#'  Call: Accepts R call containing a valid query to the `data.table` i parameter.
-#'      We have provided a convenience function, `.()`, for converting raw R
-#'      statements into call objects for subsetting.
+#'  Expression: Accepts valid query statements to the `data.table` i parameter,
+#'      this can be used to make complex queries using the `data.table` API
+#'      for the `colData` data.table.
 #'
 #' @param values [`character`, `numeric` or `logical`] Optional list of value
 #'      names to subset. Can be used to subset the dataList column further,
 #'      returning only the selected items in the new LongTable.
 #' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
-#'      defaults to TRUE, but can slow down subsets for large LongTables.
+#'      defaults to FALSE, since reindexing can have significant performance
+#'      costs in chained subsetting. We recommend using the `reindex` function
+#'      to manually reset the indexes after chained subsets.
 #'
 #' @return [`LongTable`] A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -264,34 +266,32 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
+setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=FALSE) {
 
     longTable <- x
     rm(x)
 
-    # alias to desired arguments
+    # local helper functions
     .rowData <- function(...) rowData(..., key=TRUE)
     .colData <- function(...) colData(..., key=TRUE)
+    .tryCatchNoWarn <- function(...) suppressWarnings(tryCatch(...))
+    .strSplitLength <- function(...) length(strsplit(...))
 
     # subset rowData
     ## FIXME:: Can I parameterize this into a helper that works for both row
     ## and column data?
     if (!missing(i)) {
         ## TODO:: Clean up this if-else block
-        if (is.call(i)) {
-            i <- i
-        } else if (tryCatch(is.character(i), error=function(e) FALSE)) {
-            ## TODO:: Add support for character vector subsetting
+        if (.tryCatchNoWarn(is.call(i), error=function(e) FALSE)) {
+            # Do nothing
+        } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            ## TODO:: Clean up implementation of regex columns
-            select <- .rowIDs(longTable)
-            if (length(strsplit(i, ':')) > length(select))
+            idCols <- colnames(.rowIDData(longTable))
+            if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
-                    paste0(select, collapse=':')))
-            i <- gsub('\\.\\*', '*', i)
-            i <- gsub('\\*', '.*', i)
-            i <- grepl(i, rownames(longTable), ignore.case=TRUE)
+                    paste0(idCols, collapse=':')))
+            i <- grepl(.preprocessRegexQuery(i), rownames(longTable), ignore.case=TRUE)
             i <- str2lang(.variableToCodeString(i))
         } else {
             i <- substitute(i)
@@ -304,18 +304,16 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     # subset colData
     if (!missing(j)) {
         ## TODO:: Clean up this if-else block
-        if (is.call(j)) {
-            j <- j
-        } else if (tryCatch(is.character(j), error=function(e) FALSE)) {
+        if (.tryCatchNoWarn(is.call(j), error=function(e) FALSE, silent=TRUE)) {
+            # Do nothing
+        } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            select <- .colIDs(longTable)
-            if (length(strsplit(j, ':')) > length(select))
+            idCols <- colnames(.colIDData(longTable))
+            if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',
-                    paste0(select, collapse=':')))
-            j <- gsub('\\.\\*', '*', j)
-            j <- gsub('\\*', '.*', j)
-            j <- grepl(j, colnames(longTable), ignore.case=TRUE)
+                    paste0(idCols, collapse=':')))
+            j <- grepl(.preprocessRegexQuery(j), colnames(longTable), ignore.case=TRUE)
             j <- str2lang(.variableToCodeString(j))
         } else {
             j <- substitute(j)
@@ -351,7 +349,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
                      rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
                      assays=assayData, metadata=metadata(longTable))
 
-    return(if (reindex) reindex(newLongTable) else longTable)
+    return(if (reindex) reindex(newLongTable) else newLongTable)
 })
 
 #' Convenience function for converting R code to a call
@@ -368,11 +366,28 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
 # ---- subset LongTable helpers
 
+#' Collapse vector of regex queries with | and replace * with .*
+#'
+#' @param queryString [`character`] Raw regex queries.
+#'
+#' @return [`character`] Formatted regex query.
+#'
+#' @keywords internal
+#' @noRd
+.preprocessRegexQuery <- function(queryString) {
+    # Support vectors of regex queries
+    query <- paste0(queryString, collapse='|')
+    # Swap all * with .*
+    query <- gsub('\\.\\*', '*', query)
+    return(gsub('\\*', '.*', query))
+}
+
 #'
 #'
 #'
 #'
 #' @keywords internal
+#' @noRd
 .validateRegexQuery <- function(regex, names) {
     ## TODO:: return TRUE if reqex query is valid, otherwise return error message
 }
@@ -386,6 +401,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'   reconstruct the variable.
 #'
 #' @keywords internal
+#' @noRd
 .variableToCodeString <- function(variable) {
     codeString <- paste0(capture.output(dput(variable)), collapse='')
     codeString <- gsub('\"', "'", codeString)

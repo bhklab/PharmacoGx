@@ -124,7 +124,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #' @keywords internal
 .verifyKeyIntegrity <- function(rowData, colData, assays) {
     if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
-        message(blue('The rowKey column is missing from rowData! Please try rebuilding the LongTable object with the constructor.'))
+        message(blue('The rowKey column is missing from rowData! Please try
+            rebuilding the LongTable object with the constructor.'))
     if (!('colKey' %in% colnames(colData)) || !is.numeric(colData$colID))
         stop()
 
@@ -211,7 +212,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
     cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
 
 
-    ## FIXME:: Why is this so slow? Also why doesn't it work?
     # --- metadata slot
     metadataString <- paste0('metadata(', length(metadata(object)), '): ')
     metadataNames <- names(metadata(object))
