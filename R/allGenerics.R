@@ -74,6 +74,16 @@ setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-")
 #' @export
 setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 
+#' Build a LongTable object
+#'
+#' @param from What to build the LongTable from?
+#' @param ... [`pairlist`] Allow definition of new parameters for
+#'     implementations of this generic.
+#'
+#' @export
+setGeneric('buildLongTable', function(from, ...) standardGeneric('buildLongTable'))
+
+
 # ===== Other Generics
 
 # ---- plot

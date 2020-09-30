@@ -84,6 +84,7 @@ Collate:
     'methods-assay.R'
     'methods-assayNames.R'
     'methods-assays.R'
+    'methods-buildLongTable.R'
     'methods-cellInfo.R'
     'methods-cellNames.R'
     'methods-colData.R'

@@ -277,14 +277,14 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     ## FIXME:: Can I parameterize this into a helper that works for both row
     ## and column data?
     if (!missing(i)) {
-        ## TODO:: Clean up this if block
+        ## TODO:: Clean up this if-else block
         if (is.call(i)) {
             i <- i
         } else if (tryCatch(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Add support for character vector subsetting
             ## TODO:: Implement diagnosis for failed regex queries
             ## TODO:: Clean up implementation of regex columns
-            select <- grep('^cellLine[:digit:]*', colnames(.rowData(longTable)), value=TRUE)
+            select <- .rowIDs(longTable)
             if (length(strsplit(i, ':')) > length(select))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
@@ -303,12 +303,12 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
     # subset colData
     if (!missing(j)) {
-        ## TODO:: Clean up this if block
+        ## TODO:: Clean up this if-else block
         if (is.call(j)) {
             j <- j
         } else if (tryCatch(is.character(j), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            select <- grep('^drug[:digit:]*', colnames(.colData(longTable)), value=TRUE)
+            select <- .colIDs(longTable)
             if (length(strsplit(j, ':')) > length(select))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',

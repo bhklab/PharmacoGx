@@ -9,27 +9,27 @@
 \arguments{
 \item{x}{[`LongTable`] The object to subset.}
 
-\item{i}{[`character`], [`numeric`], [`logical`] or [`expression`]
+\item{i}{[`character`], [`numeric`], [`logical`] or [`call`]
  Character: pass in a character vector of drug names, which will subset the
      object on all row id columns matching the vector.
 
  Numeric or Logical: these select based on the rowKey from the `rowData`
      method for the `LongTable`.
 
- Expression: Accepts valid query statements to the `data.table` i parameter,
-     this can be used to make complex queries using the `data.table` API
-     for the `rowData` data.table.}
+ Call: Accepts R call containing a valid query to the `data.table` i parameter.
+     We have provided a convenience function, `.()`, for converting row R
+     statements into call objects for subsetting.}
 
-\item{j}{[`character`], [`numeric`], [`logical`] or [`expression`]
+\item{j}{[`character`], [`numeric`], [`logical`] or [`call`]
  Character: pass in a character vector of drug names, which will subset the
      object on all drug id columns matching the vector.
 
  Numeric or Logical: these select based on the rowID from the `rowData`
      method for the `LongTable`.
 
- Expression: Accepts valid query statements to the `data.table` i parameter,
-     this can be used to make complex queries using the `data.table` API
-     for the `rowData` data.table.}
+ Call: Accepts R call containing a valid query to the `data.table` i parameter.
+     We have provided a convenience function, `.()`, for converting raw R
+     statements into call objects for subsetting.}
 
 \item{reindex}{[`logical`] Should the col/rowKeys be remapped after subsetting.
 defaults to TRUE, but can slow down subsets for large LongTables.}

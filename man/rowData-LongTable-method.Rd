@@ -13,8 +13,8 @@
 to FALSE.}
 
 \item{use.names}{[`logical`] This parameter is just here to stop matching
-they key argument to use.names from the rowData generic. It doesn't do
-anything.}
+the key argument to use.names from the rowData generic. It doesn't do
+anything at this time and can be ignored.}
 }
 \value{
 A [`data.table`] containing rowID, row identifiers, and row metadata.

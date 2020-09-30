@@ -6,8 +6,8 @@
 #' @param key [`logical`] Should the rowKey column also be returned? Defaults
 #'     to FALSE.
 #' @param use.names [`logical`] This parameter is just here to stop matching
-#'     they key argument to use.names from the rowData generic. It doesn't do
-#'     anything.
+#'     the key argument to use.names from the rowData generic. It doesn't do
+#'     anything at this time and can be ignored.
 #'
 #' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
 #'
@@ -60,13 +60,6 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
         } else {
 
         }
-    }
-
-    # case where row ids are in the updated table
-    if (all(rowIDCols %in% sharedRowIDCols)) {
-
-    } else {
-
     }
 
 })
