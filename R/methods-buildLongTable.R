@@ -172,7 +172,7 @@ setMethod('buildLongTable', signature(from='list'),
     DT <- from[[1]]
     from[[1]] <- NULL
     for (i in seq_along(from))
-        DT <- DT[from[[i]], on=idCols]
+        DT <- merge.data.table(DT, from[[i]], on=idCols, all=TRUE)
 
     # construct new LongTable
     buildLongTable(from=DT, rowDataCols, colDataCols, assayCols)

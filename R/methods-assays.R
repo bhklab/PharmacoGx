@@ -27,6 +27,11 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=FALSE, me
 
 #'
 #'
+#' @param x A [`LongTable`] to modify the assays in.
+#' @param value A [`list`] of `data.frame` or `data.table` objects, all of which
+#'   contain the row and column identifiers and metadata.
+#'
+#' @return A copy of the [`LongTable`] with the assays modified
 #'
 #' @importMethodsFrom SummarizedExperiment assays<-
 #' @export
@@ -43,7 +48,31 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     if (!all(isDT))
         for (i in which(!isDT)) setDT(values[[i]])
 
-    # extract the row and column values
+    # check new assay names
+    if (is.null(names(value))) {
+        warning(.warnMsg('The list being assigned to assays has no names.
+            Defaulting to numbered assays. You can correct his with
+            assayNames(x) <- value.'))
+        names(value) <- paste0('assay', seq_along(value))
+    }
 
+    # extract the row and column values
+    rowIDCols <- colnames(.rowIDData(x)[, -'rowKey'])
+    colIDCols <- colnames(.colIDData(x)[, -'colKey'])
+    rowMetaCols <- setdiff(colnames(rowData(x)), rowIDCols)
+    colMetaCols <- setdiff(colnames(colData(x)), colIDCols)
+
+    # get the rowData and colData column mappings
+    rowDataCols <- list(rowIDCols, rowMetaCols)
+    colDataCols <- list(colIDCols, colMetaCols)
+
+    # get assay column names
+    allCols <- unlist(rowDataCols, colDataCols)
+    assayCols <- lapply(value, colnames)
+    assayCols <- lapply(assayCols, setdiff, y=allCols)
+    names(assayCols) <- names(value)
+
+    # reconstruct a new LongTable
+    buildLongTable(from=value, rowDataCols, colDataCols, assayCols)
 
 })
