@@ -64,28 +64,27 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
     ## TODO:: Handle missing parameters
 
-    if (!is(colData, 'data.table')) {
-        colData <- data.table(colData, keep.rownames=keep.rownames)
-    }
+    if (!is(colData, 'data.table'))
+        setDT(colData, keep.rownames=keep.rownames)
 
-    if (!is(rowData, 'data.table')) {
-        rowData <- data.table(rowData, keep.rownames=keep.rownames)
-    }
+    if (!is(rowData, 'data.table'))
+        setDT(rowData, keep.rownames=keep.rownames)
 
-    if (!all(vapply(assays, FUN=is.data.table, FUN.VALUE=logical(1)))) {
+    isDT <- is.items(assays, FUN=is.data.table)
+    isDF <- is.items(assays, FUN=is.data.frame) & !isDT
+    if (!all(isDT))
         tryCatch({
-            assays <- lapply(assays, FUN=data.table, keep.rownames=keep.rownames)
+            for (i in which(isDF)) setDT()
         }, warning = function(w) {
             warning(w)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)
-            stop(paste0('List items are types: ',
-                        paste0(types, collapse=', '),
-                        '\nPlease ensure all items in the assays list are
-                        coerced to data.tables!'))
+            stop(.errorMsg(
+                 'List items are types: ',
+                 types, '\nPlease ensure all items in the assays list are
+                 coerced to data.tables!'), collapse=', ')
         })
-    }
 
     # Initialize the .internals object to store private metadata for a LongTable
     internals <- new.env()
@@ -144,9 +143,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 setMethod('show', signature(object='LongTable'), function(object) {
 
     ## FIXME:: Function too long. Can I refacter to a helper that prints each slot?
-    .collapse <- function(...) paste0(..., collapse=' ')
-
-    #`%+%` <- crayon::`%+%`
 
     # ---- class descriptions
     cat(yellow$bold$italic('< LongTable >', '\n'))
@@ -157,11 +153,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
     assaysString <- paste0('assays(', assayLength, '): ')
     assayNames <- assayNames(object)
     assayNamesString <-
-        if (length(assayNames(object)) > 6) {
+        if (length(assayNames(object)) > 6)
             paste0(.collapse(head(assayNames, 3), ' ... ', .collapse(tail(assayNames, 3))))
-        } else {
+        else
             .collapse(assayNames(object))
-        }
     cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
 
     # --- rownames
@@ -169,11 +164,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
     rowsString <- paste0('rownames(', rows, '): ')
     rownames <- rownames(object)
     rownamesString <-
-        if (length(rownames) > 6) {
+        if (length(rownames) > 6)
             paste0(.collapse(head(rownames, 3)), ' ... ', .collapse(tail(rownames, 3)))
-        } else {
+        else
             .collapse(rownames)
-        }
     cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
 
     # ---- rowData slot
@@ -181,11 +175,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
     rowDataString <- paste0('rowData(', rowCols, '): ')
     rowColnames <- colnames(rowData(object))
     rowDataNamesString <-
-        if (length(rowColnames) > 6) {
+        if (length(rowColnames) > 6)
             paste0(.collapse(head(rowColnames, 3)), ' ... ', .collapse(tail(rowColnames, 3)))
-        } else {
+        else
             .collapse(rowColnames)
-        }
     cat(yellow$bold(rowDataString) %+% green(rowDataNamesString), '\n')
 
     # ---- colnames
@@ -193,11 +186,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
     colsString <- paste0('colnames(', cols, '): ')
     colnames <- colnames(object)
     colnamesString <-
-        if (length(colnames) > 6) {
+        if (length(colnames) > 6)
             paste0(.collapse(head(colnames, 3)), ' ... ', .collapse(tail(colnames, 3)))
-        } else {
+        else
             .collapse(colnames)
-        }
     cat(yellow$bold(colsString) %+% green(colnamesString), '\n')
 
     # ---- colData slot
@@ -216,15 +208,12 @@ setMethod('show', signature(object='LongTable'), function(object) {
     metadataString <- paste0('metadata(', length(metadata(object)), '): ')
     metadataNames <- names(metadata(object))
     metadataNamesString <-
-        if (length(metadataNames) > 6) {
+        if (length(metadataNames) > 6)
             paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
-        }
-        else if (length(metadataNames) > 1) {
+        else if (length(metadataNames) > 1)
             .collapse(metadataNames)
-        }
-        else {
+        else
             'none'
-        }
     cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
 
 })

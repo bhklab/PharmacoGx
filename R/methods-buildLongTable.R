@@ -34,6 +34,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
         stop(magenta$bold('The following parameters are required:',
             c('rowDataCols', 'colDataCols', 'assayCols')[missingParams]))
 
+    # validate input and return useful messages if invalid
     ## TODO:: Check input parameters are valid
 
     # convert to data.table
@@ -57,25 +58,21 @@ setMethod('buildLongTable', signature(from='data.frame'),
     setkey(colData, colKey)
 
     # rename columns, if necessary
-    ## TODO:: Refactor this mess
     rowDataColnames <- lapply(rowDataCols, names)
-    if (length(rowDataColnames) < 2) rowDataColnames <- list(rowDataColnames)
     notNullRownames <- !vapply(rowDataColnames, FUN=is.null, FUN.VALUE=logical(1))
-    if (any(notNullRownames)) {
+    if (any(notNullRownames))
         for (i in which(notNullRownames)) {
             setnames(rowData, rowDataCols[[i]], names(rowDataCols[[i]]))
+            rowDataCols[[i]] <- names(rowDataCols[[i]])
         }
-        rowDataCols[[i]] <- names(rowDataCols[[i]])
-    }
+
     colDataColnames <- lapply(colDataCols, names)
-    if (length(colDataColnames) < 2) colDataColnames <- list(colDataColnames)
     notNullColnames <- !vapply(colDataColnames, FUN=is.null, FUN.VALUE=logical(1))
-    if (any(notNullColnames)) {
+    if (any(notNullColnames))
         for (i in which(notNullColnames)) {
             setnames(colData, colDataCols[[i]], names(colDataCols[[i]]))
+            colDataCols[[i]] <- names(colDataCols[[i]])
         }
-        colDataCols[[i]] <- names(colDataCols[[i]])
-    }
 
     # add the index columns to the different assay column vectors
     # this allows the .selectDataTable helper to be more general
@@ -117,24 +114,86 @@ setMethod('buildLongTable', signature(from='data.frame'),
 setMethod('buildLongTable', signature(from='character'),
           function(from, rowDataCols, colDataCols, assayCols)
 {
+    if (length(from) > 1)  # Call list subsetting method
+        buildLongTable(as.list(from), rowDataCols, colDataCols, assayCols)
     if (!file.exists(from))
         stop(magenta$bold("The is no file at path: ", from, '. Please double
             check the location of the source file!'))
 
     # read in data
-    tableData <- fread(filePath,
-                na.strings=unique(c(getOption('datatable.na.string'),
-                                  c('NA', 'NULL', 'NaN', 'missing', 'None',
-                                    'none', 'na', 'null', 'Null', 'Na'))))
+    tableData <- .freadNA(filePath)
 
     return(buildLongTable(from=tableData, rowDataCols, colDataCols, assayCols))
 })
 
-## TODO:: Implement buildLongTable method for lists of objects or lists of file paths.
+#' Create a LongTable object from a list containing file paths, data.frames and
+#'   data.tables.
+#'
+#' @param from [`list`] A list containing any combination of character file paths,
+#'  data.tables and data.frames which will be used to construct the LongTable.
+#'
+#'
+#' @import data.table
+#' @importFrom crayon magenta cyan
+#' @export
+setMethod('buildLongTable', signature(from='list'),
+          function(from, rowDataCols, colDataCols, assayCols) {
 
+    # local helpers
+    .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
+
+    # preprocess from list
+    isChar <- is.items(from, 'character')
+    isDT <- is.items(from, FUN=is.data.table)
+    isDF <- is.items(from, FUN=is.data.frame) & !isDT
+
+    if (!all(isChar | isDT | isDF))
+        stop(.errorMsg('List items at indexes ',
+             which(!(isChar | isDT | isDF )),
+             ' are not character, data.table or data.frame.', collapse=', '))
+
+    if (any(isChar)) from <- c(from[!isChar], lapply(from[isChar], FUN=.freadNA))
+    if (any(isDF))
+        for (i in which(isDF)) setDT(from[[i]])
+
+    # validate mappings
+    idCols <- c(unlist(rowDataCols[[1]]), unlist(colDataCols[[1]]))
+    dataColNames <- lapply(from, FUN=colnames)
+    idColsIn <- lapply(dataColNames, `%in%`, x=idCols)
+    hasAllIdCols <- unlist(lapply(idColsIn, FUN=all))
+    if (!all(hasAllIdCols)) {
+        missingCols <- unique(unlist(.mapply(`[`, x=idCols, i=idColsIn)))
+        stop(.errorMsg('Assays ', which(hasAllIdCols),
+             ' are missing one or more id columns: ', missingCols,
+             collapse=', '))
+    }
+
+    # join assays into a single table
+    DT <- from[[1]]
+    from[[1]] <- NULL
+    for (i in seq_along(from))
+        DT <- DT[from[[i]], on=idCols]
+
+    # construct new LongTable
+    buildLongTable(from=DT, rowDataCols, colDataCols, assayCols)
+
+})
 
 
 # ---- Helper Methods
+
+#' fread with more default na.strings
+#'
+#' @keywords internal
+#' @export
+#' @noRd
+.freadNA <- function(...) {
+    as.na <- unique(c(getOption('datatable.na.string'),
+        c('NA', 'NULL', 'NaN', 'missing', 'None',
+            'none', 'na', 'null', 'Null', 'Na')))
+    fread(..., na.strings=as.na)
+}
+
 
 #' Select a set of column names from a data.table, returning a copy of the
 #'   data.table with duplicate rows removed
@@ -150,6 +209,8 @@ setMethod('buildLongTable', signature(from='character'),
 #'
 #' @import data.table
 #' @keywords internal
+#' @export
+#' @noRd
 .selectDataTable <- function(colNames, DT, keep.rownames=FALSE) {
 
     # validate input

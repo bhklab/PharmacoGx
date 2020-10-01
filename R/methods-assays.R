@@ -23,3 +23,27 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=FALSE, me
     else
         return(x@assays)
 })
+
+
+#'
+#'
+#'
+#' @importMethodsFrom SummarizedExperiment assays<-
+#' @export
+setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, value) {
+
+    # check input is correct
+    isDF <- is.items(value, 'data.frame')
+    isDT <- is.items(value, 'data.table')
+    if (!all(isDF))
+        stop(.errorMsg('Items ', which(!isDT)), ' in value are not data.tables or
+            data.frames. These are the only types allowed in the value argument!',
+            collapse=', ')
+
+    if (!all(isDT))
+        for (i in which(!isDT)) setDT(values[[i]])
+
+    # extract the row and column values
+
+
+})

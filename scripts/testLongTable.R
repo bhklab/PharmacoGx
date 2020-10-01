@@ -1,16 +1,22 @@
 library(PharmacoGx)
 library(data.table)
 
-rowDataCols <- list(c(cell_line1="cell_line", BatchID="BatchID"))
-colDataCols <- list(c(drug1='drugA_name', drug2='drugB_name', drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
+rowDataCols1 <- list(c(cell_line1="cell_line", BatchID="BatchID"))
+colDataCols1 <- list(c(drug1='drugA_name', drug2='drugB_name', drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
 filePath <- 'data/drug_combo_merck.csv'
 assayCols <- list(viability=paste0('viability', seq_len(4)),
                   viability_summary=c('mu/muMax', 'X/X0'))
 
 a <- Sys.time()
-longTable <- buildLongTable(filePath, rowDataCols, colDataCols, assayCols)
+longTable <- buildLongTable(filePath, rowDataCols1, colDataCols1, assayCols)
 b <- Sys.time()
 b - a
+
+from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+
+rowDataCols <- lapply(rowDataCols1, names)
+colDataCols <- lapply(colDataCols1, names)
+longTable2 <- buildLongTable(from, rowDataCols, colDataCols, assayCols)
 
 a <- Sys.time()
 reindex(longTable)  # currently a tiny bit slower than building a long table
