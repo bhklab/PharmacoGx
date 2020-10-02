@@ -218,35 +218,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
 })
 
-#' Filter a data.table object based on the rowID and colID columns
-#'
-#' @param DT [`data.table`] Object with the columns rowID and colID, preferably
-#'  as the key columns.
-#' @param indexList [`list`] Two integer vectors, one indicating the rowIDs and
-#'  one indicating the colIDs to filter the `data.table` on.
-#'
-#' @return [`data.table`] A copy of `DT` subset on the row and column IDs specified
-#'  in `indexList`.
-#'
-#' @import data.table
-#' @keywords internal
-.filterLongDataTable <- function(DT, indexList) {
-
-    # validate input
-    if (length(indexList) > 2)
-        stop("This object is 2D, please only pass in two ID vectors, one for
-             rows and one for columns!")
-
-    if (!all(vapply(unlist(indexList), is.numeric, FUN.VALUE=logical(1))))
-        stop('Please ensure indexList only contains integer vectors!')
-
-    # extract indices
-    rowIndices <- indexList[[1]]
-    colIndices <- indexList[[2]]
-
-    # return filtered data.table
-    return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
-}
 
 # ==== LongTable Accessor Methods
 

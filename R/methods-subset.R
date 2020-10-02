@@ -218,8 +218,6 @@ setMethod('subset', signature(x='PharmacoSet'),
 
 
 # ==== LongTable Class
-
-## FIXME:: Update this documentation!
 #' Subset method for a LongTable object.
 #'
 #' Allows use of the colData and rowData `data.table` objects to query based on
@@ -266,7 +264,7 @@ setMethod('subset', signature(x='PharmacoSet'),
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=FALSE) {
+setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
 
     longTable <- x
     rm(x)
@@ -335,15 +333,13 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=FA
                      indexList=list(rowKeys, colKeys))
 
     # Subset rowData and colData to only keys contained in remaining assays
-    if (!all(assays %in% assayNames(longTable))) {
-        ## TODO:: Implement message telling users which rowData and colData
-        ## columns are being dropped when selecting a specific assay.
-        assayRowIDs <- unique(Reduce(c, lapply(assayData, `$`, name='rowKey')))
-        assayColIDs <- unique(Reduce(c, lapply(assayData, `$`, name='colKey')))
+    ## TODO:: Implement message telling users which rowData and colData
+    ## columns are being dropped when selecting a specific assay.
+    assayRowIDs <- unique(unlist(lapply(assayData, `[`, j='rowKey', drop=TRUE)))
+    assayColIDs <- unique(unlist(lapply(assayData, `[`, j='colKey', drop=TRUE)))
 
-        rowDataSubset <- rowDataSubset[rowKey %in% assayRowIDs]
-        colDataSubset <- colDataSubset[colKey %in% assayColIDs]
-    }
+    rowDataSubset <- rowDataSubset[rowKey %in% assayRowIDs]
+    colDataSubset <- colDataSubset[colKey %in% assayColIDs]
 
     newLongTable <- LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
                      rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
@@ -406,4 +402,34 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=FA
     codeString <- paste0(capture.output(dput(variable)), collapse='')
     codeString <- gsub('\"', "'", codeString)
     return(codeString)
+}
+
+#' Filter a data.table object based on the rowID and colID columns
+#'
+#' @param DT [`data.table`] Object with the columns rowID and colID, preferably
+#'  as the key columns.
+#' @param indexList [`list`] Two integer vectors, one indicating the rowIDs and
+#'  one indicating the colIDs to filter the `data.table` on.
+#'
+#' @return [`data.table`] A copy of `DT` subset on the row and column IDs specified
+#'  in `indexList`.
+#'
+#' @import data.table
+#' @keywords internal
+.filterLongDataTable <- function(DT, indexList) {
+
+    # validate input
+    if (length(indexList) > 2)
+        stop("This object is 2D, please only pass in two ID vectors, one for
+             rows and one for columns!")
+
+    if (!all(vapply(unlist(indexList), is.numeric, FUN.VALUE=logical(1))))
+        stop('Please ensure indexList only contains integer vectors!')
+
+    # extract indices
+    rowIndices <- indexList[[1]]
+    colIndices <- indexList[[2]]
+
+    # return filtered data.table
+    return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
 }

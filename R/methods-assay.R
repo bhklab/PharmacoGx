@@ -47,3 +47,42 @@ setMethod('assay',
 
     return(assayData)
 })
+
+
+#' Add or replace an assay in a LongTable by name
+#'
+#' @param x [`LongTable`]
+#' @param i [`character`]
+#' @param value [`data.frame`] or [`data.table`]
+#'
+#' @return [`LongTable`] With updated assays slot.
+#'
+#' @importMethodsFrom SummarizedExperiment assay<-
+#' @export
+setReplaceMethod('assay',
+                 signature(x='LongTable', i='character'),
+                 function(x, i, value) {
+
+    if (!is.data.frame(value)) stop(.errorMsg('Only a data.frame or data.table
+        can be assiged to the assay slot.'))
+
+    if (length(i) > 1) stop(.errorMsg("Only a single assay name can be assiged
+        with assay(x, i) <- value."))
+
+    whichAssay <- which(i %in% assayNames(x))
+
+    assayData <- assays(x, withDimnames=TRUE, metadata=TRUE)
+
+    if (!is.data.table(value)) setDT(value)
+
+    if (length(whichAssay) > 0) {
+        assayData[[i]] <- value
+    } else {
+        assayData <- c(assayData, eval(str2lang(paste0('list(', i, '=value)'))))
+    }
+
+    ## TODO:: Validate row and column IDs here so that the error isn't thrown from assays
+
+    assays(x) <- assayData
+    return(x)
+})

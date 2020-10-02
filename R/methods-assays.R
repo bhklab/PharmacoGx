@@ -63,11 +63,11 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     colMetaCols <- setdiff(colnames(colData(x)), colIDCols)
 
     # get the rowData and colData column mappings
-    rowDataCols <- list(rowIDCols, rowMetaCols)
-    colDataCols <- list(colIDCols, colMetaCols)
+    rowDataCols <- if (length(rowMetaCols) > 0) list(rowIDCols, rowMetaCols) else list(rowIDCols)
+    colDataCols <- if (length(colMetaCols) > 0) list(colIDCols, colMetaCols) else list(colIDCols)
 
     # get assay column names
-    allCols <- unlist(rowDataCols, colDataCols)
+    allCols <- c(unlist(rowDataCols), unlist(colDataCols))
     assayCols <- lapply(value, colnames)
     assayCols <- lapply(assayCols, setdiff, y=allCols)
     names(assayCols) <- names(value)

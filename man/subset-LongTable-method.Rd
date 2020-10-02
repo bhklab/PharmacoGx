@@ -4,7 +4,7 @@
 \alias{subset,LongTable-method}
 \title{Subset method for a LongTable object.}
 \usage{
-\S4method{subset}{LongTable}(x, i, j, assays, reindex = FALSE)
+\S4method{subset}{LongTable}(x, i, j, assays, reindex = TRUE)
 }
 \arguments{
 \item{x}{[`LongTable`] The object to subset.}

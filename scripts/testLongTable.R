@@ -13,6 +13,10 @@ longTable <- buildLongTable(filePath, rowDataCols1, colDataCols1, assayCols)
 b <- Sys.time()
 b - a
 
+viab <- assay(longTable, 'viability', withDimnames=TRUE, metadata=TRUE)
+
+assay(longTable, 'new_viability') <- viab
+
 from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
 from[[2]] <- from[[2]][drug1 == '5-FU', drug1 := '0test']
 
