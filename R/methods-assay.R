@@ -14,6 +14,7 @@
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
 #' @export
+##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assay',
           signature(x='LongTable'),
           function(x, i, withDimnames=FALSE, metadata=FALSE) {

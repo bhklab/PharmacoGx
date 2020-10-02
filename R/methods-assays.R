@@ -12,7 +12,9 @@
 #'
 #' @importMethodsFrom SummarizedExperiment assays
 #' @export
-setMethod('assays', signature(x='LongTable'), function(x, withDimnames=FALSE, metadata=FALSE) {
+##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
+setMethod('assays', signature(x='LongTable'),
+    function(x, withDimnames=FALSE, metadata=FALSE) {
 
     if (withDimnames)
         return(structure(

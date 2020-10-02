@@ -81,6 +81,12 @@ setMethod('buildLongTable', signature(from='data.frame'),
     if (is.null(names(assayCols))) names(assayCols) <- paste0('assay', seq_along(assayCols))
     assays <- lapply(assayCols, .selectDataTable, DT=assayData)
 
+    # remove the colname suffixes by reference from assays which had the same
+    # colnames prior to joining into a single DT
+    for (assay in assays) {
+        setnames(assay, colnames(assay), gsub('\\._\\d$', '', colnames(assay)))
+    }
+
     ## applicable to any type of data. Maybe allow user to specify? For example
     ## by naming the elements of rowDataCols and colDataCols?
     return(LongTable(rowData=rowData, rowIDs=rowDataCols[[1]],
@@ -153,8 +159,7 @@ setMethod('buildLongTable', signature(from='list'),
              ' are not character, data.table or data.frame.', collapse=', '))
 
     if (any(isChar)) from <- c(from[!isChar], lapply(from[isChar], FUN=.freadNA))
-    if (any(isDF))
-        for (i in which(isDF)) setDT(from[[i]])
+    if (any(isDF)) for (i in which(isDF)) setDT(from[[i]])
 
     # validate mappings
     idCols <- c(unlist(rowDataCols[[1]]), unlist(colDataCols[[1]]))
@@ -171,8 +176,21 @@ setMethod('buildLongTable', signature(from='list'),
     # join assays into a single table
     DT <- from[[1]]
     from[[1]] <- NULL
+    assayNames <- names(assayCols)
     for (i in seq_along(from))
-        DT <- merge.data.table(DT, from[[i]], on=idCols, all=TRUE)
+        DT <- merge.data.table(DT, from[[i]], on=idCols, all=TRUE,
+            suffixes=c('', paste0('._', i)))
+
+    # fix assayCols if there are duplicate column names between assays
+    # the join will append '._n' where n is the assay index - 1
+    .greplAny <- function(...) any(grepl(...))
+    hasSuffixes <- unlist(lapply(paste0('._', seq_along(from)), .greplAny, x=colnames(DT)))
+    if (any(hasSuffixes)) {
+        whichHasSuffixes <- which(hasSuffixes) + 1
+        assayCols[whichHasSuffixes] <-
+            .mapply(paste0, assayCols[whichHasSuffixes],
+                    paste0('._', seq_along(from))[hasSuffixes])
+    }
 
     # construct new LongTable
     buildLongTable(from=DT, rowDataCols, colDataCols, assayCols)

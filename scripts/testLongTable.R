@@ -15,17 +15,24 @@ b - a
 
 viab <- assay(longTable, 'viability', withDimnames=TRUE, metadata=TRUE)
 
+## TODO:: Assay is slower than assays for assignment
+a <- Sys.time()
 assay(longTable, 'new_viability') <- viab
+b <- Sys.time()
+b - a
 
 from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
-from[[2]] <- from[[2]][drug1 == '5-FU', drug1 := '0test']
+
+assayCols$new_viability <- assayCols$viability
 
 rowDataCols <- lapply(rowDataCols1, names)
 colDataCols <- lapply(colDataCols1, names)
 longTable2 <- buildLongTable(from, rowDataCols, colDataCols, assayCols)
 
+a <- Sys.time()
 assays(longTable) <- from
-
+b <- Sys.time()
+b - a
 
 a <- Sys.time()
 reindex(longTable)  # currently a tiny bit slower than building a long table
@@ -41,7 +48,7 @@ longTable[['viability']]
 
 longTable[, c('5-FU:*', 'Temozolamide:MK-8776')]
 
-longTable$viability[, colMeans(.SD, na.rm=TRUE)]
+x <- longTable$viability[, mean := rowMeans(.SD, na.rm=TRUE)]
 
 # Compare runtimes of subset with and without reindexing
 a <- Sys.time()
