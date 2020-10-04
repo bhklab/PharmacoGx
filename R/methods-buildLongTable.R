@@ -28,6 +28,9 @@
 setMethod('buildLongTable', signature(from='data.frame'),
           function(from, rowDataCols, colDataCols, assayCols)
 {
+    # local helpers
+    .unlist <- function(x) unlist(x, recursive=TRUE, use.names=FALSE)
+
     # handle missing params
     missingParams <- c(missing(rowDataCols), missing(colDataCols), missing(assayCols))
     if (any(missingParams))
@@ -37,21 +40,20 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # validate input and return useful messages if invalid
     ## TODO:: Check input parameters are valid
 
-    # convert to data.table
+    # convert to data.table by refernce
     if (!is.data.table(from))
-        from <- data.table(from, keep.rownames=FALSE)
+        setDT(from)
 
     # build drug and cell metadata tables and index by the appropriate ID
-    colData <- unique(from[, unlist(colDataCols), with=FALSE])
+    colData <- unique(from[, .unlist(colDataCols), with=FALSE])
     colData[, colKey := seq_len(.N)]
-    rowData <- unique(from[, unlist(rowDataCols), with=FALSE])
+    rowData <- unique(from[, .unlist(rowDataCols), with=FALSE])
     rowData[, rowKey := seq_len(.N)]
 
-    # add the row and column ids to the value data; as.character strips names
-    # which were causing an error inside data.table call
-    assayData <- from[rowData, on=as.character(unlist(rowDataCols))][colData, on=as.character(unlist(colDataCols))]
+    # add the row and column ids to the value data
+    assayData <- from[rowData, on=.unlist(rowDataCols)][colData, on=as.character(unlist(colDataCols))]
     rm(from)
-    assayData[, as.character(c(unlist(rowDataCols), unlist(colDataCols))) := NULL]
+    assayData[, as.character(c(.unlist(rowDataCols), .unlist(colDataCols))) := NULL]
     setkey(assayData, rowKey, colKey)
 
     setkey(rowData, rowKey)
@@ -176,7 +178,6 @@ setMethod('buildLongTable', signature(from='list'),
     # join assays into a single table
     DT <- from[[1]]
     from[[1]] <- NULL
-    assayNames <- names(assayCols)
     for (i in seq_along(from))
         DT <- merge.data.table(DT, from[[i]], on=idCols, all=TRUE,
             suffixes=c('', paste0('._', i)))

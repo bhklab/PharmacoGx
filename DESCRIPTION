@@ -19,6 +19,7 @@ Suggests: pander,
 Encoding: UTF-8
 Imports: 
     Biobase,
+    BiocGenerics,
     S4Vectors,
     SummarizedExperiment,
     BiocParallel,
@@ -36,7 +37,8 @@ Imports:
     reshape2,
     testthat,
     jsonlite,
-    crayon
+    crayon,
+    data.table
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
