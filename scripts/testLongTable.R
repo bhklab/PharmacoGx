@@ -13,6 +13,21 @@ microbenchmark({
     longTable <- buildLongTable(filePath, rowDataCols1, colDataCols1, assayCols)
 }, times=1L)
 
+rowdata <- rowData(longTable)
+rowdata[, testCol := rnorm(nrow(longTable))]
+rowdata
+
+rowData(longTable) <- rowdata
+rowData(longTable)
+
+coldata <- colData(longTable)
+coldata[, testCols := rnorm(ncol(longTable))]
+coldata
+
+colData(longTable) <- coldata
+colData(longTable)
+
+
 
 viab <- assay(longTable, 'viability', withDimnames=TRUE, metadata=TRUE)
 
