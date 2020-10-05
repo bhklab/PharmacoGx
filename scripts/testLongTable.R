@@ -2,8 +2,8 @@ library(PharmacoGx)
 library(data.table)
 library(microbenchmark)
 
-rowDataCols1 <- list(c(cell_line1="cell_line", BatchID="BatchID"))
-colDataCols1 <- list(c(drug1='drugA_name', drug2='drugB_name',
+rowDataCols <- list(c(cell_line1="cell_line", BatchID="BatchID"))
+colDataCols <- list(c(drug1='drugA_name', drug2='drugB_name',
     drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
 filePath <- 'data/drug_combo_merck.csv'
 assayCols <- list(viability=paste0('viability', seq_len(4)),
@@ -27,7 +27,10 @@ coldata
 colData(longTable) <- coldata
 colData(longTable)
 
+from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+from$new_viab <- from$viability
 
+assayCols$new_viab <- colnames(assay(longTable, 'viability'))
 
 viab <- assay(longTable, 'viability', withDimnames=TRUE, metadata=TRUE)
 
