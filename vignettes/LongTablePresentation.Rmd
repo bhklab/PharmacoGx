@@ -1,0 +1,458 @@
+---
+title: "The LongTable Class"
+author: "Christopher Eeles"
+date: '2020-10-05'
+output: 
+    beamer_presentation:
+        theme: CambridgeUS
+        colortheme: dolphin
+classoption: "aspectratio=169"
+---
+
+```{r setup, include=FALSE}
+library(formatR)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r dependencies, include=FALSE}
+library(PharmacoGx)
+library(data.table)
+```
+
+# Why Do We Need A New Class?
+
+- The current implementation for the `@sensitivy` slot in a `PharmacoSet` has some
+limitations.
+
+- Firstly, it does not natively support dose-response experiments with
+multiple drugs and/or cancer cell lines. As a result we have not been 
+able to include this data into a PharmacoSet thus far.
+
+- Secondly, drug combination data has the potential to scale to high dimensionality. 
+As a result we need an object that is highly performant to ensure
+computations on such data can be completed in a timely manner.
+
+
+# Design Philosophy
+
+- To resolve these issues Petr began designing a new class, the `long.array`, to
+support drug combination data. My work over the last month has been adapting the
+`long.array` concept into what I have tentatively dubbed the `LongTable`.
+
+- The current use case is supporting drug and cell-line combinations in 
+`PharmacoGx`, but we wanted to create something flexible enough to fit
+other use cases.
+
+- As such, the current class makes no mention of drugs or cell-lines,
+nor anything specifically related to Bioinformatics or Computation Biology.
+
+- Rather, we tried to design a general purpose data structure which could support
+high dimensional data for any use case.
+
+# Design Philosophy
+
+- Our design takes the best aspects
+of the `SummarizedExperiment` and `MultiAssayExperiment` class and implements 
+them using the `data.table` package, which provides an R API to a rich set of 
+tools for high performance data processing implemented in C.
+
+# Anatomy of a LongTable: Class Diagram
+
+\vspace{-1em}
+\centering\includegraphics[height = 0.9\textheight]{LongTableClassDiagram.png}
+
+
+# Anatomy of a LongTable: Class Diagram
+
+\vspace{-0.5em}
+\center\includegraphics[height = 0.6\textheight]{LongTableClassDiagram.png}
+
+\flushleft
+
+- We have borrowed directly from the `SummarizedExperiment` class
+for the `rowData`, `colData`, `metadata` and `assays` slot names
+
+- We also implemented the `SummarizedExperiment` accessor generics for the `LongTable`
+
+# Anatomy of a LongTable: Object Structure and Cardinality
+
+- There are, however, some important differences which make this object more
+flexible when dealing with high dimensional data.
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.8\textheight]{LongTableStucture.png}
+
+
+# Anatomy of a LongTable: Strucutre and Cardinality
+
+\vspace{-1.0em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-1.0em}
+
+- Unlike a `SummarizedExperiment`, there are three distinct 
+classes of columns in `rowData` and `colData`. 
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-1em}
+
+- The first is the `rowKey` or `colKey`, these are implemented internally to keep mappings between each assay
+and the associated samples or drugs; these will not be returned by the accessors
+by default. 
+
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0.8em}
+
+- The second are the `rowIDs` and `colID`, these hold all of the 
+information necessary to uniquely identify a row or column and are used to 
+generate the `rowKey` and `colKey`. 
+
+
+# Anatomy of a LongTable: Structure and Cardinaility
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0.8em}
+
+- Finally, there are the `rowMeta` and `colMeta`
+columns, which store any additional data about samples or drugs not required
+to uniquely identify a row in either table.
+
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0.8em}
+
+- Within the assays the `rowKey` and `colKey` are combined to form a primary key
+for each assay row. 
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0.8em}
+
+- This is required because each assay is stored in 'long' 
+format, instead of wide format as in the assay matrices within a 
+`SummarizedExperiment`.
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0,8em}
+
+- Thanks to the fast implementation of binary search
+within the `data.table` package, assay tables can scale up to tens or even
+hundreds of millions of rows while still being relatively performant.
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0,8em}
+
+- Also worth noting is the cardinality between `rowData` and `colData` for a given
+assay within the assays list. 
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0,8em}
+
+-As indicated by the lower connection between these
+tables and an assay, for each row or column key there may be zero or more rows in
+the assay table. 
+
+# Anatomy of a LongTable: Structure and Cardinality
+
+\vspace{-1.2em}
+\center\includegraphics[height=0.7\textheight]{LongTableStucture.png}
+\vspace{-0,8em}
+
+- Conversely for each row in the assay there may be zero or one key
+in `colData` or `rowData`. When combined, the `rowKey` and `colKey` for a given
+row in an assay become a composite key which maps that to
+
+
+# Building a LongTable
+
+- The current implementation of the `buildLongTable` function is able to assemble
+a `LongTable` object from two sources. 
+
+- The first is a single large table with
+all assays, row and column data contained within it.
+
+- This is the structure of the Merck drug combination data that has been used to
+test the data structure thus far.
+
+# Building a LongTable
+
+```{r head_data, echo=TRUE}
+
+filePath <- '../data/drug_combo_merck.csv'
+merckDT <- fread(filePath, na.strings=c('NULL'))
+colnames(merckDT)
+```
+
+# Building a LongTable
+
+```{r, fig.width=80, echo=TRUE}
+knitr::kable(head(merckDT)[, 1:5])
+```
+
+# Building a LongTable
+
+```{r, fig.width=80, echo=TRUE}
+knitr::kable(head(merckDT)[, 5:ncol(merckDT)])
+```
+
+- We can see from the last two slides that all the data related to the 
+treatment response experiment is contained within this table.
+
+# Building a LongTable: Single Assays Table
+
+To build a `LongTable` object from this file:
+
+```{r build_from_single_table_file, echo=TRUE}
+rowDataCols <- list(
+    c(cell_line1="cell_line", BatchID="BatchID"))
+colDataCols <- list(
+    c(drug1='drugA_name', drug2='drugB_name', 
+     drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'), 
+    c(comboName='combination_name'))
+assayCols <- list(viability=paste0('viability', seq_len(4)),
+                  viability_summary=c('mu/muMax', 'X/X0'))
+longTable <- buildLongTable(from=filePath, rowDataCols, 
+                            colDataCols, assayCols)
+```
+
+# Building a LongTable: Single Assays Table
+
+```{r}
+longTable
+```
+
+# Building a LongTable: Single Assays Table
+
+- This function will also work if directly passed a `data.table` or `data.frame`
+object:
+
+```{r from_single_table, eche=TRUE}
+longTable1 <- buildLongTable(from=merckDT, rowDataCols, colDataCols, assayCols)
+
+paste0('All equal? ', all.equal(longTable, longTable1))
+```
+
+# Building a LongTable: Multiple Assay Tables
+
+- The second option for building a `LongTable` is to pass it a list of different
+assays with a shared set of row and column identifiers. 
+
+- We haven't had a chance to testing this functionality with real data yet, 
+but do have a toy example.
+
+# Building a LongTable: Multiple Assay Tables
+
+```{r from_list_of_tables, echo=TRUE}
+assayList <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+assayList$new_viability <- assayList$viability  # Add a fake additional assay
+assayCols$new_viability <-  assayCols$viability  # Add column names for fake assay
+longTable2 <- buildLongTable(from=assayList, lapply(rowDataCols, names), lapply(colDataCols, names), assayCols)
+```
+
+# Building a LongTable: Multiple Assay Tables
+
+```{r }
+longTable2
+```
+
+- We can see that a new assay has been added to the `LongTable` object when passed
+a list of assay tables containing the required row and column IDs
+
+- Additionally, any row or column IDs not already in rowData or colData will
+be appended to these slots automiatically!
+
+# LongTable Object
+
+- As mentioned previously, a `LongTable` has both list and table like behaviours.
+For table like operations, a given `LongTable` can be thought of as a `rowKey`
+by `colKey` rectangular object. 
+
+- To support `data.frame` like subsetting for this
+object, the constructor makes pseudo row and column names, which are the ID columns
+for each row of `rowData` or `colData` pasted together with a ':'.
+
+# LongTable Object: Row and Column Names
+
+```{r rownames, echo=TRUE}
+head(rownames(longTable))
+```
+
+- We see that the rownames for the Merck `LongTable` are the cell line name
+pasted to the batch id.
+
+```{r colnames, echo=TRUE}
+head(colnames(longTable))
+```
+
+- For the column names, a similar pattern is followed by combining the colID 
+columns in the form 'drug1:drug2:drug1dose:drug2dose'.
+
+# `data.frame` Subsetting
+
+We can subset a `LongTable` using the same row and column name syntax as 
+with a `data.frame` or `matrix`.
+
+```{r subset_dataframe_character, echo=TRUE}
+row <- rownames(longTable)[1]
+columns <- colnames(longTable)[1:2]
+longTable[row, columns]
+```
+
+# `data.frame` Subsetting: Regex Queries
+
+- However, unlike a `data.frame` or `matrix` this subsetting also accepts partial
+row and column names as well as regex queries.
+
+```{r rowdata_coldata, echo=TRUE}
+head(rowData(longTable), 3)
+head(colData(longTable), 3)
+```
+
+# `data.frame` Subsetting: Regex Queries
+
+- For example, if we want to get all instance where '5-FU' is the drug:
+
+```{r simple_regex, echo=TRUE}
+longTable[, '5-FU']
+```
+
+- This has matched all colnames where 5-FU was in either drug1 or drug2. 
+
+# `data.frame` Subsetting: Regex Queries
+
+- If we only want to match drug1, we have several options:
+
+```{r column_specific_regex, echo=TRUE}
+all.equal(longTable[, '5-FU:*:*:*'], longTable[, '^5-FU'])
+```
+
+# `data.table` Subsetting
+
+- In addition to regex queries, a `LongTable` object supports arbitrarily complex
+subset queries using the `data.table` API. 
+
+- To access this API, you will need to use the `.` function, which allows you 
+to pass raw R expressions to be evaluated inside the `i` and `j` arguments 
+for `dataTable[i, j]`.
+
+# `data.table` Subsetting
+
+- For example if I want to subset to rows where the cell line is VCAP and columns
+where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
+
+```{r , echo=TRUE}
+longTable[.(cell_line1 == 'VCAP'),  # row query
+          .(drug1 == 'Temozolomide' & drug2 %in% c('Lapatinib', 'Bortezomib'))]  # column query
+```
+
+# `data.table` Subsetting
+
+- We can also invert matches or subset on other columns in `rowData` or `colData`:
+
+```{r echo=TRUE}
+subLongTable <- 
+  longTable[.(BatchID != 2),
+            .(drug1 == 'Temozolomide' & drug2 != 'Lapatinib')]
+```
+
+- To show that it works as expected:
+
+```{r echo=TRUE}
+print(paste0('BatchID: ', paste0(unique(rowData(subLongTable)$BatchID), collapse=', ')))
+print(paste0('drug2: ', paste0(unique(colData(subLongTable)$drug2), collapse=', ')))
+```
+
+# Accessor Methods: rowData
+
+```{r echo=TRUE}
+head(rowData(longTable), 3)
+```
+
+```{r echo=TRUE}
+head(rowData(longTable, key=TRUE), 3)
+```
+
+# Accessor Methods: colData
+
+```{r echo=TRUE}
+head(colData(longTable), 3)
+```
+
+```{r echo=TRUE}
+head(colData(longTable, key=TRUE), 3)
+```
+
+# Accessor Methods: assays
+
+```{r echo=TRUE}
+assays <- assays(longTable)
+assays[[1]]
+```
+
+# Accessor Methods: assays
+
+```{r echo=TRUE}
+assays[[2]]
+```
+
+# Accessor Methods: assays
+
+```{r echo=TRUE}
+assays <- assays(longTable, withDimnames=TRUE)
+colnames(assays[[1]])
+```
+
+# Accessor Methods: assays
+
+```{r echo=TRUE}
+assays <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+colnames(assays[[2]])
+```
+
+# Accessor Methods: assays
+
+```{r echo=TRUE}
+assayNames(longTable)
+```
+
+- Using these names we can access specific assays within a `LongTable`
+
+
+# Accessor Methods: assay
+
+```{r echo=TRUE}
+colnames(assay(longTable, 'viability'))
+assay(longTable, 'viability')
+```
+
+# Accessor Methods: assay
+
+```{r echo=TRUE}
+colnames(assay(longTable, 'viability', withDimnames=TRUE))
+assay(longTable, 'viability', withDimnames=TRUE)
+```
+
+
+
