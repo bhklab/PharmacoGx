@@ -62,52 +62,70 @@ setOldClass('long.table')
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       metadata=list(), keep.rownames=FALSE) {
 
-    ## TODO:: Handle missing parameters
+    # handle missing parameters
+    isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
+                 colData=missing(colData), assays=missing(assays))
 
+    if (any(isMissing))
+        stop(.errorMsg('\nRequire parameter(s) missing: ',
+            names(isMissing)[isMissing], collapse='\n\t'))
+
+    # check parameter types and coerce or error
     if (!is(colData, 'data.table'))
-        setDT(colData, keep.rownames=keep.rownames)
+        tryCatch({ setDT(colData, keep.rownames=keep.rownames) },
+            error=function(e)
+                stop(.errorMsg("colData must be coercible to a data.frame!")))
 
     if (!is(rowData, 'data.table'))
-        setDT(rowData, keep.rownames=keep.rownames)
+        tryCatch({ setDT(rowData, keep.rownames=keep.rownames) },
+            error=function(e)
+                stop(.errorMsg('rowData must be coerceible to a data.frame!')))
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
     if (!all(isDT))
         tryCatch({
-            for (i in which(isDF)) setDT(assay[i])
-        }, warning = function(w) {
-            warning(w)
+            for (i in which(isDF)) setDT(assay[i], keep.rownames)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)
             stop(.errorMsg(
                  '\nList items are types: ',
                  types, '\nPlease ensure all items in the assays list are ',
-                 'coercable to data.frames!'), collapse=', ')
+                 'coercable to a data.frame!'), collapse=', ')
         })
 
-    # Initialize the .internals object to store private metadata for a LongTable
+    # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
 
-    ## TODO:: Implement error handling
-    internals$rowIDs <-
-        if (is.numeric(rowIDs) && max(rowIDs) < ncol(rowData))
-            rowIDs
-        else
-            which(colnames(rowData) %in% rowIDs)
+    # capture row interal metadata
+    if (is.numeric(rowIDs) | is.logical(rowIDs)) rowIDs <- colnames(rowData)[rowIDs]
+    if (!all(rowIDs %in% colnames(rowData)))
+        stop(.errorMsg('\nRow IDs not in rowData: ',
+            setdiff(rowIDs, colnames(rowData)), collapse=', '))
+    internals$rowIDs <- rowIDs
     lockBinding('rowIDs', internals)
+    internals$rowMeta <- setdiff(colnames(rowData[, -'rowKey']), rowIDs)
+    lockBinding('rowMeta', internals)
 
-    internals$colIDs <-
-        if (is.numeric(colIDs) && max(colIDs) < ncol(colData))
-            colIDs
-        else
-            which(colnames(colData) %in% colIDs)
+    # capture column internal metadata
+    if (is.numeric(colIDs) | is.logical(colIDs))
+        colIDs <- colnames(colData)[colIDs]
+    if (!all(colIDs %in% colnames(colData)))
+        stop(.errorMsg('\nColumn IDs not in colData: ',
+            setdiff(colIDs, colnames(colData)), collapse=', '))
+    internals$colIDs <- colIDs
     lockBinding('colIDs', internals)
+    internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
+    lockBinding('colMeta', internals)
 
-    # Assemble the pseudo row and column names for the LongTable
+    ## Assemble the pseudo row and column names for the LongTable
+    ### TODO:: Is this the slow part of the constructor?
     .pasteColons <- function(...) paste(..., collapse=':')
-    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))), .SDcols=internals$rowIDs]
-    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))), .SDcols=internals$colIDs]
+    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=internals$rowIDs]
+    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=internals$colIDs]
 
     return(.LongTable(rowData=rowData, colData=colData,
                       assays=assays, metadata=metadata,
@@ -221,118 +239,117 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
 # ==== LongTable Accessor Methods
 
-# ---- Private Helper Methods
-
-# generics
-
-#' Return the identifiers for the column meta data in an object
+#' Get the id column names for the rowData slot of a LongTable
 #'
+#' @param object A [`LongTable`] to get the rowData id columns for.
+#' @param data [`logical`] Should the rowData for the id columns be returned
+#'     instead of the column names? Default is FALSE.
+#' @param key [`logical`] Should the key column also be returned?
+#'
+#' @return A [`character`] vector of rowData column names if data is FALSE,
+#'      otherwise a [`data.table`] with the data from the rowData id columns.
+#'
+#' @import data.table
 #' @export
-setGeneric('.colIDData', function(object, ...) standardGeneric('.colIDData'))
+setMethod('rowIDs', signature(object='LongTable'),
+    function(object, data=FALSE, key=FALSE) {
 
-#' Return the identifiers for the row metadata columns in an object
-#'
-#'
-#' @export
-setGeneric('.rowIDData', function(object, ...) standardGeneric('.rowIDData'))
-
-
-#' Private method to retrieve the .colIDs property from an object
-#'
-#' @export
-setGeneric('.colIDs', function(object, ...) standardGeneric('.colIDs'))
-
-#' Private method to retrieve the .rowIDs property from an object
-#'
-#' @export
-#' @keywords internal
-setGeneric('.rowIDs', function(object, ...) standardGeneric('.rowIDs'))
-
-#' Private method to retrieve the both the .rowIDs and .colIDs properties from
-#'   an object in a list.
-#'
-#' @param object [`any`] An object with a .intern slot with the items .rowIDs
-#'   and .colIDs
-#'
-#' @return A [`list`] v
-#'
-#' @export
-#' @keywords internal
-setGeneric('.dimIDs', function(object, ...) standardGeneric('.dimIDs'))
-
-# methods
-
-#' Extract the row ID columns from `rowDat` of a `LongTable`
-#'
-#' @param object [`LongTable`] What to get the colIDData from.
-#' @param key [`logical`] Should the `colKey` column also be returned? Default
-#'     is TRUE.
-#'
-#' @export
-#' @keywords internal
-setMethod('.rowIDData', signature(object='LongTable'), function(object, key=TRUE) {
-    colNames <- colnames(rowData(object, key))[.rowIDs(object)]
-    keepCols <- if (key) c(colNames, 'rowKey') else colNames
-
-    return(rowData(object, key)[, keepCols, with=FALSE])
+    cols <- getIntern(object, 'rowIDs')
+    if (key) cols <- c(cols, 'rowKey')
+    if (data) rowData(object, key=TRUE)[, ..cols] else cols
 })
 
-#' Extract the column ID columns from colData of a LongTable
+#' Get the id column names for the rowData slot of a LongTable
 #'
-#' @param object [`LongTable`] What to get the colIDData from
-#' @param key [`logical`] Should the colKey also be returned? Default is TRUE.
+#' @param object A [`LongTable`] to get the rowData metadata columns for.
+#' @param data [`logical`] Should the rowData for the metadata columns be returned
+#'     instead of the column names? Default is FALSE.
+#' @param key [`logical`] Should the key column also be returned? Default is FALSE
 #'
+#' @return A [`character`] vector of rowData column names if data is FALSE,
+#'      otherwise a [`data.table`] with the data from the rowData metadta columns.
+#'
+#' @import data.table
 #' @export
-#' @keywords internal
-setMethod('.colIDData', signature(object='LongTable'), function(object, key=TRUE) {
-    colNames <- colnames(colData(object))[.colIDs(object)]
-    keepCols <- if (key) c(colNames, 'colKey') else colNames
+setMethod('rowMeta', signature(object='LongTable'),
+    function(object, data=FALSE, key=FALSE){
 
-    return(colData(object, key)[, keepCols, with=FALSE])
+    cols <- getIntern(object, 'rowIDs')
+    if (key) cols <- c(cols, 'rowKey')
+    if (data) rowData(object, key=TRUE)[, ..cols] else cols
+
 })
 
-#' Developer accessor method to determine which columns hold the column identifiers
-#'   in the `colData` slot of a `LongTable` object.
+#' Get the id column names for the colData slot of a LongTable
 #'
-#' @param A [`object`] `LongTable` object to retrieve the column identifier
-#'    column indexes from.
+#' @param object A [`LongTable`] to get the colData id columns for.
+#' @param data [`logical`] Should the colData for the id columns be returned
+#'     instead of the column names? Default is FALSE.
+#' @param key [`logical`] Should the key column also be returned? Default is FALSE.
 #'
-#' @return [`numeric`] A numeric vector of integer column indexes for the ID
-#'   columns in `colData`.
+#' @return A [`character`] vector of colData column names if data is FALSE,
+#'      otherwise a [`data.table`] with the data from the colData id columns.
 #'
+#' @import data.table
 #' @export
-#' @keywords internal
-setMethod('.colIDs', signature(object='LongTable'), function(object) {
-    object@.intern$colIDs
+setMethod('colIDs', signature(object='LongTable'),
+    function(object, data=FALSE, key=FALSE) {
+
+    cols <- getIntern(object, 'colIDs')
+    if (key) cols <- c(cols, 'colKey')
+    if (data) colData(object, key=TRUE)[, ..cols] else cols
+
 })
 
-#' Developer accessor method to determine which columns hold the row identifiers
-#'   in the `rowData` slot of a `LongTable` object.
+#' Get the id column names for the colData slot of a LongTable
 #'
-#' @param A [`object`] `LongTable` object to retrieve the row identifier column
-#'   indexes from.
+#' @param object A [`LongTable`] to get the colData metadata columns for.
+#' @param data [`logical`] Should the colData for the metadata columns be returned
+#'     instead of the column names? Default is FALSE.
+#' @param key [`logical`] Should the key column also be returned?
 #'
-#' @return [`numeric`] A numeric vector of integer column indexes for the ID
-#'   columns in `rowData`.
+#' @return A [`character`] vector of colData column names if data is FALSE,
+#'      otherwise a [`data.table`] with the data from the colData metadta columns.
 #'
+#' @import data.table
 #' @export
-#' @keywords internal
-setMethod('.rowIDs', signature(object='LongTable'), function(object) {
-    object@.intern$rowIDs
+setMethod('colMeta', signature(object='LongTable'),
+    function(object, data=FALSE, key=FALSE) {
+
+    cols <- getIntern(object, 'colMeta')
+    if (key) cols <- c(cols, 'colKey')
+    if (data) colData(object, key=TRUE)[, ..cols] else cols
 })
 
-#' Developer accessor method to determine which columns hold the row identifiers
-#'   in the `rowData` slot of a `LongTable` object.
+#' Retrieve the value columns for the assays in a LongTable
 #'
-#' @param A [`LongTable`] object to retrieve the row identifier column
-#'   indexes from.
+#' @param object [`LongTable`]
+#' @param i Optional parameter specifying the [`character`] name or [`interger`]
+#'     index of the assay to get the column names for. If missing, returns a
+#'     list of value column names for all the assays.
 #'
-#' @return A [`list`] containing two `numeric` vectors, the first for the
-#'    identifier columns for the `rowData` slot and the second with the same
-#'    for the `colData` slot
+#' @return A [`list`] of `character` vectors containing the value column names for
+#'     each assay if i is missing, otherwise a `character` vector of value column
+#'     names for the selected assay.
 #'
+#' @import data.table
 #' @export
-#' @keywords internal
-setMethod('.dimIDs', signature(object='LongTable'), function(object) {
-    list(.rowIDs(object), .colIDs(object))
+setMethod('assayCols', signature(object='LongTable'),
+    function(object, i) {
+
+
+    colNameList <- lapply(assays(object, key=FALSE), names)
+    if (!missing(i)) {
+        if (length(i) > 1) stop(.errorMsg('The i parameter only accepts a ',
+            'single assay name or index'))
+
+        if ((is.numeric(i) && i < length(colNameList)) ||
+            (is.character(i) && i %in% names(colNameList)))
+            colNameList[[i]]
+        else
+            stop(.errorMsg("The specified index is invalid!"))
+    } else {
+        colNameList
+    }
+
 })

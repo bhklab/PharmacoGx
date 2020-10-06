@@ -47,7 +47,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     }
 
     # assemble information to select proper update method
-    rowIDCols <- colnames(.rowIDData(x)[, -'rowKey'])
+    rowIDCols <- rowIDs(x)
     sharedRowIDCols <- intersect(rowIDCols, colnames(value))
 
     metadataCols <- setdiff(sharedRowIDCols, colnames(rowData(x)))
@@ -60,7 +60,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
             this function only supports updates with the same
             rowID columns as the current rowData.!')
 
-    rowIDs <- .rowIDData(x)
+    rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
 
     rowData <- rowIDs[value, on=sharedRowIDCols]
     .pasteColons <- function(...) paste(..., collapse=':')

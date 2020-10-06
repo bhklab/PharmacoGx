@@ -37,8 +37,8 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
                            DT2=newColData, on=colIDCols)
     newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
 
-    return(LongTable(rowData=newRowData, rowIDs=.rowIDs(object),
-                     colData=newColData, colIDs=.colIDs(object),
+    return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
+                     colData=newColData, colIDs=getIntern(object, 'colIDs'),
                      assays=newAssayData, metadata=metadata(object)))
 
 })

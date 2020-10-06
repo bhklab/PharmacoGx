@@ -7,5 +7,5 @@
 #' @importMethodsFrom SummarizedExperiment assayNames
 #' @export
 setMethod('assayNames', signature(x='LongTable'), function(x) {
-    return(names(assays(x)))
+    return(names(x@assays))
 })

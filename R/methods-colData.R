@@ -43,7 +43,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
     }
 
     # assemble information to select proper update method
-    colIDCols <- colnames(.colIDData(x)[, -'colKey'])
+    colIDCols <- colIDs(x)
     sharedColIDCols <- intersect(colIDCols, colnames(value))
 
     metadataCols <- setdiff(sharedColIDCols, colnames(colData(x)))
@@ -59,7 +59,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
             this function only supports updates with the same
             colID columns as the current colData!')
 
-    colIDs <- .colIDData(x)
+    colIDs <- colIDs(x, data=TRUE, key=TRUE)
 
     colData <- colIDs[value, on=sharedColIDCols]
 

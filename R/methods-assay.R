@@ -10,6 +10,7 @@
 #' @param metadata [`logical`] Should all of the metadata also be joined to
 #'   the assay. This is useful when modifying assays as the resulting list
 #'   has all the information needed to recreated the LongTable object.
+#' @param key [`logical`] Should the key columns also be returned?
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
@@ -17,34 +18,35 @@
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assay',
           signature(x='LongTable'),
-          function(x, i, withDimnames=FALSE, metadata=FALSE) {
+          function(x, i, withDimnames=FALSE, metadata=FALSE, key=TRUE) {
 
     # validate input
     if (length(i) > 1)
-        stop(magenta$bold('\nPlease specifying a single character assay name or',
+        stop(.errorMsg('\nPlease specifying a single character assay name or',
             'integer index. See assayNames(x) for available assays.'))
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
     if (length(keepAssay) < 1)
-        stop(magenta$bold('\nThere is no assay named ',
-                    i,
-                    ' in this LongTable. Use assayNames(longTable) for a list',
-                    'of valid assay names.'))
+        stop(.errorMsg('\nThere is no assay ', i,
+            ' in this LongTable. Use assayNames(longTable) for a list',
+            'of valid assay names.'))
 
     # extract the specified assay
-    assayData <- assays(x)[[keepAssay]]
+    assayData <- x@assays[[keepAssay]]
 
     # optionally join to rowData and colData
     if (withDimnames && !metadata) {
-        assayData <- .rowIDData(x)[assayData, on='rowKey'][, -'rowKey']
-        assayData <- .colIDData(x)[assayData, on='colKey'][, -'colKey']
+        assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, on='rowKey']
+        assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, on='colKey']
     } else if (withDimnames && metadata) {
-        assayData <- rowData(x, key=TRUE)[assayData, on='rowKey'][, -'rowKey']
-        assayData <- colData(x, key=TRUE)[assayData, on='colKey'][, -'colKey']
+        assayData <- rowData(x, key=TRUE)[assayData, on='rowKey']
+        assayData <- colData(x, key=TRUE)[assayData, on='colKey']
     }
 
+    if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
+
     if (!withDimnames && metadata)
-    warning(cyan$bold('\nCannot use metadata=TRUE when withDimnames=FALSE.',
+    warning(.warnMsg('\nCannot use metadata=TRUE when withDimnames=FALSE.',
         'Ignoring the metadata argument.'))
 
     return(assayData)
@@ -83,8 +85,4 @@ setReplaceMethod('assay',
         assayData <- c(assayData, eval(str2lang(paste0('list(', i, '=value)'))))
     }
 
-    ## TODO:: Validate row and column IDs here so that the error isn't thrown from assays
-
-    assays(x) <- assayData
-    return(x)
 })

@@ -14,16 +14,13 @@
 #' @export
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),
-    function(x, withDimnames=FALSE, metadata=FALSE) {
+    function(x, withDimnames=FALSE, metadata=FALSE, key=TRUE) {
 
-    if (withDimnames)
-        return(structure(
-            lapply(assayNames(x),
-                   FUN=assay,
-                   x=x, withDimnames=withDimnames, metadata=metadata),
-            .Names=assayNames(x)))
-    else
-        return(x@assays)
+    return(structure(
+        lapply(assayNames(x),
+               FUN=assay,
+               x=x, withDimnames=withDimnames, metadata=metadata, key=key),
+               .Names=assayNames(x)))
 })
 
 

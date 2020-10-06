@@ -98,6 +98,7 @@ Collate:
     'methods-drugSensitivitySig.R'
     'methods-fNames.R'
     'methods-featureInfo.R'
+    'methods-getIntern.R'
     'methods-intersect.R'
     'methods-mDataNames.R'
     'methods-metadata.R'

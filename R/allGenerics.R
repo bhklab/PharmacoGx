@@ -86,9 +86,64 @@ setGeneric('buildLongTable', function(from, ...) standardGeneric('buildLongTable
 
 # ===== Other Generics
 
-# ---- plot
+#' Retrieve the symbol for the object@.intern slot
+#'
+#' Internal slot for storing metadata relevant to the internal operation of an
+#'     S4 object.
+#'
+#' Warning: This method is intended for developer use and can be ignored by
+#'   users.
+#'
+#' @param object [`S4`] An object with an @.itern slot containing an environment.
+#' @param x [`character`] One or more symbol names to retrieve from the
+#'    object@.intern environment.
+#'
+#' @export
+#' @keywords internal
+#' @noRd
+setGeneric('getIntern', function(object, x, ...) standardGeneric('getIntern'))
 
-# FIXME:: Surely we can import this generic from somewhere?
-setGeneric("plot")
+#' Generic to access the row identifiers from
+#'
+#' @param object [`S4`] An object to get row id columns from.
+#' @param ... Allow new arguments to this generic.
+#'
+#' @export
+#' @noRd
+setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
 
+#' Generic to access the row identifiers from
+#'
+#' @param object [`S4`] An object to get row metadata columns from.
+#' @param ... Allow new arguments to this generic.
+#'
+#' @export
+#' @noRd
+setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 
+#' Generic to access the row identifiers for an object.
+#'
+#' @param object [`S4`] An object to get column id columns from.
+#' @param ... ALlow new arguments to this generic
+#'
+#' @export
+#' @noRd
+setGeneric('colIDs', function(object, ...) standardGeneric('colIDs'))
+
+#' Generic to access the column identifiers for an object.
+#'
+#' @param object [`S4`] An object to get column metadata columns from.
+#' @param ... ALlow new arguments to this generic
+#'
+#' @export
+#' @noRd
+setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
+
+#' Generic to access the assay columns of an object.
+#'
+#' @param object [`S4`] An object to get assay ids from.
+#' @param ... Allow new arguments to this generic.
+#'
+#' @export
+#' @noRd
+setGeneric('assayCols', function(object, ...) standardGeneric('assayCols'))
