@@ -23,7 +23,7 @@ test_that('Can build LongTable from a file path', {
      expect_equal_to_reference(longTable, 'merckLongTable.rds')
 })
 
-merckDT <- fread(filePath)
+merckDT <- fread(filePath, na.strings=c('NULL', 'NA', 'None', 'NULL'))
 test_that('Can build longTable from a data.table', {
     longTable1 <- buildLongTable(from=merckDT, rowDataCols, colDataCols, assayCols)
     expect_s4_class(longTable1,'LongTable')

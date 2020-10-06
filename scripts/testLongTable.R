@@ -11,7 +11,7 @@ assayCols <- list(viability=paste0('viability', seq_len(4)),
 
 microbenchmark({
     longTable <- buildLongTable(filePath, rowDataCols1, colDataCols1, assayCols)
-}, times=1L)
+}, times=10L)
 
 rowdata <- rowData(longTable)
 rowdata[, testCol := rnorm(nrow(longTable))]
