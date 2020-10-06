@@ -7,7 +7,7 @@
 \alias{[[,LongTable,ANY,ANY-method}
 \title{LongTable class definition}
 \usage{
-\S4method{[[}{LongTable,ANY,ANY}(x, i, keys = FALSE)
+\S4method{[[}{LongTable,ANY,ANY}(x, i, keys = FALSE, withDimnames = TRUE, metadata = FALSE)
 }
 \arguments{
 \item{x}{[`LongTable`] object to retrieve assays from}
@@ -17,13 +17,19 @@
 \item{keys}{[`logical`] Should the row and column keys also be returned?
 Defaults to FALSE to make applying aggregate functions more convenient.}
 
+\item{withDimnames}{[`logical`] Should the row and column IDs be joined to
+the assay. Default is TRUE to allow easy use of group by arguments when
+performing data aggregation using the `data.table` API.}
+
+\item{metadata}{[`logical`] Should the row and column metadata also
+be joined to the to the returned assay. Default is FALSE, but could be
+useful if the metadata will be used for group by operation.}
+
 \item{drugs}{[`data.table`]}
 
 \item{cells}{[`data.table`]}
 
 \item{assays}{[`list`]}
-
-\item{metadata}{[`list`]}
 }
 \value{
 [`LongTable`] object containing the assay data from a

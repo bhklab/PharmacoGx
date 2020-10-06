@@ -21,15 +21,15 @@ setMethod('assay',
 
     # validate input
     if (length(i) > 1)
-        stop(magenta$bold('Please specifying a single character assay name or
-            integer index. See assayNames(x) for available assays.'))
+        stop(magenta$bold('\nPlease specifying a single character assay name or',
+            'integer index. See assayNames(x) for available assays.'))
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
     if (length(keepAssay) < 1)
-        stop(magenta$bold('There is no assay named ',
+        stop(magenta$bold('\nThere is no assay named ',
                     i,
-                    ' in this LongTable. Use assayNames(longTable) for a list of
-                    valid assay names.'))
+                    ' in this LongTable. Use assayNames(longTable) for a list',
+                    'of valid assay names.'))
 
     # extract the specified assay
     assayData <- assays(x)[[keepAssay]]
@@ -43,8 +43,9 @@ setMethod('assay',
         assayData <- colData(x, key=TRUE)[assayData, on='colKey'][, -'colKey']
     }
 
-    if (!withDimnames && metadata) warning(cyan$bold('Cannot use metadata=TRUE
-        when withDimnames=FALSE. Ignoring the metadata argument.'))
+    if (!withDimnames && metadata)
+    warning(cyan$bold('\nCannot use metadata=TRUE when withDimnames=FALSE.',
+        'Ignoring the metadata argument.'))
 
     return(assayData)
 })

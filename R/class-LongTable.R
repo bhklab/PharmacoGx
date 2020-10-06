@@ -74,16 +74,16 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
     if (!all(isDT))
         tryCatch({
-            for (i in which(isDF)) setDT()
+            for (i in which(isDF)) setDT(assay[i])
         }, warning = function(w) {
             warning(w)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)
             stop(.errorMsg(
-                 'List items are types: ',
-                 types, '\nPlease ensure all items in the assays list are
-                 coerced to data.tables!'), collapse=', ')
+                 '\nList items are types: ',
+                 types, '\nPlease ensure all items in the assays list are ',
+                 'coercable to data.frames!'), collapse=', ')
         })
 
     # Initialize the .internals object to store private metadata for a LongTable

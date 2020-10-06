@@ -52,9 +52,9 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
 
     # check new assay names
     if (is.null(names(value))) {
-        warning(.warnMsg('The list being assigned to assays has no names.
-            Defaulting to numbered assays. You can correct his with
-            assayNames(x) <- value.'))
+        warning(.warnMsg('\nThe list being assigned to assays has no names.',
+            'Defaulting to numbered assays. You can correct his with',
+            'assayNames(x) <- value.'))
         names(value) <- paste0('assay', seq_along(value))
     }
 
