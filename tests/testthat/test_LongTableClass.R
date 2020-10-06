@@ -126,11 +126,18 @@ test_that('assay works correctly', {
     expect_equal_to_reference(assay, 'merckLongTable.assay.viability.rds')
     assayDimnames <- assay(longTable, assayNames(longTable)[1], withDimnames=TRUE)
     expect_equal_to_reference(assayDimnames, 'merckLongTable.assayDimnames.viability.rds')
+    expect_equal(assay(longTable, 1), assay(longTable, 'viability'))
 })
 
 
 # error correctly
 context('LongTable accessor methods error correctly')
+test_that('assay function errors if assay is missing', {
+    expect_error(assay(longTable, 'random'))
+})
+test_that('assay function errors with logical', {
+
+})
 
 # ----- 3. Setter Methods
 

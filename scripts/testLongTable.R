@@ -2,8 +2,8 @@ library(PharmacoGx)
 library(data.table)
 library(microbenchmark)
 
-rowDataCols <- list(c(cell_line1="cell_line", BatchID="BatchID"))
-colDataCols <- list(c(drug1='drugA_name', drug2='drugB_name',
+rowDataCols1 <- list(c(cell_line1="cell_line", BatchID="BatchID"))
+colDataCols1 <- list(c(drug1='drugA_name', drug2='drugB_name',
     drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
 filePath <- 'data/drug_combo_merck.csv'
 assayCols <- list(viability=paste0('viability', seq_len(4)),
