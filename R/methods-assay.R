@@ -49,7 +49,8 @@ setMethod('assay',
     warning(.warnMsg('\nCannot use metadata=TRUE when withDimnames=FALSE.',
         'Ignoring the metadata argument.'))
 
-    return(assayData)
+    assayData
+
 })
 
 
@@ -85,4 +86,8 @@ setReplaceMethod('assay',
         assayData <- c(assayData, eval(str2lang(paste0('list(', i, '=value)'))))
     }
 
+    ## TODO:: Do I need to call the build function?
+
+    x@assays <- assayData
+    x
 })

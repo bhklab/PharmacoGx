@@ -24,7 +24,7 @@ setMethod('assays', signature(x='LongTable'),
 })
 
 
-#'
+#' Setter method for the assays slot in a LongTable object
 #'
 #' @param x A [`LongTable`] to modify the assays in.
 #' @param value A [`list`] of `data.frame` or `data.table` objects, all of which
@@ -56,10 +56,10 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     }
 
     # extract the row and column values
-    rowIDCols <- colnames(.rowIDData(x)[, -'rowKey'])
-    colIDCols <- colnames(.colIDData(x)[, -'colKey'])
-    rowMetaCols <- setdiff(colnames(rowData(x)), rowIDCols)
-    colMetaCols <- setdiff(colnames(colData(x)), colIDCols)
+    rowIDCols <- rowIDs(x, key=FALSE)
+    colIDCols <- colIDs(x, key=FALSE)
+    rowMetaCols <- rowMeta(x, key=FALSE)
+    colMetaCols <- colMeta(x, key=FALSE)
 
     # get the rowData and colData column mappings
     rowDataCols <- if (length(rowMetaCols) > 0) list(rowIDCols, rowMetaCols) else list(rowIDCols)

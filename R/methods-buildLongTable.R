@@ -86,7 +86,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # remove the colname suffixes by reference from assays which had the same
     # colnames prior to joining into a single DT
     for (assay in assays) {
-        setnames(assay, colnames(assay), gsub('\\._\\d$', '', colnames(assay)))
+        setnames(assay, colnames(assay), gsub('\\._\\d+$', '', colnames(assay)))
     }
 
     ## applicable to any type of data. Maybe allow user to specify? For example
@@ -147,6 +147,9 @@ setMethod('buildLongTable', signature(from='character'),
 setMethod('buildLongTable', signature(from='list'),
           function(from, rowDataCols, colDataCols, assayCols) {
 
+    # Prevent modify by reference for data.tables in list
+    from <- copy(from)
+
     # local helpers
     .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
 
@@ -175,27 +178,31 @@ setMethod('buildLongTable', signature(from='list'),
              collapse=', '))
     }
 
+    # Set key for faster joins
+    from <- lapply(from, setkeyv, cols=idCols)
+
     # join assays into a single table
     DT <- from[[1]]
     from[[1]] <- NULL
     for (i in seq_along(from))
-        DT <- merge.data.table(DT, from[[i]], on=idCols, all=TRUE,
-            suffixes=c('', paste0('._', i)))
+        DT <- merge.data.table(DT, from[[i]], suffixes=c('', paste0('._', i)))
 
     # fix assayCols if there are duplicate column names between assays
     # the join will append '._n' where n is the assay index - 1
     .greplAny <- function(...) any(grepl(...))
+    .paste0IfElse <- function(vector, suffix, isIn=c('rowKey', 'colKey'))
+        ifelse(vector %in% isIn, vector, paste0(vector, suffix))
     hasSuffixes <- unlist(lapply(paste0('._', seq_along(from)), .greplAny, x=colnames(DT)))
     if (any(hasSuffixes)) {
         whichHasSuffixes <- which(hasSuffixes) + 1
         assayCols[whichHasSuffixes] <-
-            .mapply(paste0, assayCols[whichHasSuffixes],
-                    paste0('._', seq_along(from))[hasSuffixes])
+            .mapply(FUN=.paste0IfElse,
+                    vector=assayCols[whichHasSuffixes],
+                    suffix=paste0('._', seq_along(from))[hasSuffixes])
     }
 
     # construct new LongTable
     buildLongTable(from=DT, rowDataCols, colDataCols, assayCols)
-
 })
 
 

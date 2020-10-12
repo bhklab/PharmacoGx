@@ -284,7 +284,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             # Do nothing
         } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- colnames(.rowIDData(longTable))
+            idCols <- rowIDs(longTable, key=TRUE)
             if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
@@ -306,7 +306,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             # Do nothing
         } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- colnames(.colIDData(longTable))
+            idCols <- colIDs(longTable, key=TRUE)
             if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',

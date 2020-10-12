@@ -147,3 +147,10 @@ setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
 #' @export
 #' @noRd
 setGeneric('assayCols', function(object, ...) standardGeneric('assayCols'))
+
+##' Generic to access the build configuration for an S4 object.
+##'
+##' @param object [`S4`] The object to retireve the configuration from.
+##'
+##'
+#setGeneric('getConfig', function(object, ...) standardGeneric(''))

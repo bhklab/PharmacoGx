@@ -89,6 +89,7 @@ Collate:
     'methods-buildLongTable.R'
     'methods-cellInfo.R'
     'methods-cellNames.R'
+    'methods-coerce.R'
     'methods-colData.R'
     'methods-dateCreated.R'
     'methods-dim.R'

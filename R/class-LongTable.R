@@ -119,7 +119,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
     lockBinding('colMeta', internals)
 
-    ## Assemble the pseudo row and column names for the LongTable
+    # Reorder columns to match the keys, this prevents issues in unit tests
+    # caused by different column orders.
+    setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
+    setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
+
+    ## Assemble  the pseudo row and column names for the LongTable
     ### TODO:: Is this the slow part of the constructor?
     .pasteColons <- function(...) paste(..., collapse=':')
     rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
@@ -145,7 +150,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
             rebuilding the LongTable object with the constructor.'))
     if (!('colKey' %in% colnames(colData)) || !is.numeric(colData$colID))
         stop()
-
 }
 
 # ---- LongTable Class Methods
@@ -274,7 +278,7 @@ setMethod('rowIDs', signature(object='LongTable'),
 setMethod('rowMeta', signature(object='LongTable'),
     function(object, data=FALSE, key=FALSE){
 
-    cols <- getIntern(object, 'rowIDs')
+    cols <- getIntern(object, 'colMeta')
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=TRUE)[, ..cols] else cols
 
@@ -337,7 +341,6 @@ setMethod('colMeta', signature(object='LongTable'),
 setMethod('assayCols', signature(object='LongTable'),
     function(object, i) {
 
-
     colNameList <- lapply(assays(object, key=FALSE), names)
     if (!missing(i)) {
         if (length(i) > 1) stop(.errorMsg('The i parameter only accepts a ',
@@ -353,3 +356,5 @@ setMethod('assayCols', signature(object='LongTable'),
     }
 
 })
+
+## TODO:: Implement a function to get the entire configuration needed to make a LongTable object

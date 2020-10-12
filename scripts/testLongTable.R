@@ -2,51 +2,54 @@ library(PharmacoGx)
 library(data.table)
 library(microbenchmark)
 
+setDTthreads(2)
+
 rowDataCols1 <- list(c(cell_line1="cell_line", BatchID="BatchID"))
 colDataCols1 <- list(c(drug1='drugA_name', drug2='drugB_name',
     drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
 filePath <- 'data/drug_combo_merck.csv'
-assayCols <- list(viability=paste0('viability', seq_len(4)),
+assayCols <- list(#dose=c('drugA Conc (µM)', 'drugB Conc (µM)'),
+                  viability=paste0('viability', seq_len(4)),
                   viability_summary=c('mu/muMax', 'X/X0'))
 
 microbenchmark({
     longTable <- buildLongTable(filePath, rowDataCols1, colDataCols1, assayCols)
-}, times=10L)
+}, times=1L)
 
-rowdata <- rowData(longTable)
-rowdata[, testCol := rnorm(nrow(longTable))]
-rowdata
+# rowdata <- rowData(longTable)
+# rowdata[, testCol := rnorm(nrow(longTable))]
+# rowdata
+#
+# rowData(longTable) <- rowdata
+# rowData(longTable)
+#
+# coldata <- colData(longTable)
+# coldata[, testCols := rnorm(ncol(longTable))]
+# coldata
 
-rowData(longTable) <- rowdata
-rowData(longTable)
+# colData(longTable) <- coldata
+# colData(longTable)
 
-coldata <- colData(longTable)
-coldata[, testCols := rnorm(ncol(longTable))]
-coldata
-
-colData(longTable) <- coldata
-colData(longTable)
-
-from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+## TODO:: This needs a lot of parameters now?
+from <- assays(longTable, withDimnames=TRUE, metadata=TRUE, key=FALSE)
 from$new_viab <- from$viability
 
-assayCols$new_viab <- colnames(assay(longTable, 'viability'))
+assayCols$new_viab <- assayCols(longTable, 'viability')
 
-viab <- assay(longTable, 'viability', withDimnames=TRUE, metadata=TRUE)
 
 ## TODO:: Assay is slower than assays for assignment
-a <- Sys.time()
-assay(longTable, 'new_viability') <- viab
-b <- Sys.time()
-b - a
-
-from <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
-
-assayCols$new_viability <- assayCols$viability
+#a <- Sys.time()
+## FIXME:: This is adding prefixes to assay column names?
+#assay(longTable, 'new_viability') <- viab
+#b <- Sys.time()
+#b - a
 
 rowDataCols <- lapply(rowDataCols1, names)
 colDataCols <- lapply(colDataCols1, names)
-longTable2 <- buildLongTable(from, rowDataCols, colDataCols, assayCols)
+microbenchmark({
+    longTable2 <- buildLongTable(from, rowDataCols, colDataCols, assayCols)
+}, times=10L)
+
 
 a <- Sys.time()
 assays(longTable) <- from
