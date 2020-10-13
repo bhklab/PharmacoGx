@@ -376,130 +376,130 @@ checkPsetStructure <-
       }
     }
 
-    #####
-    # Checking cell
-    #####
-    if('tissueid' %in% colnames(object@cell)) {
-      if('unique.tissueid' %in% colnames(object@curation$tissue))
-      {
-        if(length(intersect(rownames(object@curation$tissue),
-                            rownames(object@cell))) != nrow(object@cell)) {
-          message('rownames of curation tissue slot should be the same as cell
-                  slot (curated cell ids)')
-        } else{
-          if(length(intersect(object@cell$tissueid,
-                              object@curation$tissue$unique.tissueid)) !=
-             length(table(object@cell$tissueid))){
-            message('tissueid should be the same as unique tissue id from tissue
-                    curation slot')
-          }
-        }
-      } else {
-        message('unique.tissueid which is curated tissue id across data set
-                should be a column of tissue curation slot')
-      }
-      if(any(is.na(object@cell[,'tissueid']) | object@cell[,'tissueid']=='',
-             na.rm=TRUE)){
-        message(sprintf('There is no tissue type for this cell line(s): %s',
-                        paste(rownames(object@cell)[which(is.na(
-                          object@cell[,'tissueid']) |
-                            object@cell[,'tissueid']=='')], collapse=' ')))
-      }
-    } else {
-      warning('tissueid does not exist in cell slot')
-    }
-
-    if('unique.cellid' %in% colnames(object@curation$cell)) {
-      if(length(intersect(object@curation$cell$unique.cellid,
-                          rownames(object@cell))) != nrow(object@cell)) {
-        print('rownames of cell slot should be curated cell ids')
-      }
-    } else {
-      print('unique.cellid which is curated cell id across data set should be a
-            column of cell curation slot')
-    }
-#     if('cellid' %in% colnames(object@cell)) {
-#       if(length(intersect(object@curation$cell$cellid, rownames(object@cell)))
-#    != nrow(object@cell)) {
-#         print('values of cellid column should be curated cell line ids')
-#       }
-#     } else {
-#       print('cellid which is curated cell id across data set should be a column of cell slot')
-#     }
-
-    if(length(intersect(rownames(object@curation$cell),
-                        rownames(object@cell))) != nrow(object@cell)) {
-      print('rownames of curation cell slot should be the same as cell slot
-            (curated cell ids)')
-    }
-
-    if('unique.drugid' %in% colnames(object@curation$drug)) {
-      if(length(intersect(object@curation$drug$unique.drugid,
-                          rownames(object@drug))) != nrow(object@drug)) {
-        print('rownames of drug slot should be curated drug ids')
-      }
-    } else {
-      print('unique.drugid which is curated drug id across data set should be a
-            column of drug curation slot')
-    }
-
-#     if('drugid' %in% colnames(object@drug)) {
-#       if(length(intersect(object@curation$drug$drugid,
-#    rownames(object@drug))) != nrow(object@drug)) {
-#         print('values of drugid column should be curated drug ids')
-#       }
-#     } else {
-#       print('drugid which is curated drug id across data set should be a
-#    column of drug slot')
-#     }
-
-    if(length(intersect(rownames(object@curation$cell),
-                        rownames(object@cell))) != nrow(object@cell)) {
-      print('rownames of curation drug slot should be the same as drug
-            slot (curated drug ids)')
-    }
-
-    if(!is(object@cell, 'data.frame')) {
-      warning('cell slot class type should be dataframe')
-    }
-    if(!is(object@drug, 'data.frame')) {
-      warning('drug slot class type should be dataframe')
-    }
-    if(object@datasetType %in% c('sensitivity', 'both'))
-    {
-      if(!is(object@sensitivity$info, 'data.frame')) {
-        warning('sensitivity info slot class type should be dataframe')
-      }
-      if('cellid' %in% colnames(object@sensitivity$info)) {
-        if(!all(object@sensitivity$info[,'cellid'] %in% rownames(object@cell))){
-          warning('not all the cell lines in sensitivity data are in cell slot')
-        }
-      }else {
-        warning('cellid does not exist in sensitivity info')
-      }
-      if('drugid' %in% colnames(object@sensitivity$info)) {
-        drug.ids <- unique(object@sensitivity$info[,'drugid'])
-        drug.ids <- drug.ids[grep('///',drug.ids, invert=TRUE)]
-        if(!all(drug.ids %in% rownames(object@drug))) {
-          print('not all the drugs in sensitivity data are in drug slot')
-        }
-      }else {
-        warning('drugid does not exist in sensitivity info')
-      }
-
-      if(any(!is.na(object@sensitivity$raw))) {
-        if(!all(dimnames(object@sensitivity$raw)[[1]] %in%
-                rownames(object@sensitivity$info))) {
-          warning('For some experiments there is raw sensitivity data but no
-                  experiment information in sensitivity info')
-        }
-      }
-      if(!all(rownames(object@sensitivity$profiles) %in%
-              rownames(object@sensitivity$info))) {
-        warning('For some experiments there is sensitivity profiles but no
-                experiment information in sensitivity info')
-      }
-    }
+#    #####
+#    # Checking cell
+#    #####
+#    if('tissueid' %in% colnames(object@cell)) {
+#      if('unique.tissueid' %in% colnames(object@curation$tissue))
+#      {
+#        if(length(intersect(rownames(object@curation$tissue),
+#                            rownames(object@cell))) != nrow(object@cell)) {
+#          message('rownames of curation tissue slot should be the same as cell
+#                  slot (curated cell ids)')
+#        } else{
+#          if(length(intersect(object@cell$tissueid,
+#                              object@curation$tissue$unique.tissueid)) !=
+#             length(table(object@cell$tissueid))){
+#            message('tissueid should be the same as unique tissue id from tissue
+#                    curation slot')
+#          }
+#        }
+#      } else {
+#        message('unique.tissueid which is curated tissue id across data set
+#                should be a column of tissue curation slot')
+#      }
+#      if(any(is.na(object@cell[,'tissueid']) | object@cell[,'tissueid']=='',
+#             na.rm=TRUE)){
+#        message(sprintf('There is no tissue type for this cell line(s): %s',
+#                        paste(rownames(object@cell)[which(is.na(
+#                          object@cell[,'tissueid']) |
+#                            object@cell[,'tissueid']=='')], collapse=' ')))
+#      }
+#    } else {
+#      warning('tissueid does not exist in cell slot')
+#    }
+#
+#    if('unique.cellid' %in% colnames(object@curation$cell)) {
+#      if(length(intersect(object@curation$cell$unique.cellid,
+#                          rownames(object@cell))) != nrow(object@cell)) {
+#        print('rownames of cell slot should be curated cell ids')
+#      }
+#    } else {
+#      print('unique.cellid which is curated cell id across data set should be a
+#            column of cell curation slot')
+#    }
+##     if('cellid' %in% colnames(object@cell)) {
+##       if(length(intersect(object@curation$cell$cellid, rownames(object@cell)))
+##    != nrow(object@cell)) {
+##         print('values of cellid column should be curated cell line ids')
+##       }
+##     } else {
+##       print('cellid which is curated cell id across data set should be a column of cell slot')
+##     }
+#
+#    if(length(intersect(rownames(object@curation$cell),
+#                        rownames(object@cell))) != nrow(object@cell)) {
+#      print('rownames of curation cell slot should be the same as cell slot
+#            (curated cell ids)')
+#    }
+#
+#    if('unique.drugid' %in% colnames(object@curation$drug)) {
+#      if(length(intersect(object@curation$drug$unique.drugid,
+#                          rownames(object@drug))) != nrow(object@drug)) {
+#        print('rownames of drug slot should be curated drug ids')
+#      }
+#    } else {
+#      print('unique.drugid which is curated drug id across data set should be a
+#            column of drug curation slot')
+#    }
+#
+##     if('drugid' %in% colnames(object@drug)) {
+##       if(length(intersect(object@curation$drug$drugid,
+##    rownames(object@drug))) != nrow(object@drug)) {
+##         print('values of drugid column should be curated drug ids')
+##       }
+##     } else {
+##       print('drugid which is curated drug id across data set should be a
+##    column of drug slot')
+##     }
+#
+#    if(length(intersect(rownames(object@curation$cell),
+#                        rownames(object@cell))) != nrow(object@cell)) {
+#      print('rownames of curation drug slot should be the same as drug
+#            slot (curated drug ids)')
+#    }
+#
+#    if(!is(object@cell, 'data.frame')) {
+#      warning('cell slot class type should be dataframe')
+#    }
+#    if(!is(object@drug, 'data.frame')) {
+#      warning('drug slot class type should be dataframe')
+#    }
+#    if(object@datasetType %in% c('sensitivity', 'both'))
+#    {
+#      if(!is(object@sensitivity$info, 'data.frame')) {
+#        warning('sensitivity info slot class type should be dataframe')
+#      }
+#      if('cellid' %in% colnames(object@sensitivity$info)) {
+#        if(!all(object@sensitivity$info[,'cellid'] %in% rownames(object@cell))){
+#          warning('not all the cell lines in sensitivity data are in cell slot')
+#        }
+#      }else {
+#        warning('cellid does not exist in sensitivity info')
+#      }
+#      if('drugid' %in% colnames(object@sensitivity$info)) {
+#        drug.ids <- unique(object@sensitivity$info[,'drugid'])
+#        drug.ids <- drug.ids[grep('///',drug.ids, invert=TRUE)]
+#        if(!all(drug.ids %in% rownames(object@drug))) {
+#          print('not all the drugs in sensitivity data are in drug slot')
+#        }
+#      }else {
+#        warning('drugid does not exist in sensitivity info')
+#      }
+#
+#      if(any(!is.na(object@sensitivity$raw))) {
+#        if(!all(dimnames(object@sensitivity$raw)[[1]] %in%
+#                rownames(object@sensitivity$info))) {
+#          warning('For some experiments there is raw sensitivity data but no
+#                  experiment information in sensitivity info')
+#        }
+#      }
+#      if(!all(rownames(object@sensitivity$profiles) %in%
+#              rownames(object@sensitivity$info))) {
+#        warning('For some experiments there is sensitivity profiles but no
+#                experiment information in sensitivity info')
+#      }
+#    }
   }
 
 

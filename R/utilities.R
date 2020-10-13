@@ -97,10 +97,11 @@ is.items <- function(list, ..., FUN=is)
     if (length(mappings$unmapped) > 1)
         assayCols$experiment_metadata <- mappings$unmapped
 
-    metadata <- as.list(unique(sensDT[, mappings$metadata, with=FALSE]))
+    ## FIXME:: Re-implement metadata once we sort out column mappings.
+    #metadata <- as.list(unique(sensDT[, mappings$metadata, with=FALSE]))
 
     longTable <- buildLongTable(from=sensDT, rowDataCols, colDataCols, assayCols)
-    metadata(longTable) <- metadata
+    #metadata(longTable) <- metadata
 
     return(longTable)
 }
@@ -189,8 +190,9 @@ is.items <- function(list, ..., FUN=is)
     mapped <- c(mapped, possibleRow)
 
     unmapped <- setdiff(colnames(info), mapped)
-    unmapped <- c(definiteRow, unmapped)
+    unmapped <- c(definiteRow, definiteMetaData, unmapped)
 
-    mappings <- list(rowMeta=definiteCell, colMeta=definiteDrug, metadata=definiteMeta, unmapped=unmapped)
+    ## FIXME:: Removed metadata columns to ensure I can recreate sensitivityInfo
+    mappings <- list(rowMeta=definiteCell, colMeta=definiteDrug, unmapped=unmapped)
     return(mappings)
 }
