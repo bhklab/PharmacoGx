@@ -6,4 +6,5 @@ PharmacoGx.Rproj
 */.DS_store
 */figure
 doc
+^PSets/*
 

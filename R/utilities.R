@@ -57,10 +57,11 @@ is.items <- function(list, ..., FUN=is)
 .sensitivitySlotToLongTable <- function(object) {
 
     raw <- as.data.table(sensitivityRaw(object))  # This automatically melts to long format
+                                                  # It also drops all NA rows
     info <- as.data.table(sensitivityInfo(object), keep.rownames=TRUE)
     profiles <- as.data.table(sensitivityProfiles(object), keep.rownames=TRUE)
-    .info <- info[rn %in% unique(raw$V1)]
-    info[, experiment := seq_len(dim(.SD)[1]), by=.(cellid, drugid)]
+    info <- info[rn %in% unique(raw$V1)]  # Drop rownames for all NA rows
+    info[, drug_cell_rep := seq_len(dim(.SD)[1]), by=.(cellid, drugid)]
 
     # preprocess raw array
     setnames(raw, seq_len(3), c('rn', 'replicate', 'assay'))
@@ -89,8 +90,8 @@ is.items <- function(list, ..., FUN=is)
     mappings <- .getLongTableDimensionMappings(info)
 
     ## FIXME:: Do we want to keep dose in colData or implement special subsetting based on it
-    rowDataCols <- list(c('cellid', 'experiment'), mappings$rowMeta)
-    colDataCols <- list(c('drugid', 'experiment'), c(mappings$colMeta, assayCols$dose))
+    rowDataCols <- list(c('cellid', 'drug_cell_rep'), mappings$rowMeta)
+    colDataCols <- list(c('drugid', 'drug_cell_rep'), c(mappings$colMeta, assayCols$dose))
 
     assayCols$dose <- NULL
     if (length(mappings$unmapped) > 1)
@@ -105,6 +106,10 @@ is.items <- function(list, ..., FUN=is)
 }
 
 ## TODO:: refactor this to be shorter/more concise
+#'
+#'
+#' @import data.table
+#' @export
 .getLongTableDimensionMappings <- function(info) {
 
     # define some tools for exploring dimensionality
