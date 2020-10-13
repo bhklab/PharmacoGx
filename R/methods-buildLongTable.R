@@ -53,7 +53,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # add the row and column ids to the value data
     assayData <- from[rowData, on=.unlist(rowDataCols)][colData, on=as.character(unlist(colDataCols))]
     rm(from)
-    assayData[, as.character(c(.unlist(rowDataCols), .unlist(colDataCols))) := NULL]
+    assayData[, as.character(unique(c(.unlist(rowDataCols), .unlist(colDataCols)))) := NULL]
     setkey(assayData, rowKey, colKey)
 
     setkey(rowData, rowKey)
