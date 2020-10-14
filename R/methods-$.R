@@ -71,20 +71,30 @@ setMethod('$', signature('LongTable'),
 #' @noRd
 #' @keywords internal
 .rebuildInfo <- function(longTable) {
+
     # Extract the information needed to reconstruct the sensitivityRaw array
     meta <- assay(longTable, 'experiment_metadata')
     setkeyv(meta, c('rowKey', 'colKey'))
-    rowData <- rowData(longTable, key=TRUE)[ , -'drug_cell_rep']
+    rowData <- rowData(longTable, key=TRUE)[, -'drug_cell_rep']
     setkeyv(rowData, 'rowKey')
     colData <- colData(longTable, key=TRUE)[, -'drug_cell_rep']
     setkeyv(colData, 'colKey')
 
-    # Note, when joining using `[`, the order of tables actually reversed
-    # For example, x[y] is actually a left join of x to y, not of y to x
-    # You can get around this by using all=TRUE to do full joins
-    info <- colData[rowData[meta]]
+    # join the tables into the original data
+    info <- merge.data.table(meta, rowData, all=TRUE)
+    setkeyv(info, 'colKey')
+    info <- merge.data.table(info, colData, all=TRUE)[, -c('rowKey', 'colKey')]
+    rownames <- info$rn
+    info[, rn := NULL]
 
+    # convert to data.frame by reference, assigning rownames
+    setDF(info, rownames=rownames)
+
+    return(info)
 }
+
+## TODO:: Make this a unit test
+## all.equal(info[rownames(SI), colnames(SI)], SI
 
 #' Replicate the $profiles slot in the old sensitivity list
 #'
@@ -94,7 +104,24 @@ setMethod('$', signature('LongTable'),
 #' @keywords internal
 .rebuildProfiles <- function(longTable) {
 
+    # Extract the information needed to reconstruct the sensitivityRaw array
+    meta <- longTable$experiment_metadata[, .(rn, colKey, rowKey)]
+    setkeyv(meta, c('rowKey', 'colKey'))
+
+    sensProf <- assay(longTable, 'sensitivity_profiles')
+    setkeyv(sensProf, c('rowKey', 'colKey'))
+
+    profiles <- merge.data.table(meta, sensProf, all=TRUE)
+    rownames <- profiles$rn
+    profiles[, rn := NULL]
+
+    setDF(profiles, rownames=rownames)
+    return(profiles)
+
 }
+
+## TODO:: Make this a unit test
+## all.equal(prof[rownames(SP), colnames(SP)], SP)
 
 #'
 #'
