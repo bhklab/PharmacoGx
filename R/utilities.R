@@ -60,6 +60,7 @@ is.items <- function(list, ..., FUN=is)
                                                   # It also drops all NA rows
     info <- as.data.table(sensitivityInfo(object), keep.rownames=TRUE)
     profiles <- as.data.table(sensitivityProfiles(object), keep.rownames=TRUE)
+    # TODO:: This will remove the NA padding in sensitivityRaw
     info <- info[rn %in% unique(raw$V1)]  # Drop rownames for all NA rows
     info[, drug_cell_rep := seq_len(dim(.SD)[1]), by=.(cellid, drugid)]
 
@@ -83,25 +84,25 @@ is.items <- function(list, ..., FUN=is)
     sensDT <- merge.data.table(sensDT, profiles, all=TRUE)
 
     # build identifiers assay identifiers
+    assayRegex <- paste0(assayIDs, '_\\d+')
     .getAssayCols <- function(name, colNames) grep(name, colNames, value=TRUE)
-    assayCols <- lapply(assayIDs, .getAssayCols, colNames=colnames(sensDT))
+    assayCols <- lapply(assayRegex, .getAssayCols, colNames=colnames(sensDT))
     names(assayCols) <- tolower(assayIDs)
 
     mappings <- .getLongTableDimensionMappings(info)
 
-    ## FIXME:: Do we want to keep dose in colData or implement special subsetting based on it
     rowDataCols <- list(c('cellid', 'drug_cell_rep'), mappings$rowMeta)
-    colDataCols <- list(c('drugid', 'drug_cell_rep'), c(mappings$colMeta, assayCols$dose))
+    colDataCols <- list(c('drugid', 'drug_cell_rep'), mappings$colMeta)
 
-    assayCols$dose <- NULL
     if (length(mappings$unmapped) > 1)
         assayCols$experiment_metadata <- mappings$unmapped
+
+    assayCols$sensitivity_profiles <- colnames(profiles[, -'rn'])
 
     ## FIXME:: Re-implement metadata once we sort out column mappings.
     #metadata <- as.list(unique(sensDT[, mappings$metadata, with=FALSE]))
 
     longTable <- buildLongTable(from=sensDT, rowDataCols, colDataCols, assayCols)
-    #metadata(longTable) <- metadata
 
     return(longTable)
 }
@@ -116,7 +117,7 @@ is.items <- function(list, ..., FUN=is)
     # define some tools for exploring dimensionality
     length.unique <- function(...) length(unique(...))
 
-    mapped <- c('rn', 'drugid', 'cellid', 'experiment')
+    mapped <- c('rn', 'drugid', 'cellid', 'drug_cell_rep')
 
     # Determine which columns map to metadata
     # (i.e., which columns are the same)
@@ -190,7 +191,7 @@ is.items <- function(list, ..., FUN=is)
     mapped <- c(mapped, possibleRow)
 
     unmapped <- setdiff(colnames(info), mapped)
-    unmapped <- c(definiteRow, definiteMetaData, unmapped)
+    unmapped <- unique(c('rn', definiteRow, definiteMeta, unmapped))
 
     ## FIXME:: Removed metadata columns to ensure I can recreate sensitivityInfo
     mappings <- list(rowMeta=definiteCell, colMeta=definiteDrug, unmapped=unmapped)

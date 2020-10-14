@@ -1,11 +1,3 @@
-#' S3 Class for LongTable S4 Class
-#'
-#' Allows use of S3 methods with new S4 class. This is required to overcome
-#' limitations of the `[` S4 method.
-#'
-#' @export
-setOldClass('long.table')
-
 #' LongTable class definition
 #'
 #' Define a private constructor method to be used to build a `LongTable` object.
@@ -25,7 +17,7 @@ setOldClass('long.table')
                                   assays='list',
                                   metadata='list',
                                   .intern='environment'),
-                       contains='long.table')
+                       contains='list')
 
 #' LongTable constructor method
 #'
@@ -67,7 +59,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                  colData=missing(colData), assays=missing(assays))
 
     if (any(isMissing))
-        stop(.errorMsg('\nRequire parameter(s) missing: ',
+        stop(.errorMsg('\nRequired parameter(s) missing: ',
             names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
@@ -144,6 +136,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #' @param assays [`list`]
 #'
 #' @keywords internal
+## FIXME:: Finish this and implement class validity methods for LongTable!
 .verifyKeyIntegrity <- function(rowData, colData, assays) {
     if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
         message(blue('The rowKey column is missing from rowData! Please try

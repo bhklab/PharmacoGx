@@ -44,8 +44,9 @@
 #'  
 #' @importClassesFrom CoreGx CoreSet
 #' @return An object of the PharmacoSet class
-.PharmacoSet <- setClass("PharmacoSet", slots = list(drug="data.frame"), 
-                         contains="CoreSet")
+.PharmacoSet <- setClass('PharmacoSet',
+                         slots = list(drug='data.frame'),
+                         contains='CoreSet')
 
 
 # The default constructor above does a poor job of explaining the required 
