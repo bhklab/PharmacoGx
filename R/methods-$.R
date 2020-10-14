@@ -71,6 +71,18 @@ setMethod('$', signature('LongTable'),
 #' @noRd
 #' @keywords internal
 .rebuildInfo <- function(longTable) {
+    # Extract the information needed to reconstruct the sensitivityRaw array
+    meta <- assay(longTable, 'experiment_metadata')
+    setkeyv(meta, c('rowKey', 'colKey'))
+    rowData <- rowData(longTable, key=TRUE)[ , -'drug_cell_rep']
+    setkeyv(rowData, 'rowKey')
+    colData <- colData(longTable, key=TRUE)[, -'drug_cell_rep']
+    setkeyv(colData, 'colKey')
+
+    # Note, when joining using `[`, the order of tables actually reversed
+    # For example, x[y] is actually a left join of x to y, not of y to x
+    # You can get around this by using all=TRUE to do full joins
+    info <- colData[rowData[meta]]
 
 }
 

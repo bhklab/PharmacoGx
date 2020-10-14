@@ -60,8 +60,6 @@ is.items <- function(list, ..., FUN=is)
                                                   # It also drops all NA rows
     info <- as.data.table(sensitivityInfo(object), keep.rownames=TRUE)
     profiles <- as.data.table(sensitivityProfiles(object), keep.rownames=TRUE)
-    # TODO:: This will remove the NA padding in sensitivityRaw
-    info <- info[rn %in% unique(raw$V1)]  # Drop rownames for all NA rows
     info[, drug_cell_rep := seq_len(dim(.SD)[1]), by=.(cellid, drugid)]
 
     # preprocess raw array

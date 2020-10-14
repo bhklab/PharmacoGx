@@ -6,7 +6,7 @@ setDTthreads(15)
 pSetFiles <- list.files('PSets', full.names=TRUE)
 pSetNames <- gsub('.*/', '', pSetFiles)
 pSetNames <- gsub('.rds', '.qs', pSetNames)
-i <- 1
+i <- 5
 
 for (i in seq_along(pSetFiles)) {
     print(pSetNames[i])
