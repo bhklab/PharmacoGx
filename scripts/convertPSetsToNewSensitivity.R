@@ -11,6 +11,7 @@ i <- 1
 for (i in seq_along(pSetFiles)) {
     print(pSetNames[i])
     pSet <- readRDS(pSetFiles[i])
+    .pSet <- pSet
     newSensitivity <- .sensitivitySlotToLongTable(pSet)
     pSet@sensitivity <- newSensitivity
     qsave(pSet, file.path('NewPSets', pSetNames[i]))

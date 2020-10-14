@@ -43,9 +43,12 @@
 #'   PharmacoSet, for proper processing of the data
 #'  
 #' @importClassesFrom CoreGx CoreSet
+#' @importClassesFrom CoreGx LongTable
+#'
 #' @return An object of the PharmacoSet class
 .PharmacoSet <- setClass('PharmacoSet',
-                         slots = list(drug='data.frame'),
+                         slots = list(drug='data.frame',
+                                      sensitivity='LongTable'),
                          contains='CoreSet')
 
 

@@ -17,7 +17,7 @@
 #'
 #' @export
 setMethod(sensitivityInfo, signature="PharmacoSet", function(object){
-  callNextMethod(object=object)
+  object@sensitivity$info
 })
 
 
@@ -42,5 +42,5 @@ setMethod(sensitivityInfo, signature="PharmacoSet", function(object){
 setReplaceMethod("sensitivityInfo",
                  signature = signature(object="PharmacoSet",value="data.frame"),
                  function(object, value){
-  callNextMethod(object=object, value=value)
+  stop(.errorMsg("Assignment for the sensitivityInfo slot is not allowed!"))
 })
