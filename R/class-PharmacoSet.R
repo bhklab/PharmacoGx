@@ -47,8 +47,7 @@
 #'
 #' @return An object of the PharmacoSet class
 .PharmacoSet <- setClass('PharmacoSet',
-                         slots = list(drug='data.frame',
-                                      sensitivity='LongTable'),
+                         slots = list(drug='data.frame'),
                          contains='CoreSet')
 
 
@@ -77,7 +76,7 @@
 ##TODO:: Determine how to generalise the constructor documentation in CoreGx
 ## to make sense with all three packages which depend on it. For now it says
 ## CoreSet instead of PharmacoSet
-##TODO:: Determine if there is any way to execture R code when making roxygen2
+##TODO:: Determine if there is any way to execute R code when making roxygen2
 ## documentation. Then we could use a variable to fill in the class for each
 ## package.
 #' @inheritParams CoreGx::CoreSet

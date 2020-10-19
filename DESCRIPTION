@@ -102,6 +102,7 @@ Collate:
     'methods-sensitivityProfiles.R'
     'methods-sensitivityRaw.R'
     'methods-sensitivitySlot.R'
+    'methods-sensitivitySlotToLongTable.R'
     'methods-subset.R'
     'methods-summarizeMolecularProfiles.R'
     'methods-summarizeSensitivityProfiles.R'

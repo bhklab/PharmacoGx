@@ -57,3 +57,5 @@ setGeneric("drugNames", function(object) standardGeneric("drugNames"))
 #'
 #' @export
 setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))
+
+# ====

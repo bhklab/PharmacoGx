@@ -37,14 +37,13 @@
 \alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{sensitivityInfo,PharmacoSet-method}
-\alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
+\alias{sensitivityInfo<-,CoreSet,data.frame-method}
 \alias{sensitivityMeasures,PharmacoSet-method}
 \alias{sensitivityMeasures<-,PharmacoSet,character-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
 \alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
-\alias{sensitivityProfiles<-,PharmacoSet,matrix-method}
 \alias{sensitivityRaw,PharmacoSet-method}
-\alias{sensitivityRaw<-,PharmacoSet,ANY-method}
+\alias{sensitivityRaw<-,PharmacoSet,array-method}
 \alias{sensitivitySlot,PharmacoSet-method}
 \alias{sensitivitySlot<-,PharmacoSet,list-method}
 \title{A Class to Contain PharmacoGenomic datasets together with their curations}
@@ -99,9 +98,9 @@
 
 \S4method{sensNumber}{PharmacoSet}(object)
 
-\S4method{sensitivityInfo}{PharmacoSet}(object)
+\S4method{sensitivityInfo}{PharmacoSet}(object, dimension, ...)
 
-\S4method{sensitivityInfo}{PharmacoSet,data.frame}(object) <- value
+\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
 
 \S4method{sensitivityMeasures}{PharmacoSet}(object)
 
@@ -111,11 +110,9 @@
 
 \S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
-
 \S4method{sensitivityRaw}{PharmacoSet}(object)
 
-\S4method{sensitivityRaw}{PharmacoSet,ANY}(object) <- value
+\S4method{sensitivityRaw}{PharmacoSet,array}(object) <- value
 
 \S4method{sensitivitySlot}{PharmacoSet}(object)
 
@@ -129,6 +126,14 @@
 \item{mDataType}{the type of molecular data}
 
 \item{assay}{[`character`] Name or index of the assay data to return}
+
+\item{dimension}{[`character`] Optional name of the dimension to extract,
+either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
+`LongTable` object instead of a `list`.}
+
+\item{...}{Additional arguments to the rowData or colData
+`LongTable` methods. Only used if the sensitivity slot contains a
+`LongTable` object instead of a `list`.}
 }
 \value{
 An object of the PharmacoSet class
@@ -191,7 +196,7 @@ A [`character`] vector of all the available sensitivity measures
 
 a \code{data.frame} with the experiment info
 
-Updated \code{PharmacoSet}
+[`invisible`] Updates the `PharmacoSet` object.
 
 A \code{array} containing the raw sensitivity data
 
@@ -266,8 +271,6 @@ Get the types of sensitivity measurements from a object object
 Get the types of sensitivity measurements available in a PharmacoSet object
 
 Get the sensitivityProfiles data.frame from a PharmacoSet object
-
-Set the sensitivityProfiles in a PharmacoSet object
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -328,7 +331,8 @@ experiments
 
 \item \code{sensitivityInfo}: Return the drug dose sensitivity experiment info
 
-\item \code{sensitivityInfo<-}: Update the sensitivity experiment info
+\item \code{sensitivityInfo<-}: Update the metadata for the treatment response
+experiments in the sensitivity slot.
 
 \item \code{sensitivityMeasures}: returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
@@ -336,13 +340,11 @@ summaries, for example, whether there are IC50 values available
 \item \code{sensitivityMeasures<-}: returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
-\item \code{sensitivityProfiles}: Return the phenotypic data for the drug dose sensitivity
+\item \code{sensitivityProfiles}: Return the sensitivity profile summary values for the
+treatment response experiment data in the sensitivity slot.
 
-\item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
-sensitivity
-
-\item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
-sensitivity
+\item \code{sensitivityProfiles<-}: Update the sensitivity profiles for a `PharmacoSet`
+object.
 
 \item \code{sensitivityRaw}: Retrive the raw dose and viability data from a pSet
 
@@ -479,8 +481,8 @@ sensMeas <- sensitivityMeasures(CCLEsmall)
 data(CCLEsmall)
 sensProf <- sensitivityProfiles(CCLEsmall)
 
-data(CCLEsmall)
-sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
+data(GDSCsmall)
+sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 
 data(CCLEsmall)
 sensitivityRaw(CCLEsmall)

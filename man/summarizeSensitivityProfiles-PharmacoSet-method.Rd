@@ -7,7 +7,7 @@ drug vs cell line table}
 \usage{
 \S4method{summarizeSensitivityProfiles}{PharmacoSet}(
   object,
-  sensitivity.measure = "auc_recomputed",
+  sensitivity.measure = "aac_recomputed",
   cell.lines,
   drugs,
   summary.stat = c("mean", "median", "first", "last", "max", "min"),

@@ -1,17 +1,24 @@
-#' Reconstruct the
+#' Reconstruct the data in the @sensitivity slot list into a LongTable object.
 #'
-#' @param object [`LongTable`]
+#' @param object A [`PharmacoSet`] with a list in the sensitivity slot containing
+#'   items raw, profiles, info and n.
+#'
+#' @return A [`LongTable`] with the data from the sensitivity slot.
 #'
 #' @importFrom CoreGx buildLongTable
+#' @importMethodsFrom CoreGx sensitivitySlotToLongTable
 #' @import data.table
 #' @export
-.sensitivitySlotToLongTable <- function(object) {
+setMethod('sensitivitySlotToLongTable',
+    signature(object='PharmacoSet'), function(object) {
 
-    raw <- as.data.table(sensitivityRaw(object))  # This automatically melts to long format
-                                                  # It also drops all NA rows
     info <- as.data.table(sensitivityInfo(object), keep.rownames=TRUE)
-    profiles <- as.data.table(sensitivityProfiles(object), keep.rownames=TRUE)
+    setorderv(info, c('cellid', 'drugid'))  # sort to keep keys the same
     info[, drug_cell_rep := seq_len(.N), by=.(cellid, drugid)]
+    profiles <- as.data.table(sensitivityProfiles(object),
+        keep.rownames=TRUE)
+    # This automatically melts to long format and drops rows
+    raw <- as.data.table(sensitivityRaw(object))
 
     # preprocess raw array
     setnames(raw, seq_len(3), c('rn', 'replicate', 'assay'))
@@ -29,8 +36,8 @@
     setkeyv(longRaw, 'rn')
 
     # join raw and info to the assay data
-    sensDT <- merge.data.table(longRaw, info, all=TRUE)
-    sensDT <- merge.data.table(sensDT, profiles, all=TRUE)
+    sensDT <- merge.data.table(info, longRaw, all=TRUE)
+    sensDT <- merge.data.table(sensDT, profiles, all=TRUE)[rn == info$rn, ]
 
     # build assay identifiers
     assayRegex <- paste0(assayIDs, '_\\d+')
@@ -54,7 +61,7 @@
     longTable <- buildLongTable(from=sensDT, rowDataCols, colDataCols, assayCols)
 
     return(longTable)
-}
+})
 
 ## TODO:: refactor this to be shorter/more concise
 #'
