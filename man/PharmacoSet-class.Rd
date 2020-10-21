@@ -37,7 +37,7 @@
 \alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{sensitivityInfo,PharmacoSet-method}
-\alias{sensitivityInfo<-,CoreSet,data.frame-method}
+\alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
 \alias{sensitivityMeasures,PharmacoSet-method}
 \alias{sensitivityMeasures<-,PharmacoSet,character-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
@@ -100,7 +100,7 @@
 
 \S4method{sensitivityInfo}{PharmacoSet}(object, dimension, ...)
 
-\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
+\S4method{sensitivityInfo}{PharmacoSet,data.frame}(object, dimension, ...) <- value
 
 \S4method{sensitivityMeasures}{PharmacoSet}(object)
 

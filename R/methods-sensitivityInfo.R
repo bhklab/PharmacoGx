@@ -101,17 +101,16 @@ setMethod(sensitivityInfo, signature("PharmacoSet"),
 #'     `LongTable` methods. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
 #' @param value A \code{data.frame} with the new sensitivity annotations
-
 #'
 #' @return Updated \code{PharmacoSet}
 #'
-#' @importFrom CoreGx sensitivityInfo<-
+#' @importMethodsFrom CoreGx sensitivityInfo<-
 #' @importFrom methods callNextMethod
 #'
 #' @import data.table
 #' @export
 setReplaceMethod("sensitivityInfo",
-                 signature(object="CoreSet", value="data.frame"),
+                 signature(object="PharmacoSet", value="data.frame"),
                  function(object, dimension, ..., value) {
 
     if (is(sensitivitySlot(object), 'LongTable')) {
