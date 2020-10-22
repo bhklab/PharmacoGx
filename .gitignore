@@ -9,3 +9,5 @@ doc
 ^PSets/*
 ..Rcheck/.*
 ^.*Rcheck
+scripts/*
+scripts
