@@ -7,4 +7,5 @@ PharmacoGx.Rproj
 */figure
 doc
 ^PSets/*
-
+..Rcheck/.*
+^.*Rcheck

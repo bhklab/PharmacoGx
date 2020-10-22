@@ -45,7 +45,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread
     if(!all(cells%in%cellNames(pSet))){
       stop("The cell names should match to the names used in cellNames(pSet)")
     }
-    pSet <- subset(pSet, cells=cells)
+    pSet <- subsetTo(pSet, cells=cells)
   }
   if (mDataType %in% names(pSet@molecularProfiles)) {
     #eset <- pSet@molecularProfiles[[mDataType]]

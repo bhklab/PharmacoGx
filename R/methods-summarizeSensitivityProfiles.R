@@ -30,7 +30,7 @@
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-          function(object, sensitivity.measure="aac_recomputed", cell.lines, drugs,
+          function(object, sensitivity.measure="auc_recomputed", cell.lines, drugs,
                    summary.stat=c("mean", "median", "first", "last", "max", "min"), fill.missing=TRUE, verbose=TRUE){
               if (is(sensitivitySlot(object), 'LongTable'))
                   .summarizeSensProfiles(object, sensitivity.measure,
@@ -46,7 +46,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
-    sensitivity.measure='aac_recomputed',
+    sensitivity.measure='auc_recomputed',
     cell.lines,
     drugs,
     summary.stat,

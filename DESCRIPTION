@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.10
-Date: 2020-09-08
+Version: 2.1.12
+Date: 2020-10-22
 Authors@R: c(
   person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
   person("Zhaleh", "Safikhani", role=c("aut")),
@@ -10,16 +10,22 @@ Authors@R: c(
   person("Mark", "Freeman", role=c("aut")),
   person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
   )
-Description: Contains a set of functions to perform large-scale analysis of pharmaco-genomic data.
+Description: Contains a set of functions to perform large-scale analysis of
+    pharmaco-genomic data. These include the PharmacoSet object for storing
+    the results of pharmacogenomic experiments, as well as a number of functions
+    for computing common summaries of drug-dose response and correlating them
+    with the molecular features in a cancer cell-line.
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
     knitr,
-    knitcitations
+    knitcitations,
+    crayon,
+    testthat,
+    BiocGenerics
 Encoding: UTF-8
 Imports: 
     Biobase,
-    BiocGenerics,
     S4Vectors,
     SummarizedExperiment,
     BiocParallel,
@@ -35,9 +41,7 @@ Imports:
     graphics, 
     grDevices, 
     reshape2,
-    testthat,
     jsonlite,
-    crayon,
     data.table
 Depends: R (>= 3.6), CoreGx
 RoxygenNote: 7.1.1
@@ -68,7 +72,6 @@ Collate:
     'connectivityScore.R'
     'cosinePerm.R'
     'datasets.R'
-    'deprecated.R'
     'downloadPSet.R'
     'downloadSignatures.R'
     'drugDoseResponseCurve.R'
@@ -88,7 +91,6 @@ Collate:
     'methods-drugSensitivitySig.R'
     'methods-fNames.R'
     'methods-featureInfo.R'
-    'methods-getIntern.R'
     'methods-intersect.R'
     'methods-mDataNames.R'
     'methods-molecularProfiles.R'
@@ -103,11 +105,9 @@ Collate:
     'methods-sensitivityRaw.R'
     'methods-sensitivitySlot.R'
     'methods-sensitivitySlotToLongTable.R'
-    'methods-subset.R'
+    'methods-subsetTo.R'
     'methods-summarizeMolecularProfiles.R'
     'methods-summarizeSensitivityProfiles.R'
-    'onLoad.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'utilities.R'

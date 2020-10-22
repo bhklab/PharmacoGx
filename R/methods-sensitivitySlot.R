@@ -35,7 +35,9 @@ setMethod("sensitivitySlot", signature(object="PharmacoSet"), function(object) {
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom CoreGx sensitivitySlot<-
 #' @export
-setReplaceMethod("sensitivitySlot", signature(object="PharmacoSet", value="list"),
-                 function(object, value) {
-                    callNextMethod(object=object, value=value)
-                 })
+setReplaceMethod("sensitivitySlot",
+    signature(object="PharmacoSet", value="list"),
+    function(object, value) {
+        object <- callNextMethod(object=object, value=value)
+        return(object)
+})

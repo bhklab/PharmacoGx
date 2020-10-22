@@ -19,7 +19,7 @@ test_that("Summarize Sensitivity Profiles function outputs data with right dimen
 
 test_that("summarizeSensitivityProfiles produces correct values.",{
 
-  GDSCsmall2 <- subset(GDSCsmall, drugs="AZD6482")
+  GDSCsmall2 <- subsetTo(GDSCsmall, drugs="AZD6482")
   testCells <- GDSCsmall2@sensitivity$profiles[order(GDSCsmall2@sensitivity$info$cellid),"auc_recomputed", drop=FALSE]
 
   testSummary <- summarizeSensitivityProfiles(GDSCsmall2, summary.stat = "median", fill.missing=FALSE)

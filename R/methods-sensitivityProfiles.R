@@ -14,6 +14,7 @@
 #' @return a \code{data.frame} with the experiment info
 #'
 #' @importFrom CoreGx sensitivityProfiles
+#' @import CoreGx
 #' @importFrom methods callNextMethod
 #'
 #' @export
@@ -68,6 +69,8 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #' @return [`invisible`] Updates the `PharmacoSet` object.
 #'
 #' @import data.table
+#' @importMethodsFrom CoreGx sensitivityProfiles
+#' @import CoreGx
 #' @export
 setReplaceMethod("sensitivityProfiles",
                  signature(object="PharmacoSet", value="data.frame"),
@@ -84,11 +87,30 @@ setReplaceMethod("sensitivityProfiles",
         value <- experimentMetadata[value][, -'rn']
         assay(object@sensitivity, 'sensitivity_profiles') <- value
     } else {
-        callNextMethod(object, value=value)
+        object <- callNextMethod(object, value=value)
     }
     return(object)
 })
+
+
+#' sensitivityProfiles<- PharmacoSet Method
+#'
+#' @describeIn PharmacoSet Update the sensitivity profiles for a `PharmacoSet`
+#'   object.
+#'
+#' @examples
+#' data(GDSCsmall)
+#' sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
+#'
+#' @param object A [`PharamcoSet`] to update.
+#' @param value A [`matrix`] with the new sensitivity profiles. If a
+#'   matrix object is passed in, converted to `data.frame` before assignment.
+#'
+#' @return [`invisible`] Updates the `PharmacoSet` object.
+#'
 #' @import data.table
+#' @importMethodsFrom CoreGx sensitivityProfiles
+#' @import CoreGx
 #' @export
 setReplaceMethod("sensitivityProfiles",
                  signature(object="PharmacoSet", value="matrix"),
@@ -105,7 +127,7 @@ setReplaceMethod("sensitivityProfiles",
         value <- experimentMetadata[value][, -'rn']
         assay(object@sensitivity, 'sensitivity_profiles') <- value
     } else {
-        callNextMethod(object, value=value)
+        object <- callNextMethod(object, value=value)
     }
     return(object)
 })

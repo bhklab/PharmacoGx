@@ -10,6 +10,7 @@
 #' @return A \code{array} containing the raw sensitivity data
 #'
 #' @importMethodsFrom CoreGx sensitivityRaw
+#' @import CoreGx
 #' @export
 setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
     if (is(sensitivitySlot(object), 'LongTable'))
@@ -69,6 +70,8 @@ setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
 #' @return A copy of the \code{PharmacoSet} containing the updated sensitivty data
 #'
 #' @importMethodsFrom CoreGx sensitivityRaw<-
+#' @import CoreGx
+#' @import data.table
 #'
 #' @export
 setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"), function(object, value) {
@@ -106,7 +109,7 @@ setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"), function(o
         object@sensitivity <- longTable
 
     } else {
-        callNextMethod(object, value=value)
+        object <- callNextMethod(object, value=value)
     }
     return(object)
 })

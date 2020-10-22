@@ -1,5 +1,22 @@
 # Package Release News
 
+## v2.1.12
+- Added experimental support for a new class, the `LongTable`, for storing the
+sensitivity data in a `PharmacoSet`.
+- Because this is not well tested, we have left not updated the PSets available
+via the `downloadPSets` function. 
+- Instead we have provided a convenient function, 
+`convertSensitivitySlotToLongTable`, which takes in a `PharmacoSet` object,
+converts the data in the `@sensitivty` slot to a `LongTable` and returns an
+updated `PharmacoSet` object.
+- The `LongTable` class will be used in the future to allow `PharmacoSet`s to
+store treatment response experiments with multiple drugs or cell-lines, greatly
+expanding the variety of data which can be stored in a `PharmacoSet` object.
+- For more details on the `LongTable` class, please see the vignette in the
+`CoreGx` package.
+
+
+
 ## v2.0.0
 - PharmacoGx now depends on CoreGx, a package designed to abstract core 
 functionality from PharmacoGx for use in other Gx suite packages
@@ -7,15 +24,3 @@ functionality from PharmacoGx for use in other Gx suite packages
 `SummarizedExperiment` class instead of the the `ExpressionSet` class
 - Argument `pSet` in most PharmacoSet accessor methods now converted to `object` 
 instead; this will break code using names parameters for these accessor methods
-
-## Future Releases
-- Convert the `@molecularProfiles` slot to be a `MultiAssayExperiment` object 
-instead of a `list`
-- Reimplement `PharmacoSet` set operations (intersect, subset, etc.) using 
-generics defined in the `BiocGenerics` package
-- Redesign the `@sensitivity` and `@perturbation` slots to use either existing
-Bioconductor classes or custom implementations of Bioconductor classes
-- Add support for drug combinations to the package
-- Add support for new types of molecular data such as metabolomics, proteomics,
-and single cell sequencing
-- Continue to abstract functionality into CoreGx

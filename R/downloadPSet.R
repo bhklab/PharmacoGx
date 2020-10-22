@@ -95,11 +95,6 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRU
                          mode='wb')
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
-  #TODO:: Update this to use annotation accessor method once it is in CoreGx
-  if (is.null(pSet@annotation$version) || pSet@annotation$version < 2 ) {
-    pSet <- .convertPsetMolecularProfilesToSE(pSet)
-    saveRDS(pSet, file=file.path(saveDir, pSetFileName))
-  }
   return(pSet)
 }
 

@@ -64,8 +64,6 @@ setMethod('sensitivitySlotToLongTable',
 })
 
 ## TODO:: refactor this to be shorter/more concise
-#'
-#'
 #' @import data.table
 #' @export
 .getLongTableDimensionMappings <- function(info) {

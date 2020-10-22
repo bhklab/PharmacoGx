@@ -74,12 +74,12 @@ x <- longTable$viability[, mean := rowMeans(.SD, na.rm=TRUE)]
 
 # Compare runtimes of subset with and without reindexing
 a <- Sys.time()
-subset(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=FALSE))
+subsetTo(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=FALSE))
 b <- Sys.time()
 t1 <- b - a
 
 a <- Sys.time()
-subset(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=TRUE))
+subsetTo(longTable, .(cell_line1 == 'VCAP' & BatchID != 2), .(drug1 != 'Lapatinib', reindex=TRUE))
 b <- Sys.time()
 t2 <- b - a
 

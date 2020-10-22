@@ -105,6 +105,7 @@ setMethod(sensitivityInfo, signature("PharmacoSet"),
 #' @return Updated \code{PharmacoSet}
 #'
 #' @importMethodsFrom CoreGx sensitivityInfo<-
+#' @import CoreGx
 #' @importFrom methods callNextMethod
 #'
 #' @import data.table
@@ -148,15 +149,15 @@ setReplaceMethod("sensitivityInfo",
                 cells={ rowData(object@sensitivity, ...) <- value },
                 drugs={ colData(object@sensitivity, ...) <- value },
                 experiments={ assay(object@sensitivity, 'experiment_metadata') <- value },
-                stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] Invalid argument to',
+                stop(.errorMsg('\n[PharmacoGx::sensitivityInfo<-] Invalid argument to',
                     'dimension parameter. Please choose one of "cells" or "drugsA"')))
         }
     } else {
         if (!missing(dimension))
-            warning(.warnMsg('\n[CoreGx::sensitivityInfo<-] The dimension argument ',
+            warning(.warnMsg('\n[PharmacoGx::sensitivityInfo<-] The dimension argument ',
                 'is only valid if the sensitivity slot contains a LongTable object. ',
                 'Ignoring dimension and ... parameters.'))
-        callNextMethod(object, value=value)
+        object <- callNextMethod(object, value=value)
     }
     return(object)
 })

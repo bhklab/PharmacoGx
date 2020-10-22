@@ -1,5 +1,6 @@
 # ==== PharmacoSet Class
 
+
 #'`[`
 #'
 #' @examples
@@ -12,13 +13,14 @@
 #' @param ... further arguments
 #' @param drop A boolean flag of whether to drop single dimensions or not
 #'
-#' @return Returns the subsetted object
+#'@return Returns the subsetted object
 #'
 #' @export
 setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE){
-    eval(substitute(subset(x, i, j, i)))  # eval(substitute()) idiom allows
-                                          # direct pass through of unevaluated
-                                          # function arguments. Stops attempts
-                                          # to evaluate arguments in current
-                                          # scope.
+  if(is.character(i)&&is.character(j)){
+    return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
+  }
+  else if(is.numeric(i) && is.numeric(j) && all(as.integer(i)==i) && all(as.integer(j)==j)){
+    return(subsetTo(x, cells=cellNames(x)[i], drugs=drugNames(x)[j],  molecular.data.cells=cellNames(x)[i]))
+  }
 })

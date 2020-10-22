@@ -42,6 +42,7 @@
 \alias{sensitivityMeasures<-,PharmacoSet,character-method}
 \alias{sensitivityProfiles,PharmacoSet-method}
 \alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
+\alias{sensitivityProfiles<-,PharmacoSet,matrix-method}
 \alias{sensitivityRaw,PharmacoSet-method}
 \alias{sensitivityRaw<-,PharmacoSet,array-method}
 \alias{sensitivitySlot,PharmacoSet-method}
@@ -109,6 +110,8 @@
 \S4method{sensitivityProfiles}{PharmacoSet}(object)
 
 \S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
+
+\S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
 
 \S4method{sensitivityRaw}{PharmacoSet}(object)
 
@@ -195,6 +198,8 @@ A [`character`] vector of all the available sensitivity measures
 A [`character`] vector of all the available sensitivity measures
 
 a \code{data.frame} with the experiment info
+
+[`invisible`] Updates the `PharmacoSet` object.
 
 [`invisible`] Updates the `PharmacoSet` object.
 
@@ -346,6 +351,9 @@ treatment response experiment data in the sensitivity slot.
 \item \code{sensitivityProfiles<-}: Update the sensitivity profiles for a `PharmacoSet`
 object.
 
+\item \code{sensitivityProfiles<-}: Update the sensitivity profiles for a `PharmacoSet`
+object.
+
 \item \code{sensitivityRaw}: Retrive the raw dose and viability data from a pSet
 
 \item \code{sensitivityRaw<-}: Update the raw dose and viability data in a pSet object
@@ -480,6 +488,9 @@ sensMeas <- sensitivityMeasures(CCLEsmall)
 
 data(CCLEsmall)
 sensProf <- sensitivityProfiles(CCLEsmall)
+
+data(GDSCsmall)
+sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 
 data(GDSCsmall)
 sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
