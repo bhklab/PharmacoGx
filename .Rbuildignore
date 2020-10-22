@@ -18,3 +18,4 @@ vignettes/figure
 ^scripts/*
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
+vignettes/LongTable.*
