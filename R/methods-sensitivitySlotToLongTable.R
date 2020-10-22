@@ -5,8 +5,7 @@
 #'
 #' @return A [`LongTable`] with the data from the sensitivity slot.
 #'
-#' @importFrom CoreGx buildLongTable
-#' @importMethodsFrom CoreGx sensitivitySlotToLongTable
+#' @import CoreGx
 #' @import data.table
 #' @export
 setMethod('sensitivitySlotToLongTable',

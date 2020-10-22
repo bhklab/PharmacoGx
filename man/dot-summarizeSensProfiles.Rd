@@ -13,6 +13,10 @@
   fill.missing = TRUE
 )
 }
+\value{
+[matrix] A matrix with cell lines going down the rows, drugs across
+  the columns, with the selected sensitivity statistic for each pair.
+}
 \description{
 Summarize the sensitivity profiles when the sensitivity slot is a LongTable
 }

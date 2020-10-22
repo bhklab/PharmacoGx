@@ -11,3 +11,5 @@ doc
 ^.*Rcheck
 scripts/*
 scripts
+Psets/*
+check/*

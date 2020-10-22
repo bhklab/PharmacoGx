@@ -43,6 +43,9 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 
 #' Summarize the sensitivity profiles when the sensitivity slot is a LongTable
 #'
+#' @return [matrix] A matrix with cell lines going down the rows, drugs across
+#'   the columns, with the selected sensitivity statistic for each pair.
+#'
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
