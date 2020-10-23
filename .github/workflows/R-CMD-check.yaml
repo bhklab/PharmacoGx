@@ -77,9 +77,9 @@ jobs:
           remotes::install_cran("rcmdcheck")
           failed_installs <- setdiff(remotes::local_package_deps(dependencies=TRUE), rownames(installed.packages()))
           if (!require('BiocManager')) remotes::install_cran('BiocManager')
-          if (!require('BiocCheck')) BiocManager::install('BiocCheck', verson='devel')
-          if (length(failed_installs) > 0) BiocManager::install(failed_installs, version='devel')
-          BiocManager::install(version='devel')
+          if (!require('BiocCheck')) BiocManager::install('BiocCheck', verson='devel', ask=FALSE)
+          if (length(failed_installs) > 0) BiocManager::install(failed_installs, version='devel', ask=FALSE)
+          BiocManager::install(version='devel', ask=FALSE)
         shell: Rscript {0}
 
       - name: Session info
