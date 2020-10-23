@@ -74,7 +74,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          remotes::install_deps(dependencies = TRUE, repos=c(getOption("repos"))
+          remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           failed_installs <- setdiff(remotes::local_package_deps(dependencies=TRUE), rownames(installed.packages()))
           if (!require('BiocManager')) remotes::install_cran('BiocManager', ask=FALSE)
