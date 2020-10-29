@@ -81,7 +81,6 @@ jobs:
           if (!require('BiocCheck')) BiocManager::install('BiocCheck', verson='devel', ask=FALSE)
           if (length(failed_installs) > 0) BiocManager::install(failed_installs, version='devel', ask=FALSE)
           BiocManager::install(version='devel', ask=FALSE)
-          remotes::install_github('bhklab/CoreGx')  # Need this until new build gets into Bioc
         shell: Rscript {0}
 
       - name: Session info
