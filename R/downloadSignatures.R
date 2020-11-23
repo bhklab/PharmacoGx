@@ -17,7 +17,7 @@
 #' @param saveDir A \code{character} string with the folder path where the
 #'   PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 #'   create directory if it does not exist.
-library#' @param verbose \code{bool} Should status messages be printed during download.
+#' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
 #'
 #' @return An array type object contaning the signatures
