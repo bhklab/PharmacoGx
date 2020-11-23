@@ -13,7 +13,7 @@
 #'  
 #' @param name A \code{character} string, the name of the PharmacoSet for which
 #'   to download signatures. The name should match the names returned in the
-#'   `Dataset Name` column of `availablePSets(canonical=FALSE)`.
+#'   `PSet Name` column of `availablePSets(canonical=FALSE)`.
 #' @param saveDir A \code{character} string with the folder path where the
 #'   PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 #'   create directory if it does not exist.
@@ -28,10 +28,9 @@
 downloadPertSig <- function(name, saveDir=file.path(".", "PSets", "Sigs"),
     myfn=NULL, verbose=TRUE) {
 
-
     pSetTable <- availablePSets(canonical=FALSE)
 
-    whichx <- match(name, pSetTable[,1])
+    whichx <- match(name, pSetTable[, 3])
     if (is.na(whichx)){
         stop('Unknown Dataset. Please use the availablePSet function for the table of available PharamcoSets.')
     }
