@@ -26,11 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
+          - {os: macOS-latest,   r: 'devel'}
+          - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - {os: ubuntu-18.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest", http-user-agent: "R/4.0.0 (ubuntu-18.04) R (4.0.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
-          - {os: ubuntu-18.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -71,11 +70,15 @@ jobs:
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
           sudo apt-get install -y libglpk-dev  # this was the on that fixed piano
           sudo apt-get install -y libcurl4-openssl-dev  # fix BiocCheck install
-
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+          failed_installs <- setdiff(remotes::local_package_deps(dependencies=TRUE), rownames(installed.packages()))
+          if (!require('BiocManager')) remotes::install_cran('BiocManager', ask=FALSE)
+          if (!require('BiocCheck')) BiocManager::install('BiocCheck', verson='devel', ask=FALSE)
+          if (length(failed_installs) > 0) BiocManager::install(failed_installs, version='devel', ask=FALSE)
+          BiocManager::install(version='devel', ask=FALSE)
         shell: Rscript {0}
 
       - name: Session info
@@ -94,7 +97,7 @@ jobs:
 
       - name: BiocCheck
         run: |
-          if (!require(BiocCheck)) BiocManager::install("BiocCheck", ask=FALSE)
+          if (!require(BiocCheck)) BiocManager::install("BiocCheck", version='devel', ask=FALSE)
           checkResults <- BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
           if (length(checkResults$error) > 0)
             stop(paste0(checkResults$error, collapse='\n'))
