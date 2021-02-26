@@ -286,17 +286,17 @@ correlation coefficient.
   cc <- cellNames(common[[1]])
   
   ge.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[ , x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[ , x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   ## TO DO:: Ensure all assays are name so we can call by name instead of index
   }, d1=assay(GDSCexpression, 1), d2=assay(CCLEexpression, 1))
   ic50.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[, x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[, x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   }, d1=GDSC.ic50, d2=CCLE.ic50)
   auc.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[ , x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[ , x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   }, d1=GDSC.auc, d2=CCLE.auc)
   
   w1 <- stats::wilcox.test(x=ge.cor, y=auc.cor,

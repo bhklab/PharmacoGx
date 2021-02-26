@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.6
-Date: 2020-07-08
+Version: 2.3.5
+Date: 2020-11-23
 Authors@R: c(
   person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
   person("Zhaleh", "Safikhani", role=c("aut")),
@@ -10,12 +10,19 @@ Authors@R: c(
   person("Mark", "Freeman", role=c("aut")),
   person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
   )
-Description: Contains a set of functions to perform large-scale analysis of pharmaco-genomic data.
+Description: Contains a set of functions to perform large-scale analysis of
+    pharmaco-genomic data. These include the PharmacoSet object for storing
+    the results of pharmacogenomic experiments, as well as a number of functions
+    for computing common summaries of drug-dose response and correlating them
+    with the molecular features in a cancer cell-line.
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
     knitr,
-    knitcitations
+    knitcitations,
+    crayon,
+    testthat,
+    BiocGenerics
 Encoding: UTF-8
 Imports: 
     Biobase,
@@ -34,21 +41,22 @@ Imports:
     graphics, 
     grDevices, 
     reshape2,
-    testthat,
-    jsonlite
+    jsonlite,
+    data.table
 Depends: R (>= 3.6), CoreGx
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
 Collate: 
-    'AdaptiveMatthewCor.R'
     'ComputeGR.R'
     'GR.R'
     'GWC.R'
     'LogLogisticRegression.R'
     'MatthewCor.R'
     'SanityCheck.R'
+    'adaptiveMatthewCor.R'
+    'allGenerics.R'
     'callingWaterfall.R'
     'class-PharmacoSet.R'
     'class-SignatureClass.R'
@@ -71,10 +79,10 @@ Collate:
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
-    'generics.R'
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
+    'methods-[.R'
     'methods-cellInfo.R'
     'methods-cellNames.R'
     'methods-dateCreated.R'
@@ -83,6 +91,7 @@ Collate:
     'methods-drugSensitivitySig.R'
     'methods-fNames.R'
     'methods-featureInfo.R'
+    'methods-intersect.R'
     'methods-mDataNames.R'
     'methods-molecularProfiles.R'
     'methods-molecularProfilesSlot.R'
@@ -95,10 +104,10 @@ Collate:
     'methods-sensitivityProfiles.R'
     'methods-sensitivityRaw.R'
     'methods-sensitivitySlot.R'
+    'methods-sensitivitySlotToLongTable.R'
     'methods-subsetTo.R'
     'methods-summarizeMolecularProfiles.R'
     'methods-summarizeSensitivityProfiles.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'utilities.R'

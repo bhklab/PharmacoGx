@@ -1,3 +1,5 @@
+# ==== PharmacoSet accessor methods
+
 # ---- drugInfo
 
 #' drugInfo Generic
@@ -56,7 +58,4 @@ setGeneric("drugNames", function(object) standardGeneric("drugNames"))
 #' @export
 setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))
 
-# ---- plot
-
-# FIXME:: Surely we can import this generic from somewhere?
-setGeneric("plot")
+# ====

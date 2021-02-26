@@ -15,12 +15,20 @@
 #' availablePSets()
 #' }
 #' 
+#' @param canonical [`logical`] Should available PSets show only official PSets, or should
+#'   user generated PSets be included?
+#' 
 #' @return A data.frame with details about the available PharmacoSet objects
 #' @export
 #' @import jsonlite
-availablePSets <- function(){
+availablePSets <- function(canonical=TRUE){
   
-  avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/available")
+  if (canonical) {
+    avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/canonical")
+  } else {
+    avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/available")
+  }
+
 
   pSetTable <- data.frame("Dataset Name" = avail.psets$dataset$name,
                           "Date Created" = avail.psets$dateCreated,
@@ -66,7 +74,7 @@ availablePSets <- function(){
 #' @importFrom downloader download
 downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE) {
   
-  pSetTable <- availablePSets()
+  pSetTable <- availablePSets(canonical=FALSE)
   
   whichx <- match(name, pSetTable[,"PSet Name"])
   if (is.na(whichx)){
@@ -80,17 +88,13 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRU
   if(is.null(pSetFileName)){
     pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
   }
-  if(!file.exists(file.path(saveDir, pSetFileName))){
+  if(!file.exists(file.path(saveDir, pSetFileName))) {
     downloader::download(url = as.character(pSetTable[whichx,"Download"]), 
                          destfile=file.path(saveDir, pSetFileName), 
-                         quiet=!verbose)
+                         quiet=!verbose,
+                         mode='wb')
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
-  #TODO:: Update this to use annotation accessor method once it is in CoreGx
-  if (is.null(pSet@annotation$version) || pSet@annotation$version < 2 ) {
-    pSet <- .convertPsetMolecularProfilesToSE(pSet)
-    saveRDS(pSet, file=file.path(saveDir, pSetFileName))
-  }
   return(pSet)
 }
 

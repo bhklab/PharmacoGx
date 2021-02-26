@@ -17,7 +17,7 @@
 #'   summaries, for example, whether there are IC50 values available
 #' @export
 setMethod('sensitivityMeasures', "PharmacoSet", function(object){
-  callNextMethod(object=object)
+  colnames(sensitivityProfiles(object))
 })
 
 #' sensitivityMeasures Setter
@@ -42,5 +42,5 @@ setMethod('sensitivityMeasures', "PharmacoSet", function(object){
 setReplaceMethod('sensitivityMeasures',
                  signature=signature(object='PharmacoSet', value='character'),
                  function(object, value) {
-  callNextMethod(object=object, value=value)
+  colnames(sensitivityProfiles(object)) <- value
 })

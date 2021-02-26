@@ -3,6 +3,7 @@
 #' Amax: 100 - viability at maximum concentarion (in fitted curve)
 #' 
 #' @examples
+## FIXME:: Why are these character vectors?!?!
 #' dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
 #' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 #' computeAmax(dose, viability)
@@ -18,8 +19,6 @@
 #' @param verbose [logical] should warnings be printed
 #' @return The numerical Amax
 #' @export
-
-
 computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   concentration <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])

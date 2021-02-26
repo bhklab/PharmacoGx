@@ -19,7 +19,7 @@ intersectPSet(
 \item{pSets}{\code{list} a list of PharmacoSet objects, of which the function
 should find the intersection}
 
-\item{intersectOn}{\code{character} which identifiers to intersect on, 
+\item{intersectOn}{\code{character} which identifiers to intersect on,
 drugs, cell lines, or concentrations}
 
 \item{cells}{a \code{character}vector of common cell lines between pSets.
@@ -30,12 +30,12 @@ they can provide their list of cell lines}
 In case user is intersted on getting intersection on certain drugs,
 they can provide their list of drugs.}
 
-\item{strictIntersect}{\code{boolean} Should the intersection keep only the drugs 
+\item{strictIntersect}{\code{boolean} Should the intersection keep only the drugs
 and cell lines that have been tested on together?}
 
 \item{verbose}{\code{boolean} Should the function announce its key steps?}
 
-\item{nthread}{\code{numeric} The number of cores to use to run intersection on 
+\item{nthread}{\code{numeric} The number of cores to use to run intersection on
 concentrations}
 }
 \value{
@@ -43,9 +43,9 @@ A \code{list} of pSets, contatining only the intersection
 }
 \description{
 Given a list of PharmacoSets, the function will find the common drugs,
-and/or cell lines, and return PharmacoSets that contain data only pertaining 
-to the common drugs, and/or cell lines. The mapping between dataset 
-drug and cell names is done using annotations found in the 
+and/or cell lines, and return PharmacoSets that contain data only pertaining
+to the common drugs, and/or cell lines. The mapping between dataset
+drug and cell names is done using annotations found in the
 PharmacoSet object's internal curation slot
 }
 \examples{
