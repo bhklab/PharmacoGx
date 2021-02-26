@@ -20,8 +20,6 @@ to download signatures. The name should match the names returned in the
 PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 create directory if it does not exist.}
 
-\item{myfn}{\code{character} string, the file name to save the dataset under}
-
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
 }
@@ -39,5 +37,5 @@ and start their analysis from the already computed signatures
 if (interactive()){
 downloadPertSig("CMAP")
 }
- 
+
 }

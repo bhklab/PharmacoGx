@@ -67,13 +67,19 @@ availablePSets <- function(canonical=TRUE){
 #'   dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
-#'
+#' @param timeout \code{numeric} Parameter that lets you extend R's default timeout for 
+#'   downloading large files. Defaults for this function to 600. 
 #' @return A PSet object with the dataset
 #' 
 #' @export
 #' @importFrom downloader download
-downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE) {
+downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE, timeout=600) {
   
+  # change the download timeout since the files are big
+  opts <- options()
+  options(timeout=timeout)
+  on.exit(options(opts))
+
   pSetTable <- availablePSets(canonical=FALSE)
   
   whichx <- match(name, pSetTable[,"PSet Name"])

@@ -4,7 +4,13 @@
 \alias{downloadPSet}
 \title{Download a PharmacoSet object}
 \usage{
-downloadPSet(name, saveDir = tempdir(), pSetFileName = NULL, verbose = TRUE)
+downloadPSet(
+  name,
+  saveDir = tempdir(),
+  pSetFileName = NULL,
+  verbose = TRUE,
+  timeout = 600
+)
 }
 \arguments{
 \item{name}{\code{Character} string, the name of the PhamracoSet to download. 
@@ -20,6 +26,9 @@ dataset under}
 
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}
+
+\item{timeout}{\code{numeric} Parameter that lets you extend R's default timeout for 
+downloading large files. Defaults for this function to 600.}
 }
 \value{
 A PSet object with the dataset
