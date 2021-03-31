@@ -62,7 +62,7 @@
 #' @param trunc [bool] Should the viability values be truncated to lie in [0-100] before doing the fitting
 #' @param verbose [boolean] Should warning messages about the data passed in be printed?
 #' 
-#' @return Plots to the active graphics device and returns and invisible NULL.
+#' @return Plots to the active graphics device and returns an invisible NULL.
 #' 
 #' @import RColorBrewer
 #' 
