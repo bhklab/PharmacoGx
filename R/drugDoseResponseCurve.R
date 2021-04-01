@@ -182,11 +182,11 @@ function(drug,
           pSetNames[[i]] <- name(pSets[[i]])
           if (length(exp_i) == 1) {
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=FALSE))
+              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }else{
             drug.responses <- as.data.frame(cbind("Dose"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
-              "Viability"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}), stringsAsFactors=FALSE))
+              "Viability"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }
           doses[[i]] <- drug.responses$Dose
@@ -209,7 +209,7 @@ function(drug,
             pSetNames[[j]] <- name(pSets[[i]])
 
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"])), stringsAsFactors=FALSE))
+              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
             doses[[j]] <- drug.responses$Dose
             responses[[j]] <- drug.responses$Viability
