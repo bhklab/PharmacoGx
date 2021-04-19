@@ -151,7 +151,6 @@ PharmacoSet <-  function(name,
       colData(molecularProfiles[[i]]) <- 
         colData(molecularProfiles[[i]])[colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE]
         }
-    
     }
     #if (!is(cell, "data.frame")) {
     #    stop("Please provide the cell line annotations as a data frame.")
@@ -582,7 +581,7 @@ updateCellId <- function(object, new.ids = vector('character')){
 ### TODO:: Add updating of sensitivity Number tables
 updateDrugId <- function(object, new.ids = vector('character')){
 
-  if (length(new.ids)!=nrow(drugInfo(object))){
+  if (length(new.ids)!=nrow(drugInfo(object))) {
     stop('Wrong number of drug identifiers')
   }
 
@@ -599,7 +598,6 @@ updateDrugId <- function(object, new.ids = vector('character')){
       return(SE)
     })
   }
-  
 
   if(any(duplicated(new.ids))){
     warning('Duplicated ids passed to updateDrugId. Merging old ids into the same identifier')

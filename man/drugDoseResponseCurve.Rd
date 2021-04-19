@@ -89,7 +89,7 @@ are summarized and replicates are plotted individually otherwise}
 \item{verbose}{[boolean] Should warning messages about the data passed in be printed?}
 }
 \value{
-Plots to the active graphics device and returns and invisible NULL.
+Plots to the active graphics device and returns an invisible NULL.
 }
 \description{
 Given a list of PharmacoSets, the function will plot the drug_response curve,

@@ -44,7 +44,7 @@ Imports:
     jsonlite,
     data.table
 Depends: R (>= 3.6), CoreGx
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.1.9001
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
