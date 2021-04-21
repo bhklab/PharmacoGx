@@ -20,7 +20,6 @@
 #'   and F statistics and its corresponding p-value.
 #'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var
-#' @export
 geneDrugSensitivity <- function(x, type, batch, drugpheno, 
                                 interaction.typexgene=FALSE, 
                                 model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
