@@ -12,7 +12,7 @@ drugNames(object) <- value
 \item{value}{A \code{character} vector of the new drug names}
 }
 \value{
-The [`object`] with updated drug names
+The \code{\link{object}} with updated drug names
 }
 \description{
 A generic for the drugNames replacement method

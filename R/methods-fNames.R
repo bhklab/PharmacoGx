@@ -1,3 +1,11 @@
+#' @export
+#'
+setGeneric('fNames', function(object, mDataType, ...) standardGeneric('fNames'))
+
+#' @export
+#'
+setGeneric('fNames<-', function(object, mDataType, ..., value) standardGeneric('fNames<-'))
+
 #' fNames
 #'
 #' Return the feature names for the specified molecular data type
@@ -13,7 +21,7 @@
 #'
 #' @return A [`character`] vector of the feature names
 #'
-#' @importFrom CoreGx fNames
+#' @importMethodsFrom CoreGx fNames
 #' @importFrom methods callNextMethod
 #'
 #' @export
@@ -39,7 +47,7 @@ setMethod('fNames',
 #'
 #' @return Updated [`PharmacoSet`]
 #'
-#' @importFrom CoreGx fNames<-
+#' @importMethodsFrom CoreGx fNames<-
 #' @importFrom methods callNextMethod
 #'
 #' @export

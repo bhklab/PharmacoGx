@@ -15,7 +15,7 @@ checkPsetStructure(object, plotDist = FALSE, result.dir = ".")
 }
 \value{
 Prints out messages whenever describing the errors found in the
-  structure of the object object passed in.
+structure of the object object passed in.
 }
 \description{
 This function checks the structure of a PharamcoSet, ensuring that the

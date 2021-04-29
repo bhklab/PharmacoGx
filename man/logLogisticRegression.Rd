@@ -23,49 +23,49 @@ logLogisticRegression(
 )
 }
 \arguments{
-\item{conc}{[vector] is a vector of drug concentrations.}
+\item{conc}{\link{vector} is a vector of drug concentrations.}
 
-\item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
+\item{viability}{\link{vector} is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of the log_conc, where viability 0
 indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells.}
 
-\item{density}{[vector] is a vector of length 3 whose components are the numbers of lattice points per unit
+\item{density}{\link{vector} is a vector of length 3 whose components are the numbers of lattice points per unit
 length along the HS-, E_inf-, and base-10 logarithm of the EC50-dimensions of the parameter space, respectively.}
 
-\item{step}{[vector] is a vector of length 3 whose entries are the initial step sizes in the HS, E_inf, and
+\item{step}{\link{vector} is a vector of length 3 whose entries are the initial step sizes in the HS, E_inf, and
 base-10 logarithm of the EC50 dimensions, respectively, for the PatternSearch algorithm.}
 
 \item{precision}{is a positive real number such that when the ratio of current step size to initial step
 size falls below it, the PatternSearch algorithm terminates. A smaller value will cause LogisticPatternSearch
 to take longer to complete optimization, but will produce a more accurate estimate for the fitted parameters.}
 
-\item{lower_bounds}{[vector] is a vector of length 3 whose entries are the lower bounds on the HS, E_inf,
+\item{lower_bounds}{\link{vector} is a vector of length 3 whose entries are the lower bounds on the HS, E_inf,
 and base-10 logarithm of the EC50 parameters, respectively.}
 
-\item{upper_bounds}{[vector] is a vector of length 3 whose entries are the upper bounds on the HS, E_inf,
+\item{upper_bounds}{\link{vector} is a vector of length 3 whose entries are the upper bounds on the HS, E_inf,
 and base-10 logarithm of the EC50 parameters, respectively.}
 
 \item{scale}{is a positive real number specifying the shape parameter of the Cauchy distribution.}
 
-\item{family}{[character], if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
+\item{family}{\link{character}, if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
 instead of sum-of-squared-residuals as the objective function for assessing goodness-of-fit of
 dose-response curves to the data. Otherwise, if "normal", uses MLE with a gaussian assumption of errors}
 
 \item{median_n}{If the viability points being fit were medians of measurements, they are expected to follow a median of \code{family}
 distribution, which is in general quite different from the case of one measurement. Median_n is the number of measurements
-the median was taken of. If the measurements are means of values, then both the Normal and the Cauchy distributions are stable, so means of 
+the median was taken of. If the measurements are means of values, then both the Normal and the Cauchy distributions are stable, so means of
 Cauchy or Normal distributed variables are still Cauchy and normal respectively.}
 
-\item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data,
+\item{conc_as_log}{\link{logical}, if true, assumes that log10-concentration data has been given rather than concentration data,
 and that log10(EC50) should be returned instead of EC50.}
 
-\item{viability_as_pct}{[logical], if false, assumes that viability is given as a decimal rather
+\item{viability_as_pct}{\link{logical}, if false, assumes that viability is given as a decimal rather
 than a percentage, and that E_inf should be returned as a decimal rather than a percentage.}
 
-\item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before 
+\item{trunc}{\link{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 
-\item{verbose}{[logical], if true, causes warnings thrown by the function to be printed.}
+\item{verbose}{\link{logical}, if true, causes warnings thrown by the function to be printed.}
 }
 \value{
 A vector containing estimates for HS, E_inf, and EC50

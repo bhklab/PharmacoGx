@@ -21,27 +21,27 @@ cosinePerm(
 \item{nperm}{\code{integer} is the number of permutations to compute the null
 distribution of MCC estimates}
 
-\item{alternative}{\code{string} indicates the alternative hypothesis and 
-must be one of ‘'two.sided'’, ‘'greater'’ or ‘'less'’.  You can specify 
-just the initial letter.  ‘'greater'’ corresponds to positive association, 
-‘'less'’ to negative association. Options are 'two.sided', 'less', or 
+\item{alternative}{\code{string} indicates the alternative hypothesis and
+must be one of ‘'two.sided'’, ‘'greater'’ or ‘'less'’.  You can specify
+just the initial letter.  ‘'greater'’ corresponds to positive association,
+‘'less'’ to negative association. Options are 'two.sided', 'less', or
 'greater'}
 
-\item{include.perm}{\code{boolean} indicates whether the estimates for the 
+\item{include.perm}{\code{boolean} indicates whether the estimates for the
 null distribution should be returned. Default set to 'FALSE'}
 
-\item{nthread}{\code{integer} is the number of threads to be used to perform 
+\item{nthread}{\code{integer} is the number of threads to be used to perform
 the permutations in parallel}
 }
 \value{
-A \code{list} estimate of the cosine similarity, p-value and 
-  estimates after random permutations (null distribution) in include.perm is 
-  set to 'TRUE'
+A \code{list} estimate of the cosine similarity, p-value and
+estimates after random permutations (null distribution) in include.perm is
+set to 'TRUE'
 }
 \description{
 Computes the cosine similarity and significance using permutation test. This
-  function uses random numbers, to ensure reproducibility please call 
-  \code{set.seed()} before running the function.
+function uses random numbers, to ensure reproducibility please call
+\code{set.seed()} before running the function.
 }
 \examples{
 x <- factor(c(1,2,1,2,1))

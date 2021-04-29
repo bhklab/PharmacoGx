@@ -19,37 +19,37 @@ computeABC(
 )
 }
 \arguments{
-\item{conc1}{[vector] is a vector of drug concentrations.}
+\item{conc1}{\link{vector} is a vector of drug concentrations.}
 
-\item{conc2}{[vector] is a vector of drug concentrations.}
+\item{conc2}{\link{vector} is a vector of drug concentrations.}
 
-\item{viability1}{[vector] is a vector whose entries are the viability values observed in the presence of the
+\item{viability1}{\link{vector} is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
 of viability in the absence of any drug.}
 
-\item{viability2}{[vector] is a vector whose entries are the viability values observed in the presence of the
+\item{viability2}{\link{vector} is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
 of viability in the absence of any drug.}
 
-\item{Hill_fit1}{[list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+\item{Hill_fit1}{\link{list or vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
 as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
-viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
+viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
 and EC50 as a concentration.}
 
-\item{Hill_fit2}{[list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+\item{Hill_fit2}{\link{list or vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
 as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
-viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
+viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
 and EC50 as a concentration.}
 
-\item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data.}
+\item{conc_as_log}{\link{logical}, if true, assumes that log10-concentration data has been given rather than concentration data.}
 
-\item{viability_as_pct}{[logical], if false, assumes that viability is given as a decimal rather
+\item{viability_as_pct}{\link{logical}, if false, assumes that viability is given as a decimal rather
 than a percentage, and returns ABC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.}
 
-\item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+\item{trunc}{\link{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 
-\item{verbose}{[logical], if true, causes warnings thrown by the function to be printed.}
+\item{verbose}{\link{logical}, if true, causes warnings thrown by the function to be printed.}
 }
 \value{
 The numeric area of the absolute difference between the two hill slopes

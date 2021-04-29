@@ -17,31 +17,31 @@ drugPerturbationSig(
 )
 }
 \arguments{
-\item{pSet}{[PharmacoSet] a PharmacoSet of the perturbation experiment type}
+\item{pSet}{\link{PharmacoSet} a PharmacoSet of the perturbation experiment type}
 
-\item{mDataType}{[character] which one of the molecular data types to use
+\item{mDataType}{\link{character} which one of the molecular data types to use
 in the analysis, out of dna, rna, rnaseq, snp, cnv}
 
-\item{drugs}{[character] a vector of drug names for which to compute the
+\item{drugs}{\link{character} a vector of drug names for which to compute the
 signatures. Should match the names used in the PharmacoSet.}
 
-\item{cells}{[character] a vector of cell names to use in computing the 
+\item{cells}{\link{character} a vector of cell names to use in computing the
 signatures. Should match the names used in the PharmacoSet.}
 
-\item{features}{[character] a vector of features for which to compute the
+\item{features}{\link{character} a vector of features for which to compute the
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
-\item{nthread}{[numeric] if multiple cores are available, how many cores
+\item{nthread}{\link{numeric} if multiple cores are available, how many cores
 should the computation be parallelized over?}
 
-\item{returnValues}{[character] Which of estimate, t-stat, p-value and fdr
+\item{returnValues}{\link{character} Which of estimate, t-stat, p-value and fdr
 should the function return for each gene drug pair?}
 
-\item{verbose}{[bool] Should diagnostive messages be printed? (default false)}
+\item{verbose}{\link{bool} Should diagnostive messages be printed? (default false)}
 }
 \value{
-[list] a 3D array with genes in the first dimension, drugs in the
-  second, and return values in the third.
+\link{list} a 3D array with genes in the first dimension, drugs in the
+second, and return values in the third.
 }
 \description{
 Given a Pharmacoset of the perturbation experiment type, and a list of drugs,

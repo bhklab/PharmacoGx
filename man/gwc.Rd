@@ -37,8 +37,8 @@ gwc(
 \code{numeric} a vector of two values, the correlation and associated p-value.
 }
 \description{
-Calculate the gwc score between two vectors, using either a weighted spearman 
- or pearson correlation
+Calculate the gwc score between two vectors, using either a weighted spearman
+or pearson correlation
 }
 \examples{
 data(CCLEsmall)

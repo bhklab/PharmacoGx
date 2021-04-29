@@ -14,7 +14,7 @@ downloadPertSig(
 \arguments{
 \item{name}{A \code{character} string, the name of the PharmacoSet for which
 to download signatures. The name should match the names returned in the
-`PSet Name` column of `availablePSets(canonical=FALSE)`.}
+\verb{PSet Name} column of \code{availablePSets(canonical=FALSE)}.}
 
 \item{saveDir}{A \code{character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will

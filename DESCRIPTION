@@ -44,6 +44,7 @@ Imports:
     jsonlite,
     data.table
 Depends: R (>= 3.6), CoreGx
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1.9001
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
@@ -54,11 +55,12 @@ Collate:
     'GWC.R'
     'LogLogisticRegression.R'
     'MatthewCor.R'
+    'allGenerics.R'
+    'class-PharmacoSet.R'
+    'PharmacoSet-accessors.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'
-    'allGenerics.R'
     'callingWaterfall.R'
-    'class-PharmacoSet.R'
     'class-SignatureClass.R'
     'computeABC.R'
     'computeAUC.R'
@@ -86,7 +88,6 @@ Collate:
     'methods-cellInfo.R'
     'methods-cellNames.R'
     'methods-dateCreated.R'
-    'methods-drugInfo.R'
     'methods-drugNames.R'
     'methods-drugSensitivitySig.R'
     'methods-fNames.R'

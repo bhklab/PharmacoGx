@@ -2,7 +2,7 @@
 % Please edit documentation in R/filterNoisyCurves.R
 \name{filterNoisyCurves}
 \alias{filterNoisyCurves}
-\title{Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
+\title{Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
 to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.}
 \usage{
 filterNoisyCurves(
@@ -14,26 +14,26 @@ filterNoisyCurves(
 )
 }
 \arguments{
-\item{pSet}{[PharmacoSet] a PharmacoSet object}
+\item{pSet}{\link{PharmacoSet} a PharmacoSet object}
 
-\item{epsilon}{[numeric] a value indicates assumed threshold for the 
+\item{epsilon}{\link{numeric} a value indicates assumed threshold for the
 distance between to consecutive viability values on the drug-response curve
 in the analysis, out of dna, rna, rnaseq, snp, cnv}
 
-\item{positive.cutoff.percent}{[numeric] This value indicates that function 
+\item{positive.cutoff.percent}{\link{numeric} This value indicates that function
 may violate epsilon rule for how many points on drug-response curve}
 
-\item{mean.viablity}{[numeric] average expected viability value}
+\item{mean.viablity}{\link{numeric} average expected viability value}
 
-\item{nthread}{[numeric] if multiple cores are available, how many cores
+\item{nthread}{\link{numeric} if multiple cores are available, how many cores
 should the computation be parallelized over?}
 }
 \value{
-a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
-  rownames of the non-noisy curves
+a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the
+rownames of the non-noisy curves
 }
 \description{
-Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
+Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
 to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
 }
 \examples{
