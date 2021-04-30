@@ -2,13 +2,15 @@
 NULL
 
 .local_class <- 'PharmacoSet'
+.local_data <- 'CCLEsmall'
+data(CCLEsmall)
 
 # =======================================
 # Accessor Method Documentation Object
 # ---------------------------------------
 
-#' @eval CoreGx:::.docs_CoreSet_accessors(name_='PharmacoSet-accessors', 
-#'    class_='PharmacoSet')
+#' @name PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_accessors(class_=.local_class)
 NULL
 
 
@@ -17,7 +19,8 @@ NULL
 # --------------------------------------
 
 
-## --------------
+
+## ==============
 ## ---- drug slot
 
 #' @examples
@@ -46,3 +49,15 @@ setReplaceMethod("drugInfo",
   object@drug <- value
   object
 })
+
+## ==============
+## ---- cell slot
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_cellInfo(class_=.local_class)
+#' @importFrom CoreGx cellInfo
+#' @importFrom methods callNextMethod
+setMethod(cellInfo, "PharmacoSet", function(object){
+  callNextMethod(object)
+})
+

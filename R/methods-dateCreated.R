@@ -40,6 +40,8 @@ setMethod(dateCreated, 'PharmacoSet', function(object) {
 #' @importFrom CoreGx sensNumber<-
 #' @importFrom methods callNextMethod
 #' @export
-setReplaceMethod('sensNumber', signature = signature(object='PharmacoSet',value='matrix'), function(object, value){
+setReplaceMethod('sensNumber', signature(object='PharmacoSet', 
+  value='matrix'), function(object, value) 
+{
   callNextMethod(object=object, value=value)
 })

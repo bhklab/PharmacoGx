@@ -1,23 +1,3 @@
-#' cellInfo
-#'
-#' Return cell line metadata from a object
-#'
-#' @examples
-#' data(CCLEsmall)
-#' cellInf <- cellInfo(CCLEsmall)
-#'
-#' @param object The \code{PharmacoSet} to retrieve cell info from
-#'
-#' @return a \code{data.frame} with the cell annotations
-#'
-#' @describeIn PharmacoSet
-#'
-#' @importFrom CoreGx cellInfo
-#' @importFrom methods callNextMethod
-#' @export
-setMethod(cellInfo, "PharmacoSet", function(object){
-  callNextMethod(object)
-})
 
 
 #' cellInfo<- Generic

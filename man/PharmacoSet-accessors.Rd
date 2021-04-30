@@ -4,16 +4,25 @@
 \alias{PharmacoSet-accessors}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
+\alias{cellInfo,PharmacoSet-method}
+\alias{cellInfo}
 \title{Accessing and modifying information in a \code{PharmacoSet}}
 \usage{
 \S4method{drugInfo}{PharmacoSet}(object)
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
+
+\S4method{cellInfo}{PharmacoSet}(object)
 }
 \arguments{
 \item{object}{A \code{PharmacoSet} object.}
 
 \item{value}{See details.}
+
+\item{mDataType}{\code{character(1)} The name of a molecular datatype to access
+from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
+
+\item{assay}{See details.}
 
 \item{...}{See details.}
 }
@@ -23,11 +32,11 @@ Accessors: See details.
 Setters: An updated \code{PharmacoSet} object, returned invisibly.
 }
 \description{
-Accessing and modifying information in a \code{PharmacoSet}
+Documentation for the various setters and getters which allow manipulation
+of data in the slots of a \code{PharmacoSet} object.
 }
 \details{
-Documentation for the various setters and getters which allow manipulation
-of data in the slots of a \code{PharmacoSet} object:
+\strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{PharmacoSet} object.
 }
 \examples{
 data(CCLEsmall)

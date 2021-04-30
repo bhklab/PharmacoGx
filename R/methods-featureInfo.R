@@ -15,9 +15,9 @@
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom CoreGx featureInfo
 #' @export
-setMethod(featureInfo,
-          signature="PharmacoSet",
-          function(object, mDataType){
+setMethod(featureInfo, signature("PharmacoSet", "character"), 
+  function(object, mDataType)
+{
   callNextMethod(object=object, mDataType=mDataType)
 })
 
@@ -41,8 +41,9 @@ setMethod(featureInfo,
 #' @describeIn PharmacoSet Replace the gene info for the molecular data
 #'
 #' @export
-setReplaceMethod("featureInfo",
-                 signature=signature(object="PharmacoSet", mDataType ="character", value="DataFrame"),
-                 function(object, mDataType, value) {
+setReplaceMethod("featureInfo", signature(object="PharmacoSet", 
+    mDataType ="character", value="DataFrame"), 
+    function(object, mDataType, value) 
+{
   callNextMethod(object=object, mDataType=mDataType, value=value)
 })
