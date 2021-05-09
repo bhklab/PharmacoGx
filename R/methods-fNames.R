@@ -17,9 +17,9 @@ setGeneric('fNames<-', function(object, mDataType, ..., value) standardGeneric('
 #' fNames(CCLEsmall, "rna")
 #'
 #' @param object The [`PharmacoSet`]
-#' @param mDataType [`character`] The molecular data type to return feature names for
+#' @param mDataType `character` The molecular data type to return feature names for
 #'
-#' @return A [`character`] vector of the feature names
+#' @return A `character` vector of the feature names
 #'
 #' @importMethodsFrom CoreGx fNames
 #' @importFrom methods callNextMethod
@@ -42,8 +42,8 @@ setMethod('fNames',
 #' fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
 #'
 #' @param object The [`PharmacoSet`] object to update
-#' @param mDataType [`character`] The molecular data type to update
-#' @param value A [`character`] vector of the new cell names
+#' @param mDataType `character` The molecular data type to update
+#' @param value A `character` vector of the new cell names
 #'
 #' @return Updated [`PharmacoSet`]
 #'

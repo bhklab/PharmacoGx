@@ -9,7 +9,7 @@
 #' name(CCLEsmall)
 #'
 #' @param object A [`PharmacoSet`]
-#' @return [`character`] The name of the `PharmacoSet`
+#' @return `character` The name of the `PharmacoSet`
 #'
 #' @importMethodsFrom CoreGx name
 #' @importFrom methods callNextMethod

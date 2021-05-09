@@ -10,7 +10,7 @@
 #' phenoInf <- phenoInfo(CCLEsmall, mDataType="rna")
 #'
 #' @param object The [`PharmacoSet`] to retrieve rna annotations from
-#' @param mDataType [`character`] The type of molecular data
+#' @param mDataType `character` The type of molecular data
 #'
 #' @return a [`data.frame`] with the phenotype information for the specified molecular data type
 #'

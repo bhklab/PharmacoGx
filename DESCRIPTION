@@ -103,7 +103,6 @@ Collate:
     'methods-sensitivityInfo.R'
     'methods-sensitivityMeasures.R'
     'methods-sensitivityProfiles.R'
-    'methods-sensitivityRaw.R'
     'methods-sensitivitySlot.R'
     'methods-sensitivitySlotToLongTable.R'
     'methods-subsetTo.R'

@@ -9,8 +9,8 @@
 #' molProf <- molecularProfiles(CCLEsmall, "rna")
 #'
 #' @param object The [`PharmacoSet`] to retrieve molecular profiles from
-#' @param mDataType [`character`] The type of molecular data
-#' @param assay [`character`] Name of the desired assay; if excluded defaults to first assay
+#' @param mDataType `character` The type of molecular data
+#' @param assay `character` Name of the desired assay; if excluded defaults to first assay
 #'   in the SummarizedExperiment for the given mDataType
 #'
 #' @return a [`matrix`] of data for the given mDataType and assay
@@ -36,7 +36,7 @@ setMethod(molecularProfiles, signature="PharmacoSet", function(object, mDataType
 #'
 #' @param object The [`PharmacoSet`] to replace molecular profiles in
 #' @param mDataType The type of molecular data to be updated
-#' @param assay [`character`] Name or index of the assay data to return
+#' @param assay `character` Name or index of the assay data to return
 #' @param value A [`matrix`] with the new profiles
 #'
 #' @return Updated [`PharmacoSet`]

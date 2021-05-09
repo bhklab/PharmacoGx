@@ -6,7 +6,7 @@
 %   R/methods-name.R, R/methods-pertNumber.R, R/methods-phenoInfo.R,
 %   R/methods-sensNumber.R, R/methods-sensitivityInfo.R,
 %   R/methods-sensitivityMeasures.R, R/methods-sensitivityProfiles.R,
-%   R/methods-sensitivityRaw.R, R/methods-sensitivitySlot.R
+%   R/methods-sensitivitySlot.R
 \docType{class}
 \name{PharmacoSet-class}
 \alias{PharmacoSet-class}
@@ -40,8 +40,6 @@
 \alias{sensitivityProfiles,PharmacoSet-method}
 \alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
 \alias{sensitivityProfiles<-,PharmacoSet,matrix-method}
-\alias{sensitivityRaw,PharmacoSet-method}
-\alias{sensitivityRaw<-,PharmacoSet,array-method}
 \alias{sensitivitySlot,PharmacoSet-method}
 \alias{sensitivitySlot<-,PharmacoSet,list-method}
 \title{A Class to Contain PharmacoGenomic datasets together with their curations}
@@ -103,10 +101,6 @@
 \S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
 
 \S4method{sensitivityProfiles}{PharmacoSet,matrix}(object) <- value
-
-\S4method{sensitivityRaw}{PharmacoSet}(object)
-
-\S4method{sensitivityRaw}{PharmacoSet,array}(object) <- value
 
 \S4method{sensitivitySlot}{PharmacoSet}(object)
 
@@ -187,10 +181,6 @@ a \code{data.frame} with the experiment info
 \code{\link{invisible}} Updates the \code{PharmacoSet} object.
 
 \code{\link{invisible}} Updates the \code{PharmacoSet} object.
-
-A \code{array} containing the raw sensitivity data
-
-A copy of the \code{PharmacoSet} containing the updated sensitivty data
 
 A \code{list} of the sensitivity slot contents
 
@@ -327,10 +317,6 @@ object.
 \item \code{sensitivityProfiles<-}: Update the sensitivity profiles for a \code{PharmacoSet}
 object.
 
-\item \code{sensitivityRaw}: Retrive the raw dose and viability data from a pSet
-
-\item \code{sensitivityRaw<-}: Update the raw dose and viability data in a pSet object
-
 \item \code{sensitivitySlot}: Retrieve the contents of the sensitivity slot
 
 \item \code{sensitivitySlot<-}: Set the raw dose and viability data for an pSet and return
@@ -458,12 +444,6 @@ sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 
 data(GDSCsmall)
 sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
-
-data(CCLEsmall)
-sensitivityRaw(CCLEsmall)
-
-data(CCLEsmall)
-sensitivityRaw(CCLEsmall) <- sensitivityRaw(CCLEsmall)
 
 data(CCLEsmall)
 sensitivitySlot(CCLEsmall)

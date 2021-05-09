@@ -13,9 +13,9 @@ setOldClass('sessionInfo', sessionInfo)
 #' Contructor for the PharmacoSig S4 class
 #'
 #' @param Data [`array`] of data to build the signature from
-#' @param PSetName [`character`] vector containing name of PSet, defaults to ''
+#' @param PSetName `character` vector containing name of PSet, defaults to ''
 #' @param DateCreated [`date`] date the signature was created, defaults to `date()`
-#' @param SigType [`character`] vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
+#' @param SigType `character` vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
 #' @param SessionInfo [`sessionInfo`] object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`
 #' @param Call [`character` or `call`] specifying the constructor call used to make the object, defaults to 'No Call Recorded'
 #' @param Arguments [`list`] a list of additional arguments to the constructure

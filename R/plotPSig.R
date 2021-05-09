@@ -13,12 +13,12 @@
 #' 
 #' @param x [`PharmacoSig`] a PharmacoSig object, result of drugSensitivitySig
 #'  or drugPerturbationSig
-#' @param adjust.method [`character`] or [`boolean`] either FALSE for no adjustment,
+#' @param adjust.method `character` or [`boolean`] either FALSE for no adjustment,
 #' or one of the methods implemented by p.adjust. Defaults to FALSE for no 
 #' correction
-#' @param drugs [`character`] a vector of drug names for which to plot the estimated
+#' @param drugs `character` a vector of drug names for which to plot the estimated
 #' associations with gene expression 
-#' @param features [`character`] a vector of features for which to plot the estimated
+#' @param features `character` a vector of features for which to plot the estimated
 #' associations with drug treatment 
 #' @param effect_cutoff the cutoff to use for coloring significant effect sizes. 
 #' @param signif_cutoff the cutoff to use for coloring significance by p value or

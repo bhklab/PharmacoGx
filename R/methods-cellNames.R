@@ -29,7 +29,7 @@ setMethod(cellNames, signature="PharmacoSet", function(object) {
 #' cellNames(CCLEsmall) <- cellNames(CCLEsmall)
 #'
 #' @param object The [`PharmacoSet`] object to update
-#' @param value A [`character`] vector of the new cell names
+#' @param value A `character` vector of the new cell names
 #'
 #' @return Updated [`PharmacoSet`]
 #'

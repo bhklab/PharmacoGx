@@ -8,10 +8,10 @@
 #'
 #' @param object The [`PharmacoSet`] to retrieve sensitivity experiment
 #'     annotations from
-#' @param dimension [`character`] Optional name of the dimension to extract,
+#' @param dimension `character` Optional name of the dimension to extract,
 #'     either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
-#' @param ... [`pairlist`] Additional arguments to the rowData or colData
+#' @param ... `pairlist` Additional arguments to the rowData or colData
 #'     `LongTable` methods. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
 #'
@@ -40,7 +40,7 @@ setMethod(sensitivityInfo, signature("PharmacoSet"),
 #' sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 #'
 #' @param object The [`PharmacoSet`] to update
-#' @param dimension [`character`] Optional name of the dimension to extract,
+#' @param dimension `character` Optional name of the dimension to extract,
 #'     either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
 #' @param ... Additional arguments to the rowData or colData

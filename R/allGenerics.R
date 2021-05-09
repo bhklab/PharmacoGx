@@ -37,7 +37,7 @@ setGeneric('drugInfo<-', function(object, value) standardGeneric('drugInfo<-'))
 #'
 #' @param object The [`PharmacoSet`] to return drug names from
 #'
-#' @return A [`character`] vector of drug names in the object
+#' @return A `character` vector of drug names in the object
 #'
 #' @export
 setGeneric("drugNames", function(object) standardGeneric("drugNames"))

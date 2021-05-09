@@ -8,7 +8,7 @@
 #'
 #' @param object The [`PharmacoSet`] object to retrieve available sensitivity measurement types from
 #'
-#' @return A [`character`] vector of all the available sensitivity measures
+#' @return A `character` vector of all the available sensitivity measures
 #'
 #' @importMethodsFrom CoreGx sensitivityMeasures
 #' @importFrom methods callNextMethod
@@ -33,7 +33,7 @@ setMethod('sensitivityMeasures', "PharmacoSet", function(object){
 #'
 #' @param object The [`PharmacoSet`] object to retrieve available sensitivity measurement types from
 #'
-#' @return A [`character`] vector of all the available sensitivity measures
+#' @return A `character` vector of all the available sensitivity measures
 #'
 #' @importMethodsFrom CoreGx sensitivityMeasures<-
 #' @importFrom methods callNextMethod

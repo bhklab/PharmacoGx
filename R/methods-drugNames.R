@@ -10,7 +10,7 @@
 #'
 #' @param object The [`PharmacoSet`] to return drug names from
 #'
-#' @return A [`character`] vector containg the names of drugs in the pSet
+#' @return A `character` vector containg the names of drugs in the pSet
 #'
 #' @export
 setMethod(drugNames, signature="PharmacoSet", function(object) {
@@ -29,7 +29,7 @@ setMethod(drugNames, signature="PharmacoSet", function(object) {
 #' drugNames(CCLEsmall) <- drugNames(CCLEsmall)
 #'
 #' @param object The [`PharmacoSet`] to update
-#' @param value A [`character`] vector of the new drug names
+#' @param value A `character` vector of the new drug names
 #'
 #' @return The updated [`PharmacoSet`] object
 #'

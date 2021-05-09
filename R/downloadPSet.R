@@ -15,7 +15,7 @@
 #' availablePSets()
 #' }
 #' 
-#' @param canonical [`logical`] Should available PSets show only official PSets, or should
+#' @param canonical `logical` Should available PSets show only official PSets, or should
 #'   user generated PSets be included?
 #' 
 #' @return A data.frame with details about the available PharmacoSet objects

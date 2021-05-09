@@ -22,7 +22,8 @@
 \item{mDataType}{\code{character(1)} The name of a molecular datatype to access
 from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
 
-\item{assay}{See details.}
+\item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
+of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
 
 \item{...}{See details.}
 }

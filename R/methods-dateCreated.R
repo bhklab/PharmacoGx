@@ -9,7 +9,7 @@
 #'
 #' @param object A [`PharmacoSet`]
 #'
-#' @return [`character`] The date the `PharmacoSet` was created
+#' @return `character` The date the `PharmacoSet` was created
 #'
 #' @importMethodsFrom CoreGx dateCreated
 #' @importFrom methods callNextMethod
