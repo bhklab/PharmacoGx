@@ -113,9 +113,9 @@
 
 \item{mDataType}{the type of molecular data}
 
-\item{assay}{\code{\link{character}} Name or index of the assay data to return}
+\item{assay}{\code{character} Name or index of the assay data to return}
 
-\item{dimension}{\code{\link{character}} Optional name of the dimension to extract,
+\item{dimension}{\code{character} Optional name of the dimension to extract,
 either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
 \code{LongTable} object instead of a \code{list}.}
 
@@ -130,17 +130,17 @@ A vector of the cell names used in the PharmacoSet
 
 Updated \code{\link{PharmacoSet}}
 
-\code{\link{character}} The date the \code{PharmacoSet} was created
+\code{character} The date the \code{PharmacoSet} was created
 
 The updated \code{PharmacoSet}
 
-A \code{\link{character}} vector containg the names of drugs in the pSet
+A \code{character} vector containg the names of drugs in the pSet
 
 The updated \code{\link{PharmacoSet}} object
 
-A \code{\link{character}} vector of the feature names
+A \code{character} vector of the feature names
 
-A \code{\link{data.frame}} with the feature annotations for the specified \code{mDataType}
+A \code{data.frame} with the feature annotations for the specified \code{mDataType}
 
 Updated \code{PharmacoSet}
 
@@ -150,18 +150,18 @@ a \code{\link{matrix}} of data for the given mDataType and assay
 
 Updated \code{\link{PharmacoSet}}
 
-A \code{\link{list}} of \code{SummarizedExperiment} objects, named by molecular data type
+A \code{list} of \code{SummarizedExperiment} objects, named by molecular data type
 
-\code{\link{character}} The name of the \code{PharmacoSet}
+\code{character} The name of the \code{PharmacoSet}
 
 The name of the PharmacoSet
 
-A 3D \code{\link{array}} with the number of perturbation experiments per
+A 3D  with the number of perturbation experiments per
 drug and cell line, and data type
 
 The updated \code{\link{PharmacoSet}}
 
-a \code{\link{data.frame}} with the phenotype information for the specified molecular data type
+a \code{data.frame} with the phenotype information for the specified molecular data type
 
 The updated \code{PharmacoSet}
 
@@ -172,9 +172,9 @@ a \code{\link{DataFrame}} with the experiment info
 
 Updated \code{PharmacoSet}
 
-A \code{\link{character}} vector of all the available sensitivity measures
+A \code{character} vector of all the available sensitivity measures
 
-A \code{\link{character}} vector of all the available sensitivity measures
+A \code{character} vector of all the available sensitivity measures
 
 a \code{data.frame} with the experiment info
 

@@ -6,7 +6,7 @@
 #'
 #' @param object A [`PharmacoSet`] object to retrieve the molecular profiles slot from
 #'
-#' @return A [`list`] of `SummarizedExperiment` objects, named by molecular data type
+#' @return A `list` of `SummarizedExperiment` objects, named by molecular data type
 #'
 #' @describeIn PharmacoSet Getter for the molecular profiles slot
 #' @importMethodsFrom CoreGx molecularProfilesSlot
@@ -20,7 +20,7 @@ setMethod('molecularProfilesSlot', signature(object="PharmacoSet"), function(obj
 #' molecularProfilesSlot(CCLEsmall) <- molecularProfilesSlot(CCLEsmall)
 #'
 #' @param object A [`PharmacoSet`] object to update the molecular profiles slot in
-#' @param value A [`list`] of `SummarizedExperiment` objects to update the molecular profiles slot with
+#' @param value A `list` of `SummarizedExperiment` objects to update the molecular profiles slot with
 #'
 #' @describeIn PharmacoSet Setter for the molecular profiles slot
 #'

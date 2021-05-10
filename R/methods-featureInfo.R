@@ -8,7 +8,7 @@
 #'
 #' @param object The [`PharmacoSet`] to retrieve feature annotations from
 #' @param mDataType `character` The type of molecular data
-#' @return A [`data.frame`] with the feature annotations for the specified `mDataType`
+#' @return A `data.frame` with the feature annotations for the specified `mDataType`
 #'
 #' @describeIn PharmacoSet Return the feature info for the given molecular datatype
 #'

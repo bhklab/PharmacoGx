@@ -25,6 +25,8 @@ from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
 \item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
 of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
 
+\item{dimension}{See details.}
+
 \item{...}{See details.}
 }
 \value{

@@ -15,19 +15,19 @@ PharmacoSig(
 )
 }
 \arguments{
-\item{Data}{\code{\link{array}} of data to build the signature from}
+\item{Data}{of data to build the signature from}
 
-\item{PSetName}{\code{\link{character}} vector containing name of PSet, defaults to ''}
+\item{PSetName}{\code{character} vector containing name of PSet, defaults to ''}
 
 \item{DateCreated}{\code{\link{date}} date the signature was created, defaults to \code{date()}}
 
-\item{SigType}{\code{\link{character}} vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'}
+\item{SigType}{\code{character} vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'}
 
 \item{SessionInfo}{\code{\link{sessionInfo}} object as retuned by \code{sesssionInfo()} function, defaults to \code{sessionInfo()}}
 
 \item{Call}{\link[=`character` or `call`]{\code{character} or \code{call}} specifying the constructor call used to make the object, defaults to 'No Call Recorded'}
 
-\item{Arguments}{\code{\link{list}} a list of additional arguments to the constructure}
+\item{Arguments}{\code{list} a list of additional arguments to the constructure}
 }
 \value{
 A \code{\link{PharmacoSig}} object build from the provided signature data

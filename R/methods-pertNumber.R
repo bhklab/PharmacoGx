@@ -11,7 +11,7 @@
 #'
 #' @param object A [`PharmacoSet`]
 #'
-#' @return A 3D [`array`] with the number of perturbation experiments per
+#' @return A 3D  with the number of perturbation experiments per
 #'   drug and cell line, and data type
 #'
 #' @importFrom CoreGx pertNumber

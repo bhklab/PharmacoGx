@@ -11,7 +11,7 @@
 items raw, profiles, info and n.}
 }
 \value{
-A \code{\link{LongTable}} with the data from the sensitivity slot.
+A \code{LongTable} with the data from the sensitivity slot.
 }
 \description{
 Reconstruct the data in the @sensitivity slot list into a LongTable object.

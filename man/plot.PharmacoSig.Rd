@@ -19,14 +19,14 @@
 \item{x}{\code{\link{PharmacoSig}} a PharmacoSig object, result of drugSensitivitySig
 or drugPerturbationSig}
 
-\item{adjust.method}{\code{\link{character}} or \code{\link{boolean}} either FALSE for no adjustment,
+\item{adjust.method}{\code{character} or \code{\link{boolean}} either FALSE for no adjustment,
 or one of the methods implemented by p.adjust. Defaults to FALSE for no
 correction}
 
-\item{drugs}{\code{\link{character}} a vector of drug names for which to plot the estimated
+\item{drugs}{\code{character} a vector of drug names for which to plot the estimated
 associations with gene expression}
 
-\item{features}{\code{\link{character}} a vector of features for which to plot the estimated
+\item{features}{\code{character} a vector of features for which to plot the estimated
 associations with drug treatment}
 
 \item{effect_cutoff}{the cutoff to use for coloring significant effect sizes.}

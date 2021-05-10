@@ -9,9 +9,9 @@
 \arguments{
 \item{object}{The \code{\link{PharmacoSet}} object to update}
 
-\item{mDataType}{\code{\link{character}} The molecular data type to update}
+\item{mDataType}{\code{character} The molecular data type to update}
 
-\item{value}{A \code{\link{character}} vector of the new cell names}
+\item{value}{A \code{character} vector of the new cell names}
 }
 \value{
 Updated \code{\link{PharmacoSet}}

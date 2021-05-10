@@ -7,7 +7,7 @@
 availablePSets(canonical = TRUE)
 }
 \arguments{
-\item{canonical}{\code{\link{logical}} Should available PSets show only official PSets, or should
+\item{canonical}{\code{logical} Should available PSets show only official PSets, or should
 user generated PSets be included?}
 }
 \value{

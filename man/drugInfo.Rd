@@ -10,7 +10,7 @@ drugInfo(object)
 \item{object}{The \code{PharmacoSet} to retrieve drug info from}
 }
 \value{
-A \code{\link{data.frame}} of annotations for drugs in the object
+A \code{data.frame} of annotations for drugs in the object
 }
 \description{
 Generic for drugInfo getter method

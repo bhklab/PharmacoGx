@@ -10,7 +10,7 @@ drugNames(object)
 \item{object}{The \code{\link{PharmacoSet}} to return drug names from}
 }
 \value{
-A \code{\link{character}} vector of drug names in the object
+A \code{character} vector of drug names in the object
 }
 \description{
 A generic for the drugNames method

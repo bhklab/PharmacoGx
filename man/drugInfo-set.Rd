@@ -9,7 +9,7 @@ drugInfo(object) <- value
 \arguments{
 \item{object}{The \code{\link{PharmacoSet}} to replace drug info}
 
-\item{value}{A \code{\link{data.frame}} with the new drug annotations}
+\item{value}{A \code{data.frame} with the new drug annotations}
 }
 \value{
 The \code{\link{object}} with updated drug annotations

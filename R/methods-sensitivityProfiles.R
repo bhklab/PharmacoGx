@@ -27,7 +27,7 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 
 #' Replicate the $profiles item in the old @sensitivity slot list object.
 #'
-#' @param longTable [`LongTable`]
+#' @param longTable `LongTable`
 #'
 #' @export
 #' @import data.table
@@ -63,7 +63,7 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #' sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 #'
 #' @param object A [`PharamcoSet`] to update.
-#' @param value A [`data.frame`] with the new sensitivity profiles. If a
+#' @param value A `data.frame` with the new sensitivity profiles. If a
 #'   matrix object is passed in, converted to `data.frame` before assignment.
 #'
 #' @return [`invisible`] Updates the `PharmacoSet` object.

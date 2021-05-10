@@ -12,7 +12,7 @@
 #' @param object The [`PharmacoSet`] to retrieve rna annotations from
 #' @param mDataType `character` The type of molecular data
 #'
-#' @return a [`data.frame`] with the phenotype information for the specified molecular data type
+#' @return a `data.frame` with the phenotype information for the specified molecular data type
 #'
 #'
 #' @importFrom methods callNextMethod
@@ -36,7 +36,7 @@ setMethod('phenoInfo', signature='PharmacoSet', function(object, mDataType){
 #'
 #' @param object The [`PharmacoSet`] to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data
-#' @param value a [`data.frame`]  with the new experiment annotations
+#' @param value a `data.frame`  with the new experiment annotations
 #'
 #' @return The updated \code{PharmacoSet}
 #'

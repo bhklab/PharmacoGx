@@ -3,7 +3,7 @@
 #' @param object A [`PharmacoSet`] with a list in the sensitivity slot containing
 #'   items raw, profiles, info and n.
 #'
-#' @return A [`LongTable`] with the data from the sensitivity slot.
+#' @return A `LongTable` with the data from the sensitivity slot.
 #'
 #' @import CoreGx
 #' @import data.table

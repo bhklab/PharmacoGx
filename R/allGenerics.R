@@ -8,7 +8,7 @@
 #'
 #' @param object The \code{PharmacoSet} to retrieve drug info from
 #'
-#' @return A [`data.frame`] of annotations for drugs in the object
+#' @return A `data.frame` of annotations for drugs in the object
 #'
 #' @export
 setGeneric("drugInfo", function(object) standardGeneric("drugInfo"))
@@ -18,7 +18,7 @@ setGeneric("drugInfo", function(object) standardGeneric("drugInfo"))
 #' Generic for drugInfo replace method
 #'
 #' @param object The [`PharmacoSet`] to replace drug info
-#' @param value A [`data.frame`] with the new drug annotations
+#' @param value A `data.frame` with the new drug annotations
 #'
 #' @return The [`object`] with updated drug annotations
 #'
