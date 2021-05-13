@@ -43,10 +43,10 @@ returns the data unchanged as a ExpressionSet}
 
 \item{verbose}{\code{boolean} should messages be printed}
 
-\item{binarize.threshold}{\code{numeric} A value on which the molecular data is binarized.
+\item{binarize.threshold}{\code{numeric} A value on which the molecular data is binarized. 
 If NA, no binarization is done.}
 
-\item{binarize.direction}{\code{character} One of "less" or "greater", the direction of binarization on
+\item{binarize.direction}{\code{character} One of "less" or "greater", the direction of binarization on 
 binarize.threshold, if it is not NA.}
 
 \item{removeTreated}{\code{logical} If treated/perturbation experiments are present, should they
@@ -54,7 +54,7 @@ be removed? Defaults to yes.}
 }
 \value{
 \code{matrix} An updated PharmacoSet with the molecular data summarized
-per cell line.
+  per cell line.
 }
 \description{
 Given a PharmacoSet with molecular data, this function will summarize

@@ -2,29 +2,29 @@
 % Please edit documentation in R/computeSlope.R
 \name{computeSlope}
 \alias{computeSlope}
-\title{Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking
+\title{Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking 
 its concentration and viability as input.}
 \usage{
 computeSlope(concentration, viability, trunc = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{concentration}{\link{vector} A concentration range that the AUC should be computed for that range.
+\item{concentration}{[vector] A concentration range that the AUC should be computed for that range.
 Concentration range by default considered as not logarithmic scaled. Converted to numeric by function if necessary.}
 
-\item{viability}{\link{vector} Viablities corresponding to the concentration range passed as first parameter.
+\item{viability}{[vector] Viablities corresponding to the concentration range passed as first parameter.
 The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
 100 and lower than 0 are also accepted.}
 
-\item{trunc}{\link{binary} A flag that identify if the viabality values should be truncated to be in the
+\item{trunc}{[binary] A flag that identify if the viabality values should be truncated to be in the
 range of (0,100)}
 
-\item{verbose}{\link{boolean} If 'TRUE' the function will retrun warnings and other infomrative messages.}
+\item{verbose}{[boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.}
 }
 \value{
 Returns the normalized linear slope of the drug response curve
 }
 \description{
-Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking
+Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking 
 its concentration and viability as input.
 }
 \examples{

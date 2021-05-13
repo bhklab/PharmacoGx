@@ -9,16 +9,16 @@ Amax: 100 - viability at maximum concentarion (in fitted curve)}
 computeAmax(concentration, viability, trunc = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{concentration}{\link{vector} is a vector of drug concentrations.}
+\item{concentration}{[vector] is a vector of drug concentrations.}
 
-\item{viability}{\link{vector} is a vector whose entries are the viability values observed in the presence of the
+\item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
 of viability in the absence of any drug.}
 
-\item{trunc}{\link{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
+\item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 
-\item{verbose}{\link{logical} should warnings be printed}
+\item{verbose}{[logical] should warnings be printed}
 }
 \value{
 The numerical Amax

@@ -1,11 +1,3 @@
-#' @export
-#'
-setGeneric('fNames', function(object, mDataType, ...) standardGeneric('fNames'))
-
-#' @export
-#'
-setGeneric('fNames<-', function(object, mDataType, ..., value) standardGeneric('fNames<-'))
-
 #' fNames
 #'
 #' Return the feature names for the specified molecular data type
@@ -26,7 +18,7 @@ setGeneric('fNames<-', function(object, mDataType, ..., value) standardGeneric('
 #'
 #' @export
 setMethod('fNames',
-          signature=signature(object='PharmacoSet', mDataType='character'),
+          signature=signature(object='PharmacoSet'),
           function(object, mDataType){
     callNextMethod(object=object, mDataType=mDataType)
 })
@@ -52,7 +44,7 @@ setMethod('fNames',
 #'
 #' @export
 setReplaceMethod('fNames',
-                 signature = signature(object='PharmacoSet', mDataType='character', value='character'),
+                 signature = signature(object='PharmacoSet', value='character'),
                  function(object, mDataType, value) {
     callNextMethod(object=object, mDataType=mDataType, value=value)
 })

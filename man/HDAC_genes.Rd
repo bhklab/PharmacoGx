@@ -6,13 +6,13 @@
 \title{HDAC Gene Signature}
 \format{
 a 13x2 data.frame with gene identifiers in the first column and
-direction change in the second
+  direction change in the second
 }
 \usage{
 data(HDAC_genes)
 }
 \description{
-A gene signature for HDAC inhibitors, as detailed by Glaser et al. The
+A gene signature for HDAC inhibitors, as detailed by Glaser et al. The 
 signature is mapped from the probe to gene level using
 \code{probeGeneMapping}
 }

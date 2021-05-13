@@ -38,14 +38,14 @@ signatures. Should match the names used in the PharmacoSet.}
 \item{features}{\code{character} a vector of features for which to compute the
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
-\item{cells}{\code{character} allows choosing exactly which cell lines to include for the signature fitting.
+\item{cells}{\code{character} allows choosing exactly which cell lines to include for the signature fitting. 
 Should be a subset of cellNames(pSet)}
 
-\item{tissues}{\code{character} a vector of which tissue types to include in the signature fitting.
+\item{tissues}{\code{character} a vector of which tissue types to include in the signature fitting. 
 Should be a subset of cellInfo(pSet)$tissueid}
 
-\item{sensitivity.measure}{\code{character} which measure of the drug dose
-sensitivity should the function use for its computations? Use the
+\item{sensitivity.measure}{\code{character} which measure of the drug dose 
+sensitivity should the function use for its computations? Use the 
 sensitivityMeasures function to find out what measures are available for each PSet.}
 
 \item{molecular.summary.stat}{\code{character} What summary statistic should be used to
@@ -60,8 +60,8 @@ should the function return for each gene drug pair?}
 \item{sensitivity.cutoff}{\code{numeric} Allows the user to binarize the sensitivity data using this threshold.}
 
 \item{standardize}{\code{character} One of "SD", "rescale", or "none", for the form of standardization of
-the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95\%
-interquantile range lies in \link{0,1}. If none no rescaling is done.}
+the data to use. If "SD", the the data is scaled so that SD = 1. If rescale, then the data is scaled so that the 95%
+interquantile range lies in [0,1]. If none no rescaling is done.}
 
 \item{molecular.cutoff}{Allows the user to binarize the sensitivity data using this threshold.}
 
@@ -76,14 +76,14 @@ should the computation be parallelized over?}
 }
 \value{
 \code{list} a 3D array with genes in the first dimension, drugs in the
-second, and return values in the third.
+  second, and return values in the third.
 }
 \description{
-Given a Pharmacoset of the sensitivity experiment type, and a list of drugs,
+Given a Pharmacoset of the sensitivity experiment type, and a list of drugs, 
 the function will compute a signature for the effect gene expression on the
-molecular profile of a cell. The function returns the estimated coefficient,
-the t-stat, the p-value and the false discovery rate associated with that
-coefficient, in a 3 dimensional array, with genes in the first direction,
+molecular profile of a cell. The function returns the estimated coefficient, 
+the t-stat, the p-value and the false discovery rate associated with that 
+coefficient, in a 3 dimensional array, with genes in the first direction, 
 drugs in the second, and the selected return values in the third.
 }
 \examples{

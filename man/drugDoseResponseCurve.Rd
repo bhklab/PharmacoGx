@@ -29,64 +29,64 @@ drugDoseResponseCurve(
 )
 }
 \arguments{
-\item{drug}{\link{string} A drug name for which the drug response curve should be
+\item{drug}{[string] A drug name for which the drug response curve should be 
 plotted. If the plot is desirable for more than one pharmaco set, A unique drug id
 should be provided.}
 
-\item{cellline}{\link{string} A cell line name for which the drug response curve should be
+\item{cellline}{[string] A cell line name for which the drug response curve should be 
 plotted. If the plot is desirable for more than one pharmaco set, A unique cell id
 should be provided.}
 
-\item{pSets}{\link{list} a list of PharmacoSet objects, for which the function
+\item{pSets}{[list] a list of PharmacoSet objects, for which the function
 should plot the curves.}
 
-\item{concentrations, viabilities}{\link{list} A list of concentrations and viabilities to plot, the function assumes that
-concentrations[\link{i}] is plotted against viabilities[\link{i}]. The names of the concentration list are used to create the legend labels}
+\item{concentrations, viabilities}{[list] A list of concentrations and viabilities to plot, the function assumes that
+concentrations[[i]] is plotted against viabilities[[i]]. The names of the concentration list are used to create the legend labels}
 
-\item{conc_as_log}{\link{logical}, if true, assumes that log10-concentration data has been given rather than concentration data,
+\item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data,
 and that log10(ICn) should be returned instead of ICn. Applies only to the concentrations parameter.}
 
-\item{viability_as_pct}{\link{logical}, if false, assumes that viability is given as a decimal rather
+\item{viability_as_pct}{[logical], if false, assumes that viability is given as a decimal rather
 than a percentage, and that E_inf passed in as decimal. Applies only to the viabilities parameter.}
 
-\item{trunc}{\link{bool} Should the viability values be truncated to lie in \link{0-100} before doing the fitting}
+\item{trunc}{[bool] Should the viability values be truncated to lie in [0-100] before doing the fitting}
 
-\item{legends.label}{\link{vector} A vector of sensitivity measurment types which could
+\item{legends.label}{[vector] A vector of sensitivity measurment types which could 
 be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.
-A legend will be displayed on the top right of the plot which each line of the legend is
+A legend will be displayed on the top right of the plot which each line of the legend is 
 the values of requested sensitivity measerments for one of the requested pSets.
 If this parameter is missed no legend would be provided for the plot.}
 
-\item{ylim}{\link{vector} A vector of two numerical values to be used as ylim of the plot.
+\item{ylim}{[vector] A vector of two numerical values to be used as ylim of the plot.
 If this parameter would be missed c(0,100) would be used as the ylim of the plot.}
 
-\item{xlim}{\link{vector} A vector of two numerical values to be used as xlim of the plot.
-If this parameter would be missed the minimum and maximum comncentrations between all
+\item{xlim}{[vector] A vector of two numerical values to be used as xlim of the plot.
+If this parameter would be missed the minimum and maximum comncentrations between all 
 the pSets would be used as plot xlim.}
 
-\item{mycol}{\link{vector} A vector with the same lenght of the pSets parameter which
-will determine the color of the curve for the pharmaco sets. If this parameter is
+\item{mycol}{[vector] A vector with the same lenght of the pSets parameter which 
+will determine the color of the curve for the pharmaco sets. If this parameter is 
 missed default colors from Rcolorbrewer package will be used as curves color.}
 
-\item{title}{\link{character} The title of the graph. If no title is provided, then it defaults to
+\item{title}{[character] The title of the graph. If no title is provided, then it defaults to
 'Drug':'Cell Line'.}
 
-\item{plot.type}{\link{character} Plot type which can be the actual one ("Actual") or
+\item{plot.type}{[character] Plot type which can be the actual one ("Actual") or 
 the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 If this parameter is missed by default actual curve is plotted.}
 
-\item{summarize.replicates}{\link{character} If this parameter is set to true replicates
+\item{summarize.replicates}{[character] If this parameter is set to true replicates 
 are summarized and replicates are plotted individually otherwise}
 
-\item{lwd}{\link{numeric} The line width to plot with}
+\item{lwd}{[numeric] The line width to plot with}
 
-\item{cex}{\link{numeric} The cex parameter passed to plot}
+\item{cex}{[numeric] The cex parameter passed to plot}
 
-\item{cex.main}{\link{numeric} The cex.main parameter passed to plot, controls the size of the titles}
+\item{cex.main}{[numeric] The cex.main parameter passed to plot, controls the size of the titles}
 
 \item{legend.loc}{And argument passable to xy.coords for the position to place the legend.}
 
-\item{verbose}{\link{boolean} Should warning messages about the data passed in be printed?}
+\item{verbose}{[boolean] Should warning messages about the data passed in be printed?}
 }
 \value{
 Plots to the active graphics device and returns an invisible NULL.
@@ -94,11 +94,11 @@ Plots to the active graphics device and returns an invisible NULL.
 \description{
 Given a list of PharmacoSets, the function will plot the drug_response curve,
 for a given drug/cell pair. The y axis of the plot is the viability percentage
-and x axis is the log transformed concentrations. If more than one pSet is
-provided, a light gray area would show the common concentration range between pSets.
+and x axis is the log transformed concentrations. If more than one pSet is 
+provided, a light gray area would show the common concentration range between pSets. 
 User can ask for type of sensitivity measurment to be shown in the plot legend.
-The user can also provide a list of their own concentrations and viability values,
-as in the examples below, and it will be treated as experiments equivalent to values coming
+The user can also provide a list of their own concentrations and viability values, 
+as in the examples below, and it will be treated as experiments equivalent to values coming 
 from a pset. The names of the concentration list determine the legend labels.
 }
 \examples{

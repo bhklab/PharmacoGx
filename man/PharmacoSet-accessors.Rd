@@ -6,7 +6,7 @@
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{cellInfo,PharmacoSet-method}
 \alias{cellInfo}
-\title{Accessing and modifying information in a \code{PharmacoSet}}
+\title{Accessing and modifying information in a `PharmacoSet`}
 \usage{
 \S4method{drugInfo}{PharmacoSet}(object)
 
@@ -15,15 +15,15 @@
 \S4method{cellInfo}{PharmacoSet}(object)
 }
 \arguments{
-\item{object}{A \code{PharmacoSet} object.}
+\item{object}{A `PharmacoSet` object.}
 
 \item{value}{See details.}
 
-\item{mDataType}{\code{character(1)} The name of a molecular datatype to access
-from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
+\item{mDataType}{`character(1)` The name of a molecular datatype to access
+from the `molecularProfiles` of a `PharmacoSet` object.}
 
-\item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
-of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
+\item{assay}{`character(1)` A valid assay name in the `SummarizedExperiment`
+of `@molecularProfiles` of a PharmacoSet object for data type `mDataType`.}
 
 \item{dimension}{See details.}
 
@@ -32,11 +32,11 @@ of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataTy
 \value{
 Accessors: See details.
 
-Setters: An updated \code{PharmacoSet} object, returned invisibly.
+Setters: An updated `PharmacoSet` object, returned invisibly.
 }
 \description{
 Documentation for the various setters and getters which allow manipulation
-of data in the slots of a \code{PharmacoSet} object.
+of data in the slots of a `PharmacoSet` object.
 }
 \details{
 \strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{PharmacoSet} object.

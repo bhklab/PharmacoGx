@@ -35,7 +35,10 @@
 #'   second, and return values in the third.
 #' 
 #' @export
-drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), verbose=FALSE){
+drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features, 
+  nthread=1, returnValues=c("estimate","tstat", "pvalue", "fdr"), 
+  verbose=FALSE)
+{
 	availcore <- parallel::detectCores()
 	if ( nthread > availcore) {
 	  nthread <- availcore

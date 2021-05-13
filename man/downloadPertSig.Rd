@@ -7,18 +7,23 @@
 downloadPertSig(
   name,
   saveDir = file.path(".", "PSets", "Sigs"),
-  myfn = NULL,
-  verbose = TRUE
+  fileName = NULL,
+  verbose = TRUE,
+  myfn = fileName
 )
 }
 \arguments{
 \item{name}{A \code{character} string, the name of the PharmacoSet for which
 to download signatures. The name should match the names returned in the
-\verb{PSet Name} column of \code{availablePSets(canonical=FALSE)}.}
+`PSet Name` column of `availablePSets(canonical=FALSE)`.}
 
 \item{saveDir}{A \code{character} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 create directory if it does not exist.}
+
+\item{fileName, myfn}{`character(1)` Path to save the file to. Note the
+`myfn` argument is being depreacted in favour of the more clear `fileName`.
+For backwards compatibility, both still work.}
 
 \item{verbose}{\code{bool} Should status messages be printed during download.
 Defaults to TRUE.}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods-[.R
 \name{[,PharmacoSet,ANY,ANY,ANY-method}
 \alias{[,PharmacoSet,ANY,ANY,ANY-method}
-\title{\code{[}}
+\title{`[`}
 \usage{
 \S4method{[}{PharmacoSet,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
@@ -21,7 +21,7 @@
 Returns the subsetted object
 }
 \description{
-\code{[}
+`[`
 }
 \examples{
 data(CCLEsmall)

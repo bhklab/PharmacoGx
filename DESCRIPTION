@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.3.5
-Date: 2020-11-23
+Version: 2.3.6
+Date: 2021-05-13
 Authors@R: c(
   person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
   person("Zhaleh", "Safikhani", role=c("aut")),
@@ -44,8 +44,7 @@ Imports:
     jsonlite,
     data.table
 Depends: R (>= 3.6), CoreGx
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1.9001
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
@@ -56,7 +55,7 @@ Collate:
     'LogLogisticRegression.R'
     'MatthewCor.R'
     'allGenerics.R'
-    'class-PharmacoSet.R'
+    'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'

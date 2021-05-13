@@ -17,15 +17,25 @@
 #' @param saveDir A \code{character} string with the folder path where the
 #'   PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 #'   create directory if it does not exist.
+#' @param fileName,myfn `character(1)` Path to save the file to. Note the
+#'   `myfn` argument is being depreacted in favour of the more clear `fileName`.
+#'   For backwards compatibility, both still work.   
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
 #'
 #' @return An array type object contaning the signatures
 #'
 #' @export
+#' @importFrom CoreGx .warning .funContext
 #' @import downloader
 downloadPertSig <- function(name, saveDir=file.path(".", "PSets", "Sigs"),
-    myfn=NULL, verbose=TRUE) {
+    fileName=NULL, verbose=TRUE, myfn=fileName) {
+    
+    funContext <- .funContext('::downloadPertSig')
+    if (fileName == myfn) .warning(funContext, 'The `myfn` parameter is
+        being deprecated. Please use `fileName` instead. This function
+        still work with myfn for now, but this is will be phased out in the
+        next release.')
 
     # change the download timeout since the files are big
     opts <- options()

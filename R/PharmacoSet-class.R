@@ -544,40 +544,6 @@ updateCellId <- function(object, new.ids = vector('character')){
   CoreGx::updateCellId(object, new.ids)
 }
 
-# updateFeatureNames <- function(object, new.ids = vector('character')){
-#
-#   if (length(new.ids)!=nrow(cellInfo(object))){
-#     stop('Wrong number of cell identifiers')
-#   }
-#
-#   if(object@datasetType=='sensitivity'|object@datasetType=='both'){
-#     myx <- match(sensitivityInfo(object)[,'cellid'],rownames(cellInfo(object)))
-#     sensitivityInfo(object)[,'cellid'] <- new.ids[myx]
-#
-#   }
-#
-#   object@molecularProfiles <- lapply(object@molecularProfiles, function(eset){
-#
-#     myx <- match(pData(eset)[['cellid']],rownames(cellInfo(object)))
-#     pData(eset)[['cellid']]  <- new.ids[myx]
-#     return(eset)
-#       })
-#   myx <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-#   rownames(object@curation$cell) <- new.ids[myx]
-#   rownames(object@curation$tissue) <- new.ids[myx]
-#   if (dim(pertNumber(object))[[1]]>0){
-#     myx <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-#     dimnames(pertNumber(object))[[1]] <- new.ids[myx]
-#   }
-#   if (nrow(sensNumber(object))>0){
-#     myx <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-#     rownames(sensNumber(object)) <- new.ids[myx]
-#   }
-#   rownames(cellInfo(object)) <- new.ids
-#   return(object)
-#
-# }
-
 ### TODO:: Add updating of sensitivity Number tables
 updateDrugId <- function(object, new.ids = vector('character')){
 

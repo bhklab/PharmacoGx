@@ -7,11 +7,11 @@
 \S4method{sensitivitySlotToLongTable}{PharmacoSet}(object)
 }
 \arguments{
-\item{object}{A \code{\link{PharmacoSet}} with a list in the sensitivity slot containing
+\item{object}{A [`PharmacoSet`] with a list in the sensitivity slot containing
 items raw, profiles, info and n.}
 }
 \value{
-A \code{LongTable} with the data from the sensitivity slot.
+A `LongTable` with the data from the sensitivity slot.
 }
 \description{
 Reconstruct the data in the @sensitivity slot list into a LongTable object.
