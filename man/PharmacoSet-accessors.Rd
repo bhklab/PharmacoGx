@@ -3,9 +3,17 @@
 \name{PharmacoSet-accessors}
 \alias{PharmacoSet-accessors}
 \alias{drugInfo,PharmacoSet-method}
+\alias{drugInfo{`r}
+\alias{.local_class`}-method}
+\alias{drugInfo}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
+\alias{drugInfo<-{`r}
+\alias{.local_class`},data.frame-method}
+\alias{drugInfo<-}
 \alias{cellInfo,PharmacoSet-method}
 \alias{cellInfo}
+\alias{cellInfo<-,PharmacoSet,data.frame-method}
+\alias{cellInfo<-}
 \title{Accessing and modifying information in a `PharmacoSet`}
 \usage{
 \S4method{drugInfo}{PharmacoSet}(object)
@@ -13,6 +21,8 @@
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
 
 \S4method{cellInfo}{PharmacoSet}(object)
+
+\S4method{cellInfo}{PharmacoSet,data.frame}(object) <- value
 }
 \arguments{
 \item{object}{A `PharmacoSet` object.}
@@ -39,13 +49,30 @@ Documentation for the various setters and getters which allow manipulation
 of data in the slots of a `PharmacoSet` object.
 }
 \details{
+\subsection{drug slot accessors}{
+
+\strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
+{PharmacoSet} objects \verb{@drug} slot.
+}
+
+\subsection{drug slot accessors}{
+
+\strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
+{PharmacoSet} objects \verb{@drug} slot.
+}
+
 \strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{PharmacoSet} object.
+
+\strong{cellInfo<-}: assign updated cell-line annotations to the \code{PharmacoSet} object. Arguments:
+\itemize{
+\item value: a \code{data.frame} object.
+}
 }
 \examples{
-data(CCLEsmall)
 drugInf <- drugInfo(CCLEsmall)
 
-data(CCLEsmall)
-drugInf <- drugInfo(CCLEsmall)
+drugInfo(`r .local_data`) <- drugInfo(`r .local_data`)
+
+cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
 
 }

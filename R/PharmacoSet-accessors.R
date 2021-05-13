@@ -94,17 +94,8 @@ setMethod(cellInfo, "PharmacoSet", function(object){
 
 
 #' @rdname PharmacoSet-accessors
-#'
-#' Generic for cellInfo replace method
-#'
-#' @examples
-#' data(CCLEsmall)
-#' cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
-#'
-#' @param object The \code{PharmacoSet} to replace cell info in
-#' @param value A \code{data.frame} with the new cell annotations
-#' @return Updated \code{PharmacoSet}
-#'
+#' @eval CoreGx:::.docs_CoreSet_set_cellInfo(class_=.local_class, 
+#' data_=.local_data)
 #' @importFrom CoreGx cellInfo<-
 #' @importFrom methods callNextMethod
 setReplaceMethod("cellInfo", signature = signature(object="PharmacoSet", value="data.frame"), function(object, value){

@@ -84,7 +84,6 @@ Collate:
     'globals.R'
     'intersectPSets.R'
     'methods-[.R'
-    'methods-cellInfo.R'
     'methods-cellNames.R'
     'methods-dateCreated.R'
     'methods-drugNames.R'
