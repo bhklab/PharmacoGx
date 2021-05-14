@@ -17,10 +17,10 @@ setGeneric("drugInfo", function(object) standardGeneric("drugInfo"))
 #'
 #' Generic for drugInfo replace method
 #'
-#' @param object The [`PharmacoSet`] to replace drug info
+#' @param object The `PharmacoSet` to replace drug info
 #' @param value A `data.frame` with the new drug annotations
 #'
-#' @return The [`object`] with updated drug annotations
+#' @return The `object` with updated drug annotations
 #'
 #' @export
 setGeneric('drugInfo<-', function(object, value) standardGeneric('drugInfo<-'))
@@ -35,7 +35,7 @@ setGeneric('drugInfo<-', function(object, value) standardGeneric('drugInfo<-'))
 #' data(CCLEsmall)
 #' drugNames(CCLEsmall)
 #'
-#' @param object The [`PharmacoSet`] to return drug names from
+#' @param object The `PharmacoSet` to return drug names from
 #'
 #' @return A `character` vector of drug names in the object
 #'
@@ -53,7 +53,7 @@ setGeneric("drugNames", function(object) standardGeneric("drugNames"))
 #' @param object The \code{PharmacoSet} to update
 #' @param value A \code{character} vector of the new drug names
 #'
-#' @return The [`object`] with updated drug names
+#' @return The `object` with updated drug names
 #'
 #' @export
 setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))

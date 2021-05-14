@@ -10,7 +10,7 @@
 #' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
 #'
 #' @param object [PharmacoSet] The PharmacoSet from which to extract the data
-#' @param sensitivity.measure [character] which sensitivity sensitivity.measure to use? Use the 
+#' @param sensitivity.measure `character` which sensitivity sensitivity.measure to use? Use the 
 #'   sensitivityMeasures function to find out what measures are available for each object.
 #' @param cell.lines \code{character} The cell lines to be summarized. 
 #'    If any cell lines has no data, it will be filled with

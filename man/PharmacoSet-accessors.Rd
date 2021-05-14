@@ -3,37 +3,115 @@
 \name{PharmacoSet-accessors}
 \alias{PharmacoSet-accessors}
 \alias{drugInfo,PharmacoSet-method}
-\alias{drugInfo{`r}
-\alias{.local_class`}-method}
+\alias{drugInfoPharmacoSet-method}
 \alias{drugInfo}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
-\alias{drugInfo<-{`r}
-\alias{.local_class`},data.frame-method}
+\alias{drugInfo<-PharmacoSet,data.frame-method}
 \alias{drugInfo<-}
+\alias{annotation,PharmacoSet-method}
+\alias{annotation}
+\alias{annotation<-,PharmacoSet,list-method}
+\alias{annotation<-}
+\alias{dateCreated,PharmacoSet-method}
+\alias{dateCreated}
+\alias{dateCreated<-,PharmacoSet,character-method}
+\alias{dateCreated<-,PharmacoSet-method}
+\alias{dateCreated<-}
+\alias{name,CoreSet-method}
+\alias{name,PharmacoSet-method}
+\alias{name}
+\alias{name<-,CoreSet-method}
+\alias{name<-,PharmacoSet,character-method}
+\alias{name<-}
 \alias{cellInfo,PharmacoSet-method}
 \alias{cellInfo}
 \alias{cellInfo<-,PharmacoSet,data.frame-method}
 \alias{cellInfo<-}
-\title{Accessing and modifying information in a `PharmacoSet`}
+\alias{cellNames,PharmacoSet-method}
+\alias{cellName,PharmacoSet-method}
+\alias{cellNames}
+\alias{cellNames<-,PharmacoSet,character-method}
+\alias{cellNames<-,PharmacoSet,list-method}
+\alias{cellNames<-}
+\alias{curation,PharmacoSet-method}
+\alias{curation}
+\alias{curation<-,PharmacoSet,list-method}
+\alias{curation<-}
+\alias{datasetType,PharmacoSet-method}
+\alias{datasetType}
+\alias{datasetType<-,PharmacoSet,character-method}
+\alias{datasetType<-}
+\alias{molecularProfiles,PharmacoSet-method}
+\alias{molecularProfiles}
+\alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,character,missing,matrix-method}
+\alias{molecularProfiles<-}
+\alias{featureInfo,PharmacoSet-method}
+\alias{featureInfo}
+\alias{featureInfo<-,PharmacoSet,character,data.frame-method}
+\alias{featureInfo<-,PharmacoSet,character,DataFrame-method}
+\alias{featureInfo<-}
+\alias{phenoInfo,PharmacoSet,character-method}
+\alias{phenoInfo}
+\alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
+\alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
+\alias{phenoInfo<-}
+\title{Accessing and modifying information in a \code{PharmacoSet}}
 \usage{
 \S4method{drugInfo}{PharmacoSet}(object)
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
 
+\S4method{annotation}{PharmacoSet}(object)
+
+\S4method{annotation}{PharmacoSet,list}(object) <- value
+
+\S4method{dateCreated}{PharmacoSet}(object)
+
+\S4method{dateCreated}{PharmacoSet,character}(object) <- value
+
+\S4method{name}{CoreSet}(object)
+
+\S4method{name}{CoreSet}(object) <- value
+
 \S4method{cellInfo}{PharmacoSet}(object)
 
 \S4method{cellInfo}{PharmacoSet,data.frame}(object) <- value
+
+\S4method{cellNames}{PharmacoSet}(object)
+
+\S4method{cellNames}{PharmacoSet,character}(object) <- value
+
+\S4method{curation}{PharmacoSet}(object)
+
+\S4method{curation}{PharmacoSet,list}(object) <- value
+
+\S4method{datasetType}{PharmacoSet}(object)
+
+\S4method{datasetType}{PharmacoSet,character}(object) <- value
+
+\S4method{molecularProfiles}{PharmacoSet}(object, mDataType, assay)
+
+\S4method{molecularProfiles}{PharmacoSet,character,character,matrix}(object, mDataType, assay) <- value
+
+\S4method{featureInfo}{PharmacoSet}(object, mDataType)
+
+\S4method{featureInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
+
+\S4method{phenoInfo}{PharmacoSet,character}(object, mDataType)
+
+\S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
 }
 \arguments{
-\item{object}{A `PharmacoSet` object.}
+\item{object}{A \code{PharmacoSet} object.}
 
 \item{value}{See details.}
 
-\item{mDataType}{`character(1)` The name of a molecular datatype to access
-from the `molecularProfiles` of a `PharmacoSet` object.}
+\item{mDataType}{\code{character(1)} The name of a molecular datatype to access
+from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
 
-\item{assay}{`character(1)` A valid assay name in the `SummarizedExperiment`
-of `@molecularProfiles` of a PharmacoSet object for data type `mDataType`.}
+\item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
+of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
 
 \item{dimension}{See details.}
 
@@ -42,23 +120,56 @@ of `@molecularProfiles` of a PharmacoSet object for data type `mDataType`.}
 \value{
 Accessors: See details.
 
-Setters: An updated `PharmacoSet` object, returned invisibly.
+Setters: An updated \code{PharmacoSet} object, returned invisibly.
 }
 \description{
 Documentation for the various setters and getters which allow manipulation
-of data in the slots of a `PharmacoSet` object.
+of data in the slots of a \code{PharmacoSet} object.
 }
 \details{
 \subsection{drug slot accessors}{
 
 \strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
-{PharmacoSet} objects \verb{@drug} slot.
+\code{PharmacoSet} objects \verb{@drug} slot.
 }
 
-\subsection{drug slot accessors}{
+\strong{drugInfo}: Update the \verb{@drug} slot of a \code{PharmacoSet} object.
+\itemize{
+\item value: \code{data.frame} of updated drug metadata to assign to a
+\code{PharmacoSet} objects \verb{@drug} slot.
+}
 
-\strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
-{PharmacoSet} objects \verb{@drug} slot.
+\subsection{@annotation}{
+
+\strong{annotation}: A \code{list} of PharmacoSet annotations with items: 'name',
+the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
+the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
+and 'version', the object version.
+}
+
+\strong{annotation<-}: Setter method for the annotation slot. Arguments:
+\itemize{
+\item value: a \code{list} of annotations to update the PharmacoSet with.
+}
+
+\subsection{@dateCreated}{
+
+\strong{dateCreated}: \code{character(1)} The date the \code{PharmacoSet} object was
+created, as returned by the \code{date()} function.
+}
+
+\strong{dateCreated<-}: Update the 'dateCreated' item in the \code{annotation} slot of
+a \code{PharmacoSet} object. Arguments:
+\itemize{
+\item value: A \code{character(1)} vector, as returned by the \code{date()} function.
+}
+
+\strong{name}: \code{character(1)} The name of the \code{PharmacoSet}, retreived from
+the \verb{@annotation} slot.
+
+\strong{name<-}: Update the \verb{@annotation$name} value in a \code{PharmacoSet}  object.
+\itemize{
+\item value: \code{character(1)} The name of the \code{PharmacoSet} object.
 }
 
 \strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{PharmacoSet} object.
@@ -67,12 +178,143 @@ of data in the slots of a `PharmacoSet` object.
 \itemize{
 \item value: a \code{data.frame} object.
 }
+
+\strong{cellNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
+the \code{cell} slot from a PharmacoSet object.
+
+\strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
+a PharmacoSet object. Arguments:
+\itemize{
+\item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
+}
+
+\subsection{@curation}{
+
+\strong{curation}: A \code{list} of curated mappings between identifiers in the
+PharmacoSet object and the original data publication. Contains three \code{data.frame}s, 'cell' with
+cell-line ids and 'tissue' with tissue ids and 'drug' with drug ids.
+}
+
+\strong{curation<-}: Update the \code{curation} slot of a PharmacoSet object. Arugments:
+\itemize{
+\item value: A \code{list} of \code{data.frame}s, one for each type of curated
+identifier. For a \code{PharmacoSet} object the slot should
+contain tissue, cell-line and drug id \code{data.frame}s.
+}
+
+\subsection{datasetType slot}{
+
+\strong{datasetType}: \code{character(1)} The type treatment response in the
+\code{sensitivity} slot. Valid values are 'sensitivity', 'perturbation' or 'both'.
+}
+
+\strong{datasetType<-}: Update the datasetType slot of a PharmacoSet object.
+Arguments:
+\itemize{
+\item value: A \code{character(1)} vector with one of 'sensitivity', 'perturbation'
+or 'both'
+}
+
+\subsection{@molecularProfiles}{
+
+\strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
+\code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{PharmacoSet}
+object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
+found with \code{mDataNames(object)}. Arguments:
+\itemize{
+\item assay: Optional \code{character(1)} vector specifying an assay in the
+\code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
+\code{PharmacoSet} object for the specified \code{mDataType}. If excluded,
+defaults to modifying the first assay in the \code{SummarizedExperiment} for
+the given \code{mDataType}.
+}
+}
+
+\strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
+the \code{molecularProfiles} slot of a PharmacoSet object with the specified
+\code{mDataType}. Valid \code{mDataType} arguments can be found with
+\code{mDataNames(object)}.
+\itemize{
+\item assay: Optional \code{character(1)} vector specifying an assay in the
+\code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
+\code{PharmacoSet} object for the specified \code{mDataType}. If excluded,
+defaults to modifying the first assay in the \code{SummarizedExperiment} for
+the given \code{mDataType}.
+\item value: A \code{matrix} of values to assign to the \code{assay} slot of the
+\code{SummarizedExperiment} for the selected \code{mDataType}. The rownames and
+column names must match the associated \code{SummarizedExperiment}.
+}
+
+\strong{featureInfo}: Retrieve a \code{DataFrame} of feature metadata for the specified
+\code{mDataType} from the \code{molecularProfiles} slot of a \code{PharmacoSet} object. More
+specifically, retrieve the \verb{@rowData} slot from the \code{SummarizedExperiment}
+from the \verb{@molecularProfiles} of a \code{PharmacoSet} object with the name
+\code{mDataType}.
+
+\strong{featureInfo<-}: Update the \code{featureInfo(object, mDataType)} \code{DataFrame}
+with new feature metadata. Arguments:
+\itemize{
+\item value: A \code{data.frame} or \code{DataFrame} with updated feature metadata for
+the specified molecular profile in the \code{molecularProfiles} slot of a
+\code{PharmacoSet} object.
+}
+
+\strong{phenoInfo}: Return the \verb{@colData} slot from the \code{SummarizedExperiment} of
+\code{mDataType}, containing sample-level metadata, from a \code{PharmacoSet} object.
+
+\strong{phenoInfo<-}: Update the \verb{@colData} slot of the \code{SummarizedExperiment}
+of \code{mDataType} in the \verb{@molecularProfiles} slot of a \code{PharmacoSet} object.
+This updates the sample-level metadata in-place.
+\itemize{
+\item value: A \code{data.frame} or \code{DataFrame} object where rows are samples
+and columns are sample metadata.
+}
 }
 \examples{
-drugInf <- drugInfo(CCLEsmall)
+data(CCLEsmall)
+## drug slot
 
-drugInfo(`r .local_data`) <- drugInfo(`r .local_data`)
+drugInfo(CCLEsmall)
+
+drugInfo(CCLEsmall) <- drugInfo(CCLEsmall)
+
+dateCreated(CCLEsmall)
+
+## dateCreated
+dateCreated(CCLEsmall) <- date()
+
+name(CCLEsmall)
+
+name(CCLEsmall) <- 'new_name'
 
 cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
+
+cellNames(CCLEsmall)
+
+cellNames(CCLEsmall) <- cellNames(CCLEsmall)
+
+## curation
+curation(CCLEsmall)
+
+curation(CCLEsmall) <- curation(CCLEsmall)
+
+datasetType(CCLEsmall)
+
+datasetType(CCLEsmall) <- 'both'
+
+# No assay specified
+molecularProfiles(CCLEsmall, 'rna') <- molecularProfiles(CCLEsmall, 'rna')
+
+# Specific assay
+molecularProfiles(CCLEsmall, 'rna', 'exprs') <- 
+    molecularProfiles(CCLEsmall, 'rna', 'exprs')
+
+featureInfo(CCLEsmall, 'rna')
+
+featureInfo(CCLEsmall, 'rna') <- featureInfo(CCLEsmall, 'rna')
+
+phenoInfo(CCLEsmall, 'rna')
+
+phenoInfo(CCLEsmall, 'rna') <- phenoInfo(CCLEsmall, 'rna')
 
 }

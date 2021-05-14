@@ -9,7 +9,7 @@
 #' data(CCLEsmall)
 #' pertNumber(CCLEsmall)
 #'
-#' @param object A [`PharmacoSet`]
+#' @param object A `PharmacoSet`
 #'
 #' @return A 3D  with the number of perturbation experiments per
 #'   drug and cell line, and data type
@@ -35,7 +35,7 @@ setMethod(pertNumber, signature='PharmacoSet', function(object) {
 #' @param value A new 3D \code{array} with the number of perturbation experiments
 #'     per drug and cell line, and data type
 #'
-#' @return The updated [`PharmacoSet`]
+#' @return The updated `PharmacoSet`
 #'
 #' @describeIn PharmacoSet Update the summary of available perturbation
 #'   experiments

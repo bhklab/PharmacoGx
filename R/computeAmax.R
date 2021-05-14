@@ -8,15 +8,15 @@
 #' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
 #' computeAmax(dose, viability)
 #'
-#' @param concentration [vector] is a vector of drug concentrations.
+#' @param concentration `numeric` is a vector of drug concentrations.
 #' 
-#' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#' @param viability `numeric` is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
 #' of viability in the absence of any drug.
 #' 
-#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
-#' @param verbose [logical] should warnings be printed
+#' @param verbose `logical` should warnings be printed
 #' @return The numerical Amax
 #' @export
 computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {

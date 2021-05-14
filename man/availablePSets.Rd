@@ -7,14 +7,14 @@
 availablePSets(canonical = TRUE)
 }
 \arguments{
-\item{canonical}{`logical` Should available PSets show only official PSets, or should
-user generated PSets be included?}
+\item{canonical}{\code{logical(1)} Should available PSets show only official
+PSets, or should user generated PSets be included?}
 }
 \value{
-A data.frame with details about the available PharmacoSet objects
+A \code{data.frame} with details about the available PharmacoSet objects
 }
 \description{
-The function fetches a table of all PharmacoSets available for download. 
+The function fetches a table of all PharmacoSets available for download.
 The table includes the dataset names, version information for the data in the PSet,
 the date of last update, the name of the PSet, and references for the data contained within,
 a DOI for the data, and a direct download link. Download can also be done using the downloadPSet
@@ -26,7 +26,7 @@ www.orcestra.ca
 }
 \examples{
 if (interactive()){
-availablePSets()
+    availablePSets()
 }
 
 }

@@ -6,7 +6,7 @@
 #' data(CCLEsmall)
 #' sensMeas <- sensitivityMeasures(CCLEsmall)
 #'
-#' @param object The [`PharmacoSet`] object to retrieve available sensitivity measurement types from
+#' @param object The `PharmacoSet` object to retrieve available sensitivity measurement types from
 #'
 #' @return A `character` vector of all the available sensitivity measures
 #'
@@ -31,7 +31,7 @@ setMethod('sensitivityMeasures', "PharmacoSet", function(object){
 #' data(CCLEsmall)
 #' sensMeas <- sensitivityMeasures(CCLEsmall)
 #'
-#' @param object The [`PharmacoSet`] object to retrieve available sensitivity measurement types from
+#' @param object The `PharmacoSet` object to retrieve available sensitivity measurement types from
 #'
 #' @return A `character` vector of all the available sensitivity measures
 #'

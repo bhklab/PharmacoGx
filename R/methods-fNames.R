@@ -8,7 +8,7 @@
 #' data(CCLEsmall)
 #' fNames(CCLEsmall, "rna")
 #'
-#' @param object The [`PharmacoSet`]
+#' @param object The `PharmacoSet`
 #' @param mDataType `character` The molecular data type to return feature names for
 #'
 #' @return A `character` vector of the feature names
@@ -26,18 +26,18 @@ setMethod('fNames',
 
 #' fNames<-
 #'
-#' Setter for the feature names of a [`SummarizedExperiment`] in the
+#' Setter for the feature names of a `SummarizedExperiment` in the
 #'   molecularProfiles slot
 #'
 #' @examples
 #' data(CCLEsmall)
 #' fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
 #'
-#' @param object The [`PharmacoSet`] object to update
+#' @param object The `PharmacoSet` object to update
 #' @param mDataType `character` The molecular data type to update
 #' @param value A `character` vector of the new cell names
 #'
-#' @return Updated [`PharmacoSet`]
+#' @return Updated `PharmacoSet`
 #'
 #' @importMethodsFrom CoreGx fNames<-
 #' @importFrom methods callNextMethod

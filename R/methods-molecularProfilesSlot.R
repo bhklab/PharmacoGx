@@ -4,7 +4,7 @@
 #' data(CCLEsmall)
 #' molProfSlot <- molecularProfilesSlot(CCLEsmall)
 #'
-#' @param object A [`PharmacoSet`] object to retrieve the molecular profiles slot from
+#' @param object A `PharmacoSet` object to retrieve the molecular profiles slot from
 #'
 #' @return A `list` of `SummarizedExperiment` objects, named by molecular data type
 #'
@@ -19,7 +19,7 @@ setMethod('molecularProfilesSlot', signature(object="PharmacoSet"), function(obj
 #' data(CCLEsmall)
 #' molecularProfilesSlot(CCLEsmall) <- molecularProfilesSlot(CCLEsmall)
 #'
-#' @param object A [`PharmacoSet`] object to update the molecular profiles slot in
+#' @param object A `PharmacoSet` object to update the molecular profiles slot in
 #' @param value A `list` of `SummarizedExperiment` objects to update the molecular profiles slot with
 #'
 #' @describeIn PharmacoSet Setter for the molecular profiles slot

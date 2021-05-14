@@ -7,12 +7,12 @@
 drugInfo(object) <- value
 }
 \arguments{
-\item{object}{The [`PharmacoSet`] to replace drug info}
+\item{object}{The \code{PharmacoSet} to replace drug info}
 
-\item{value}{A `data.frame` with the new drug annotations}
+\item{value}{A \code{data.frame} with the new drug annotations}
 }
 \value{
-The [`object`] with updated drug annotations
+The \code{object} with updated drug annotations
 }
 \description{
 Generic for drugInfo replace method

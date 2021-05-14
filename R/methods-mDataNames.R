@@ -8,7 +8,7 @@
 #' data(CCLEsmall)
 #' mDataNames(CCLEsmall)
 #'
-#' @param object [`PharamcoSet`] object
+#' @param object `PharmacoSet` object
 #'
 #' @return Vector of names of the molecular data types
 #'

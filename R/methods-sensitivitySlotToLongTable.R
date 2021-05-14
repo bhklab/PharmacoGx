@@ -1,6 +1,6 @@
 #' Reconstruct the data in the @sensitivity slot list into a LongTable object.
 #'
-#' @param object A [`PharmacoSet`] with a list in the sensitivity slot containing
+#' @param object A `PharmacoSet` with a list in the sensitivity slot containing
 #'   items raw, profiles, info and n.
 #'
 #' @return A `LongTable` with the data from the sensitivity slot.

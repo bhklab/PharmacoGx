@@ -11,9 +11,9 @@
 #'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' plot(drug.sensitivity)
 #' 
-#' @param x [`PharmacoSig`] a PharmacoSig object, result of drugSensitivitySig
+#' @param x `PharmacoSig` a PharmacoSig object, result of drugSensitivitySig
 #'  or drugPerturbationSig
-#' @param adjust.method `character` or [`boolean`] either FALSE for no adjustment,
+#' @param adjust.method `character(1)` or `logical(1)` either FALSE for no adjustment,
 #' or one of the methods implemented by p.adjust. Defaults to FALSE for no 
 #' correction
 #' @param drugs `character` a vector of drug names for which to plot the estimated

@@ -17,20 +17,20 @@ PharmacoSig(
 \arguments{
 \item{Data}{of data to build the signature from}
 
-\item{PSetName}{`character` vector containing name of PSet, defaults to ''}
+\item{PSetName}{\code{character} vector containing name of PSet, defaults to ''}
 
-\item{DateCreated}{`date` date the signature was created, defaults to `date()`}
+\item{DateCreated}{\code{date} date the signature was created, defaults to \code{date()}}
 
-\item{SigType}{`character` vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'}
+\item{SigType}{\code{character} vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'}
 
-\item{SessionInfo}{`sessionInfo` object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`}
+\item{SessionInfo}{\code{sessionInfo} object as retuned by \code{sesssionInfo()} function, defaults to \code{sessionInfo()}}
 
-\item{Call}{`character` or `call` specifying the constructor call used to make the object, defaults to 'No Call Recorded'}
+\item{Call}{\code{character} or \code{call} specifying the constructor call used to make the object, defaults to 'No Call Recorded'}
 
-\item{Arguments}{`list` a list of additional arguments to the constructure}
+\item{Arguments}{\code{list} a list of additional arguments to the constructure}
 }
 \value{
-A `PharmacoSig` object build from the provided signature data
+A \code{PharmacoSig} object build from the provided signature data
 }
 \description{
 Contructor for the PharmacoSig S4 class

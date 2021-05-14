@@ -6,7 +6,7 @@
 #' data(CCLEsmall)
 #' sensInf <- sensitivityInfo(CCLEsmall)
 #'
-#' @param object The [`PharmacoSet`] to retrieve sensitivity experiment
+#' @param object The `PharmacoSet` to retrieve sensitivity experiment
 #'     annotations from
 #' @param dimension `character` Optional name of the dimension to extract,
 #'     either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
@@ -15,7 +15,7 @@
 #'     `LongTable` methods. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
 #'
-#' @return a [`DataFrame`] with the experiment info
+#' @return a `DataFrame` with the experiment info
 #'
 #' @importMethodsFrom CoreGx sensitivityInfo
 #' @importFrom methods callNextMethod
@@ -39,7 +39,7 @@ setMethod(sensitivityInfo, signature("PharmacoSet"),
 #' data(CCLEsmall)
 #' sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 #'
-#' @param object The [`PharmacoSet`] to update
+#' @param object The `PharmacoSet` to update
 #' @param dimension `character` Optional name of the dimension to extract,
 #'     either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.

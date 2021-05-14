@@ -16,13 +16,13 @@ drug vs cell line table}
 )
 }
 \arguments{
-\item{object}{[PharmacoSet] The PharmacoSet from which to extract the data}
+\item{object}{\link{PharmacoSet} The PharmacoSet from which to extract the data}
 
-\item{sensitivity.measure}{[character] which sensitivity sensitivity.measure to use? Use the 
+\item{sensitivity.measure}{\code{character} which sensitivity sensitivity.measure to use? Use the
 sensitivityMeasures function to find out what measures are available for each object.}
 
-\item{cell.lines}{\code{character} The cell lines to be summarized. 
- If any cell lines has no data, it will be filled with
+\item{cell.lines}{\code{character} The cell lines to be summarized.
+If any cell lines has no data, it will be filled with
 missing values}
 
 \item{drugs}{\code{character} The drugs to be summarized.
@@ -38,8 +38,8 @@ molecular data object be filled in with missing values?}
 \item{verbose}{Should the function print progress messages?}
 }
 \value{
-[matrix] A matrix with cell lines going down the rows, drugs across
-  the columns, with the selected sensitivity statistic for each pair.
+\link{matrix} A matrix with cell lines going down the rows, drugs across
+the columns, with the selected sensitivity statistic for each pair.
 }
 \description{
 This function creates a table with cell lines as rows and drugs as columns,

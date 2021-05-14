@@ -22,10 +22,10 @@ geneDrugSensitivity(
 
 \item{batch}{A \code{vector} of factors specifying the batch}
 
-\item{drugpheno}{A \code{numeric} vector of drug sensitivity values (e.g., 
+\item{drugpheno}{A \code{numeric} vector of drug sensitivity values (e.g.,
 IC50 or AUC)}
 
-\item{interaction.typexgene}{\code{boolean} Should interaction between gene 
+\item{interaction.typexgene}{\code{boolean} Should interaction between gene
 expression and cell/type type be computed? Default set to FALSE}
 
 \item{model}{\code{boolean} Should the full linear model be returned? Default
@@ -36,9 +36,9 @@ set to FALSE}
 \item{verbose}{\code{boolean} Should the function display messages?}
 }
 \value{
-A \code{vector} reporting the effect size (estimateof the coefficient 
-  of drug concentration), standard error (se), sample size (n), t statistic, 
-  and F statistics and its corresponding p-value.
+A \code{vector} reporting the effect size (estimateof the coefficient
+of drug concentration), standard error (se), sample size (n), t statistic,
+and F statistics and its corresponding p-value.
 }
 \description{
 TODO:: Write a description!

@@ -17,21 +17,21 @@
 #' print(drug.perturbation)
 #' 
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
-#' @param mDataType [character] which one of the molecular data types to use
+#' @param mDataType `character` which one of the molecular data types to use
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
-#' @param drugs [character] a vector of drug names for which to compute the
+#' @param drugs `character` a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
-#' @param cells [character] a vector of cell names to use in computing the 
+#' @param cells `character` a vector of cell names to use in computing the 
 #'   signatures. Should match the names used in the PharmacoSet.
-#' @param features [character] a vector of features for which to compute the
+#' @param features `character` a vector of features for which to compute the
 #'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
-#' @param nthread [numeric] if multiple cores are available, how many cores
+#' @param nthread `numeric` if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
-#' @param returnValues [character] Which of estimate, t-stat, p-value and fdr
+#' @param returnValues `character` Which of estimate, t-stat, p-value and fdr
 #'   should the function return for each gene drug pair?
-#' @param verbose [bool] Should diagnostive messages be printed? (default false)
+#' @param verbose `logical(1)` Should diagnostive messages be printed? (default false)
 #' 
-#' @return [list] a 3D array with genes in the first dimension, drugs in the
+#' @return `list` a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
 #' 
 #' @export

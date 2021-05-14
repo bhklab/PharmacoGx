@@ -22,9 +22,10 @@ Suggests: pander,
     knitcitations,
     crayon,
     testthat,
-    BiocGenerics
+    markdown
 Encoding: UTF-8
-Imports: 
+Imports:
+    BiocGenerics,
     Biobase,
     S4Vectors,
     SummarizedExperiment,
@@ -42,10 +43,13 @@ Imports:
     grDevices, 
     reshape2,
     jsonlite,
-    data.table
+    data.table,
+    glue
 Depends: R (>= 3.6), CoreGx
+Roxygen: list(markdown = TRUE, r6=FALSE)
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
 Collate: 
@@ -84,19 +88,13 @@ Collate:
     'globals.R'
     'intersectPSets.R'
     'methods-[.R'
-    'methods-cellNames.R'
-    'methods-dateCreated.R'
     'methods-drugNames.R'
     'methods-drugSensitivitySig.R'
     'methods-fNames.R'
-    'methods-featureInfo.R'
     'methods-intersect.R'
     'methods-mDataNames.R'
-    'methods-molecularProfiles.R'
     'methods-molecularProfilesSlot.R'
-    'methods-name.R'
     'methods-pertNumber.R'
-    'methods-phenoInfo.R'
     'methods-sensNumber.R'
     'methods-sensitivityInfo.R'
     'methods-sensitivityMeasures.R'

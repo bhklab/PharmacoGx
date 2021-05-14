@@ -1,14 +1,14 @@
 # Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking 
 # its concentration and viability as input.
 # 
-# @param conc [vector] A concentration range that the AUC should be computed for that range.
+# @param conc `numeric` A concentration range that the AUC should be computed for that range.
 # Concentration range by default considered as not logarithmic scaled.
-# @param viability [vector] Viablities correspondant to the concentration range passed as first parameter.
+# @param viability `numeric` Viablities correspondant to the concentration range passed as first parameter.
 # The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
 # 100 and lower than 0 are also accepted.
 # @param trunc [binary] A flag that identify if the viabality values should be truncated to be in the
 # range of (0,100)
-# @param verbose [boolean] If 'TRUE' the function will retrun warnings and other infomrative messages.
+# @param verbose `logical(1)` If 'TRUE' the function will retrun warnings and other infomrative messages.
 # @import caTools
 computeAUC_old <- function(conc, viability, 
                        conc_as_log = FALSE,

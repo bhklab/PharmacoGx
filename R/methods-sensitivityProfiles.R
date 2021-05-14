@@ -62,11 +62,11 @@ setMethod(sensitivityProfiles, "PharmacoSet", function(object) {
 #' data(GDSCsmall)
 #' sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 #'
-#' @param object A [`PharamcoSet`] to update.
+#' @param object A `PharmacoSet` to update.
 #' @param value A `data.frame` with the new sensitivity profiles. If a
 #'   matrix object is passed in, converted to `data.frame` before assignment.
 #'
-#' @return [`invisible`] Updates the `PharmacoSet` object.
+#' @return `invisible` Updates the `PharmacoSet` object.
 #'
 #' @import data.table
 #' @importMethodsFrom CoreGx sensitivityProfiles
@@ -102,11 +102,11 @@ setReplaceMethod("sensitivityProfiles",
 #' data(GDSCsmall)
 #' sensitivityProfiles(GDSCsmall) <- sensitivityProfiles(GDSCsmall)
 #'
-#' @param object A [`PharamcoSet`] to update.
-#' @param value A [`matrix`] with the new sensitivity profiles. If a
+#' @param object A `PharmacoSet` to update.
+#' @param value A `matrix` with the new sensitivity profiles. If a
 #'   matrix object is passed in, converted to `data.frame` before assignment.
 #'
-#' @return [`invisible`] Updates the `PharmacoSet` object.
+#' @return `invisible` Updates the `PharmacoSet` object.
 #'
 #' @import data.table
 #' @importMethodsFrom CoreGx sensitivityProfiles

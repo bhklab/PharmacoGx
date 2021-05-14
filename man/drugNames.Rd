@@ -7,10 +7,10 @@
 drugNames(object)
 }
 \arguments{
-\item{object}{The [`PharmacoSet`] to return drug names from}
+\item{object}{The \code{PharmacoSet} to return drug names from}
 }
 \value{
-A `character` vector of drug names in the object
+A \code{character} vector of drug names in the object
 }
 \description{
 A generic for the drugNames method

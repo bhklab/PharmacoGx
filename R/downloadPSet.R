@@ -12,13 +12,13 @@
 #'
 #' @examples
 #' if (interactive()){
-#' availablePSets()
+#'     availablePSets()
 #' }
 #' 
-#' @param canonical `logical` Should available PSets show only official PSets, or should
-#'   user generated PSets be included?
+#' @param canonical `logical(1)` Should available PSets show only official 
+#'   PSets, or should user generated PSets be included?
 #' 
-#' @return A data.frame with details about the available PharmacoSet objects
+#' @return A `data.frame` with details about the available PharmacoSet objects
 #' @export
 #' @import jsonlite
 availablePSets <- function(canonical=TRUE){
@@ -48,8 +48,8 @@ availablePSets <- function(canonical=TRUE){
 #' \code{PharmacoGx}. User \code{availablePSets} to discover which PSets are available.
 #' 
 #' @examples
-#' if (interactive()){
-#' downloadPSet("CTRPv2", saveDir=file.path(".", "pSets"))
+#' \dontrun{
+#'     if (interactive()) downloadPSet("CTRPv2_2015") 
 #' }
 #' 
 #' @section Warning:
@@ -73,7 +73,8 @@ availablePSets <- function(canonical=TRUE){
 #' 
 #' @export
 #' @importFrom downloader download
-downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE, timeout=600) {
+downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, 
+    verbose=TRUE, timeout=600) {
   
   # change the download timeout since the files are big
   opts <- options()
@@ -82,8 +83,8 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRU
 
   pSetTable <- availablePSets(canonical=FALSE)
   
-  whichx <- match(name, pSetTable[,"PSet Name"])
-  if (is.na(whichx)){
+  whichx <- match(name, pSetTable[, "PSet Name"])
+  if (is.na(whichx)) {
     stop('Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.')
   }
   

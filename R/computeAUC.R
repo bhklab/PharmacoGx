@@ -12,21 +12,21 @@
 #' computeAUC(dose, viability)
 #' 
 #' 
-#' @param concentration [vector] is a vector of drug concentrations.
-#' @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#' @param concentration `numeric` is a vector of drug concentrations.
+#' @param viability `numeric` is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
 #' indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells. 
-#' @param Hill_fit [list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+#' @param Hill_fit `list` or `vector` In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
 #' as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
 #' viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
 #' and EC50 as a concentration. 
-#' @param conc_as_log [logical], if true, assumes that log10-concentration data has been given rather than concentration data.
-#' @param viability_as_pct [logical], if false, assumes that viability is given as a decimal rather
+#' @param conc_as_log `logical`, if true, assumes that log10-concentration data has been given rather than concentration data.
+#' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
 #' than a percentage, and returns AUC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.
-#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
 #' @param area.type Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")
-#' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
+#' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
 #' @return Numeric AUC value
 #' @export
 #' @import caTools

@@ -7,18 +7,18 @@
 \S4method{fNames}{PharmacoSet,ANY,character}(object, mDataType) <- value
 }
 \arguments{
-\item{object}{The [`PharmacoSet`] object to update}
+\item{object}{The \code{PharmacoSet} object to update}
 
-\item{mDataType}{`character` The molecular data type to update}
+\item{mDataType}{\code{character} The molecular data type to update}
 
-\item{value}{A `character` vector of the new cell names}
+\item{value}{A \code{character} vector of the new cell names}
 }
 \value{
-Updated [`PharmacoSet`]
+Updated \code{PharmacoSet}
 }
 \description{
-Setter for the feature names of a [`SummarizedExperiment`] in the
-  molecularProfiles slot
+Setter for the feature names of a \code{SummarizedExperiment} in the
+molecularProfiles slot
 }
 \examples{
 data(CCLEsmall)

@@ -248,13 +248,13 @@
 #  Fits dose-response curves to data given by the user
 #  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
 #
-#  @param concentration [vector] is a vector of drug concentrations.
+#  @param concentration `numeric` is a vector of drug concentrations.
 #
-#  @param viability [vector] is a vector whose entries are the viability values observed in the presence of the
+#  @param viability `numeric` is a vector whose entries are the viability values observed in the presence of the
 #  drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
 #  of viability in the absence of any drug.
 #
-#  @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#  @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #  curve-fitting is performed.
 #' @importFrom CoreGx .getSupportVec
 #' @export

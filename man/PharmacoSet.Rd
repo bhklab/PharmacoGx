@@ -62,7 +62,7 @@ print out any errors it finds after construction?}
 An object of class PharmacoSet
 }
 \description{
-A constructor that simplifies the process of creating PharmacoSets, as well 
+A constructor that simplifies the process of creating PharmacoSets, as well
 as creates empty objects for data not provided to the constructor. Only
 objects returned by this constructor are expected to work with the PharmacoSet
 methods. For a much more detailed instruction on creating PharmacoSets, please
