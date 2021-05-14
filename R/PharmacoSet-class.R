@@ -203,6 +203,8 @@ PharmacoSet <-  function(name,
 
 # Constructor Helper Functions ----------------------------------------------
 
+#' @keywords internal
+#' @importFrom CoreGx idCols . .errorMsg .collapse
 .summarizeSensitivityNumbers <- function(object) {
 
   ## TODO:: Checks don't like assigning to global evnironment. Can we return this?
