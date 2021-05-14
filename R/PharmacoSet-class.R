@@ -525,7 +525,7 @@ checkPsetStructure <-
 #'
 #' @export
 setMethod('show', signature=signature(object='PharmacoSet'), function(object) {
-  callNextMethod(object)
+    callNextMethod(object)
 })
 
 #' Get the dimensions of a PharmacoSet
@@ -534,28 +534,28 @@ setMethod('show', signature=signature(object='PharmacoSet'), function(object) {
 #' @return A named vector with the number of Cells and Drugs in the PharmacoSet
 #' @export
 setMethod('dim', signature=signature(x='PharmacoSet'), function(x){
-  return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
+    return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
 })
 
 
 ### TODO:: Add updating of sensitivity Number tables
 #' @importFrom CoreGx updateCellId
 updateCellId <- function(object, new.ids = vector('character')){
-  CoreGx::updateCellId(object, new.ids)
+    CoreGx::updateCellId(object, new.ids)
 }
 
 ### TODO:: Add updating of sensitivity Number tables
 updateDrugId <- function(object, new.ids = vector('character')){
 
-  if (length(new.ids)!=nrow(drugInfo(object))) {
+  if (length(new.ids) != nrow(drugInfo(object))) {
     stop('Wrong number of drug identifiers')
   }
 
   if(object@datasetType=='sensitivity'|object@datasetType=='both'){
     myx <- match(sensitivityInfo(object)[,'drugid'],rownames(drugInfo(object)))
     sensitivityInfo(object)[,'drugid'] <- new.ids[myx]
-
   }
+  
   if(object@datasetType == 'perturbation' | object@datasetType == 'both'){
     object@molecularProfiles <- lapply(object@molecularProfiles, function(SE) {
 

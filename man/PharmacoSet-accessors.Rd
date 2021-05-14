@@ -4,10 +4,10 @@
 \alias{PharmacoSet-accessors}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfoPharmacoSet-method}
-\alias{drugInfo}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
 \alias{drugInfo<-PharmacoSet,data.frame-method}
-\alias{drugInfo<-}
+\alias{drugNames,PharmacoSet-method}
+\alias{drugNames<-,PharmacoSet,character-method}
 \alias{annotation,PharmacoSet-method}
 \alias{annotation}
 \alias{annotation<-,PharmacoSet,list-method}
@@ -17,10 +17,9 @@
 \alias{dateCreated<-,PharmacoSet,character-method}
 \alias{dateCreated<-,PharmacoSet-method}
 \alias{dateCreated<-}
-\alias{name,CoreSet-method}
 \alias{name,PharmacoSet-method}
 \alias{name}
-\alias{name<-,CoreSet-method}
+\alias{name<-,PharmacoSet-method}
 \alias{name<-,PharmacoSet,character-method}
 \alias{name<-}
 \alias{cellInfo,PharmacoSet-method}
@@ -56,11 +55,57 @@
 \alias{phenoInfo<-,PharmacoSet,character,data.frame-method}
 \alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{phenoInfo<-}
+\alias{fNames,PharmacoSet,character-method}
+\alias{fNames}
+\alias{fNames<-,PharmacoSet,character,character-method}
+\alias{fNames<-}
+\alias{mDataNames,PharmacoSet-method}
+\alias{mDataNames}
+\alias{mDataNames<-,PharmacoSet-method}
+\alias{mDataNames<-,PharmacoSet,ANY-method}
+\alias{mDataNames<-}
+\alias{molecularProfilesSlot,PharmacoSet-method}
+\alias{moleculerProfilesSlot,PharmacoSet-method}
+\alias{molecularProfilesSlot}
+\alias{molecularProfilesSlot<-,PharmacoSet,list_or_MAE-method}
+\alias{molecularProfilesSlot<-,PharmacoSet,list-method}
+\alias{molecularProfilesSlot<-PharmacoSet,MultiAssayExperiment-method}
+\alias{molecularProfilesSlot<-}
+\alias{sensitivityInfo,PharmacoSet-method}
+\alias{sensitivityInfo,PharmacoSet,missing-method}
+\alias{sensitivityInfo,PharmacoSet,character-method}
+\alias{sensitivityInfo<-,PharmacoSet,data.frame-method}
+\alias{sensitivityInfo<-,PharmacoSet,missing,data.frame-method}
+\alias{sensitvityInfo<-,PharmacoSet,character,data.frame-method}
+\alias{sensitivityMeasures,PharmacoSet-method}
+\alias{sensitivityMeasures<-,PharmacoSet,character-method}
+\alias{sensitivityProfiles,PharmacoSet-method}
+\alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
+\alias{sensitivityRaw,PharmacoSet-method}
+\alias{sensitivityRaw<-,PharmacoSet,array-method}
+\alias{sensitivitySlot,PharmacoSet-method}
+\alias{sensitivitySlot}
+\alias{sensitivitySlot<-,PharmacoSet,list_or_LongTable-method}
+\alias{sensitivitySlot<-}
+\alias{sensitivitySlot<-,PharmacoSet,list-method}
+\alias{sensitivitySlot<-,PharmacoSet,LongTable-method}
+\alias{sensNumber,PharmacoSet-method}
+\alias{sensNumber}
+\alias{sensNumber<-,PharmacoSet,matrix-method}
+\alias{sensNumber<-}
+\alias{pertNumber,PharmacoSet-method}
+\alias{pertNumber}
+\alias{pertNumber<-,PharmacoSet,array-method}
+\alias{pertNumber<-}
 \title{Accessing and modifying information in a \code{PharmacoSet}}
 \usage{
 \S4method{drugInfo}{PharmacoSet}(object)
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
+
+\S4method{drugNames}{PharmacoSet}(object)
+
+\S4method{drugNames}{PharmacoSet,character}(object) <- value
 
 \S4method{annotation}{PharmacoSet}(object)
 
@@ -70,9 +115,9 @@
 
 \S4method{dateCreated}{PharmacoSet,character}(object) <- value
 
-\S4method{name}{CoreSet}(object)
+\S4method{name}{PharmacoSet}(object)
 
-\S4method{name}{CoreSet}(object) <- value
+\S4method{name}{PharmacoSet}(object) <- value
 
 \S4method{cellInfo}{PharmacoSet}(object)
 
@@ -101,6 +146,46 @@
 \S4method{phenoInfo}{PharmacoSet,character}(object, mDataType)
 
 \S4method{phenoInfo}{PharmacoSet,character,data.frame}(object, mDataType) <- value
+
+\S4method{fNames}{PharmacoSet,character}(object, mDataType)
+
+\S4method{fNames}{PharmacoSet,character,character}(object, mDataType) <- value
+
+\S4method{mDataNames}{PharmacoSet}(object)
+
+\S4method{mDataNames}{PharmacoSet}(object) <- value
+
+\S4method{molecularProfilesSlot}{PharmacoSet}(object)
+
+\S4method{molecularProfilesSlot}{PharmacoSet,list_or_MAE}(object) <- value
+
+\S4method{sensitivityInfo}{PharmacoSet}(object, dimension, ...)
+
+\S4method{sensitivityInfo}{PharmacoSet,data.frame}(object, dimension, ...) <- value
+
+\S4method{sensitivityMeasures}{PharmacoSet}(object)
+
+\S4method{sensitivityMeasures}{PharmacoSet,character}(object) <- value
+
+\S4method{sensitivityProfiles}{PharmacoSet}(object)
+
+\S4method{sensitivityProfiles}{PharmacoSet,data.frame}(object) <- value
+
+\S4method{sensitivityRaw}{PharmacoSet}(object)
+
+\S4method{sensitivityRaw}{PharmacoSet,array}(object) <- value
+
+\S4method{sensitivitySlot}{PharmacoSet}(object)
+
+\S4method{sensitivitySlot}{PharmacoSet,list_or_LongTable}(object) <- value
+
+\S4method{sensNumber}{PharmacoSet}(object)
+
+\S4method{sensNumber}{PharmacoSet,matrix}(object) <- value
+
+\S4method{pertNumber}{PharmacoSet}(object)
+
+\S4method{pertNumber}{PharmacoSet,array}(object) <- value
 }
 \arguments{
 \item{object}{A \code{PharmacoSet} object.}
@@ -137,6 +222,15 @@ of data in the slots of a \code{PharmacoSet} object.
 \itemize{
 \item value: \code{data.frame} of updated drug metadata to assign to a
 \code{PharmacoSet} objects \verb{@drug} slot.
+}
+
+\strong{drugNames}: \code{character()} The names of all drugs available in a specified
+\code{PharmacoSet} object.
+
+\strong{drugNames<-}:  Set the drug names available in a PharmacoSet object.
+\itemize{
+\item value: A \code{character} vector of the new drug names. Must have the same
+length equal to \code{nrow(drugInfo(object))}.
 }
 
 \subsection{@annotation}{
@@ -269,14 +363,164 @@ This updates the sample-level metadata in-place.
 \item value: A \code{data.frame} or \code{DataFrame} object where rows are samples
 and columns are sample metadata.
 }
+
+\strong{fNames}: \code{character()} The features names from the \code{rowData} slot of a
+\code{SummarizedExperiment} of \code{mDataType} within a \code{PharmacoSet} object.
+
+\strong{fNames}: Updates the rownames of the feature metadata (i.e., \code{rowData})
+for a \code{SummarizedExperiment} of \code{mDataType} within a \code{PharmacoSet} object.
+\itemize{
+\item value: \code{character()} A character vector of new features names for the
+\code{rowData} of the \code{SummarizedExperiment} of \code{mDataType} in the
+\verb{@molecularProfiles} slot of a \code{PharmacoSet} object. Must be the same
+length as \code{nrow(featureInfo(object, mDataType))},
+the number of rows in the feature metadata.
+}
+
+\strong{mDataNames}: \code{character} Retrieve the names of the molecular data types
+available in the \code{molecularProfiles} slot of a \code{PharmacoSet} object. These
+are the options which can be used in the \code{mDataType} parameter of various
+\code{molecularProfiles} slot accessors methods.
+
+\strong{mDataNames}: Update the molecular data type names of the
+\code{molecularProfiles} slot of a PharmacoSet object. Arguments:
+\itemize{
+\item value: \code{character} vector of molecular datatype names, with length
+equal to \code{length(molecularProfilesSlot(object))}.
+}
+
+\strong{molecularProfilesSlot}: Return the contents of the \verb{@molecularProfiles}
+slot of a \code{PharmacoSet} object. This will either be a \code{list} or
+\code{MultiAssayExperiment} of \code{SummarizedExperiment}s.
+
+\strong{molecularProfilesSlot<-}: Update the contents of the \verb{@molecularProfiles}
+slot of a \code{PharmacoSet} object. Arguemnts:
+\itemize{
+\item value: A \code{list} or \code{MultiAssayExperiment} of \code{SummarizedExperiment}s. The
+\code{list} and \code{assays} should be named for the molecular datatype in each
+\code{SummarizedExperiment}.
+}
+
+\subsection{@sensitivity}{
+\subsection{Arguments:}{
+\itemize{
+\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
+retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
+\code{PharmacoSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+warning if \verb{@sensitivity} is not a \code{LongTable} object.
+\item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
+\code{LongTable} methods. Only used if the sensitivity slot contains a
+\code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
+specified.
+}
+}
+
+\subsection{Methods:}{
+
+\strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
+by cell-line metadata for the \code{PharmacoSet} object. When the \code{dimension}
+parameter is used, it allows retrieval of the dimension specific metadata
+from the \code{LongTable} object in \verb{@sensitivity} of a PharmacoSet object.
+}
+
+}
+
+\strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
+\code{PharmacoSet} object. When used without the \code{dimension} argument is behaves
+similar to the old PharmacoSet implementation, where the \verb{@sensitivity} slot
+contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
+arugment is used, more complicated assignments can occur where 'cell'
+modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
+'assay' the 'assay_metadata' assay.
+Arguments:
+\itemize{
+\item value: A \code{data.frame} of treatment response experiment metadata,
+documenting experiment level metadata (mapping to drugs and cells). If
+the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimension} is
+not specified, you can only modify existing columns as returned by
+\code{sensitivityInfo(object)}.
+}
+
+\strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{PharmacoSet}
+object. Each measure reprents some summary of cell-line sensitivity to a given
+dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+\code{character} vector with all available metrics for the PSet object.
+
+\strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{PharmacoSet}
+object. Thesee values are the column names of the 'profiles' assay and
+represent various compued sensitviity metrics such as ic50, ec50, AUC, AAC,
+etc.
+\itemize{
+\item value: A \code{character} vector of new sensitivity measure names, the
+then length of the character vector must matcht he number of columns of the
+'profiles' assay, excluding metadata and key columns.
+}
+
+\strong{sensitivityProfiles}: Return the sensitivity profile summaries from the
+sensitivity slot. This data.frame cotanins vaarious sensitivity summary
+metrics, such as ic50, amax, EC50, aac, HS, etc as columns, with rows as
+drug by sample experiments.
+
+\strong{sensitivityProfiles<-}: Update the sensitivity profile summaries the
+sensitivity slot. Arguments:
+-value: A \code{data.frame} the the same number of rows as as returned by
+\code{sensitivityProfiles(object)}, but potentially modified columns, such as the
+computation of additional summary metrics.
+
+\strong{sensitivityRaw}: Access the raw sensitiity measurents for a PharmacoSet
+object. A 3D \code{array} where rows are experiment_ids, columns are doses
+and the third dimension is metric, either 'Dose' for the doses used or
+'Viability' for the cell-line viability at that dose.
+
+\strong{sensitvityRaw<-}: Update the raw dose and viability data in a PharmacoSet.
+\itemize{
+\item value: A 3D \code{array} object where rows are experiment_ids, columns are
+replicates and pages are c('Dose', 'Viability'), with the corresponding
+dose or viability measurement for that experiment_id and replicate.
+}
+
+\strong{sensNumber}: Return a count of viability observations in a \code{PharmacoSet}
+object for each drug-combo by cell-line combination.
+
+\strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
+of drug by cell-line experiment counts, in the \code{list} in \verb{@sensitivity}
+slot of a \code{PharmacoSet} object. Will error when \verb{@sensitviity} contains
+a \code{LongTable} object, since the counts are computed on the fly. Arguments:
+\itemize{
+\item value: A \code{matrix} where rows are cells and columns are drugs, with a
+count of the number of experiments for each combination as the values.
+}
+
+\strong{pertNumber}: \code{array} Summary of available perturbation experiments
+from in a \code{PharmacoSet} object. Returns a 3D \code{array} with the number of
+perturbation experiments per drug and cell line, and data type.
+
+\strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{PharmacoSet} object,
+which stores a summary of the available perturbation experiments. Arguments:
+\itemize{
+\item value: A new 3D \code{array} with the number of perturbation experiments per
+drug and cell line, and data type
+}
 }
 \examples{
 data(CCLEsmall)
+
 ## drug slot
 
 drugInfo(CCLEsmall)
 
 drugInfo(CCLEsmall) <- drugInfo(CCLEsmall)
+
+drugNames(CCLEsmall)
+
+drugNames(CCLEsmall) <- drugNames(CCLEsmall)
+
+
+## @annotation
+
+annotation(CCLEsmall)
+
+annotation(CCLEsmall) <- annotation(CCLEsmall)
 
 dateCreated(CCLEsmall)
 
@@ -316,5 +560,45 @@ featureInfo(CCLEsmall, 'rna') <- featureInfo(CCLEsmall, 'rna')
 phenoInfo(CCLEsmall, 'rna')
 
 phenoInfo(CCLEsmall, 'rna') <- phenoInfo(CCLEsmall, 'rna')
+
+fNames(CCLEsmall, 'rna')
+
+fNames(CCLEsmall, 'rna') <- fNames(CCLEsmall, 'rna')
+
+mDataNames(CCLEsmall)
+
+mDataNames(CCLEsmall) <- mDataNames(CCLEsmall)
+
+molecularProfilesSlot(CCLEsmall)
+
+molecularProfilesSlot(CCLEsmall) <- molecularProfilesSlot(CCLEsmall)
+
+sensitivityInfo(CCLEsmall)
+
+sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
+
+sensitivityMeasures(CCLEsmall) <- sensitivityMeasures(CCLEsmall)
+
+sensitivityMeasures(CCLEsmall) <- sensitivityMeasures(CCLEsmall)
+
+sensitivityProfiles(CCLEsmall)
+
+sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
+
+head(sensitivityRaw(CCLEsmall))
+
+sensitivityRaw(CCLEsmall) <- sensitivityRaw(CCLEsmall)
+
+sensitivitySlot(CCLEsmall)
+
+sensitivitySlot(CCLEsmall) <- sensitivitySlot(CCLEsmall)
+
+sensNumber(CCLEsmall)
+
+sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
+
+pertNumber(CCLEsmall)
+
+pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
 
 }

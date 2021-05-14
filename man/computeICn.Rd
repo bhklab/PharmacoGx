@@ -33,7 +33,7 @@ computeICn(
 drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
 indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells.}
 
-\item{Hill_fit}{\link{list or vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
+\item{Hill_fit}{\code{list} or \code{vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
 as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
 viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
 and EC50 as a concentration.}

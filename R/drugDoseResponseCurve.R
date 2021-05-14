@@ -30,7 +30,7 @@
 #' @param pSets `list` a list of PharmacoSet objects, for which the function
 #' should plot the curves.
 #' @param concentrations,viabilities `list` A list of concentrations and viabilities to plot, the function assumes that
-#' concentrations[[i]] is plotted against viabilities[[i]]. The names of the concentration list are used to create the legend labels
+#' `concentrations[[i]]` is plotted against `viabilities[[i]]`. The names of the concentration list are used to create the legend labels
 #' @param conc_as_log `logical`, if true, assumes that log10-concentration data has been given rather than concentration data,
 #' and that log10(ICn) should be returned instead of ICn. Applies only to the concentrations parameter.
 #' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
@@ -59,7 +59,7 @@
 #' @param cex `numeric` The cex parameter passed to plot
 #' @param cex.main `numeric` The cex.main parameter passed to plot, controls the size of the titles
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend. 
-#' @param trunc `logical(1)` Should the viability values be truncated to lie in [0-100] before doing the fitting
+#' @param trunc `logical(1)` Should the viability values be truncated to lie in \[0-100\] before doing the fitting
 #' @param verbose `logical(1)` Should warning messages about the data passed in be printed?
 #' 
 #' @return Plots to the active graphics device and returns an invisible NULL.

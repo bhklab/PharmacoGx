@@ -29,6 +29,7 @@ Imports:
     Biobase,
     S4Vectors,
     SummarizedExperiment,
+    MultiAssayExperiment,
     BiocParallel,
     ggplot2,
     magicaxis, 
@@ -88,19 +89,8 @@ Collate:
     'globals.R'
     'intersectPSets.R'
     'methods-[.R'
-    'methods-drugNames.R'
     'methods-drugSensitivitySig.R'
-    'methods-fNames.R'
     'methods-intersect.R'
-    'methods-mDataNames.R'
-    'methods-molecularProfilesSlot.R'
-    'methods-pertNumber.R'
-    'methods-sensNumber.R'
-    'methods-sensitivityInfo.R'
-    'methods-sensitivityMeasures.R'
-    'methods-sensitivityProfiles.R'
-    'methods-sensitivitySlot.R'
-    'methods-sensitivitySlotToLongTable.R'
     'methods-subsetTo.R'
     'methods-summarizeMolecularProfiles.R'
     'methods-summarizeSensitivityProfiles.R'

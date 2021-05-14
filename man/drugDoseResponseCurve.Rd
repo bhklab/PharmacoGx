@@ -41,7 +41,7 @@ should be provided.}
 should plot the curves.}
 
 \item{concentrations, viabilities}{\code{list} A list of concentrations and viabilities to plot, the function assumes that
-concentrations[\link{i}] is plotted against viabilities[\link{i}]. The names of the concentration list are used to create the legend labels}
+\code{concentrations[[i]]} is plotted against \code{viabilities[[i]]}. The names of the concentration list are used to create the legend labels}
 
 \item{conc_as_log}{\code{logical}, if true, assumes that log10-concentration data has been given rather than concentration data,
 and that log10(ICn) should be returned instead of ICn. Applies only to the concentrations parameter.}
@@ -49,7 +49,7 @@ and that log10(ICn) should be returned instead of ICn. Applies only to the conce
 \item{viability_as_pct}{\code{logical}, if false, assumes that viability is given as a decimal rather
 than a percentage, and that E_inf passed in as decimal. Applies only to the viabilities parameter.}
 
-\item{trunc}{\code{logical(1)} Should the viability values be truncated to lie in \link{0-100} before doing the fitting}
+\item{trunc}{\code{logical(1)} Should the viability values be truncated to lie in [0-100] before doing the fitting}
 
 \item{legends.label}{\code{numeric} A vector of sensitivity measurment types which could
 be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.

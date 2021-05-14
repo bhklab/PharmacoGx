@@ -15,7 +15,7 @@ Concentration range by default considered as not logarithmic scaled. Converted t
 The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
 100 and lower than 0 are also accepted.}
 
-\item{trunc}{\link{binary} A flag that identify if the viabality values should be truncated to be in the
+\item{trunc}{\code{logical(1)} A flag that identify if the viabality values should be truncated to be in the
 range of (0,100)}
 
 \item{verbose}{\code{logical(1)} If 'TRUE' the function will retrun warnings and other infomrative messages.}

@@ -73,12 +73,13 @@ NULL
     `{class_}` objects `@drug` slot.
 
     @examples
+
     ## drug slot
 
     drugInfo({data_})
     
     @md
-    @aliases drugInfo{class_}-method drugInfo
+    @aliases drugInfo{class_}-method
     @exportMethod drugInfo
     ",
     ...
@@ -103,7 +104,7 @@ setMethod(drugInfo, signature=c(object='PharmacoSet'), function(object) {
     drugInfo({data_}) <- drugInfo({data_})
 
     @md
-    @aliases drugInfo<-{class_},data.frame-method drugInfo<-
+    @aliases drugInfo<-{class_},data.frame-method
     @exportMethod drugInfo<-
     ",
     ...
@@ -119,6 +120,60 @@ setReplaceMethod("drugInfo", signature(object="PharmacoSet",
 })
 
 
+##
+## == drugNames
+
+
+#' @noRd
+.docs_PharmacoSet_get_drugNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __drugNames__: `character()` The names of all drugs available in a specified 
+    `{class_}` object.
+
+    @examples
+    drugNames({data_})
+
+    @md
+    @aliases drugNames,{class_}-method
+    @exportMethod drugNames
+    ",
+    ...
+)
+
+#' @rdname PharmacoSet-accessors
+#' @eval .docs_PharmacoSet_get_drugNames(class_=.local_class, data_=.local_data)
+setMethod(drugNames, signature="PharmacoSet", function(object) {
+  rownames(drugInfo(object))
+})
+
+.docs_PharmacoSet_set_drugNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __drugNames<-__:  Set the drug names available in a PharmacoSet object.
+    - value: A `character` vector of the new drug names. Must have the same
+    length equal to `nrow(drugInfo(object))`.
+
+    @examples
+    drugNames({data_}) <- drugNames({data_})
+
+    @md
+    @aliases drugNames<-,{class_},character-method
+    @exportMethod drugNames<-
+    ",
+    ...
+)
+
+#' @rdname PharmacoSet-accessors
+#' @eval .docs_PharmacoSet_set_drugNames(class_=.local_class, data_=.local_data)
+setReplaceMethod("drugNames", signature(object="PharmacoSet", 
+    value="character"), function(object, value) 
+{
+    object <- updateDrugId(object, value)
+    return(object)
+})
+
+
 #### CoreGx inherited methods
 ####
 #### Note: The raw documentation lives in CoreGx, see the functions called
@@ -127,6 +182,10 @@ setReplaceMethod("drugInfo", signature(object="PharmacoSet",
 #### See .parseToRoxygen method in utils-messages.R file of CoreGx to 
 #### create similar metaprogrammed docs.
 ####
+#### Warning: for dynamic docs to work, you must set
+#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### in the DESCRPTION file!
+
 
 
 ## ====================
@@ -139,14 +198,14 @@ setReplaceMethod("drugInfo", signature(object="PharmacoSet",
 
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_get_annotation(class_=.local_class)
+#' @eval CoreGx:::.docs_CoreSet_get_annotation(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx annotation
 setMethod('annotation', signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
 
 #' @rdname PharmacoSet-accessors 
-#' @eval CoreGx:::.docs_CoreSet_set_annotation(class_=.local_class)
+#' @eval CoreGx:::.docs_CoreSet_set_annotation(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx annotation<-
 setReplaceMethod("annotation", signature("PharmacoSet", "list"),
     function(object, value) 
@@ -183,14 +242,14 @@ setReplaceMethod('dateCreated', signature(object="PharmacoSet", value="character
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_get_name(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx name
-setMethod('name', signature("CoreSet"), function(object){
+setMethod('name', signature("PharmacoSet"), function(object){
     return(object@annotation$name)
 })
 
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_name(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx name<-
-setReplaceMethod('name', signature("CoreSet"), function(object, value){
+setReplaceMethod('name', signature("PharmacoSet"), function(object, value){
     object@annotation$name <- value
     return(object)
 })
@@ -400,3 +459,251 @@ setReplaceMethod("phenoInfo", signature(object="PharmacoSet",
     callNextMethod(object=object, mDataType=mDataType, value=value)
 })
 
+
+##
+## == fNames
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_fNames(class_=.local_class, 
+#' data_=.local_data, mDataType_='rna')
+#' @importMethodsFrom CoreGx fNames
+setMethod('fNames', signature(object='PharmacoSet', mDataType='character'), 
+    function(object, mDataType)
+{
+    callNextMethod(object=object, mDataType=mDataType)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_fNames(class_=.local_class, 
+#' data_=.local_data, mDataType_='rna')
+#' @importMethodsFrom CoreGx fNames<-
+setReplaceMethod('fNames', signature(object='PharmacoSet', mDataType='character',
+    value='character'), function(object, mDataType, value)
+{
+    callNextMethod(object=object, mDataType=mDataType, value=value)
+})
+
+
+##
+## == mDataNames
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_mDataNames(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx mDataNames
+setMethod("mDataNames", "PharmacoSet", function(object){
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_mDataNames(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx mDataNames<-
+setReplaceMethod("mDataNames", "PharmacoSet", function(object, value){
+    callNextMethod(object=object, value=value)
+})
+
+
+
+##
+## == molecularProfilesSlot
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_molecularProfilesSlot(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx molecularProfilesSlot
+setMethod("molecularProfilesSlot", signature("PharmacoSet"), function(object) {
+    callNextMethod(object=object)
+})
+
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_molecularProfilesSlot(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx molecularProfilesSlot<-
+setReplaceMethod("molecularProfilesSlot", signature("PharmacoSet", "list_or_MAE"),
+    function(object, value) 
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+# ---------------------
+## ---- sensitivity slot
+
+
+##
+## == sensitivityInfo
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensitivityInfo(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityInfo
+setMethod('sensitivityInfo', signature("PharmacoSet"),
+    function(object, dimension, ...) 
+{
+    callNextMethod(object=object, dimension=dimension, ...)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_sensitivityInfo(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityInfo<-
+setReplaceMethod("sensitivityInfo", signature(object="PharmacoSet", 
+    value="data.frame"), function(object, dimension, ..., value) 
+{
+    callNextMethod(object=object, dimension=dimension, ..., value=value)
+})
+
+
+##
+## == sensitvityMeasures
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensitivityMeasures(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityMeasures
+setMethod('sensitivityMeasures', signature(object="PharmacoSet"), 
+    function(object)
+{
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_sensitityMeasures(class_=.local_class, 
+#' data_=.local_data) 
+setReplaceMethod('sensitivityMeasures',
+    signature(object='PharmacoSet', value='character'), function(object, value) 
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+##
+## == sensitivityProfiles
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensitivityProfiles(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityProfiles
+setMethod('sensitivityProfiles', signature(object="PharmacoSet"), function(object) 
+{
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_sensitivityProfiles(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityProfiles<-
+setReplaceMethod("sensitivityProfiles",
+    signature(object="PharmacoSet", value="data.frame"),
+    function(object, value) 
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+#
+# == sensitivityRaw
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensitivityRaw(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityRaw
+setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_sensitivityRaw(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivityRaw<-
+setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"), 
+    function(object, value) 
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+#
+# == sensitivitySlot
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensitivitySlot(class_=.local_class, 
+#'   data_=.local_data)
+#' @importMethodsFrom CoreGx sensitivitySlot
+setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
+    callNextMethod(object=object)
+})
+
+#' @importClassesFrom CoreGx LongTable
+setClassUnion('list_or_LongTable', c('list', 'LongTable'))
+
+#' @rdname PharmacoSet-accessors
+#' @importMethodsFrom CoreGx sensitivitySlot<-
+#' @eval CoreGx:::.docs_CoreSet_set_sensitivitySlot(class_=.local_class, 
+#' data_=.local_data)
+setReplaceMethod('sensitivitySlot', signature(object='PharmacoSet', 
+    value='list_or_LongTable'), function(object, value) 
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+##
+## == sensNumber
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_sensNumber(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensNumber
+setMethod('sensNumber', "PharmacoSet", function(object){
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_sensNumber(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx sensNumber<-
+setReplaceMethod('sensNumber', signature(object="PharmacoSet", value="matrix"), 
+    function(object, value)
+{
+    callNextMethod(object=object, value=value)
+})
+
+
+## ======================
+## ---- perturbation slot
+
+
+##
+## == pertNumber 
+
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_pertNumber(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx pertNumber
+setMethod('pertNumber', signature(object='PharmacoSet'), function(object) {
+    callNextMethod(object=object)
+})
+
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_set_pertNumber(class_=.local_class, 
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx pertNumber<-
+setReplaceMethod('pertNumber', signature(object='PharmacoSet', value="array"), 
+    function(object, value)
+{
+    callNextMethod(object=object, value=value)
+})
