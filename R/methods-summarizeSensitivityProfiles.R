@@ -7,7 +7,8 @@
 #' 
 #' @examples 
 #' data(GDSCsmall)
-#' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
+#' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, 
+#'     sensitivity.measure='auc_published')
 #'
 #' @param object [PharmacoSet] The PharmacoSet from which to extract the data
 #' @param sensitivity.measure `character` which sensitivity sensitivity.measure to use? Use the 
@@ -30,16 +31,18 @@
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-          function(object, sensitivity.measure="auc_recomputed", cell.lines, drugs,
-                   summary.stat=c("mean", "median", "first", "last", "max", "min"), fill.missing=TRUE, verbose=TRUE){
-              if (is(sensitivitySlot(object), 'LongTable'))
-                  .summarizeSensProfiles(object, sensitivity.measure,
-                      cell.lines, drugs, summary.stat, fill.missing)
-              else
-                  .summarizeSensitivityProfilesPharmacoSet(object,
-                      sensitivity.measure, cell.lines, drugs, summary.stat,
-                      fill.missing, verbose)
-          })
+    function(object, sensitivity.measure="auc_recomputed", cell.lines, drugs,
+        summary.stat=c("mean", "median", "first", "last", "max", "min"), 
+        fill.missing=TRUE, verbose=TRUE)
+{
+    if (is(sensitivitySlot(object), 'LongTable'))
+        .summarizeSensProfiles(object, sensitivity.measure,
+            cell.lines, drugs, summary.stat, fill.missing)
+    else
+        .summarizeSensitivityProfilesPharmacoSet(object,
+            sensitivity.measure, cell.lines, drugs, summary.stat,
+            fill.missing, verbose)
+})
 
 #' Summarize the sensitivity profiles when the sensitivity slot is a LongTable
 #'
@@ -64,8 +67,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     longTable <- sensitivitySlot(object)
 
     # extract the sensitivty profiles
-    sensProfiles <- assay(longTable, 'sensitivity_profiles', withDimnames=TRUE, key=FALSE)
-    ## TODO:: implement idCols method to get the unique ids
+    sensProfiles <- assay(longTable, 'profiles', withDimnames=TRUE, key=FALSE)
     profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
 
     # compute max concentration and add it to the profiles
@@ -82,7 +84,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 
     # ensure selected measure is an option
     if (!(sensitivity.measure %in% profileOpts))
-        stop(.errorMsg('[PharmacoGx::summarizeSensivitiyProfiles,LongTable] ',
+        stop(.errorMsg('[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ',
             'there is no measure ', sensitivity.measure, ' in this PharmacoSet.',
             ' Please select one of: ', .collapse(profileOpts)))
 

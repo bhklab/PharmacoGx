@@ -12,7 +12,7 @@
 #' @examples
 #' data(GDSCsmall)
 #' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-#'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
+#'   nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' print(drug.sensitivity)
 #' 
 #' @param object `PharmacoSet` a PharmacoSet of the perturbation experiment type
@@ -51,186 +51,187 @@
 #'
 #' @importMethodsFrom CoreGx drugSensitivitySig
 #' @export
-setMethod("drugSensitivitySig",
-          signature(object="PharmacoSet"),
-          function(object, mDataType, drugs, features, cells, tissues, sensitivity.measure = "auc_recomputed",
-                    molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
-                    sensitivity.summary.stat = c("mean", "median", "first", "last"),
-                    returnValues = c("estimate", "pvalue", "fdr"),
-                    sensitivity.cutoff, standardize = c("SD", "rescale", "none"), molecular.cutoff = NA,
-                    molecular.cutoff.direction = c("less", "greater"), nthread = 1, verbose=TRUE, ...){
-            .drugSensitivitySigPharmacoSet(object, mDataType, drugs, features, cells, tissues, sensitivity.measure,
-                                           molecular.summary.stat, sensitivity.summary.stat, returnValues,
-                                           sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction,
-                                           nthread, verbose, ...)
-          })
+setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
+    function(object, mDataType, drugs, features, cells, tissues, 
+        sensitivity.measure = "auc_recomputed", 
+        molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+        sensitivity.summary.stat = c("mean", "median", "first", "last"),
+        returnValues = c("estimate", "pvalue", "fdr"),
+        sensitivity.cutoff, standardize = c("SD", "rescale", "none"), 
+        molecular.cutoff = NA, 
+        molecular.cutoff.direction = c("less", "greater"), nthread = 1, 
+        verbose=TRUE, ...)
+{
+    .drugSensitivitySigPharmacoSet(object=object, mDataType=mDataType, 
+        drugs=drugs, features=features, cells=cells, tissues=tissues, 
+        sensitivity.measure=sensitivity.measure, 
+        molecular.summary.stat=molecular.summary.stat, 
+        sensitivity.summary.stat=sensitivity.summary.stat, 
+        returnValues=returnValues, sensitivity.cutoff=sensitivity.cutoff, 
+        standardize=standardize, molecular.cutoff=molecular.cutoff, 
+        molecular.cutoff.direction=molecular.cutoff.direction, nthread=nthread, 
+        verbose=verbose, ...)
+})
 
 #' @import parallel
 #' @importFrom SummarizedExperiment assayNames assay
+#' @importMethodsFrom MultiAssayExperiment experiments
 #' @keywords internal
-.drugSensitivitySigPharmacoSet <- function(object,
- mDataType,
- drugs,
- features,
- cells, 
- tissues,
- sensitivity.measure = "auc_recomputed", 
- molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"), 
- sensitivity.summary.stat = c("mean", "median", "first", "last"), 
- returnValues = c("estimate", "pvalue", "fdr"),
- sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
- molecular.cutoff = NA,
- molecular.cutoff.direction = c("less", "greater"),
- nthread = 1,
- verbose=TRUE, 
- ...) 
+.drugSensitivitySigPharmacoSet <- function(object, mDataType, drugs, features, 
+    cells,  tissues, sensitivity.measure = "auc_recomputed",  
+    molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),  
+    sensitivity.summary.stat = c("mean", "median", "first", "last"),  
+    returnValues = c("estimate", "pvalue", "fdr"), sensitivity.cutoff, 
+    standardize = c("SD", "rescale", "none"), molecular.cutoff = NA, 
+    molecular.cutoff.direction = c("less", "greater"), nthread = 1, 
+    verbose=TRUE,  ...) 
 {
   
-  ### This function needs to: Get a table of AUC values per cell line / drug
-  ### Be able to recompute those values on the fly from raw data if needed to change concentration
-  ### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
-  ### Be able to extract genomic data 
-  ### Run rankGeneDrugSens in parallel at the drug level
-  ### Return matrix as we had before
+    ### This function needs to: Get a table of AUC values per cell line / drug
+    ### Be able to recompute those values on the fly from raw data if needed to change concentration
+    ### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
+    ### Be able to extract genomic data 
+    ### Run rankGeneDrugSens in parallel at the drug level
+    ### Return matrix as we had before
   
-  #sensitivity.measure <- match.arg(sensitivity.measure)
-  molecular.summary.stat <- match.arg(molecular.summary.stat)
-  sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
-  standardize <- match.arg(standardize)
-  molecular.cutoff.direction <- match.arg(molecular.cutoff.direction)
-  dots <- list(...)
-  ndots <- length(dots)
-  
-  
-  if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
-  }
-  
-  if (!(mDataType %in% names(object@molecularProfiles))) {
-    stop (sprintf("Invalid mDataType for %s, choose among: %s", object@annotation$name, paste(names(object@molecularProfiles), collapse=", ")))
-  }
-  switch (S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation,
-    "mutation" = {
-      if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop ("Molecular summary statistic for mutation must be either 'or' or 'and'")
-      }
-    },
-    "fusion" = {
-      if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop ("Molecular summary statistic for fusion must be either 'or' or 'and'")
-      }
-    },
-    "rna" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
-      }
-    },
-    "cnv" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop ("Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'")
-      }
-    },
-    "rnaseq" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
-    }},
-    "isoform" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
-    }},
-    stop (sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation))
-  )
-  
-  if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
-    stop ("Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'")
-  }
-  
-  if (missing(sensitivity.cutoff)) {
-    sensitivity.cutoff <- NA
-  }
-  if (missing(drugs)){
-    drugn <- drugs <- drugNames(object)
-  } else {
-    drugn <- drugs
-  }
-
-  if (missing(cells)){
-    celln <- cells <- cellNames(object)
-  } else {
-    celln <- cells
-  }
-
-  availcore <- parallel::detectCores()
-  if ( nthread > availcore) {
-    nthread <- availcore
-  }
-  
-  if (missing(features)) {
-    features <- rownames(featureInfo(object, mDataType))
-  } else {
-    fix <- is.element(features, rownames(featureInfo(object, mDataType)))
-    if (verbose && !all(fix)) {
-      warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
+    # Convert molecularProfiles to a list to prevent errors when columns
+    #   get renamed in summarizeMolecularProfiles
+    if (is(molecularProfilesSlot(object), 'MultiAssayExperiment')) {
+        molecularProfilesSlot(object) <- 
+            as.list(experiments(molecularProfilesSlot(object)))
     }
-    features <- features[fix]
-  }
-  
-  if(is.null(dots[["sProfiles"]])){
-    drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
-      
-      return(t(summarizeSensitivityProfiles(object,
-        sensitivity.measure = sensitivity.measure,
-        summary.stat = sensitivity.summary.stat,
-        verbose = verbose)))
-      
-    })} else {
-      sProfiles <- dots[["sProfiles"]]
-      drugpheno.all <- list(t(sProfiles))
+
+    #sensitivity.measure <- match.arg(sensitivity.measure)
+    molecular.summary.stat <- match.arg(molecular.summary.stat)
+    sensitivity.summary.stat <- match.arg(sensitivity.summary.stat)
+    standardize <- match.arg(standardize)
+    molecular.cutoff.direction <- match.arg(molecular.cutoff.direction)
+    dots <- list(...)
+    ndots <- length(dots)
+    
+    
+    if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
+      stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
     }
     
-    dix <- is.element(drugn, do.call(colnames, drugpheno.all))
-    if (verbose && !all(dix)) {
-      warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
+    if (!(mDataType %in% names(object@molecularProfiles))) {
+      stop (sprintf("Invalid mDataType for %s, choose among: %s", object@annotation$name, paste(names(object@molecularProfiles), collapse=", ")))
     }
-    if (!any(dix)) {
-      stop("None of the drugs were found in the dataset")
-    }
-    drugn <- drugn[dix]
-
-    cix <- is.element(celln, do.call(rownames, drugpheno.all))
-    if (verbose && !all(cix)) {
-      warning (sprintf("%i/%i cells can be found", sum(cix), length(celln)))
-    }
-    if (!any(cix)) {
-      stop("None of the cells were found in the dataset")
-    }
-    celln <- celln[cix]
+    switch (S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation,
+      "mutation" = {
+        if (!is.element(molecular.summary.stat, c("or", "and"))) {
+          stop ("Molecular summary statistic for mutation must be either 'or' or 'and'")
+        }
+      },
+      "fusion" = {
+        if (!is.element(molecular.summary.stat, c("or", "and"))) {
+          stop ("Molecular summary statistic for fusion must be either 'or' or 'and'")
+        }
+      },
+      "rna" = {
+        if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+          stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+        }
+      },
+      "cnv" = {
+        if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+          stop ("Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'")
+        }
+      },
+      "rnaseq" = {
+        if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+          stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      }},
+      "isoform" = {
+        if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
+          stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      }},
+      stop (sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation))
+    )
     
-    if(!missing(tissues)){
-      celln <- celln[cellInfo(object)[celln,"tissueid"] %in% tissues]
+    if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
+      stop ("Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'")
+    }
+    
+    if (missing(sensitivity.cutoff)) {
+      sensitivity.cutoff <- NA
+    }
+    if (missing(drugs)){
+      drugn <- drugs <- drugNames(object)
     } else {
-      tissues <- unique(cellInfo(object)$tissueid)
+      drugn <- drugs
+    }   
+    if (missing(cells)){
+      celln <- cells <- cellNames(object)
+    } else {
+      celln <- cells
+    }   
+    availcore <- parallel::detectCores()
+    if ( nthread > availcore) {
+      nthread <- availcore
     }
-
-    object@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(object = object,
-      mDataType = mDataType,
-      summary.stat = molecular.summary.stat,
-      binarize.threshold = molecular.cutoff,
-      binarize.direction = molecular.cutoff.direction,
-      verbose = verbose)[features, ]
+    
+    if (missing(features)) {
+      features <- rownames(featureInfo(object, mDataType))
+    } else {
+      fix <- is.element(features, rownames(featureInfo(object, mDataType)))
+      if (verbose && !all(fix)) {
+        warning (sprintf("%i/%i features can be found", sum(fix), length(features)))
+      }
+      features <- features[fix]
+    }
+    
+    if(is.null(dots[["sProfiles"]])){
+      drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
+      
+        return(t(summarizeSensitivityProfiles(object,
+          sensitivity.measure = sensitivity.measure,
+          summary.stat = sensitivity.summary.stat,
+          verbose = verbose)))
+        
+      })} else {
+        sProfiles <- dots[["sProfiles"]]
+        drugpheno.all <- list(t(sProfiles))
+      }
+    
+      dix <- is.element(drugn, do.call(colnames, drugpheno.all))
+      if (verbose && !all(dix)) {
+        warning (sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
+      }
+      if (!any(dix)) {
+        stop("None of the drugs were found in the dataset")
+      }
+      drugn <- drugn[dix]   
+      cix <- is.element(celln, do.call(rownames, drugpheno.all))
+      if (verbose && !all(cix)) {
+        warning (sprintf("%i/%i cells can be found", sum(cix), length(celln)))
+      }
+      if (!any(cix)) {
+        stop("None of the cells were found in the dataset")
+      }
+      celln <- celln[cix]
+    
+      if(!missing(tissues)){
+        celln <- celln[cellInfo(object)[celln,"tissueid"] %in% tissues]
+      } else {
+        tissues <- unique(cellInfo(object)$tissueid)
+      } 
+      object@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(
+          object=object, mDataType=mDataType, summary.stat=molecular.summary.stat, 
+          binarize.threshold=molecular.cutoff, 
+          binarize.direction=molecular.cutoff.direction, verbose=verbose
+          )[features, ]
     
     if(!is.null(dots[["mProfiles"]])){
       mProfiles <- dots[["mProfiles"]]
       SummarizedExperiment::assay(object@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(object@molecularProfiles[[mDataType]]), drop = FALSE]
-      
+    
     }
-    
+
     drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
-    
-    molcellx <- phenoInfo(object, mDataType)[ ,"cellid"] %in% celln
 
-    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"cellid"], "tissueid"])
-
+    molcellx <- phenoInfo(object, mDataType)[ ,"cellid"] %in% celln 
+    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"cellid"], "tissueid"])    
     if("batchid" %in% colnames(phenoInfo(object, mDataType))){
       batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
     } else {
@@ -243,7 +244,7 @@ setMethod("drugSensitivitySig",
     if (verbose) {
       message("Computing drug sensitivity signatures...")
     }
-    
+
     splitix <- parallel::splitIndices(nx = length(drugn), ncl = 1)
     splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
     mcres <-  parallel::mclapply(splitix, function(x, drugn, expr, drugpheno, type, batch, standardize, nthread) {
@@ -262,7 +263,7 @@ setMethod("drugSensitivitySig",
       names(res) <- drugn[x]
       return(res)
     }, drugn=drugn, expr=t(molecularProfiles(object, mDataType)[features, molcellx, drop=FALSE]), drugpheno=drugpheno.all, type=type, batch=batch, nthread=nthread, standardize=standardize)
-    
+
     res <- do.call(c, mcres)
     res <- res[!vapply(res, is.null, FUN.VALUE=logical(1))]
     drug.sensitivity <- array(NA,
@@ -280,7 +281,7 @@ setMethod("drugSensitivitySig",
               FUN.VALUE=numeric(dim(drug.sensitivity)[1]))
       drug.sensitivity[rownames(featureInfo(object, mDataType)[features,, drop = FALSE]), names(res), j] <- ttt
     }
-    
+
     drug.sensitivity <- PharmacoSig(drug.sensitivity, 
                                     PSetName = name(object),
                                     Call = as.character(match.call()), 
@@ -301,7 +302,7 @@ setMethod("drugSensitivitySig",
                                       "molecular.cutoff.direction" = molecular.cutoff.direction,
                                       "nthread" = nthread,
                                       "verbose" = verbose))
-    
+
     return(drug.sensitivity)
-  }
+}
 

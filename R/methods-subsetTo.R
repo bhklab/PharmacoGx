@@ -35,17 +35,19 @@
 #'
 #' @importMethodsFrom CoreGx subsetTo
 #' @export
-setMethod('subsetTo', signature(object='PharmacoSet'), function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL,
-                     keep.controls=TRUE, ...){
-  .subsetToPharmacoSet(object, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells,
-                       keep.controls=keep.controls)
+setMethod('subsetTo', signature(object='PharmacoSet'), function(object, 
+  cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...)
+{
+    .subsetToPharmacoSet(object, cells=cells, drugs=drugs, 
+        molecular.data.cells=molecular.data.cells, keep.controls=keep.controls)
 })
 
 
 #' @importFrom CoreGx .intersectList
 #' @keywords internal
-.subsetToPharmacoSet <- function(object, cells=NULL, drugs=NULL, molecular.data.cells=NULL,
-                     keep.controls=TRUE, ...) {
+.subsetToPharmacoSet <- function(object, cells=NULL, drugs=NULL, 
+    molecular.data.cells=NULL, keep.controls=TRUE, ...) 
+{
   drop=FALSE #TODO:: Is this supposed to be here?
 
   adArgs = list(...)

@@ -48,6 +48,7 @@ pairs
 }
 \examples{
 data(GDSCsmall)
-GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure='auc_published')
+GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, 
+    sensitivity.measure='auc_published')
 
 }

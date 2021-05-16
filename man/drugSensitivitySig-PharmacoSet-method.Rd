@@ -89,7 +89,7 @@ drugs in the second, and the selected return values in the third.
 \examples{
 data(GDSCsmall)
 drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
-             nthread=1, features = fNames(GDSCsmall, "rna")[1])
+  nthread=1, features = fNames(GDSCsmall, "rna")[1])
 print(drug.sensitivity)
 
 }

@@ -199,7 +199,6 @@ PharmacoSet <-  function(name,
   return(pSet)
 }
 
-##TODO:: Figure out how to properly inherit params from CoreGx
 
 # Constructor Helper Functions ----------------------------------------------
 
@@ -246,7 +245,7 @@ PharmacoSet <-  function(name,
 .summarizePerturbationNumbers <- function(object) {
 
   if (object@datasetType != 'perturbation' && object@datasetType != 'both') {
-    stop ('Data type must be either perturbation or both')
+    stop('Data type must be either perturbation or both')
   }
 
   ## unique drug identifiers
