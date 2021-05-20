@@ -472,7 +472,7 @@ object. A 3D \code{array} where rows are experiment_ids, columns are doses
 and the third dimension is metric, either 'Dose' for the doses used or
 'Viability' for the cell-line viability at that dose.
 
-\strong{sensitvityRaw<-}: Update the raw dose and viability data in a PharmacoSet.
+\strong{sensitvityRaw<-}: Update the raw dose and viability data in a \code{PharmacoSet}.
 \itemize{
 \item value: A 3D \code{array} object where rows are experiment_ids, columns are
 replicates and pages are c('Dose', 'Viability'), with the corresponding
