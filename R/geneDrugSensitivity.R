@@ -63,7 +63,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
     if (is.factor(drugpheno[,1])){
       rest <- c("estimate"=NA_real_, "se"=NA_real_, "n"=nn, "pvalue"=NA_real_, df=NA_real_)
     } else {
-      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
+      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA )
     }
   }  
   
