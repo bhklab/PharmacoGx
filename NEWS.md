@@ -1,5 +1,15 @@
 # Package Release News
 
+## v2.5.2
+- Fix: remove 'fdr' item from geneDrugSensitivity return vector
+
+## v2.5.1
+- Fix: reverted GDSCsmall.rda and CCLEsmall.rda to original data format; they
+were accidentally pushed with MutliAssayExperiments in @molecularProfiles
+
+## v2.5.0
+- Spring Bioconductor release!
+
 ## v2.1.12
 - Added experimental support for a new class, the `LongTable`, for storing the
 sensitivity data in a `PharmacoSet`.
