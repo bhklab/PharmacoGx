@@ -97,8 +97,11 @@ jobs:
         uses: r-lib/actions/setup-pandoc@master
 
       ## added to correct failed vignette builds
-      - name: Install tinytex from r-lib
-        uses: r-lib/actions/setup-tinytex@master
+      - name: Install tinytex
+        run: |
+          install.packages("tinytex")
+          tinytex::install_tinytex()
+        shell: Rscript {0}
 
       - name: Query dependencies
         run: |
