@@ -96,6 +96,10 @@ jobs:
         if: runner.os != 'Linux'
         uses: r-lib/actions/setup-pandoc@master
 
+      ## added to correct failed vignette builds
+      - name: Install tinytex from r-lib
+        uses: r-lib/actions/setup-tinytex@master
+
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -153,6 +157,8 @@ jobs:
         run: |
           BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE, force = TRUE)
         shell: Rscript {0}
+
+      - name: Install tinytex
 
       - name: Install dependencies pass 1
         run: |
