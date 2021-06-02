@@ -25,8 +25,6 @@ expanding the variety of data which can be stored in a `PharmacoSet` object.
 - For more details on the `LongTable` class, please see the vignette in the
 `CoreGx` package.
 
-
-
 ## v2.0.0
 - PharmacoGx now depends on CoreGx, a package designed to abstract core 
 functionality from PharmacoGx for use in other Gx suite packages
