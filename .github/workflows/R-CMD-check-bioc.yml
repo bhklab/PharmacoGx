@@ -30,7 +30,7 @@ on:
       - master
       - main
 
-name: R-CMD-check-bioc
+name: R-CMD-check-bioc-devel
 
 ## These environment variables control whether to run GHA code later on that is
 ## specific to testthat, covr, and pkgdown.
@@ -46,6 +46,7 @@ env:
   has_RUnit: 'false'
   cache-version: 'cache-v1'
   run_docker: 'false'
+  github_dependencies: 'true'
 
 jobs:
   build-check:
@@ -58,7 +59,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: ubuntu-latest, r: '4', bioc: '3.14', cont: "bioconductor/bioconductor_docker:devel", rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest" }
+          - { os: ubuntu-latest, r: '4', bioc: '3.14', cont: "bioconductor/bioconductor_docker:devel", rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest", github: "bhklab/CoreGx" }
           
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -178,6 +179,13 @@ jobs:
           BiocManager::install("BiocCheck")
         shell: Rscript {0}
 
+      - name: Install GitHub dependencies
+        if: env.github_dependencies == 'true'
+        run: |
+          ## Install self managed GitHub dependencies to enable package testing aheaed of CRAN daily build
+          remotes::install_github(repos="${{ matrix.config.github }}", upgrade=TRUE, force=TRUE)
+        shell: Rscript {0}
+        
       - name: Install BiocGenerics
         if:  env.has_RUnit == 'true'
         run: |
