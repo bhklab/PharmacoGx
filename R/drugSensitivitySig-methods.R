@@ -233,7 +233,7 @@ setMethod("drugSensitivitySig",
     if(!missing(tissues)){
       celln <- celln[cellInfo(object)[celln,"tissueid"] %in% tissues]
     } else {
-      tissues <- unique(cellInfo(object)$tissueid)
+      tissues <- unique(cellInfo(object)[celln,"tissueid"])
     }
 
     object@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(object = object,
