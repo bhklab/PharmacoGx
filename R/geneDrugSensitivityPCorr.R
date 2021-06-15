@@ -278,6 +278,8 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         p.value <- p.value$p.value
         pcor.boot <- function(ddd, w){
           ddd <- ddd[w,] 
+          ddd <- ddd[,apply(ddd[,,drop=F], 2, function(x) return(length(unique(x))))>=2]
+
 
           partial.dp <- residuals(lm(formula(ffd), ddd))
           partial.x <- residuals(lm(formula(ffx), ddd))
