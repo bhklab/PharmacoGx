@@ -271,7 +271,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
               partial.dp[dd[,3]==gp] <- partial.dp[dd[,3]==gp]-mean(partial.dp[dd[,3]==gp])
             }
 
-            perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
+            perm.cor <- cor(partial.dp, partial.x, use="complete.obs")
             return(abs(obs.cor) < abs(perm.cor))
           }
         } else {
@@ -284,7 +284,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
             partial.dp <- residuals(lm(formula(ffd), dd2))
             partial.x <- residuals(lm(formula(ffx), dd2))
 
-            perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
+            perm.cor <- cor(partial.dp, partial.x, use="complete.obs")
             return(abs(obs.cor) < abs(perm.cor))
           }          
         }
@@ -316,7 +316,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
 
           }
 
-          return(coop::pcor(partial.dp, partial.x, use="complete.obs"))
+          return(cor(partial.dp, partial.x, use="complete.obs"))
         }
         
         boot.out <- boot(dd, pcor.boot, R=nBoot)
