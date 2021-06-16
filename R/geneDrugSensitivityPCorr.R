@@ -258,26 +258,43 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       ## split here and don't do extranous calls to lm if it is unnecessay. 
 
       if(ncol(dd) > 2){
-        sample_function <- function(){
+        ## implementing a much more efficient method for the particular case where we have 3 columns with assumption that 
+        ## column 3 is the tissue. 
+        if(ncol(dd)==3){
+          sample_function <- function(){
+
+            partial.dp <- sample(dd[,1], nrow(dd))
+            partial.x <- sample(dd[,2], nrow(dd))
+
+            for(gp in unique(dd[,3])){
+              partial.x[dd[,3]==gp] <- partial.x[dd[,3]==gp]-mean(partial.x[dd[,3]==gp])
+              partial.dp[dd[,3]==gp] <- partial.dp[dd[,3]==gp]-mean(partial.dp[dd[,3]==gp])
+            }
+
+            perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
+            return(abs(obs.cor) < abs(perm.cor))
+          }
+        } else {
+          sample_function <- function(){
           # browser()
-          dd2 <- dd
-          dd2[,1] <- sample(dd[,1], nrow(dd))
-          dd2[,2] <- sample(dd[,2], nrow(dd))
+            dd2 <- dd
+            dd2[,1] <- sample(dd[,1], nrow(dd))
+            dd2[,2] <- sample(dd[,2], nrow(dd))
 
-          partial.dp <- residuals(lm(formula(ffd), dd2))
-          partial.x <- residuals(lm(formula(ffx), dd2))
+            partial.dp <- residuals(lm(formula(ffd), dd2))
+            partial.x <- residuals(lm(formula(ffx), dd2))
 
-          perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
-          return(abs(obs.cor) < abs(perm.cor))
+            perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
+            return(abs(obs.cor) < abs(perm.cor))
+          }          
         }
-
-
 
         p.value <- corPermute(sample_function, req_alpha = req_alpha)
         significant <- p.value$significant
         p.value <- p.value$p.value
         pcor.boot <- function(ddd, w){
           ddd <- ddd[w,] 
+          ## Taking care of an edge case where only one factor level is left after resampling 
           ddd <- ddd[,apply(ddd[,,drop=F], 2, function(x) return(length(unique(x))))>=2]
 
 
