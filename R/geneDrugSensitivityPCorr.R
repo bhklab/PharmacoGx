@@ -292,17 +292,33 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         p.value <- corPermute(sample_function, req_alpha = req_alpha)
         significant <- p.value$significant
         p.value <- p.value$p.value
+
         pcor.boot <- function(ddd, w){
           ddd <- ddd[w,] 
           ## Taking care of an edge case where only one factor level is left after resampling 
           ddd <- ddd[,apply(ddd[,,drop=F], 2, function(x) return(length(unique(x))))>=2]
 
+          if(ncol(ddd)==3){
+            partial.dp <- ddd[,1]
+            partial.x <- ddd[,2]
+            for(gp in unique(ddd[,3])){
+              partial.x[ddd[,3]==gp] <- partial.x[ddd[,3]==gp]-mean(partial.x[ddd[,3]==gp])
+              partial.dp[ddd[,3]==gp] <- partial.dp[ddd[,3]==gp]-mean(partial.dp[ddd[,3]==gp])
+            }
 
-          partial.dp <- residuals(lm(formula(ffd), ddd))
-          partial.x <- residuals(lm(formula(ffx), ddd))
+          } else if(ncol(ddd)==2){
+            partial.dp <- ddd[,1]
+            partial.x <- ddd[,2]
+          } else {
+
+            partial.dp <- residuals(lm(formula(ffd), ddd))
+            partial.x <- residuals(lm(formula(ffx), ddd))
+
+          }
 
           return(coop::pcor(partial.dp, partial.x, use="complete.obs"))
         }
+        
         boot.out <- boot(dd, pcor.boot, R=nBoot)
         cint <- tryCatch(boot.ci(boot.out, conf = conf.level, type="bca")$bca[,4:5],
                   error = function(e) {
