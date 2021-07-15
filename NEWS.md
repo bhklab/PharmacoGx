@@ -5,7 +5,7 @@
 
 ## v2.5.1
 - Fix: reverted GDSCsmall.rda and CCLEsmall.rda to original data format; they
-were accidentally pushed with MutliAssayExperiments in @molecularProfiles
+were accidentally pushed with MultiAssayExperiments in @molecularProfiles
 
 ## v2.5.0
 - Spring Bioconductor release!
