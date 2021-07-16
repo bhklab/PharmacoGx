@@ -1,8 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 # Stardardized Molecular Data names and annotations for PSets
 
 This document will describe two things: First, we document the currently required standards for naming, annotating, and including molecular data into psets.\
