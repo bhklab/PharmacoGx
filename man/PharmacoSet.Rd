@@ -38,7 +38,7 @@ sensitivity experiments}
 \item{sensitivityRaw}{A 3 Dimensional \code{array} contaning the raw drug
 dose response data for the sensitivity experiments}
 
-\item{sensitivityProfiles}{\code{data.frame} containing drug sensitivity profile 
+\item{sensitivityProfiles}{\code{data.frame} containing drug sensitivity profile
 statistics such as IC50 and AUC}
 
 \item{sensitivityN}{A \code{data.frame} summarizing the

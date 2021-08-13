@@ -11,23 +11,23 @@ mcc(x, y, nperm = 1000, nthread = 1)
 
 \item{y}{\code{factor} of the same length with the same number of levels}
 
-\item{nperm}{\code{numeric} number of permutations for significance 
+\item{nperm}{\code{numeric} number of permutations for significance
 estimation. If 0, no permutation testing is done}
 
-\item{nthread}{\code{numeric} can parallelize permutation texting using 
+\item{nthread}{\code{numeric} can parallelize permutation texting using
 BiocParallels bplapply}
 }
 \value{
 A list with the MCC as the $estimate, and p value as $p.value
 }
 \description{
-The function computes a Matthews correlation coefficient for two factors 
-provided to the function. It assumes each factor is a factor of class labels, 
+The function computes a Matthews correlation coefficient for two factors
+provided to the function. It assumes each factor is a factor of class labels,
 and the enteries are paired in order of the vectors.
 }
 \details{
-Please note: we recommend you call set.seed() before using this function to 
-ensure the reproducibility of your results. Write down the seed number or 
+Please note: we recommend you call set.seed() before using this function to
+ensure the reproducibility of your results. Write down the seed number or
 save it in a script if you intend to use the results in a publication.
 }
 \examples{

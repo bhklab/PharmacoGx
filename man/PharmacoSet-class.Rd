@@ -7,7 +7,7 @@
 \alias{cellInfo,PharmacoSet-method}
 \alias{drugInfo,PharmacoSet-method}
 \alias{drugInfo<-,PharmacoSet,data.frame-method}
-\alias{phenoInfo,PharmacoSet-method}
+\alias{phenoInfo,PharmacoSet,ANY-method}
 \alias{phenoInfo<-,PharmacoSet,character,DataFrame-method}
 \alias{molecularProfiles,PharmacoSet-method}
 \alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
@@ -39,7 +39,7 @@
 
 \S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{phenoInfo}{PharmacoSet}(object, mDataType)
+\S4method{phenoInfo}{PharmacoSet,ANY}(object, mDataType)
 
 \S4method{phenoInfo}{PharmacoSet,character,DataFrame}(object, mDataType) <- value
 

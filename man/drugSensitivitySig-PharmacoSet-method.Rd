@@ -22,7 +22,7 @@ analysis.}
   molecular.cutoff = NA,
   molecular.cutoff.direction = c("less", "greater"),
   nthread = 1,
-  parallel.on = c("drug", "gene"),
+  parallel.on = c("gene", "drug"),
   verbose = TRUE,
   ...
 )

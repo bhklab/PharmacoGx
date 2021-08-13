@@ -16,8 +16,8 @@ connectivityScore(
 }
 \arguments{
 \item{x}{A \code{matrix} with the first gene signature. In the case of GSEA the vector of
-values per gene for GSEA in which we are looking for an enrichment. In the 
-case of gwc, this should be a matrix, with the per gene responses in the 
+values per gene for GSEA in which we are looking for an enrichment. In the
+case of gwc, this should be a matrix, with the per gene responses in the
 first column, and the significance values in the second.}
 
 \item{y}{A \code{matrix} with the second signature. In the case of GSEA, this is the
@@ -41,11 +41,11 @@ statistic?}
 }
 \value{
 \code{numeric} a numeric vector with the score and the p-value associated
-  with it
+with it
 }
 \description{
 A function for finding the connectivity between two signatures, using either
-the GSEA method based on the KS statistic, or the gwc method based on a 
+the GSEA method based on the KS statistic, or the gwc method based on a
 weighted spearman statistic. The GSEA analysis is implemented in the piano package.
 }
 \examples{
@@ -60,11 +60,11 @@ data.cor <- connectivityScore(xx,yy,method='gwc', gwc.method='spearman', nperm=3
 }
 \references{
 F. Pozzi, T. Di Matteo, T. Aste, 'Exponential smoothing weighted
-   correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
-   10.1140/epjb/e2012-20697-x
+correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
+10.1140/epjb/e2012-20697-x
 
 Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set
-   analysis of genome-wide data by incorporating directionality of gene
-   expression and combining statistical hypotheses and methods. Nucleic
-   Acids Research. 41 (8), 4378-4391. doi: 10.1093/nar/gkt111
+analysis of genome-wide data by incorporating directionality of gene
+expression and combining statistical hypotheses and methods. Nucleic
+Acids Research. 41 (8), 4378-4391. doi: 10.1093/nar/gkt111
 }

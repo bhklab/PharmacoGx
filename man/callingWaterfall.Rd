@@ -17,14 +17,12 @@ callingWaterfall(
 \item{x}{What type of object does this take in?}
 
 \item{type}{ic50: IC50 values in micro molar (positive values)
-
-  actarea: Activity Area, that is area under the drug activity curve (positive values)
- 
-  amax: Activity at max concentration (positive values)}
+actarea: Activity Area, that is area under the drug activity curve (positive values)
+amax: Activity at max concentration (positive values)}
 
 \item{intermediate.fold}{vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively}
 
-\item{cor.min.linear}{\code{numeric} The minimum linear correlation to 
+\item{cor.min.linear}{\code{numeric} The minimum linear correlation to
 require?}
 
 \item{name}{\code{character} The name of the output to use in plot}
@@ -32,32 +30,39 @@ require?}
 \item{plot}{\code{boolean} Whether to plot the results}
 }
 \value{
-\code{factor} Containing the status drug sensitivity status of each
-  cellline.
+\code{factor} Containing the drug sensitivity status of each
+cellline.
 }
 \description{
-1. Sensitivity calls were made using one of IC50, ActArea or Amax
+\enumerate{
+\item Sensitivity calls were made using one of IC50, ActArea or Amax
+}
 }
 \details{
-2. Sort log IC50s (or ActArea or Amax) of the cell lines to generate a 
-  “waterfall distribution”
-  
-3. Identify cutoff:
+\enumerate{
+\item Sort log IC50s (or ActArea or Amax) of the cell lines to generate a
+“waterfall distribution”
+\item Identify cutoff:
+}
 
- 3.1 If the waterfall distribution is non-linear (pearson cc to the linear 
-   fit <=0.95), estimate the major inflection point of the log IC50 curve as 
-   the point on the curve with the maximal distance to a line drawn between 
-   the start and end points of the distribution.
-   
- 3.2 If the waterfall distribution appears linear (pearson cc to the linear 
-   fit > 0.95), then use the median IC50 instead.
-   
-4. Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20% Amax 
-  difference) difference centered around this inflection point are classified 
-  as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax 
-  values) than this range are defined as sensitive, and those with IC50s (or 
-  ActArea/Amax) higher than this range are called “insensitive”.
-  
-5. Require at least x sensitive and x insensitive cell lines after applying 
-  these criteria (x=5 in our case).
+3.1 If the waterfall distribution is non-linear (pearson cc to the linear
+fit <=0.95), estimate the major inflection point of the log IC50 curve as
+the point on the curve with the maximal distance to a line drawn between
+the start and end points of the distribution.
+
+3.2 If the waterfall distribution appears linear (pearson cc to the linear
+fit > 0.95), then use the median IC50 instead.
+\enumerate{
+\item Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20\% Amax
+difference) difference centered around this inflection point are classified
+as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax
+values) than this range are defined as sensitive, and those with IC50s (or
+ActArea/Amax) higher than this range are called “insensitive”.
+\item Require at least x sensitive and x insensitive cell lines after applying
+these criteria (x=5 in our case).
+}
+}
+\examples{
+# Dummy example
+1 + 1
 }

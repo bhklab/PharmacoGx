@@ -119,15 +119,25 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
         if(modeling.method == "anova"){
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         } else if(modeling.method == "pearson") {
-          
-          res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr, 
-                                                    type=type,
-                                                    batch=batch, 
-                                                    drugpheno=drugpheno, 
-                                                    verbose=verbose, 
-                                                    test=inference.method, 
-                                                    req_alpha = req_alpha))
-      ## TODO:: insert logic about computing the appropriate number of permutations. 
+          if(!is.character(data)){
+            res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr, 
+                                                      type=type,
+                                                      batch=batch, 
+                                                      drugpheno=drugpheno, 
+                                                      verbose=verbose, 
+                                                      test=inference.method, 
+                                                      req_alpha = req_alpha))
+          } else {
+            res <- t(apply(data[ , x, drop=FALSE], 2, function(dataIn) {
+              geneDrugSensitivityPBCorr(as.factor(dataIn),  
+                                                      type=type,
+                                                      batch=batch, 
+                                                      drugpheno=drugpheno, 
+                                                      verbose=verbose, 
+                                                      test=inference.method, 
+                                                      req_alpha = req_alpha)}))            
+          }
+
         }
 
 
