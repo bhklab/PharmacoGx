@@ -232,7 +232,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       y <- as.numeric(var2)
       GR <- rep(0L, length(x))
       GS <- as.integer(length(x))
-      NG <- 1
+      NG <- 1L
       N <- as.numeric(length(x))
 
       p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2)) 
