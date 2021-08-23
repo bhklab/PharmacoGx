@@ -148,7 +148,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
          standardize=standardize, 
          modeling.method = modeling.method, 
          inference.method = inference.method,
-         req_alpha = req_alpha, mc.cores = nthread, mc.preschedule = (inference.method == "analytic"))
+         req_alpha = req_alpha, mc.cores = nthread, mc.preschedule = TRUE)
       rest <- do.call(rbind, mcres)
       rest <- cbind(rest, "fdr"=p.adjust(rest[ , "pvalue"], method="fdr"))
       # rest <- rest[ , nc, drop=FALSE]
