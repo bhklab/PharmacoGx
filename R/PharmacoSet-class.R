@@ -1,3 +1,13 @@
+#' @include allGenerics.R
+NULL
+
+#' @export
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
+
+# #' @importClassesFrom CoreGx LongTable TreatmentResponseExperiment
+# setClassUnion('list_or_LongTable', c('list', 'LongTable'))
+
 #' A Class to Contain PharmacoGenomic datasets together with their curations
 #' 
 #' The PharmacoSet (pSet) class was developed to contain and organise large 
@@ -42,13 +52,14 @@
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   PharmacoSet, for proper processing of the data
 #'  
-#' @importClassesFrom CoreGx CoreSet
-#' @importClassesFrom CoreGx LongTable
+#' @importClassesFrom CoreGx CoreSet 
+#' @importClassesFrom CoreGx LongTable 
+#' @importClassesFrom CoreGx TreatmentResponseExperiment
 #'
 #' @return An object of the PharmacoSet class
 .PharmacoSet <- setClass('PharmacoSet',
-                         slots = list(drug='data.frame'),
-                         contains='CoreSet')
+    slots = list(drug='data.frame'),
+    contains='CoreSet')
 
 
 # The default constructor above does a poor job of explaining the required 

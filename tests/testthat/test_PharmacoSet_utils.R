@@ -25,6 +25,6 @@ test_that('subsetBySample works...', {
     })
 })
 
-test_taht('subsetByFeature works...', {
+test_that('subsetByFeature works...', {
     
 })
