@@ -18,8 +18,9 @@ drug vs cell line table}
 \arguments{
 \item{object}{\link{PharmacoSet} The PharmacoSet from which to extract the data}
 
-\item{sensitivity.measure}{\code{character} which sensitivity sensitivity.measure to use? Use the
-sensitivityMeasures function to find out what measures are available for each object.}
+\item{sensitivity.measure}{\code{character} which sensitivity sensitivity.measure
+to use? Use the sensitivityMeasures function to find out what measures are
+available for each object.}
 
 \item{cell.lines}{\code{character} The cell lines to be summarized.
 If any cell lines has no data, it will be filled with
@@ -48,7 +49,7 @@ pairs
 }
 \examples{
 data(GDSCsmall)
-GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, 
+GDSCauc <- summarizeSensitivityProfiles(GDSCsmall,
     sensitivity.measure='auc_published')
 
 }

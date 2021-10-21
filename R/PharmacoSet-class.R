@@ -8,6 +8,8 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 # #' @importClassesFrom CoreGx LongTable TreatmentResponseExperiment
 # setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
+.local_class="PharmacoSet"
+
 #' A Class to Contain PharmacoGenomic datasets together with their curations
 #' 
 #' The PharmacoSet (pSet) class was developed to contain and organise large 
@@ -62,9 +64,9 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
     contains='CoreSet')
 
 
-# The default constructor above does a poor job of explaining the required 
-# structure of a PharmacoSet. The constructor function defined below guides the 
-# user into providing the required components of the curation and senstivity 
+# The default constructor above does a poor job of explaining the required
+# structure of a PharmacoSet. The constructor function defined below guides the
+# user into providing the required components of the curation and senstivity
 # lists and hides the annotation slot which the user does not need to manually 
 # fill. This also follows the design of the Expression Set class.
 
@@ -125,132 +127,151 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom CoreGx CoreSet
 #' 
 #' @export
-PharmacoSet <-  function(name,
-                          molecularProfiles=list(), 
-                          cell=data.frame(), 
-                          drug=data.frame(),
-                          sensitivityInfo=data.frame(),
-                          sensitivityRaw=array(dim=c(0,0,0)), 
-                          sensitivityProfiles=matrix(), 
-                          sensitivityN=matrix(nrow=0, ncol=0), 
-                          perturbationN=array(NA, dim=c(0,0,0)), 
-                          curationDrug=data.frame(), 
-                          curationCell = data.frame(), 
-                          curationTissue = data.frame(), 
-                          datasetType=c("sensitivity", "perturbation", "both"),
-                          verify = TRUE
-                         )
-{
+PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(), 
+        drug=data.frame(), sensitivityInfo=data.frame(), 
+        sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
+        sensitivityN=matrix(nrow=0, ncol=0), 
+        perturbationN=array(NA, dim=c(0,0,0)), curationDrug=data.frame(), 
+        curationCell = data.frame(), curationTissue = data.frame(), 
+        datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE) {
+
     datasetType <- match.arg(datasetType)
-    
+
     annotation <- list()
     annotation$name <- as.character(name)
     annotation$dateCreated <- date()
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
-    
-    ## TODO:: If the colnames and rownames are not found below, it will fill with NAs. This is undersirable behaviour.
+
+    ## TODO:: If the colnames and rownames are not found below, it will fill 
+    ##>with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     ## TODO:: Determine if I should use SummarizedExperiment construtor here?
-    for (i in seq_along(molecularProfiles)){
+    for (i in seq_along(molecularProfiles)) {
         if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
             stop(sprintf("Please provide the %s data as a SummarizedExperiment", 
-                         names(molecularProfiles[i])))
-        }else{
-      rowData(molecularProfiles[[i]]) <- 
-        rowData(molecularProfiles[[i]])[rownames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE]
-      colData(molecularProfiles[[i]]) <- 
-        colData(molecularProfiles[[i]])[colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE]
+                names(molecularProfiles[i])))
+        } else {
+            rowData(molecularProfiles[[i]]) <- rowData(molecularProfiles[[i]])[
+                rownames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
+            ]
+            colData(molecularProfiles[[i]]) <- colData(molecularProfiles[[i]])[
+                colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
+            ]
         }
     }
-    #if (!is(cell, "data.frame")) {
-    #    stop("Please provide the cell line annotations as a data frame.")
-    #}
-    #if (!is(drug, "data.frame")) {
-    #    stop("Please provide the drug annotations as a data frame.")
-    #}
-    
+
     sensitivity <- list()
-    
-    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & 
-             rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])){
-        stop("Please ensure all the row names match between the sensitivity data.")
+
+    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) &
+            rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])) {
+        stop("Please ensure all the row names match between the sensitivity ",
+            "data.")
     }
-    
+
     sensitivity$info <- as.data.frame(sensitivityInfo, stringsAsFactors = FALSE)
     sensitivity$raw <- sensitivityRaw
-    sensitivity$profiles <- as.data.frame(sensitivityProfiles, stringsAsFactors = FALSE)
+    sensitivity$profiles <- as.data.frame(sensitivityProfiles,
+        stringsAsFactors = FALSE)
     sensitivity$n <- sensitivityN
-    
+
     curation <- list()
     curation$drug <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
     curation$cell <- as.data.frame(curationCell, stringsAsFactors = FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
-    ### TODO:: Make sure to fix the curation to check for matching row names to the drug and cell line matrices!!!!!!
-    
+    ### TODO:: Make sure to fix the curation to check for matching row names 
+    ##> to the drug and cell line matrices!
+
     perturbation <- list()
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
-        perturbation$info <- "The metadata for the perturbation experiments is 
-          available for each molecular type by calling the appropriate info 
-          function. \n For example, for RNA transcriptome perturbations, 
-          the metadata can be accessed using rnaInfo(object)."
+        perturbation$info <- "The metadata for the perturbation experiments is
+            available for each molecular type by calling the appropriate info
+            function. \n For example, for RNA transcriptome perturbations,
+            the metadata can be accessed using rnaInfo(object)."
     } else {
         perturbation$info <- "Not a perturbation dataset."
     }
-    
-    pSet  <- .PharmacoSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), drug=as.data.frame(drug), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
-    if (verify) { checkPsetStructure(pSet) }
-  if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
-    pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
-  }
-    if(length(perturbationN) == 0  & datasetType %in% c("perturbation", "both")) {
-      pSet@perturbation$n <- .summarizePerturbationNumbers(pSet)
+
+    pSet  <- .PharmacoSet(annotation=annotation, 
+        molecularProfiles=molecularProfiles, cell=as.data.frame(cell), 
+        drug=as.data.frame(drug), datasetType=datasetType, 
+        sensitivity=sensitivity, perturbation=perturbation, 
+        curation=curation)
+    if (verify) checkPsetStructure(pSet)
+    if (length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
+        pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
     }
-  return(pSet)
+    if (!length(perturbationN) &&
+            datasetType %in% c("perturbation", "both")) {
+        pSet@perturbation$n <- .summarizePerturbationNumbers(pSet)
+    }
+    return(pSet)
 }
 
+#' @eval CoreGx:::.docs_CoreSet2_constructor(class_=.local_class, 
+#' sx_="Samples in a `PharmacoSet` represent cancer cell-lines.",
+#' tx_="Treatments in a `PharmacoSet` represent pharmaceutical compounds.")
+#' @importFrom CoreGx CoreSet2
+#' @export
+PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
+        sample=data.frame(), molecularProfiles=MultiAssayExperiment(),
+        treatmentResponse=LongTable(), 
+        curation=list(sample=data.frame(), treatment=data.frame())) {
+
+    # -- Leverage existing checks in CoreSet constructor
+    cSet <- CoreSet2(name=name, treatment=treatment,
+        treatmentResponse=treatmentResponse, 
+        moleuclarProfiles=molecularProfiles, curation=curation)
+
+    ## -- data integrity
+    # treatment
+    ## TODO
+
+    .PharmacoSet(
+        annotation=cSet@annotation,
+        cell=cSet@sample,
+        drug=treatment,
+        molecularProfiles=cSet@molecularProfiles,
+        treatmentResponse=cSet@treatmentResponse,
+        datasetType=cSet@datasetType,
+        curation=cSet@curation
+    )
+}
 
 # Constructor Helper Functions ----------------------------------------------
 
 #' @keywords internal
 #' @importFrom CoreGx idCols . .errorMsg .collapse
 .summarizeSensitivityNumbers <- function(object) {
-
-  ## TODO:: Checks don't like assigning to global evnironment. Can we return this?
-  assign('object_sumSenNum', object) # Removed envir=.GlobalEnv
-  if (object@datasetType != 'sensitivity' && object@datasetType != 'both') {
-    stop ('Data type must be either sensitivity or both')
-  }
-
-  ## unique drug identifiers
-  # drugn <- sort(unique(object@sensitivity$info[ , 'drugid']))
-
-  ## consider all drugs
-  drugn <- rownames(object@drug)
-
-  ## unique drug identifiers
-  # celln <- sort(unique(object@sensitivity$info[ , 'cellid']))
-
-  ## consider all cell lines
-  celln <- rownames(object@cell)
-
-  sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), dimnames=list(celln, drugn))
-  drugids <- object@sensitivity$info[ , 'drugid']
-  cellids <- object@sensitivity$info[ , 'cellid']
-  cellids <- cellids[grep('///', drugids, invert=TRUE)]
-  drugids <- drugids[grep('///', drugids, invert=TRUE)]
-
-
-  tt <- table(cellids, drugids)
-  sensitivity.info[rownames(tt), colnames(tt)] <- tt
+    ## TODO:: Checks don't like assigning to global evnironment. Can we return this?
+    assign('object_sumSenNum', object) # Removed envir=.GlobalEnv
+    if (object@datasetType != 'sensitivity' && object@datasetType != 'both') {
+        stop ('Data type must be either sensitivity or both')
+    }
+    ## unique drug identifiers
+    # drugn <- sort(unique(object@sensitivity$info[ , 'drugid']))   
+    ## consider all drugs
+    drugn <- rownames(object@drug)
+    ## unique drug identifiers
+    # celln <- sort(unique(object@sensitivity$info[ , 'cellid']))   
+    ## consider all cell lines
+    celln <- rownames(object@cell)
+    sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn),
+        dimnames=list(celln, drugn))
+    drugids <- object@sensitivity$info[ , 'drugid']
+    cellids <- object@sensitivity$info[ , 'cellid']
+    cellids <- cellids[grep('///', drugids, invert=TRUE)]
+    drugids <- drugids[grep('///', drugids, invert=TRUE)]
+    tt <- table(cellids, drugids)
+    sensitivity.info[rownames(tt), colnames(tt)] <- tt
 
     return(sensitivity.info)
 }
 
 #' @importFrom CoreGx .summarizeMolecularNumbers
 .summarizeMolecularNumbers <- function(object) {
-  CoreGx::.summarizeMolecularNumbers
+    CoreGx::.summarizeMolecularNumbers(object)
 }
 
 .summarizePerturbationNumbers <- function(object) {
@@ -589,11 +610,11 @@ updateDrugId <- function(object, new.ids = vector('character')){
     curMatch <- match(rownames(object@curation$drug),rownames(drugInfo(object)))
 
     duplId <- unique(new.ids[duplicated(new.ids)])
-    for(id in duplId){
+    for(id in duplId) {
 
       if (ncol(sensNumber(object))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(object)[,myx[1]] <- apply(sensNumber(object)[,myx], 1, sum)
+        sensNumber(object)[,myx[1]] <- apply(sensNumber(object)[, myx], 1, sum)
         sensNumber(object) <- sensNumber(object)[,-myx[-1]]
         # sensMatch <- sensMatch[-myx[-1]]
       }

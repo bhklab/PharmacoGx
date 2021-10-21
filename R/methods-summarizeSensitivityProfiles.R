@@ -1,20 +1,21 @@
 #' Takes the sensitivity data from a PharmacoSet, and summarises them into a
 #' drug vs cell line table
-#' 
+#'
 #' This function creates a table with cell lines as rows and drugs as columns,
 #' summarising the drug senstitivity data of a PharmacoSet into drug-cell line
 #' pairs
-#' 
-#' @examples 
+#'
+#' @examples
 #' data(GDSCsmall)
-#' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall, 
+#' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall,
 #'     sensitivity.measure='auc_published')
 #'
 #' @param object [PharmacoSet] The PharmacoSet from which to extract the data
-#' @param sensitivity.measure `character` which sensitivity sensitivity.measure to use? Use the 
-#'   sensitivityMeasures function to find out what measures are available for each object.
-#' @param cell.lines \code{character} The cell lines to be summarized. 
-#'    If any cell lines has no data, it will be filled with
+#' @param sensitivity.measure `character` which sensitivity sensitivity.measure
+#'   to use? Use the sensitivityMeasures function to find out what measures are
+#'   available for each object.
+#' @param cell.lines \code{character} The cell lines to be summarized.
+#'   If any cell lines has no data, it will be filled with
 #'   missing values
 #' @param drugs \code{character} The drugs to be summarized.
 #'   If any drugs has no data, it will be filled with
@@ -31,10 +32,9 @@
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-    function(object, sensitivity.measure="auc_recomputed", cell.lines, drugs,
-        summary.stat=c("mean", "median", "first", "last", "max", "min"), 
-        fill.missing=TRUE, verbose=TRUE)
-{
+        function(object, sensitivity.measure="auc_recomputed", cell.lines, 
+        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"), 
+        fill.missing=TRUE, verbose=TRUE) {
     if (is(sensitivitySlot(object), 'LongTable'))
         .summarizeSensProfiles(object, sensitivity.measure,
             cell.lines, drugs, summary.stat, fill.missing)
@@ -52,11 +52,8 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
-    sensitivity.measure='auc_recomputed',
-    cell.lines,
-    drugs,
-    summary.stat,
-    fill.missing=TRUE) {
+        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat, 
+        fill.missing=TRUE) {
 
     # handle missing
     if (missing(cell.lines)) cell.lines <- cellNames(object)
@@ -73,8 +70,9 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     # compute max concentration and add it to the profiles
     if (sensitivity.measure == 'max.conc') {
         dose <- copy(assay(longTable, 'dose', withDimnames=TRUE, key=FALSE))
-        dose[, max.conc := max(.SD, na.rm=TRUE), .SDcols=grep('Dose_\\d+', colnames(dose))]
-        dose <- dose[, .SD, .SDcols=!grepl('Dose_\\d+', colnames(dose))]
+        dose[, max.conc := max(.SD, na.rm=TRUE), 
+            .SDcols=grep('dose\\d+id', colnames(dose))]
+        dose <- dose[, .SD, .SDcols=!grepl('dose\\d+id', colnames(dose))]
         sensProfiles <- dose[sensProfiles, on=idCols(longTable)]
     }
 
@@ -105,7 +103,8 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     }
 
     # do the summary
-    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)), by=.(drugid, cellid)]
+    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)), 
+        by=.(drugid, cellid)]
 
     # NA pad the missing cells and drugs
     if (fill.missing) {
