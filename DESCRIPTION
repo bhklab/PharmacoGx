@@ -49,7 +49,7 @@ Imports:
     checkmate
 Depends: R (>= 3.6), CoreGx
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification

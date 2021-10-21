@@ -91,7 +91,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     # match summary function
     ## TODO:: extend this function to support passing in a custom summary function
     summary.function <- function(x) {
-        if(all(is.na(x))) {
+        if (all(is.na(x))) {
             return(NA_real_)
         }
         switch(summary.stat,
