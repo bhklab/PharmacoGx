@@ -193,13 +193,13 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
         perturbation$info <- "Not a perturbation dataset."
     }
 
-    pSet  <- .PharmacoSet(annotation=annotation, 
-        molecularProfiles=molecularProfiles, cell=as.data.frame(cell), 
-        drug=as.data.frame(drug), datasetType=datasetType, 
-        sensitivity=sensitivity, perturbation=perturbation, 
+    pSet  <- .PharmacoSet(annotation=annotation,
+        molecularProfiles=molecularProfiles, cell=as.data.frame(cell),
+        drug=as.data.frame(drug), datasetType=datasetType,
+        sensitivity=sensitivity, perturbation=perturbation,
         curation=curation)
     if (verify) checkPsetStructure(pSet)
-    if (length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
+    if (length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
         pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
     }
     if (!length(perturbationN) &&
@@ -221,8 +221,8 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
 
     # -- Leverage existing checks in CoreSet constructor
     cSet <- CoreSet2(name=name, treatment=treatment,
-        treatmentResponse=treatmentResponse, 
-        moleuclarProfiles=molecularProfiles, curation=curation)
+        sample=sample, treatmentResponse=treatmentResponse,
+        molecularProfiles=molecularProfiles, curation=curation)
 
     ## -- data integrity
     # treatment
@@ -230,10 +230,10 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
 
     .PharmacoSet(
         annotation=cSet@annotation,
-        cell=cSet@sample,
+        cell=cSet@cell,
         drug=treatment,
         molecularProfiles=cSet@molecularProfiles,
-        treatmentResponse=cSet@treatmentResponse,
+        sensitivity=cSet@sensitivity,
         datasetType=cSet@datasetType,
         curation=cSet@curation
     )
@@ -276,41 +276,32 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
 
 .summarizePerturbationNumbers <- function(object) {
 
-  if (object@datasetType != 'perturbation' && object@datasetType != 'both') {
-    stop('Data type must be either perturbation or both')
-  }
+    if (object@datasetType != 'perturbation' && object@datasetType != 'both') {
+        stop('Data type must be either perturbation or both')
+    }
 
-  ## unique drug identifiers
-  # drugn <- sort(unique(unlist(lapply(object@molecularProfiles, function (x) {
-  #   res <- NULL
-  #   if (nrow(pData(x)) > 0 & 'drugid' %in% colnames(pData(x))) {
-  #     res <- pData(x)[ , 'drugid']
-  #   }
-  #   return (res)
-  # }))))
+    ## consider all drugs
+    drugn <- rownames(object@drug)
 
-  ## consider all drugs
-  drugn <- rownames(object@drug)
+    ## consider all cell lines
+    celln <- rownames(object@cell)
 
-  ## unique cell line identifiers
-  # celln <- sort(unique(unlist(lapply(object@molecularProfiles, function (x) {
-  #   res <- NULL
-  #   if (nrow(pData(x)) > 0 & 'cellid' %in% colnames(pData(x))) {
-  #     res <- pData(x)[ , 'cellid']
-  #   }
-  #   return (res)
-  # }))))
-
-  ## consider all cell lines
-  celln <- rownames(object@cell)
-
-  perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(object@molecularProfiles)), dimnames=list(celln, drugn, names((object@molecularProfiles))))
+    perturbation.info <- array(0, dim=c(length(celln), length(drugn),
+        length(molecularProfilesSlot(object))), 
+        dimnames=list(celln, drugn, names((molecularProfilesSlot(object))))
+    )
 
     for (i in seq_len(length(object@molecularProfiles))) {
-      if (nrow(SummarizedExperiment::colData(object@molecularProfiles[[i]])) > 0 && all(is.element(c('cellid', 'drugid'), colnames(SummarizedExperiment::colData(object@molecularProfiles[[i]]))))) {
-      tt <- table(SummarizedExperiment::colData(object@molecularProfiles[[i]])[ , 'cellid'], SummarizedExperiment::colData(object@molecularProfiles[[i]])[ , 'drugid'])
-        perturbation.info[rownames(tt), colnames(tt), names(object@molecularProfiles)[i]] <- tt
-      }
+        if (nrow(colData(object@molecularProfiles[[i]])) > 0 &&
+                all(c('cellid', 'drugid') %in%
+                    colnames(molecularProfilesSlot(object)[[i]]))) {
+            tt <- table(
+                colData(molecularProfilesSlot(object)[[i]])[, 'cellid'],
+                colData(object@molecularProfiles[[i]])[, 'drugid']
+            )
+        perturbation.info[rownames(tt), colnames(tt), 
+            names(object@molecularProfiles)[i]] <- tt
+        }
     }
 
     return(perturbation.info)
