@@ -25,10 +25,7 @@ PharmacoSet2(
 @param treatmentResponse A `LongTable` or `LongTableDataMapper` object
     containing all treatment response data associated with the `\{class_\}`
     object.
-@param curation A `list(2)` object with two items named `treatment` and
-    `sample` with mappings from publication identifiers to standardized
-    identifiers for both annotations, respectively.
-@param datasetType A `character(1)` One of 
+@param curation \{cx_\} 
 }
 }
 \details{
