@@ -1,5 +1,11 @@
 # Package Release News
 
+## 2.5.3
+- Added PharmacoSet2 constructor to allow creation of PSets with updated class definition introducted in BioC 3.13
+- The sensitivity slot is now required to be a TreatmentResponseExperiment
+- The molecularProfiles slot is now required to be a MultiAssayExperiment
+- The original constructor and all accessors remain in the package for full backwards compatibility
+
 ## v2.5.2
 - Fix: remove 'fdr' item from geneDrugSensitivity return vector
 
