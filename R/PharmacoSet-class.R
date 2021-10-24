@@ -1,7 +1,6 @@
 #' @include allGenerics.R
 NULL
 
-#' @export
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
@@ -210,16 +209,20 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     return(pSet)
 }
 
-#' @eval CoreGx:::.docs_CoreSet2_constructor(class_=.local_class, 
+#' @eval CoreGx:::.docs_CoreSet2_constructor(class_=.local_class,
 #' sx_="Samples in a `PharmacoSet` represent cancer cell-lines.",
-#' tx_="Treatments in a `PharmacoSet` represent pharmaceutical compounds.")
-#' @importFrom CoreGx CoreSet2
+#' tx_="Treatments in a `PharmacoSet` represent pharmaceutical compounds.",
+#' cx_="This class requires an additional curation item, tissue, which maps
+#' from published to standardized tissue idenifiers.",
+#' data_=.local_data)
+#' @importFrom CoreGx CoreSet2 LongTable TreatmentResponseExperiment
 #' @export
 PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(),
-        treatmentResponse=LongTable(), 
-        curation=list(sample=data.frame(), treatment=data.frame())) {
-
+        treatmentResponse=TreatmentResponseExperiment(),
+        curation=list(sample=data.frame(), treatment=data.frame(),
+        tissue=data.frame())
+) {
     # -- Leverage existing checks in CoreSet constructor
     cSet <- CoreSet2(name=name, treatment=treatment,
         sample=sample, treatmentResponse=treatmentResponse,

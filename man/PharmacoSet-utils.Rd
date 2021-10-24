@@ -15,7 +15,7 @@
 
 \S4method{subsetByTreatment}{PharmacoSet}(x, treatments)
 
-\S4method{subsetByFeature}{PharmacoSet}(x, features)
+\S4method{subsetByFeature}{PharmacoSet}(x, features, mDataTypes)
 }
 \arguments{
 \item{x}{A \code{PharmacoSet} object.}
@@ -30,7 +30,9 @@ rownames from \code{treatmentInfo(x)}. This method does not work with
 \item{features}{\code{character()} vector of feature names. Must be valid feature
 names for a given \code{mDataType}}
 
-\item{mDataTypes}{\code{character()}}
+\item{mDataTypes}{\code{character()} One or more molecular data types to
+to subset features by. Must be valid rownames for the selected
+SummarizedExperiment mDataTypes.}
 }
 \value{
 See details.

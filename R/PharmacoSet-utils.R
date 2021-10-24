@@ -69,8 +69,8 @@ setMethod('subsetByTreatment', signature(x='PharmacoSet'),
 #' @eval CoreGx:::.docs_CoreSet_subsetByFeature(class_=.local_class, 
 #' data_=.local_data)
 setMethod('subsetByFeature', signature(x='PharmacoSet'), 
-        function(x, features) {
-    callNextMethod(x=x, features=features)
+        function(x, features, mDataTypes) {
+    callNextMethod(x=x, features=features, mDataTypes)
 })
 
 ## ===========
