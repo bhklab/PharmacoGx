@@ -519,9 +519,6 @@ setMethod("molecularProfilesSlot", signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
 
-#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
-setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
-
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_molecularProfilesSlot(class_=.local_class, 
 #' data_=.local_data)
@@ -645,8 +642,7 @@ setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
 
-#' @importClassesFrom CoreGx LongTable
-setClassUnion('list_or_LongTable', c('list', 'LongTable'))
+
 
 #' @rdname PharmacoSet-accessors
 #' @importMethodsFrom CoreGx sensitivitySlot<-

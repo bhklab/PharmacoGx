@@ -20,3 +20,8 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 vignettes/LongTable.*
 PSets/.*
+local_data
+local_data/.*
+scripts
+scripts/.*
+.VSCodeCounter

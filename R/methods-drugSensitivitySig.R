@@ -52,7 +52,7 @@
 #' @importMethodsFrom CoreGx drugSensitivitySig
 #' @export
 setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
-    function(object, mDataType, drugs, features, cells, tissues, 
+    function(object, mDataType, drugs, features, cells, tissues,
         sensitivity.measure = "auc_recomputed", 
         molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
         sensitivity.summary.stat = c("mean", "median", "first", "last"),
@@ -282,9 +282,9 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
       drug.sensitivity[rownames(featureInfo(object, mDataType)[features,, drop = FALSE]), names(res), j] <- ttt
     }
 
-    drug.sensitivity <- PharmacoSig(drug.sensitivity, 
+    drug.sensitivity <- PharmacoSig(drug.sensitivity,
                                     PSetName = name(object),
-                                    Call = as.character(match.call()), 
+                                    Call = as.character(match.call()),
                                     SigType='Sensitivity',
                                     Arguments = list(
                                       "mDataType" = mDataType,

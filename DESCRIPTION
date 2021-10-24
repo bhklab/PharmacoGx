@@ -1,15 +1,15 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.5.2
-Date: 2021-06-01
+Version: 2.5.3
+Date: 2021-07-15
 Authors@R: c(
-  person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
-  person("Zhaleh", "Safikhani", role=c("aut")),
-  person("Christopher", "Eeles", email="christopher.eeles@uhnresearch.ca", role=c("aut")),
-  person("Mark", "Freeman", role=c("aut")),
-  person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
-  )
+    person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
+    person("Zhaleh", "Safikhani", role=c("aut")),
+    person("Christopher", "Eeles", email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+    person("Mark", "Freeman", role=c("aut")),
+    person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
+    )
 Description: Contains a set of functions to perform large-scale analysis of
     pharmaco-genomic data. These include the PharmacoSet object for storing
     the results of pharmacogenomic experiments, as well as a number of functions
@@ -45,10 +45,11 @@ Imports:
     reshape2,
     jsonlite,
     data.table,
-    glue
+    glue,
+    checkmate
 Depends: R (>= 3.6), CoreGx
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
@@ -62,6 +63,7 @@ Collate:
     'allGenerics.R'
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
+    'PharmacoSet-utils.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
