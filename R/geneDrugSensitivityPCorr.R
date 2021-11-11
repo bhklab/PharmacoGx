@@ -30,6 +30,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   req_alpha = 0.05,
   nBoot = 1e3,
   conf.level = 0.95,
+  max_perm = getOption("PharmacoGx_Max_Perm", ceiling(1/req_alpha*100)),
   verbose=FALSE) {
 
   test <- match.arg(test)
@@ -160,7 +161,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
           }          
         }
 
-        p.value <- corPermute(sample_function, req_alpha = req_alpha)
+        p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
         significant <- p.value$significant
         p.value <- p.value$p.value
 
@@ -174,7 +175,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         NG <- length(table(factor(dd[,3])))
         N <- as.numeric(length(x))
 
-        p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2)) 
+        p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2)) 
         significant <- p.value[[1]]
         p.value <- p.value[[2]]        
       }
@@ -223,7 +224,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         return(abs(obs.cor) < abs(coop::pcor(v1, var2, use="complete.obs")))
       }
 
-      p.value <- corPermute(sample_function, req_alpha = req_alpha)
+      p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
       significant <- p.value$significant
       p.value <- p.value$p.value
     } else {
@@ -235,7 +236,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       NG <- 1L
       N <- as.numeric(length(x))
 
-      p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2)) 
+      p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2)) 
       significant <- p.value[[1]]
       p.value <- p.value[[2]]        
     }

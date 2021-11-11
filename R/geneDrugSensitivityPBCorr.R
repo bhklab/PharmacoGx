@@ -141,6 +141,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
   req_alpha = 0.05,
   nBoot = 1e3,
   conf.level = 0.95,
+  max_perm = getOption("PharmacoGx_Max_Perm", ceiling(1/req_alpha*100)),
   verbose=FALSE) {
 
   test <- match.arg(test)
@@ -282,7 +283,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
         }          
       }
 
-      p.value <- corPermute(sample_function, req_alpha = req_alpha)
+      p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
       significant <- p.value$significant
       p.value <- p.value$p.value
 
@@ -358,7 +359,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
         return(abs(obs.mean.diff) < abs(diff(tapply(v1, var2, mean))))
       }
 
-      p.value <- corPermute(sample_function, req_alpha = req_alpha)
+      p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
       significant <- p.value$significant
       p.value <- p.value$p.value
     # } else {
