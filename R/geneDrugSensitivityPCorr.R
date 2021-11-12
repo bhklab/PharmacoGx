@@ -1,6 +1,20 @@
 
 cor.boot <- function(data, w){
-  return(coop::pcor(data[w,1], data[w,2]))
+  ddd <- data[w,]
+        ## A question here is what to do when our bootstrap sample has 0 variance in one of 
+      ## the two variables (usually the molecular feature)
+      ## If we return NA, we effectively condition on a sampling procedure that samples at least 
+      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned 
+      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more 
+      ## conservative. We probably want to use a completely different model to discover "rare" biomarkers
+      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on 
+      ## the behaviour of coop. 
+
+  if(length(unique(ddd[,1]))<2 || length(unique(ddd[,2]))<2){
+    return(0)
+  }
+
+  return(coop::pcor(ddd[,1], ddd[,2]))
 }
 
 
@@ -183,8 +197,25 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
 
     pcor.boot <- function(ddd, w){
       ddd <- ddd[w,] 
-          ## Taking care of an edge case where only one factor level is left after resampling 
-      ddd <- ddd[,apply(ddd[,,drop=F], 2, function(x) return(length(unique(x))))>=2]
+          ## Taking care of an edge case where only one factor level is left after resampling
+          ## However, we need to keep the first two numeric columns to properly return a value, otherwise
+          ## if we remove gene expression because there were only non-detected samples, for example, 
+          ## we will try to take the correlation against a character vector.  
+      ddd <- ddd[,c(TRUE, TRUE, apply(ddd[,-c(1,2),drop=F], 2, function(x) return(length(unique(x))))>=2)]
+
+
+      ## A question here is what to do when our bootstrap sample has 0 variance in one of 
+      ## the two variables (usually the molecular feature)
+      ## If we return NA, we effectively condition on a sampling procedure that samples at least 
+      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned 
+      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more 
+      ## conservative. We probably want to use a completely different model to discover "rare" biomarkers
+      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on 
+      ## the behaviour of coop. 
+
+      if(length(unique(ddd[,1]))<2 || length(unique(ddd[,2]))<2){
+        return(0)
+      }
 
       if(ncol(ddd)==3){
         partial.dp <- ddd[,1]
@@ -256,7 +287,6 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       })
   }
 
-      ## Think about if the partial cor should also be refit for each (Probably, different lines would be fit if points are missing...) 
 
 } else if(test == "analytic"){
       # if(ncol(dd) > 2){

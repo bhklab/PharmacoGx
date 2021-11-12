@@ -108,7 +108,7 @@ corPermute <- function(sample_function, req_alpha=0.05, tolerance_par = req_alph
   return(xx)
 }
 
-
+## TODO: decide better what to do with no variance cases. 
 cor.boot <- function(data, w){
   return(cor(data[w,1], data[w,2]))
 }
