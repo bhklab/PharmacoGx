@@ -109,7 +109,7 @@ The base PharmacoSet structure is as follows:
 * `dateCreated`: When the object was created.
 * `sessionInfo`: Software environment used to create the object.
 * `call`: Set of parameters used to create the object.
-* `dataType`: Either 'sensitivity', 'perturbation', or 'both'
+* `datasetType`: Either 'sensitivity', 'perturbation', or 'both'
 * `cell`: data frame annotating all cell lines investigated in the study.
 * `drug`: data frame annotating all the drugs investigated in the study.
 

@@ -184,7 +184,7 @@ and returns the data into the R session.
 \footnotesize
 ```{r download-example, eval=FALSE}
 availablePSets()
-GDSC <- downloadPSet("GDSC") 
+GDSC <- downloadPSet("GDSC_2020(v2-8.2)") 
 ```
 \normalsize
 
