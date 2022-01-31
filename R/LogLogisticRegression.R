@@ -194,7 +194,7 @@ logLogisticRegression <- function(conc,
 
   guess <- CoreGx::.fitCurve(x = log_conc,
                               y = viability,
-                              f = .Hill,
+                              f = PharmacoGx:::.Hill,
                               density = density,
                               step = step,
                               precision = precision,
