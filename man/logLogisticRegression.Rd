@@ -19,7 +19,7 @@ logLogisticRegression(
   conc_as_log = FALSE,
   viability_as_pct = TRUE,
   trunc = TRUE,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -68,7 +68,10 @@ curve-fitting is performed.}
 \item{verbose}{\code{logical}, if true, causes warnings thrown by the function to be printed.}
 }
 \value{
-A vector containing estimates for HS, E_inf, and EC50
+A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquared, which is the R^2 of the fit.
+Note that this is calculated using the values actually used for the fit, after truncation and any transform applied. With truncation, this will be
+different from the R^2 compared to the variance of the raw data. This also means that if all points were truncated down or up, there is no variance
+in the data, and the R^2 may be NaN.
 }
 \description{
 By default, logLogisticRegression uses an L-BFGS algorithm to generate the fit. However, if

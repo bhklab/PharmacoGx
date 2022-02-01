@@ -42,7 +42,11 @@
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before 
 #' curve-fitting is performed.
 #' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
-#' @return A vector containing estimates for HS, E_inf, and EC50
+#' @return A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquared, which is the R^2 of the fit. 
+#' Note that this is calculated using the values actually used for the fit, after truncation and any transform applied. With truncation, this will be 
+#' different from the R^2 compared to the variance of the raw data. This also means that if all points were truncated down or up, there is no variance 
+#' in the data, and the R^2 may be NaN. 
+#'
 #' @export
 #' 
 #' @importFrom CoreGx .meshEval .residual
@@ -208,9 +212,10 @@ logLogisticRegression <- function(conc,
                               gritty_guess = gritty_guess,
                               span = 1)
 
-
-
-  return(list("HS" = guess[1],
+  returnval <- list("HS" = guess[1],
               "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
-              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
+              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3]))
+  attr(returnval, "Rsquare") <- attr(guess, "Rsquare")
+
+  return(returnval)
 }

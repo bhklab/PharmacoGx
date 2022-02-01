@@ -36,7 +36,7 @@ set to FALSE}
 \item{verbose}{\code{boolean} Should the function display messages?}
 }
 \value{
-A \code{vector} reporting the effect size (estimateof the coefficient
+A \code{vector} reporting the effect size (estimate of the coefficient
 of drug concentration), standard error (se), sample size (n), t statistic,
 and F statistics and its corresponding p-value.
 }
