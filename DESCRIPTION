@@ -56,7 +56,6 @@ VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
 Collate: 
-    'AdaptiveMatthewCor.R'
     'ComputeGR.R'
     'GR.R'
     'GWC.R'
