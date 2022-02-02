@@ -12,15 +12,23 @@
 #'
 #' @examples
 #' if (interactive()){
-#' availablePSets()
+#'     availablePSets()
 #' }
 #' 
-#' @return A data.frame with details about the available PharmacoSet objects
+#' @param canonical `logical(1)` Should available PSets show only official 
+#'   PSets, or should user generated PSets be included?
+#' 
+#' @return A `data.frame` with details about the available PharmacoSet objects
 #' @export
 #' @import jsonlite
-availablePSets <- function(){
+availablePSets <- function(canonical=TRUE){
   
-  avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/available")
+  if (canonical) {
+    avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/canonical")
+  } else {
+    avail.psets <- fromJSON("http://www.orcestra.ca/api/psets/available")
+  }
+
 
   pSetTable <- data.frame("Dataset Name" = avail.psets$dataset$name,
                           "Date Created" = avail.psets$dateCreated,
@@ -40,8 +48,8 @@ availablePSets <- function(){
 #' \code{PharmacoGx}. User \code{availablePSets} to discover which PSets are available.
 #' 
 #' @examples
-#' if (interactive()){
-#' downloadPSet("CTRPv2", saveDir=file.path(".", "pSets"))
+#' \dontrun{
+#'     if (interactive()) downloadPSet("CTRPv2_2015") 
 #' }
 #' 
 #' @section Warning:
@@ -59,17 +67,24 @@ availablePSets <- function(){
 #'   dataset under
 #' @param verbose \code{bool} Should status messages be printed during download.
 #'   Defaults to TRUE.
-#'
+#' @param timeout \code{numeric} Parameter that lets you extend R's default timeout for 
+#'   downloading large files. Defaults for this function to 600. 
 #' @return A PSet object with the dataset
 #' 
 #' @export
 #' @importFrom downloader download
-downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRUE) {
+downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, 
+    verbose=TRUE, timeout=600) {
   
-  pSetTable <- availablePSets()
+  # change the download timeout since the files are big
+  opts <- options()
+  options(timeout=timeout)
+  on.exit(options(opts))
+
+  pSetTable <- availablePSets(canonical=FALSE)
   
-  whichx <- match(name, pSetTable[,"PSet Name"])
-  if (is.na(whichx)){
+  whichx <- match(name, pSetTable[, "PSet Name"])
+  if (is.na(whichx)) {
     stop('Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.')
   }
   
@@ -80,17 +95,13 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL, verbose=TRU
   if(is.null(pSetFileName)){
     pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
   }
-  if(!file.exists(file.path(saveDir, pSetFileName))){
+  if(!file.exists(file.path(saveDir, pSetFileName))) {
     downloader::download(url = as.character(pSetTable[whichx,"Download"]), 
                          destfile=file.path(saveDir, pSetFileName), 
-                         quiet=!verbose)
+                         quiet=!verbose,
+                         mode='wb')
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
-  #TODO:: Update this to use annotation accessor method once it is in CoreGx
-  if (is.null(pSet@annotation$version) || pSet@annotation$version < 2 ) {
-    pSet <- .convertPsetMolecularProfilesToSE(pSet)
-    saveRDS(pSet, file=file.path(saveDir, pSetFileName))
-  }
   return(pSet)
 }
 

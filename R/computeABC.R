@@ -16,27 +16,27 @@
 #' viability2 <- c("100.94","112.5","86","104.16","75","68","48","29")
 #' computeABC(dose1, dose2, viability1, viability2)
 #' 
-#' @param conc1 [vector] is a vector of drug concentrations.
-#' @param conc2 [vector] is a vector of drug concentrations.
-#' @param viability1 [vector] is a vector whose entries are the viability values observed in the presence of the
+#' @param conc1 `numeric` is a vector of drug concentrations.
+#' @param conc2 `numeric` is a vector of drug concentrations.
+#' @param viability1 `numeric` is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of conc1, expressed as percentages
 #' of viability in the absence of any drug.
-#' @param viability2 [vector] is a vector whose entries are the viability values observed in the presence of the
+#' @param viability2 `numeric` is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of conc2, expressed as percentages
 #' of viability in the absence of any drug.
-#' @param Hill_fit1 [list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+#' @param Hill_fit1 `list` or `vector` In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
 #' as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
 #' viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
 #' and EC50 as a concentration. 
-#' @param Hill_fit2 [list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+#' @param Hill_fit2 `lis` or `vector` In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
 #' as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
 #' viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
 #' and EC50 as a concentration. 
-#' @param conc_as_log [logical], if true, assumes that log10-concentration data has been given rather than concentration data.
-#' @param viability_as_pct [logical], if false, assumes that viability is given as a decimal rather
+#' @param conc_as_log `logical`, if true, assumes that log10-concentration data has been given rather than concentration data.
+#' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
 #' than a percentage, and returns ABC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.
-#' @param verbose [logical], if true, causes warnings thrown by the function to be printed.
-#' @param trunc [logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+#' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
+#' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
 #' 
 #' @return The numeric area of the absolute difference between the two hill slopes

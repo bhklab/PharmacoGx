@@ -16,36 +16,36 @@ computeAUC(
 )
 }
 \arguments{
-\item{concentration}{[vector] is a vector of drug concentrations.}
+\item{concentration}{\code{numeric} is a vector of drug concentrations.}
 
-\item{viability}{[vector] is a vector whose entries are the viability values observed in the presence of the
+\item{viability}{\code{numeric} is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
 indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells.}
 
-\item{Hill_fit}{[list or vector] In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope 
+\item{Hill_fit}{\code{list} or \code{vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
 as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
-viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal, 
+viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
 and EC50 as a concentration.}
 
-\item{conc_as_log}{[logical], if true, assumes that log10-concentration data has been given rather than concentration data.}
+\item{conc_as_log}{\code{logical}, if true, assumes that log10-concentration data has been given rather than concentration data.}
 
-\item{viability_as_pct}{[logical], if false, assumes that viability is given as a decimal rather
+\item{viability_as_pct}{\code{logical}, if false, assumes that viability is given as a decimal rather
 than a percentage, and returns AUC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.}
 
-\item{trunc}{[logical], if true, causes viability data to be truncated to lie between 0 and 1 before
+\item{trunc}{\code{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 
 \item{area.type}{Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")}
 
-\item{verbose}{[logical], if true, causes warnings thrown by the function to be printed.}
+\item{verbose}{\code{logical}, if true, causes warnings thrown by the function to be printed.}
 }
 \value{
 Numeric AUC value
 }
 \description{
 Returns the AUC (Area Under the drug response Curve) given concentration and viability as input, normalized by the concentration
-range of the experiment. The area returned is the response (1-Viablility) area, i.e. area under the curve when the response curve 
-is plotted on a log10 concentration scale, with high AUC implying high sensitivity to the drug. The function can calculate both 
+range of the experiment. The area returned is the response (1-Viablility) area, i.e. area under the curve when the response curve
+is plotted on a log10 concentration scale, with high AUC implying high sensitivity to the drug. The function can calculate both
 the area under a fitted Hill Curve to the data, and a trapz numeric integral of the actual data provided. Alternatively, the parameters
 of a Hill Slope returned by logLogisticRegression can be passed in if they already known.
 }

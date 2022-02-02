@@ -1,6 +1,6 @@
 library(PharmacoGx)
 
-context("Checking subsetTo.")
+context("Checking subset.")
 
 test_that("Intersection result did not change since last time", {
 data(CCLEsmall)

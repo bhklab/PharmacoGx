@@ -1,21 +1,35 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.1.5
-Date: 2020-06-26
-Author: Petr Smirnov, Zhaleh Safikhani, Christopher Eeles, Mark Freeman, Benjamin Haibe-Kains
-Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
-Description: Contains a set of functions to perform large-scale analysis of pharmacogenomic data.
+Version: 2.5.3
+Date: 2021-10-24
+Authors@R: c(
+    person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
+    person("Zhaleh", "Safikhani", role=c("aut")),
+    person("Christopher", "Eeles", email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+    person("Mark", "Freeman", role=c("aut")),
+    person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
+    )
+Description: Contains a set of functions to perform large-scale analysis of
+    pharmaco-genomic data. These include the PharmacoSet object for storing
+    the results of pharmacogenomic experiments, as well as a number of functions
+    for computing common summaries of drug-dose response and correlating them
+    with the molecular features in a cancer cell-line.
 License: Artistic-2.0
 Suggests: pander,
     rmarkdown,
     knitr,
-    knitcitations
+    knitcitations,
+    crayon,
+    testthat,
+    markdown
 Encoding: UTF-8
-Imports: 
+Imports:
+    BiocGenerics,
     Biobase,
     S4Vectors,
     SummarizedExperiment,
+    MultiAssayExperiment,
     BiocParallel,
     ggplot2,
     magicaxis, 
@@ -29,12 +43,16 @@ Imports:
     graphics, 
     grDevices, 
     reshape2,
-    testthat,
-    jsonlite
+    jsonlite,
+    data.table,
+    glue,
+    checkmate
 Depends: R (>= 3.6), CoreGx
-RoxygenNote: 7.1.1
 LinkingTo: Rcpp
+Roxygen: list(markdown = TRUE, r6=FALSE)
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
+VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
 Collate: 
@@ -44,10 +62,15 @@ Collate:
     'GWC.R'
     'LogLogisticRegression.R'
     'MatthewCor.R'
-    'PharmacoSetClass.R'
+    'allGenerics.R'
+    'PharmacoSet-class.R'
+    'PharmacoSet-accessors.R'
+    'PharmacoSet-utils.R'
     'RcppExports.R'
     'SanityCheck.R'
+    'adaptiveMatthewCor.R'
     'callingWaterfall.R'
+    'class-SignatureClass.R'
     'computeABC.R'
     'computeAUC.R'
     'computeAUC_old.R'
@@ -64,7 +87,6 @@ Collate:
     'downloadSignatures.R'
     'drugDoseResponseCurve.R'
     'drugPerturbationSig.R'
-    'drugSensitivitySig-methods.R'
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
@@ -74,11 +96,13 @@ Collate:
     'globals.R'
     'intersectPSets.R'
     'mergePSets.R'
-    'signatureClass.R'
+    'methods-[.R'
+    'methods-drugSensitivitySig.R'
+    'methods-intersect.R'
+    'methods-subsetTo.R'
+    'methods-summarizeMolecularProfiles.R'
+    'methods-summarizeSensitivityProfiles.R'
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
-    'summarizeMolecularProfiles-methods.R'
-    'summarizeSensitivityProfiles-methods.R'
-    'utilities.R'
     'zzz.R'

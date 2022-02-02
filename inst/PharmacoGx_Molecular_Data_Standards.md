@@ -22,6 +22,7 @@ Currently, there is a mixed bag of molecular data names used across psets, as no
 
 Currently, we meet the following names in PSets downloaded from orcestra:
 
+<<<<<<< HEAD
 +---------------------------------+--------------------------------------------------------------+
 | Name                            | Data type                                                    |
 +=================================+==============================================================+
@@ -49,6 +50,23 @@ Currently, we meet the following names in PSets downloaded from orcestra:
 +---------------------------------+--------------------------------------------------------------+
 | mutation_exome                  | mutation data, at protein level, specifically from exome seq |
 +---------------------------------+--------------------------------------------------------------+
+=======
+| Name                            | Data type                                                    |
+|---------------------------------|--------------------------------------------------------------|
+| rnaseq                          | rnaseq (gene tpm??)                                          |
+| rna                             | microarray rna                                               |
+| Kallisto_0.46.1.rnaseq          | rnaseq gene level tpm                                        |
+| Kallisto_0.46.1.rnaseq.counts   | rnaseq gene level counts                                     |
+| Kallisto_0.46.1.isoforms        | rnaseq isoform level tpm                                     |
+| Kallisto_0.46.1.isoforms.counts | rnaseq isoform level counts                                  |
+| cnv                             | snp array derived copy number                                |
+| mutation                        | mutation data, at protein level                              |
+| fusion                          | presence of fusion data, as binary                           |
+| mutationall                     | mutation data, at protein level                              |
+| mutationchosen                  | mutation data, at protein level                              |
+| mutation_exome                  | mutation data, at protein level, specifically from exome seq |
+
+>>>>>>> master
 
 Of these, `show` is aware of:
 
@@ -70,17 +88,14 @@ Functions within the package use the value of this field to determine how to tre
 
 The currently allowed vocabulary is:
 
-+---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+
 | Name                            | Data type                                                                                                                                                 |
-+=================================+===========================================================================================================================================================+
+|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | rna                             | gene expression values                                                                                                                                    |
-+---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 | cnv                             | logR copy number                                                                                                                                          |
-+---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 | mutation                        | gene level binary mutation, encoded as "wt" for 0, or the protein change for a 1. Multiple mutations in same gene are separated with '///' .              |
-+---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 | fusion                          | gene partner level binary fusion status, encoded as "wt" for 0, or the fusion partners for a 1. Multiple fusions in same genes are separated with '///' . |
-+---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+
 
 ### Annotation of the right version for the PSet
 

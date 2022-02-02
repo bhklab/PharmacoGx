@@ -13,6 +13,7 @@ geneDrugSensitivityPCorr(
   req_alpha = 0.05,
   nBoot = 1000,
   conf.level = 0.95,
+  max_perm = getOption("PharmacoGx_Max_Perm", ceiling(1/req_alpha * 100)),
   verbose = FALSE
 )
 }
@@ -23,7 +24,7 @@ geneDrugSensitivityPCorr(
 
 \item{batch}{A \code{vector} of factors specifying the batch}
 
-\item{drugpheno}{A \code{numeric} vector of drug sensitivity values (e.g., 
+\item{drugpheno}{A \code{numeric} vector of drug sensitivity values (e.g.,
 IC50 or AUC)}
 
 \item{test}{A \code{character} string indicating whether resampling or analytic based tests should be used}
@@ -37,9 +38,9 @@ IC50 or AUC)}
 \item{conf.leve}{\code{numeric}, between 0 and 1. Size of the confidence interval required}
 }
 \value{
-A \code{vector} reporting the effect size (estimateof the coefficient 
-  of drug concentration), standard error (se), sample size (n), t statistic, 
-  and F statistics and its corresponding p-value.
+A \code{vector} reporting the effect size (estimateof the coefficient
+of drug concentration), standard error (se), sample size (n), t statistic,
+and F statistics and its corresponding p-value.
 }
 \description{
 This version of the function uses a partial correlation instead of standardized linear models.

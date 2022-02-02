@@ -125,7 +125,7 @@ are the Genomics of Drug Sensitivity in Cancer Project (GDSC)
 [@barretina_cancer_2012]. The third dataset is of the *perturbation* type, the 
 Connectivity Map (CMAP) project [@lamb_connectivity_2006].
 
-Furthermore, `PharmacoGx` provides a suite of parallized functions which
+Furthermore, `PharmacoGx` provides a suite of parallelized functions which
 facilitate drug response biomarker discovery, and molecular drug
 characterization. This vignette will provide two example analysis case
 studies. The first will be comparing gene expression and drug sensitivity
@@ -184,7 +184,7 @@ and returns the data into the R session.
 \footnotesize
 ```{r download-example, eval=FALSE}
 availablePSets()
-GDSC <- downloadPSet("GDSC") 
+GDSC <- downloadPSet("GDSC_2020(v2-8.2)") 
 ```
 \normalsize
 
@@ -286,17 +286,17 @@ correlation coefficient.
   cc <- cellNames(common[[1]])
   
   ge.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[ , x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[ , x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   ## TO DO:: Ensure all assays are name so we can call by name instead of index
   }, d1=assay(GDSCexpression, 1), d2=assay(CCLEexpression, 1))
   ic50.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[, x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[, x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   }, d1=GDSC.ic50, d2=CCLE.ic50)
   auc.cor <- sapply(cc, function (x, d1, d2) {
-    return (stats::cor(d1[ , x], d2[ , x], method="spearman",
-                use="pairwise.complete.obs"))
+    stats::cor(d1[ , x], d2[ , x], method="spearman",
+                use="pairwise.complete.obs")
   }, d1=GDSC.auc, d2=CCLE.auc)
   
   w1 <- stats::wilcox.test(x=ge.cor, y=auc.cor,

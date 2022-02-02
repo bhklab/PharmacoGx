@@ -6,13 +6,13 @@
 #' filterNoisyCurves(GDSCsmall)
 #'
 #' @param pSet [PharmacoSet] a PharmacoSet object
-#' @param epsilon [numeric] a value indicates assumed threshold for the 
+#' @param epsilon `numeric` a value indicates assumed threshold for the 
 #'   distance between to consecutive viability values on the drug-response curve
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
-#' @param positive.cutoff.percent [numeric] This value indicates that function 
+#' @param positive.cutoff.percent `numeric` This value indicates that function 
 #'   may violate epsilon rule for how many points on drug-response curve 
-#' @param mean.viablity [numeric] average expected viability value
-#' @param nthread [numeric] if multiple cores are available, how many cores
+#' @param mean.viablity `numeric` average expected viability value
+#' @param nthread `numeric` if multiple cores are available, how many cores
 #'   should the computation be parallelized over? 
 #' 
 #' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 

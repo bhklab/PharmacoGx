@@ -21,48 +21,48 @@
 #' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
 #' }
 #' 
-#' @param drug [string] A drug name for which the drug response curve should be 
+#' @param drug `character(1)` A drug name for which the drug response curve should be 
 #' plotted. If the plot is desirable for more than one pharmaco set, A unique drug id
 #' should be provided.
-#' @param cellline [string] A cell line name for which the drug response curve should be 
+#' @param cellline `character(1)` A cell line name for which the drug response curve should be 
 #' plotted. If the plot is desirable for more than one pharmaco set, A unique cell id
 #' should be provided.
-#' @param pSets [list] a list of PharmacoSet objects, for which the function
+#' @param pSets `list` a list of PharmacoSet objects, for which the function
 #' should plot the curves.
-#' @param concentrations,viabilities [list] A list of concentrations and viabilities to plot, the function assumes that
-#' concentrations[[i]] is plotted against viabilities[[i]]. The names of the concentration list are used to create the legend labels
-#' @param conc_as_log [logical], if true, assumes that log10-concentration data has been given rather than concentration data,
+#' @param concentrations,viabilities `list` A list of concentrations and viabilities to plot, the function assumes that
+#' `concentrations[[i]]` is plotted against `viabilities[[i]]`. The names of the concentration list are used to create the legend labels
+#' @param conc_as_log `logical`, if true, assumes that log10-concentration data has been given rather than concentration data,
 #' and that log10(ICn) should be returned instead of ICn. Applies only to the concentrations parameter.
-#' @param viability_as_pct [logical], if false, assumes that viability is given as a decimal rather
+#' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
 #' than a percentage, and that E_inf passed in as decimal. Applies only to the viabilities parameter.
-#' @param legends.label [vector] A vector of sensitivity measurment types which could 
+#' @param legends.label `numeric` A vector of sensitivity measurment types which could 
 #' be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.
 #' A legend will be displayed on the top right of the plot which each line of the legend is 
 #' the values of requested sensitivity measerments for one of the requested pSets.
 #' If this parameter is missed no legend would be provided for the plot.
-#' @param ylim [vector] A vector of two numerical values to be used as ylim of the plot.
+#' @param ylim `numeric` A vector of two numerical values to be used as ylim of the plot.
 #' If this parameter would be missed c(0,100) would be used as the ylim of the plot.
-#' @param xlim [vector] A vector of two numerical values to be used as xlim of the plot.
+#' @param xlim `numeric` A vector of two numerical values to be used as xlim of the plot.
 #' If this parameter would be missed the minimum and maximum comncentrations between all 
 #' the pSets would be used as plot xlim.
-#' @param mycol [vector] A vector with the same lenght of the pSets parameter which 
+#' @param mycol `numeric` A vector with the same lenght of the pSets parameter which 
 #' will determine the color of the curve for the pharmaco sets. If this parameter is 
 #' missed default colors from Rcolorbrewer package will be used as curves color. 
-#' @param plot.type [character] Plot type which can be the actual one ("Actual") or 
+#' @param plot.type `character` Plot type which can be the actual one ("Actual") or 
 #' the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 #' If this parameter is missed by default actual curve is plotted. 
-#' @param summarize.replicates [character] If this parameter is set to true replicates 
+#' @param summarize.replicates `character` If this parameter is set to true replicates 
 #' are summarized and replicates are plotted individually otherwise
-#' @param title [character] The title of the graph. If no title is provided, then it defaults to
+#' @param title `character` The title of the graph. If no title is provided, then it defaults to
 #' 'Drug':'Cell Line'.
-#' @param lwd [numeric] The line width to plot with
-#' @param cex [numeric] The cex parameter passed to plot
-#' @param cex.main [numeric] The cex.main parameter passed to plot, controls the size of the titles
+#' @param lwd `numeric` The line width to plot with
+#' @param cex `numeric` The cex parameter passed to plot
+#' @param cex.main `numeric` The cex.main parameter passed to plot, controls the size of the titles
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend. 
-#' @param trunc [bool] Should the viability values be truncated to lie in [0-100] before doing the fitting
-#' @param verbose [boolean] Should warning messages about the data passed in be printed?
+#' @param trunc `logical(1)` Should the viability values be truncated to lie in \[0-100\] before doing the fitting
+#' @param verbose `logical(1)` Should warning messages about the data passed in be printed?
 #' 
-#' @return Plots to the active graphics device and returns and invisible NULL.
+#' @return Plots to the active graphics device and returns an invisible NULL.
 #' 
 #' @import RColorBrewer
 #' 
@@ -182,11 +182,11 @@ function(drug,
           pSetNames[[i]] <- name(pSets[[i]])
           if (length(exp_i) == 1) {
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"])), stringsAsFactors=FALSE))
+              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }else{
             drug.responses <- as.data.frame(cbind("Dose"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
-              "Viability"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}), stringsAsFactors=FALSE))
+              "Viability"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }
           doses[[i]] <- drug.responses$Dose
@@ -209,7 +209,7 @@ function(drug,
             pSetNames[[j]] <- name(pSets[[i]])
 
             drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"])), stringsAsFactors=FALSE))
+              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
             doses[[j]] <- drug.responses$Dose
             responses[[j]] <- drug.responses$Viability

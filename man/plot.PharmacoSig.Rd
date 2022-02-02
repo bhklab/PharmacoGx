@@ -16,17 +16,17 @@
 )
 }
 \arguments{
-\item{x}{[PharmacoSig] a PharmacoSig object, result of drugSensitivitySig
+\item{x}{\code{PharmacoSig} a PharmacoSig object, result of drugSensitivitySig
 or drugPerturbationSig}
 
-\item{adjust.method}{[character] or [boolean] either FALSE for no adjustment,
-or one of the methods implemented by p.adjust. Defaults to FALSE for no 
+\item{adjust.method}{\code{character(1)} or \code{logical(1)} either FALSE for no adjustment,
+or one of the methods implemented by p.adjust. Defaults to FALSE for no
 correction}
 
-\item{drugs}{[character] a vector of drug names for which to plot the estimated
+\item{drugs}{\code{character} a vector of drug names for which to plot the estimated
 associations with gene expression}
 
-\item{features}{[character] a vector of features for which to plot the estimated
+\item{features}{\code{character} a vector of features for which to plot the estimated
 associations with drug treatment}
 
 \item{effect_cutoff}{the cutoff to use for coloring significant effect sizes.}
@@ -45,8 +45,8 @@ can be saved to a variable for further customization by adding ggplot elements t
 graph
 }
 \description{
-Given a PharmacoSig, this will plot a volcano plot, with parameters to set cutoffs 
-for a significant effect size, p value, to pick multiple testing correction strategy, 
+Given a PharmacoSig, this will plot a volcano plot, with parameters to set cutoffs
+for a significant effect size, p value, to pick multiple testing correction strategy,
 and to change point colors. Built on top of ggplot, it will return the plot object which
 can be easily customized as any other ggplot.
 }

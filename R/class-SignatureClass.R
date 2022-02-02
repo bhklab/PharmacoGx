@@ -9,17 +9,18 @@ setOldClass('sessionInfo', sessionInfo)
             SessionInfo = 'sessionInfo',
             Call = 'character'), contains='array')
 
+
 #' Contructor for the PharmacoSig S4 class
 #'
-#' @param Data [`array`] of data to build the signature from
-#' @param PSetName [`character`] vector containing name of PSet, defaults to ''
-#' @param DateCreated [`date`] date the signature was created, defaults to `date()`
-#' @param SigType [`character`] vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
-#' @param SessionInfo [`sessionInfo`] object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`
-#' @param Call [`character` or `call`] specifying the constructor call used to make the object, defaults to 'No Call Recorded'
-#' @param Arguments [`list] a list of additional arguments to the constructure
+#' @param Data  of data to build the signature from
+#' @param PSetName `character` vector containing name of PSet, defaults to ''
+#' @param DateCreated `date` date the signature was created, defaults to `date()`
+#' @param SigType `character` vector specifying whether the signature is sensitivity or perturbation, defaults to 'sensitivity'
+#' @param SessionInfo `sessionInfo` object as retuned by `sesssionInfo()` function, defaults to `sessionInfo()`
+#' @param Call `character` or `call` specifying the constructor call used to make the object, defaults to 'No Call Recorded'
+#' @param Arguments `list` a list of additional arguments to the constructure
 #'
-#' @return A [`PharmacoSig`] object build from the provided signature data
+#' @return A `PharmacoSig` object build from the provided signature data
 #'
 #' @export
 PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity',
@@ -48,6 +49,7 @@ setMethod("show", signature=signature(object='PharmacoSig'),
         cat("Number of Drugs: ", dim(object)[[2]], "\n")
         cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
            })
+
 
 #' Show the Annotations of a signature object
 #' 
@@ -78,8 +80,3 @@ setMethod("showSigAnnot", signature(object="PharmacoSig"), function(object){
   print(object@SessionInfo)
   return(invisible(NULL))
 } 
-
-
-
-
-

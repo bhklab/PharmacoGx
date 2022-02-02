@@ -15,7 +15,7 @@
 #' @param standardize \code{character} One of 'SD', 'rescale' or 'none'
 #' @param verbose \code{boolean} Should the function display messages?
 #'  
-#' @return A \code{vector} reporting the effect size (estimateof the coefficient 
+#' @return A \code{vector} reporting the effect size (estimate of the coefficient 
 #'   of drug concentration), standard error (se), sample size (n), t statistic, 
 #'   and F statistics and its corresponding p-value.
 #'
@@ -63,7 +63,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
     if (is.factor(drugpheno[,1])){
       rest <- c("estimate"=NA_real_, "se"=NA_real_, "n"=nn, "pvalue"=NA_real_, df=NA_real_)
     } else {
-      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA , "fdr" = NA)
+      rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA )
     }
   }  
   

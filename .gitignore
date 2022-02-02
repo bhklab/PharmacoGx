@@ -6,5 +6,18 @@ PharmacoGx.Rproj
 */.DS_store
 */figure
 doc
+<<<<<<< HEAD
 Meta
 */*.so
+=======
+^PSets/*
+..Rcheck/.*
+^.*Rcheck
+scripts/*
+scripts
+Psets/*
+check/*
+PSets/**
+local_data/**
+.VSCodeCounter/**
+>>>>>>> master

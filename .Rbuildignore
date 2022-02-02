@@ -13,3 +13,15 @@ old_data
 vignettes/figure
 ^doc$
 ^Meta$
+.idea*
+^PSets/*
+^scripts/*
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+vignettes/LongTable.*
+PSets/.*
+local_data
+local_data/.*
+scripts
+scripts/.*
+.VSCodeCounter

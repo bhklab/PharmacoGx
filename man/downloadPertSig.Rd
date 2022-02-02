@@ -7,23 +7,30 @@
 downloadPertSig(
   name,
   saveDir = file.path(".", "PSets", "Sigs"),
-  myfn = NULL,
-  verbose = TRUE
+  fileName,
+  verbose = TRUE,
+  ...,
+  myfn
 )
 }
 \arguments{
-\item{name}{\code{Character} string, the name of the PharmacoSet for which to
-download signatures. The name should match the names returned in the
-availablePSets table.}
+\item{name}{A \code{character(1)} string, the name of the PharmacoSet for which
+to download signatures. The name should match the names returned in the
+\verb{PSet Name} column of \code{availablePSets(canonical=FALSE)}.}
 
-\item{saveDir}{\code{Character} string with the folder path where the 
+\item{saveDir}{A \code{character(1)} string with the folder path where the
 PharmacoSet should be saved. Defaults to \code{"./PSets/Sigs/"}. Will
 create directory if it does not exist.}
 
-\item{myfn}{\code{character} string, the file name to save the dataset under}
+\item{fileName}{\code{character(1)} What to name the downloaded file. Defaults
+to '\code{name}_signature.RData' when excluded.}
 
-\item{verbose}{\code{bool} Should status messages be printed during download.
-Defaults to TRUE.}
+\item{verbose}{\code{logical(1)} Should \code{downloader} show detailed messages?}
+
+\item{...}{\code{pairlist} Force subsequent arguments to be named.}
+
+\item{myfn}{\code{character(1)} A deprecated version of \code{fileName}. Still works
+for now, but will be deprecated in future releases.}
 }
 \value{
 An array type object contaning the signatures
@@ -36,8 +43,9 @@ user to skip these very lengthy calculation steps for the datasets available,
 and start their analysis from the already computed signatures
 }
 \examples{
-if (interactive()){
-downloadPertSig("CMAP")
+
+\dontrun{
+    if (interactive()) downloadPertSig("CMAP_2016")
 }
- 
+
 }
