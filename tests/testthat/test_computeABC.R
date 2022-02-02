@@ -15,8 +15,8 @@ test_that("Function complains when given insensible input",{
 	# 	viability1 = c(50, 60, 70),
 	# 	Hill_fit2 = c(0.5, 0.2, 1)))
 
-	expect_error(computeABC(conc1 = c(1, 2),
-		conc2 = c(1, 2, 3),
+	expect_error(computeABC(conc1 = c(1, 2,3),
+		conc2 = c(1, 2, 3, 4),
 		viability1 = c(50, 60, 70),
 		viability2 = c(40, 90, 10)), "is not of same length") #should complain
 	expect_error(computeABC(conc1 = c(-1, 2, 3),
@@ -25,11 +25,11 @@ test_that("Function complains when given insensible input",{
 		viability2 = c(40, 90, 10),
 		conc_as_log = FALSE)) #should complain
 	##TO-DO::Add warning string to expect_warning call
-	expect_warning(expect_error(computeABC(conc1 = c(NA, "cat", 3),
+	expect_error(computeABC(conc1 = c(NA, "cat", 3),
 		conc2 = c(1, -2, 3),
 		viability1 = c(50, 60, 70),
 		viability2 = c(40, 90, 10),
-		conc_as_log = FALSE))) #should complain
+		conc_as_log = FALSE)) #should complain
 	expect_error(computeABC(conc1 = c(1, 2, 3),
 		conc2 = c(1, -2, 3),
 		viability1 = c(50, 60, 70),
