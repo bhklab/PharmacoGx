@@ -39,6 +39,7 @@ cor.boot <- function(data, w){
 #'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var
 #' @importFrom boot boot boot.ci
+#' @importFrom coop pcor
 geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno, 
   test = c("resampling", "analytic"),
   req_alpha = 0.05,
