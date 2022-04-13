@@ -2,7 +2,7 @@
 NULL
 
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
-setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
+setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 
 # #' @importClassesFrom CoreGx LongTable TreatmentResponseExperiment
 # setClassUnion('list_or_LongTable', c('list', 'LongTable'))
@@ -10,51 +10,51 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 .local_class="PharmacoSet"
 
 #' A Class to Contain PharmacoGenomic datasets together with their curations
-#' 
-#' The PharmacoSet (pSet) class was developed to contain and organise large 
-#' PharmacoGenomic datasets, and aid in their metanalysis. It was designed 
-#' primarily to allow bioinformaticians and biologists to work with data at the 
-#' level of genes, drugs and cell lines, providing a more naturally intuitive 
-#' interface and simplifying analyses between several datasets. As such, it was 
-#' designed to be flexible enough to hold datasets of two different natures 
-#' while providing a common interface. The class can accomidate datasets 
-#' containing both drug dose response data, as well as datasets contaning 
-#' genetic profiles of cell lines pre and post treatement with compounds, known 
+#'
+#' The PharmacoSet (pSet) class was developed to contain and organise large
+#' PharmacoGenomic datasets, and aid in their metanalysis. It was designed
+#' primarily to allow bioinformaticians and biologists to work with data at the
+#' level of genes, drugs and cell lines, providing a more naturally intuitive
+#' interface and simplifying analyses between several datasets. As such, it was
+#' designed to be flexible enough to hold datasets of two different natures
+#' while providing a common interface. The class can accomidate datasets
+#' containing both drug dose response data, as well as datasets contaning
+#' genetic profiles of cell lines pre and post treatement with compounds, known
 #' respecitively as sensitivity and perturbation datasets.
-#' 
+#'
 #' @param object A \code{PharmacoSet} object
-#' @param mDataType A \code{character} with the type of molecular data to 
+#' @param mDataType A \code{character} with the type of molecular data to
 #'   return/update
 #' @param value A replacement value
-#' 
+#'
 #' @slot annotation A \code{list} of annotation data about the PharmacoSet,
 #'    including the \code{$name} and the session information for how the object
 #'    was creating, detailing the exact versions of R and all the packages used
-#' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment} 
-#'   type object for holding data for RNA, DNA, SNP and CNV 
-#'   measurements, with associated \code{fData} and \code{pData} 
+#' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment}
+#'   type object for holding data for RNA, DNA, SNP and CNV
+#'   measurements, with associated \code{fData} and \code{pData}
 #'   containing the row and column metadata
-#' @slot cell A \code{data.frame} containing the annotations for all the cell 
+#' @slot cell A \code{data.frame} containing the annotations for all the cell
 #'   lines profiled in the data set, across all data types
-#' @slot drug A \code{data.frame} containg the annotations for all the drugs 
+#' @slot drug A \code{data.frame} containg the annotations for all the drugs
 #'   profiled in the data set, across all data types
-#' @slot sensitivity A \code{list} containing all the data for the sensitivity 
-#'   experiments, including \code{$info}, a \code{data.frame} containing the 
-#'   experimental info,\code{$raw} a 3D \code{array} containing raw data, 
-#'   \code{$profiles}, a \code{data.frame} containing sensitivity profiles 
-#'   statistics, and \code{$n}, a \code{data.frame} detailing the number of 
+#' @slot sensitivity A \code{list} containing all the data for the sensitivity
+#'   experiments, including \code{$info}, a \code{data.frame} containing the
+#'   experimental info,\code{$raw} a 3D \code{array} containing raw data,
+#'   \code{$profiles}, a \code{data.frame} containing sensitivity profiles
+#'   statistics, and \code{$n}, a \code{data.frame} detailing the number of
 #'   experiments for each cell-drug pair
-#' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame} 
+#' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame}
 #'   summarizing the available perturbation data,
-#' @slot curation A \code{list} containing mappings for \code{$drug}, 
-#'   \code{cell}, \code{tissue} names  used in the data set to universal 
+#' @slot curation A \code{list} containing mappings for \code{$drug},
+#'   \code{cell}, \code{tissue} names  used in the data set to universal
 #'   identifiers used between different PharmacoSet objects
-#' @slot datasetType A \code{character} string of 'sensitivity', 
-#'   'perturbation', or both detailing what type of data can be found in the 
+#' @slot datasetType A \code{character} string of 'sensitivity',
+#'   'perturbation', or both detailing what type of data can be found in the
 #'   PharmacoSet, for proper processing of the data
-#'  
-#' @importClassesFrom CoreGx CoreSet 
-#' @importClassesFrom CoreGx LongTable 
+#'
+#' @importClassesFrom CoreGx CoreSet
+#' @importClassesFrom CoreGx LongTable
 #' @importClassesFrom CoreGx TreatmentResponseExperiment
 #'
 #' @return An object of the PharmacoSet class
@@ -66,7 +66,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 # The default constructor above does a poor job of explaining the required
 # structure of a PharmacoSet. The constructor function defined below guides the
 # user into providing the required components of the curation and senstivity
-# lists and hides the annotation slot which the user does not need to manually 
+# lists and hides the annotation slot which the user does not need to manually
 # fill. This also follows the design of the Expression Set class.
 
 #####
@@ -74,21 +74,21 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #####
 
 #' PharmacoSet constructor
-#' 
-#' A constructor that simplifies the process of creating PharmacoSets, as well 
+#'
+#' A constructor that simplifies the process of creating PharmacoSets, as well
 #' as creates empty objects for data not provided to the constructor. Only
 #' objects returned by this constructor are expected to work with the PharmacoSet
 #' methods. For a much more detailed instruction on creating PharmacoSets, please
 #' see the "CreatingPharmacoSet" vignette.
-#' 
-#' @examples  
+#'
+#' @examples
 #' ## For help creating a PharmacoSet object, please see the following vignette:
 #' browseVignettes("PharmacoGx")
-#' 
+#'
 ##TODO:: Determine how to generalise the constructor documentation in CoreGx
 ## to make sense with all three packages which depend on it. For now it says
 ## CoreSet instead of PharmacoSet
-##TODO:: Determine if there is any way to execute R code when making roxygen2: 
+##TODO:: Determine if there is any way to execute R code when making roxygen2:
 #>Yes there is via @eval
 ## documentation. Then we could use a variable to fill in the class for each
 ## package.
@@ -116,7 +116,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #   PharmacoSet, for proper processing of the data
 # @param verify \code{boolean} Should the function verify the PharmacoSet and
 #   print out any errors it finds after construction?
-#' 
+#'
 #' @return An object of class PharmacoSet
 #
 #' @import methods
@@ -125,14 +125,14 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom SummarizedExperiment rowData colData assay assays assayNames Assays
 #' @importFrom S4Vectors DataFrame SimpleList metadata
 #' @importFrom CoreGx CoreSet
-#' 
+#'
 #' @export
-PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(), 
-        drug=data.frame(), sensitivityInfo=data.frame(), 
-        sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
-        sensitivityN=matrix(nrow=0, ncol=0), 
-        perturbationN=array(NA, dim=c(0,0,0)), curationDrug=data.frame(), 
-        curationCell = data.frame(), curationTissue = data.frame(), 
+PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
+        drug=data.frame(), sensitivityInfo=data.frame(),
+        sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(),
+        sensitivityN=matrix(nrow=0, ncol=0),
+        perturbationN=array(NA, dim=c(0,0,0)), curationDrug=data.frame(),
+        curationCell = data.frame(), curationTissue = data.frame(),
         datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE) {
 
     datasetType <- match.arg(datasetType)
@@ -143,13 +143,13 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
 
-    ## TODO:: If the colnames and rownames are not found below, it will fill 
+    ## TODO:: If the colnames and rownames are not found below, it will fill
     ##>with NAs. This is undersirable behaviour.
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     ## TODO:: Determine if I should use SummarizedExperiment construtor here?
     for (i in seq_along(molecularProfiles)) {
         if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
-            stop(sprintf("Please provide the %s data as a SummarizedExperiment", 
+            stop(sprintf("Please provide the %s data as a SummarizedExperiment",
                 names(molecularProfiles[i])))
         } else {
             rowData(molecularProfiles[[i]]) <- rowData(molecularProfiles[[i]])[
@@ -179,7 +179,7 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     curation$drug <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
     curation$cell <- as.data.frame(curationCell, stringsAsFactors = FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
-    ### TODO:: Make sure to fix the curation to check for matching row names 
+    ### TODO:: Make sure to fix the curation to check for matching row names
     ##> to the drug and cell line matrices!
 
     perturbation <- list()
@@ -254,11 +254,11 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
         stop ('Data type must be either sensitivity or both')
     }
     ## unique drug identifiers
-    # drugn <- sort(unique(object@sensitivity$info[ , 'drugid']))   
+    # drugn <- sort(unique(object@sensitivity$info[ , 'drugid']))
     ## consider all drugs
     drugn <- rownames(object@drug)
     ## unique drug identifiers
-    # celln <- sort(unique(object@sensitivity$info[ , 'cellid']))   
+    # celln <- sort(unique(object@sensitivity$info[ , 'cellid']))
     ## consider all cell lines
     celln <- rownames(object@cell)
     sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn),
@@ -291,7 +291,7 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
     celln <- rownames(object@cell)
 
     perturbation.info <- array(0, dim=c(length(celln), length(drugn),
-        length(molecularProfilesSlot(object))), 
+        length(molecularProfilesSlot(object))),
         dimnames=list(celln, drugn, names((molecularProfilesSlot(object))))
     )
 
@@ -303,7 +303,7 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
                 colData(molecularProfilesSlot(object)[[i]])[, 'cellid'],
                 colData(object@molecularProfiles[[i]])[, 'drugid']
             )
-        perturbation.info[rownames(tt), colnames(tt), 
+        perturbation.info[rownames(tt), colnames(tt),
             names(object@molecularProfiles)[i]] <- tt
         }
     }
@@ -538,16 +538,16 @@ checkPsetStructure <-
 ### -------------------------------------------------------------------------
 
 #' Show a PharamcoSet
-#' 
+#'
 #' @param object \code{PharmacoSet}
-#' 
+#'
 #' @examples
 #' data(CCLEsmall)
 #' CCLEsmall
-#' 
-#' @return Prints the PharmacoSet object to the output stream, and returns 
-#'   invisible NULL. 
-#' 
+#'
+#' @return Prints the PharmacoSet object to the output stream, and returns
+#'   invisible NULL.
+#'
 #'  @importFrom CoreGx show
 #'  @importFrom methods callNextMethod
 #'
@@ -557,7 +557,7 @@ setMethod('show', signature=signature(object='PharmacoSet'), function(object) {
 })
 
 #' Get the dimensions of a PharmacoSet
-#' 
+#'
 #' @param x PharmacoSet
 #' @return A named vector with the number of Cells and Drugs in the PharmacoSet
 #' @export
@@ -583,7 +583,7 @@ updateDrugId <- function(object, new.ids = vector('character')){
     myx <- match(sensitivityInfo(object)[,'drugid'],rownames(drugInfo(object)))
     sensitivityInfo(object)[,'drugid'] <- new.ids[myx]
   }
-  
+
   if(object@datasetType == 'perturbation' | object@datasetType == 'both'){
     object@molecularProfiles <- lapply(object@molecularProfiles, function(SE) {
 
@@ -595,7 +595,7 @@ updateDrugId <- function(object, new.ids = vector('character')){
 
   if(any(duplicated(new.ids))){
     warning('Duplicated ids passed to updateDrugId. Merging old ids into the same identifier')
-    
+
     if(ncol(sensNumber(object))>0){
       sensMatch <- match(colnames(sensNumber(object)), rownames(drugInfo(object)))
     }
@@ -659,5 +659,3 @@ updateDrugId <- function(object, new.ids = vector('character')){
 
   return(object)
 }
-
-
