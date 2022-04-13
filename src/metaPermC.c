@@ -108,7 +108,7 @@ void sampleIdx(uint64_t N, uint64_t *permPointer, uint64_t *state){
 
 // This code is adapted from the quickstop reference implementation here: https://github.com/julianhecker/QUICK-STOP
 
-inline double log_denom(uint64_t suc,uint64_t n, double p)
+double log_denom(uint64_t suc,uint64_t n, double p)
 {
    double tmp=0;
    if(fabs(p)>pow(10,-16))

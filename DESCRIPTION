@@ -46,7 +46,8 @@ Imports:
     jsonlite,
     data.table,
     glue,
-    checkmate
+    checkmate,
+    boot
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)

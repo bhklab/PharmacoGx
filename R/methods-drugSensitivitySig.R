@@ -44,6 +44,13 @@
 #' @param molecular.cutoff Allows the user to binarize the sensitivity data using this threshold. 
 #' @param molecular.cutoff.direction `character` One of "less" or "greater", allows to set direction of binarization. 
 #' @param verbose `logical` 'TRUE' if the warnings and other informative message shoud be displayed
+#' @param parallel.on One of "gene" or "drug", chooses which level to parallelize computation (by gene, or by drug).
+#' @param modeling.method One of "anova" or "pearson". If "anova", nested linear models (including and excluding the molecular feature) adjusted for 
+#'   are fit after the data is standardized, and ANOVA is used to estimate significance. If "pearson", partial correlation adjusted for tissue of origin are 
+#'   fit to the data, and a Pearson t-test (or permutation) test are used. Note that the difference is in whether standardization is done across the whole 
+#'   dataset (anova) or within each tissue (pearson), as well as the test applied. 
+#' @param inference.method Should "analytic" or "resampling" (permutation testing + bootstrap) inference be used to estimate significance. 
+#'   For permutation testing, QUICK-STOP is used to adaptively stop permutations. Resampling is currently only implemented for "pearson" modelling method. 
 #' @param ... additional arguments not currently fully supported by the function
 #' 
 #' @return `array` a 3D array with genes in the first dimension, drugs in the
@@ -59,11 +66,12 @@ setMethod("drugSensitivitySig",
                     returnValues = c("estimate", "pvalue", "fdr"),
                     sensitivity.cutoff, standardize = c("SD", "rescale", "none"), molecular.cutoff = NA,
                     molecular.cutoff.direction = c("less", "greater"), 
-                    nthread = 1, parallel.on = c("gene", "drug"), verbose=TRUE, ...){
+                    nthread = 1, parallel.on = c("drug", "gene"),  modeling.method = c("anova", "pearson"),
+                    inference.method = c("analytic", "resampling"), verbose=TRUE, ...){
             .drugSensitivitySigPharmacoSet(object, mDataType, drugs, features, cells, tissues, sensitivity.measure,
                                            molecular.summary.stat, sensitivity.summary.stat, returnValues,
                                            sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction, 
-                                           nthread, parallel.on, verbose, ...)
+                                           nthread, parallel.on, modeling.method, inference.method, verbose, ...)
           })
 
 #' @import parallel
@@ -84,6 +92,8 @@ setMethod("drugSensitivitySig",
  molecular.cutoff.direction = c("less", "greater"),
  nthread = 1,
  parallel.on = c("drug", "gene"),
+ modeling.method = c("anova", "pearson"),
+ inference.method = c("analytic", "resampling"),
  verbose=TRUE, 
  ...) 
 {
@@ -103,7 +113,10 @@ setMethod("drugSensitivitySig",
   parallel.on <- match.arg(parallel.on)
   dots <- list(...)
   ndots <- length(dots)
-
+  modeling.method <- match.arg(modeling.method)
+  inference.method <- match.arg(inference.method)
+  
+  
   
   if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
@@ -187,17 +200,13 @@ setMethod("drugSensitivitySig",
     features <- features[fix]
   }
   
-  if(is.null(dots[["modeling.method"]])){
-    modeling.method <- "anova"
-  } else {
-    modeling.method <- dots[["modeling.method"]]
-  }
-  if(is.null(dots[["inference.method"]])){
-    inference.method <- "analytic"
-  } else {
-    inference.method <- dots[["inference.method"]]
-  }
-
+  # if(missing(modeling.method)){
+  #   modeling.method <- "anova"
+  # } 
+  # 
+  # if(missing(inference.method)){
+  #   inference.method <- "analytic"
+  # } 
 
   if(is.null(dots[["sProfiles"]])){
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {

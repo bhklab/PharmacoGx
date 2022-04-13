@@ -38,7 +38,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
   inference.method <- match.arg(inference.method)
 
   if(modeling.method == "anova" && inference.method == "resampling") {
-    stop("Not yet implemented to do resampling based inference for anova model")
+    stop("Resampling based inference for anova model is not yet implemented.")
   }
 
   if(is.null(dim(drugpheno))){
