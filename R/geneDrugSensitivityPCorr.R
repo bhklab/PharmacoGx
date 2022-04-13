@@ -30,14 +30,16 @@ cor.boot <- function(data, w){
 #' @param test A \code{character} string indicating whether resampling or analytic based tests should be used
 #' @param req_alpha \code{numeric}, number of permutations for p value calculation
 #' @param nBoot \code{numeric}, number of bootstrap resamplings for confidence interval estimation
-#' @param conf.leve \code{numeric}, between 0 and 1. Size of the confidence interval required
+#' @param conf.level \code{numeric}, between 0 and 1. Size of the confidence interval required
+#' @param max_perm \code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA. 
+#'   Can be set globally by setting the option "PharmacoGx_Max_Perm", or left at the default of \code{ceiling(1/req_alpha*100)}.
 #' @param verbose \code{boolean} Should the function display messages?
 #'  
 #' @return A \code{vector} reporting the effect size (estimateof the coefficient 
 #'   of drug concentration), standard error (se), sample size (n), t statistic, 
 #'   and F statistics and its corresponding p-value.
 #'
-#' @importFrom stats sd complete.cases lm glm anova pf formula var
+#' @importFrom stats sd complete.cases lm glm anova pf formula var pt qnorm cor residuals runif 
 #' @importFrom boot boot boot.ci
 #' @importFrom coop pcor
 geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno, 

@@ -33,9 +33,12 @@ IC50 or AUC)}
 
 \item{nBoot}{\code{numeric}, number of bootstrap resamplings for confidence interval estimation}
 
-\item{verbose}{\code{boolean} Should the function display messages?}
+\item{conf.level}{\code{numeric}, between 0 and 1. Size of the confidence interval required}
 
-\item{conf.leve}{\code{numeric}, between 0 and 1. Size of the confidence interval required}
+\item{max_perm}{\code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA.
+Can be set globally by setting the option "PharmacoGx_Max_Perm", or left at the default of \code{ceiling(1/req_alpha*100)}.}
+
+\item{verbose}{\code{boolean} Should the function display messages?}
 }
 \value{
 A \code{vector} reporting the effect size (estimateof the coefficient
