@@ -47,7 +47,8 @@ Imports:
     data.table,
     glue,
     checkmate,
-    boot
+    boot,
+    coop
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
