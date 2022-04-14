@@ -30,20 +30,20 @@ test_that("Values returned as expected (previous runs of function).",{
 		logLogisticRegression(seq(-10,10,0.1), .Hill(seq(-10,10,0.1), c(1,0,0))
 			, conc_as_log=TRUE, viability_as_pct = FALSE, family="Cauchy"), list(1,0,0))
 
-	expect_equal(logLogisticRegression(c(1, 2, 3), c(70, 60, 50)), 
-        structure(list(HS = 0.766235008089789, E_inf = 0, EC50 = 3.14114781624406), Rsquare = 0.983872720888105), 
+	expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(99,70, 60, 50,40)), 
+        structure(list(HS = 1.28651256396627, E_inf = 36.2653101620223, EC50 = 1.1810533048852), Rsquare = 0.994776857838702), 
         tolerance=1e-3) #should run with no objections
 
-    expect_equal(logLogisticRegression(c(1, 2, 3), c(70, 60, 50), family="Cauchy"), 
-        structure(list(HS = 0.766099642757164, E_inf = 0, EC50 = 3.13883130512133), Rsquare = 0.983863295704847), 
+    expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(99,70, 60, 50,40), family="Cauchy"), 
+        structure(list(HS = 1.29137210106265, E_inf = 36.32166034246, EC50 = 1.17645746710051), Rsquare = 0.994810069836551), 
         tolerance=1e-3) #should run with no objections
 
-	expect_equal(logLogisticRegression(c(1, 2, 3), c(70, 60, 50), trunc=FALSE), 
-        structure(list(HS = 0.766234869170442, E_inf = 0, EC50 = 3.14114817741207), Rsquare = 0.983872721139933), 
+	expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(100,70, 60, 50,40), trunc=FALSE), 
+        structure(list(HS = 1.375, E_inf = 38.125, EC50 = 1.1139738599948), Rsquare = 0.992907719144335), 
         tolerance=1e-3) #should run with no objections
 
-    expect_equal(logLogisticRegression(c(1, 2, 3), c(70, 60, 50), family="Cauchy", trunc=FALSE), 
-        structure(list(HS = 0.766099642757164, E_inf = 0, EC50 = 3.13883130512133), Rsquare = 0.983863295704847),
+    expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(100,70, 60, 50,40), trunc=FALSE, family="Cauchy"), 
+        structure(list(HS = 1.33972330068866, E_inf = 36.8279821440339, EC50 = 1.17127888613006), Rsquare = 0.993391659104375),
         tolerance=1e-3) #should run with no objections
 
     ## These next few tests make sure trunc is doing something sensible
