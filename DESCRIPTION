@@ -1,7 +1,7 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.7.0
+Version: 2.99.0
 Date: 2021-10-24
 Authors@R: c(
     person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
@@ -32,16 +32,16 @@ Imports:
     MultiAssayExperiment,
     BiocParallel,
     ggplot2,
-    magicaxis, 
-    RColorBrewer, 
-    parallel, 
-    caTools, 
-    methods, 
-    downloader, 
-    stats, 
-    utils, 
-    graphics, 
-    grDevices, 
+    magicaxis,
+    RColorBrewer,
+    parallel,
+    caTools,
+    methods,
+    downloader,
+    stats,
+    utils,
+    graphics,
+    grDevices,
     reshape2,
     jsonlite,
     data.table,
@@ -57,7 +57,7 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate: 
+Collate:
     'ComputeGR.R'
     'GR.R'
     'GWC.R'
