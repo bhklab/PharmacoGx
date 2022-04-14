@@ -10,14 +10,14 @@ test_that("Function complains when given insensible input",{
 	# 		# 	viability1 = c(50, 60, 70),
 	# 	Hill_fit2 = c(0.5, 0.2, 1)))
 
-	expect_error(computeIC50(concentration = c(1, 2), viability = c(50, 60, 70)), "is not of same length") #should complain
-	expect_error(computeIC50(concentration = c(-1, 2, 3),viability = c(50, 60, 70),conc_as_log = FALSE),"Negative concentrations encountered") #should complain
+	expect_error(computeIC50(concentration = c(1, 2, 3, 5), viability = c(50, 60, 70)), "is not of same length") #should complain
+	expect_error(computeIC50(concentration = c(-1, 2, 3),viability = c(50, 60, 70),conc_as_log = FALSE),"'x_as_log' flag may be set incorrectly") #should complain
 	##TO-DO:: Add wanring strings to expect_warning call
-	expect_warning(expect_error(computeIC50(concentration = c(NA, "cat", 3), viability = c(50, 60, 70), conc_as_log = FALSE), "Concentration vector contains elements which are not real numbers.")) #should complain
-	expect_error(computeIC50(concentration = c(1, 2, Inf), viability = c(50, 60, 70)), "Concentration vector contains elements which are not real numbers.") #should complain
+	expect_error(computeIC50(concentration = c(NA, "cat", 3), viability = c(50, 60, 70), conc_as_log = FALSE), "real numbers") #should complain
+	expect_error(computeIC50(concentration = c(1, 2, Inf), viability = c(50, 60, 70)), "real numbers, NA-values, and/or -Inf") #should complain
 	expect_warning(computeIC50(concentration = c(1, 2, 3),
 		viability = c(.50, .60, .70),
-		viability_as_pct = TRUE), "viability_as_pct") #should complain
+		viability_as_pct = TRUE), "as_pct") #should complain
 	expect_error(computeIC50()) #should complain
 })
 

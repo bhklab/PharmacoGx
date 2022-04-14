@@ -6,6 +6,8 @@ PharmacoGx.Rproj
 */.DS_store
 */figure
 doc
+Meta
+*/*.so
 ^PSets/*
 ..Rcheck/.*
 ^.*Rcheck
@@ -16,3 +18,4 @@ check/*
 PSets/**
 local_data/**
 .VSCodeCounter/**
+*.o

@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Stardardized Molecular Data names and annotations for PSets
 
 This document will describe two things: First, we document the currently required standards for naming, annotating, and including molecular data into psets.\
@@ -17,6 +22,35 @@ Currently, there is a mixed bag of molecular data names used across psets, as no
 
 Currently, we meet the following names in PSets downloaded from orcestra:
 
+<<<<<<< HEAD
++---------------------------------+--------------------------------------------------------------+
+| Name                            | Data type                                                    |
++=================================+==============================================================+
+| rnaseq                          | rnaseq (gene tpm??)                                          |
++---------------------------------+--------------------------------------------------------------+
+| rna                             | microarray rna                                               |
++---------------------------------+--------------------------------------------------------------+
+| Kallisto_0.46.1.rnaseq          | rnaseq gene level tpm                                        |
++---------------------------------+--------------------------------------------------------------+
+| Kallisto_0.46.1.rnaseq.counts   | rnaseq gene level counts                                     |
++---------------------------------+--------------------------------------------------------------+
+| Kallisto_0.46.1.isoforms        | rnaseq isoform level tpm                                     |
++---------------------------------+--------------------------------------------------------------+
+| Kallisto_0.46.1.isoforms.counts | rnaseq isoform level counts                                  |
++---------------------------------+--------------------------------------------------------------+
+| cnv                             | snp array derived copy number                                |
++---------------------------------+--------------------------------------------------------------+
+| mutation                        | mutation data, at protein level                              |
++---------------------------------+--------------------------------------------------------------+
+| fusion                          | presence of fusion data, as binary                           |
++---------------------------------+--------------------------------------------------------------+
+| mutationall                     | mutation data, at protein level                              |
++---------------------------------+--------------------------------------------------------------+
+| mutationchosen                  | mutation data, at protein level                              |
++---------------------------------+--------------------------------------------------------------+
+| mutation_exome                  | mutation data, at protein level, specifically from exome seq |
++---------------------------------+--------------------------------------------------------------+
+=======
 | Name                            | Data type                                                    |
 |---------------------------------|--------------------------------------------------------------|
 | rnaseq                          | rnaseq (gene tpm??)                                          |
@@ -32,6 +66,7 @@ Currently, we meet the following names in PSets downloaded from orcestra:
 | mutationchosen                  | mutation data, at protein level                              |
 | mutation_exome                  | mutation data, at protein level, specifically from exome seq |
 
+>>>>>>> master
 
 Of these, `show` is aware of:
 

@@ -22,6 +22,9 @@ analysis.}
   molecular.cutoff = NA,
   molecular.cutoff.direction = c("less", "greater"),
   nthread = 1,
+  parallel.on = c("drug", "gene"),
+  modeling.method = c("anova", "pearson"),
+  inference.method = c("analytic", "resampling"),
   verbose = TRUE,
   ...
 )
@@ -69,6 +72,16 @@ interquantile range lies in [0,1]. If none no rescaling is done.}
 
 \item{nthread}{\code{numeric} if multiple cores are available, how many cores
 should the computation be parallelized over?}
+
+\item{parallel.on}{One of "gene" or "drug", chooses which level to parallelize computation (by gene, or by drug).}
+
+\item{modeling.method}{One of "anova" or "pearson". If "anova", nested linear models (including and excluding the molecular feature) adjusted for
+are fit after the data is standardized, and ANOVA is used to estimate significance. If "pearson", partial correlation adjusted for tissue of origin are
+fit to the data, and a Pearson t-test (or permutation) test are used. Note that the difference is in whether standardization is done across the whole
+dataset (anova) or within each tissue (pearson), as well as the test applied.}
+
+\item{inference.method}{Should "analytic" or "resampling" (permutation testing + bootstrap) inference be used to estimate significance.
+For permutation testing, QUICK-STOP is used to adaptively stop permutations. Resampling is currently only implemented for "pearson" modelling method.}
 
 \item{verbose}{\code{logical} 'TRUE' if the warnings and other informative message shoud be displayed}
 

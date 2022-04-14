@@ -46,8 +46,11 @@ Imports:
     jsonlite,
     data.table,
     glue,
-    checkmate
+    checkmate,
+    boot,
+    coop
 Depends: R (>= 3.6), CoreGx
+LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
@@ -64,6 +67,7 @@ Collate:
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'PharmacoSet-utils.R'
+    'RcppExports.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
@@ -87,9 +91,12 @@ Collate:
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
+    'geneDrugSensitivityPBCorr.R'
+    'geneDrugSensitivityPCorr.R'
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
+    'mergePSets.R'
     'methods-[.R'
     'methods-drugSensitivitySig.R'
     'methods-intersect.R'

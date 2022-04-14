@@ -8,8 +8,8 @@
 #' PatternSearch algorithm to fit a log-logistic curve to the data.
 #'
 #' @examples
-#' dose <- c("0.0025","0.008","0.025","0.08","0.25","0.8","2.53","8") 
-#' viability <- c("108.67","111","102.16","100.27","90","87","74","57")
+#' dose <- c(0.0025,0.008,0.025,0.08,0.25,0.8,2.53,8) 
+#' viability <- c(108.67,111,102.16,100.27,90,87,74,57)
 #' computeAUC(dose, viability)
 #' 
 #' @param conc `numeric` is a vector of drug concentrations.
@@ -42,7 +42,11 @@
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before 
 #' curve-fitting is performed.
 #' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
-#' @return A vector containing estimates for HS, E_inf, and EC50
+#' @return A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquared, which is the R^2 of the fit. 
+#' Note that this is calculated using the values actually used for the fit, after truncation and any transform applied. With truncation, this will be 
+#' different from the R^2 compared to the variance of the raw data. This also means that if all points were truncated down or up, there is no variance 
+#' in the data, and the R^2 may be NaN. 
+#'
 #' @export
 #' 
 #' @importFrom CoreGx .meshEval .residual
@@ -60,7 +64,7 @@ logLogisticRegression <- function(conc,
                                   conc_as_log = FALSE,
                                   viability_as_pct = TRUE,
                                   trunc = TRUE,
-                                  verbose = FALSE) {
+                                  verbose = TRUE) {
   # guess <- .logLogisticRegressionRaw(conc, viability, density , step, precision, lower_bounds, upper_bounds, scale, Cauchy_flag, conc_as_log, viability_as_pct, trunc, verbose)
 
 
@@ -78,6 +82,7 @@ logLogisticRegression <- function(conc,
 #                                   trunc = TRUE,
 #                                   verbose = FALSE) {
   family <- match.arg(family)
+
 
   if (prod(is.finite(step)) != 1) {
     print(step)
@@ -149,16 +154,39 @@ logLogisticRegression <- function(conc,
     print(scale)
     stop("Scale parameter is a nonpositive number.")
   }
-  
-  cleanData  <- sanitizeInput(conc=conc,
-            viability=viability,
-            conc_as_log = conc_as_log,
-            viability_as_pct = viability_as_pct,
-            trunc = trunc,
-            verbose=verbose)
+ 
 
-  log_conc <- cleanData[["log_conc"]]
-  viability <- cleanData[["viability"]]
+
+
+
+  CoreGx::.sanitizeInput(x = conc,
+                         y = viability,
+                         x_as_log = conc_as_log,
+                         y_as_log = FALSE,
+                         y_as_pct = viability_as_pct,
+                         trunc = trunc,
+                         verbose = verbose)
+
+  cleanData <- CoreGx::.reformatData(x = conc,
+                               y = viability,
+                               x_to_log = !conc_as_log,
+                               y_to_log = FALSE,
+                               y_to_frac = viability_as_pct,
+                               trunc = trunc)
+
+  if (!(all(lower_bounds < upper_bounds))) {
+    if (verbose == 2) {
+      message("lower_bounds:")
+      message(lower_bounds)
+      message("upper_bounds:")
+      message(upper_bounds)
+    }
+    stop ("All lower bounds must be less than the corresponding upper_bounds.")
+  }
+
+
+  log_conc <- cleanData[["x"]]
+  viability <- cleanData[["y"]]
   
   
   #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
@@ -166,102 +194,28 @@ logLogisticRegression <- function(conc,
   gritty_guess <- c(pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
                     pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
                     pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]), upper_bounds[3]))
-  guess <- tryCatch(optim(par=gritty_guess,#par = sieve_guess,
-                          fn = function(x) {.residual(log_conc,
-                                                      viability,
-                                                      pars = x,
-                                                      n = median_n,
-                                                      scale = scale,
-                                                      family = family,
-                                                      trunc = trunc)
-                          },
-                          lower = lower_bounds,
-                          upper = upper_bounds,
-                          method = "L-BFGS-B",
-                          #control=list(maxit=100000)
-                          ),#[[1]],
-                    error = function(e) {
-                      list("par"=gritty_guess, "convergence"=-1)
-                    })
-  # if(guess[["convergence"]]!=0)  print(guess[["message"]]); #print(results[["convergence"]])
-  failed = guess[["convergence"]]!=0
-  guess <- guess[["par"]]
   
-  guess_residual <- .residual(log_conc,
-                              viability,
-                              pars = guess,
-                              n = median_n,
+
+  guess <- CoreGx::.fitCurve(x = log_conc,
+                              y = viability,
+                              f = PharmacoGx:::.Hill,
+                              density = density,
+                              step = step,
+                              precision = precision,
+                              lower_bounds = lower_bounds,
+                              upper_bounds = upper_bounds,
                               scale = scale,
                               family = family,
-                              trunc = trunc)
-  
+                              median_n = median_n,
+                              trunc = trunc,
+                              verbose = verbose,
+                              gritty_guess = gritty_guess,
+                              span = 1)
 
-  #GENERATE INITIAL GUESS BY OBJECTIVE FUNCTION EVALUATION AT LATTICE POINTS
-
-  gritty_guess_residual <- .residual(log_conc,
-                                    viability,
-                                    pars = gritty_guess,
-                                    n = median_n,
-                                    scale = scale,
-                                    family = family,
-                                    trunc = trunc)
-  
-
-  #CHECK SUCCESS OF L-BFGS OPTIMIZAITON AND RE-OPTIMIZE WITH A PATTERN SEARCH IF NECESSARY
-  if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-    #GENERATE INITIAL GUESS BY OBJECTIVE FUNCTION EVALUATION AT LATTICE POINTS
-    sieve_guess <- .meshEval(log_conc,
-                           viability,
-                           lower_bounds = lower_bounds,
-                           upper_bounds = upper_bounds,
-                           density = density,
-                           n=median_n,
-                           scale = scale,
-                           family = family,
-                           trunc = trunc)
-
-    sieve_guess_residual <- .residual(log_conc,
-                                    viability,
-                                    pars = sieve_guess,
-                                    n = median_n,
-                                    scale = scale,
-                                    family = family,
-                                    trunc = trunc)
-
-    guess <- sieve_guess
-    guess_residual <- sieve_guess_residual
-    span <- 1
-    
-    while (span > precision) {
-      neighbours <- rbind(guess, guess, guess, guess, guess, guess)
-      neighbour_residuals <- matrix(NA, nrow=1, ncol=6)
-      neighbours[1, 1] <- pmin(neighbours[1, 1] + span * step[1], upper_bounds[1])
-      neighbours[2, 1] <- pmax(neighbours[2, 1] - span * step[1], lower_bounds[1])
-      neighbours[3, 2] <- pmin(neighbours[3, 2] + span * step[2], upper_bounds[2])
-      neighbours[4, 2] <- pmax(neighbours[4, 2] - span * step[2], lower_bounds[2])
-      neighbours[5, 3] <- pmin(neighbours[5, 3] + span * step[3], upper_bounds[3])
-      neighbours[6, 3] <- pmax(neighbours[6, 3] - span * step[3], lower_bounds[3])
-      
-      for (i in seq_len(nrow(neighbours))) {
-        neighbour_residuals[i] <- .residual(log_conc,
-                                            viability,
-                                            pars = neighbours[i, ],
-                                            n = median_n,
-                                            scale = scale,
-                                            family = family,
-                                            trunc = trunc)
-      }
-      
-      if (min(neighbour_residuals) < guess_residual) {
-        guess <- neighbours[which.min(neighbour_residuals), ]
-        guess_residual <- min(neighbour_residuals)
-      } else {
-        span <- span / 2
-      }
-    }
-  }
-
-  return(list("HS" = guess[1],
+  returnval <- list("HS" = guess[1],
               "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
-              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3])))
+              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3]))
+  attr(returnval, "Rsquare") <- attr(guess, "Rsquare")
+
+  return(returnval)
 }
