@@ -115,7 +115,7 @@ setMethod(drugInfo, signature=c(object='PharmacoSet'), function(object) {
 setReplaceMethod("drugInfo", signature(object="PharmacoSet",
     value="data.frame"), function(object, value)
 {
-    object@drug <- value
+    object@treatment <- value
     object
 })
 
@@ -144,7 +144,7 @@ setReplaceMethod("drugInfo", signature(object="PharmacoSet",
 #' @rdname PharmacoSet-accessors
 #' @eval .docs_PharmacoSet_get_drugNames(class_=.local_class, data_=.local_data)
 setMethod(drugNames, signature="PharmacoSet", function(object) {
-  rownames(drugInfo(object))
+    rownames(drugInfo(object))
 })
 
 .docs_PharmacoSet_set_drugNames <- function(...) .parseToRoxygen(
@@ -255,26 +255,31 @@ setReplaceMethod('name', signature("PharmacoSet"), function(object, value){
 })
 
 ## ==============
-## ---- cell slot
+## ---- sample slot
 ## --------------
 
 
 ##
-## == cellInfo
+## == sampleInfo
 
+.local_sample <- "cell"
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_get_cellInfo(class_=.local_class)
-#' @importFrom CoreGx cellInfo
-setMethod(cellInfo, "PharmacoSet", function(object){
+#' @eval CoreGx:::.docs_CoreSet_get_sampleInfo(class_=.local_class, sample_=.local_sample)
+#' @importFrom CoreGx sampleInfo
+setMethod("sampleInfo", "PharmacoSet", function(object) {
     callNextMethod(object)
 })
 
+## FIXME:: Do I need this? Maybe the aliased generic from CoreGx already does this?
+# #' @export
+# cellInfo <- sampleInfo
+
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_set_cellInfo(class_=.local_class,
-#' data_=.local_data)
+#' @eval CoreGx:::.docs_CoreSet_set_sampleInfo(class_=.local_class,
+#' data_=.local_data, sample_="cell")
 #' @importFrom CoreGx cellInfo<-
-setReplaceMethod("cellInfo", signature(object="PharmacoSet",
+setReplaceMethod("sampleInfo", signature(object="PharmacoSet",
     value="data.frame"), function(object, value)
 {
     callNextMethod(object, value=value)
@@ -282,25 +287,24 @@ setReplaceMethod("cellInfo", signature(object="PharmacoSet",
 
 
 ##
-## == cellNames
+## == sampleNames
 
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_get_cellNames(class_=.local_class,
-#' data_=.local_data)
-#' @importMethodsFrom CoreGx cellNames
-setMethod(cellNames, signature("PharmacoSet"), function(object){
+#' @eval CoreGx:::.docs_CoreSet_get_sampleNames(class_=.local_class,
+#' data_=.local_data, sample_=.local_sample)
+#' @importMethodsFrom CoreGx sampleNames
+setMethod("sampleNames", signature("PharmacoSet"), function(object) {
     callNextMethod(object)
 })
 
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_set_cellNames(class_=.local_class,
-#' data_=.local_data)
-#' @importMethodsFrom CoreGx cellNames<-
-setReplaceMethod("cellNames", signature(object="PharmacoSet",value="character"),
-  function(object, value)
-{
+#' @eval CoreGx:::.docs_CoreSet_set_sampleNames(class_=.local_class,
+#' data_=.local_data, sample_=.local_sample)
+#' @importMethodsFrom CoreGx sampleNames<-
+setReplaceMethod("sampleNames", signature(object="PharmacoSet", value="character"),
+        function(object, value) {
     callNextMethod(object=object, value=value)
 })
 
@@ -649,7 +653,7 @@ setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
 #' @eval CoreGx:::.docs_CoreSet_set_sensitivitySlot(class_=.local_class,
 #' data_=.local_data)
 setReplaceMethod('sensitivitySlot', signature(object='PharmacoSet',
-    value='list_or_LongTable'), function(object, value)
+    value='list_OR_LongTable'), function(object, value)
 {
     callNextMethod(object=object, value=value)
 })

@@ -27,9 +27,6 @@ PharmacoSet(
 \item{molecularProfiles}{A \code{list} of SummarizedExperiment objects containing
 molecular profiles for each molecular data type.}
 
-\item{cell}{A \code{data.frame} containing the annotations for all the cell
-lines profiled in the data set, across all data types}
-
 \item{drug}{A \code{data.frame} containg the annotations for all the drugs}
 
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the
@@ -69,7 +66,6 @@ methods. For a much more detailed instruction on creating PharmacoSets, please
 see the "CreatingPharmacoSet" vignette.
 }
 \examples{
- 
 ## For help creating a PharmacoSet object, please see the following vignette:
 browseVignettes("PharmacoGx")
 
