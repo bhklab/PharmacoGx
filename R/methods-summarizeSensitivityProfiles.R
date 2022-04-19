@@ -25,15 +25,15 @@
 #' @param fill.missing \code{boolean} should the missing cell lines not in the
 #'   molecular data object be filled in with missing values?
 #' @param verbose Should the function print progress messages?
-#' 
+#'
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
-#'   
+#'
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-        function(object, sensitivity.measure="auc_recomputed", cell.lines, 
-        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"), 
+        function(object, sensitivity.measure="auc_recomputed", cell.lines,
+        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
         fill.missing=TRUE, verbose=TRUE) {
     if (is(sensitivitySlot(object), 'LongTable'))
         .summarizeSensProfiles(object, sensitivity.measure,
@@ -52,7 +52,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
-        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat, 
+        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat,
         fill.missing=TRUE) {
 
     # handle missing
@@ -70,7 +70,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     # compute max concentration and add it to the profiles
     if (sensitivity.measure == 'max.conc') {
         dose <- copy(assay(longTable, 'dose', withDimnames=TRUE, key=FALSE))
-        dose[, max.conc := max(.SD, na.rm=TRUE), 
+        dose[, max.conc := max(.SD, na.rm=TRUE),
             .SDcols=grep('dose\\d+id', colnames(dose))]
         dose <- dose[, .SD, .SDcols=!grepl('dose\\d+id', colnames(dose))]
         sensProfiles <- dose[sensProfiles, on=idCols(longTable)]
@@ -103,7 +103,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     }
 
     # do the summary
-    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)), 
+    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)),
         by=.(drugid, cellid)]
 
     # NA pad the missing cells and drugs
@@ -137,7 +137,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 	summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
   if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(object)), "max.conc"))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
+    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
   if (missing(cell.lines)) {
     cell.lines <- cellNames(object)
@@ -172,7 +172,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 
   # if(verbose){
 
-  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, object@annotation$name))
+  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, annotation(object)$name))
   #   total <- length(drugs)*length(cell.lines)
   #   # create progress bar
   #   pb <- utils::txtProgressBar(min=0, max=total, style=3)

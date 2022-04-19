@@ -10,6 +10,7 @@ PharmacoSet2(
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
   treatmentResponse = TreatmentResponseExperiment(),
+  perturbation = list(),
   curation = list(sample = data.frame(), treatment = data.frame(), tissue =
     data.frame())
 )
