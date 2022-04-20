@@ -246,10 +246,10 @@ function(drug,
       responses2[[i]] <- viabilities[[i]]
       if(length(legends.label)>0){
         if(any(grepl("AUC", x=toupper(legends.label)))){
-          legend.values2[[i]] <- paste(legend.values2[i][[1]],sprintf("%s = %s", "AUC", round(computeAUC(concentrations[[i]],viabilities[[i]], conc_as_log=FALSE, viability_as_pct=TRUE)/100, digits=2)), sep=", ")
+          legend.values2[[i]] <- paste(legend.values2[i][[1]],sprintf("%s = %s", "AUC", round(computeAUC(concentrations[[i]],viabilities[[i]], conc_as_log=FALSE, viability_as_pct=TRUE)/100, digits=2, trunc=trunc)), sep=", ")
         }
         if(any(grepl("IC50", x=toupper(legends.label)))){
-          legend.values2[[i]] <- paste(legend.values2[i][[1]],sprintf("%s = %s", "IC50", round(computeIC50(concentrations[[i]],viabilities[[i]], conc_as_log=FALSE, viability_as_pct=TRUE), digits=2)), sep=", ")
+          legend.values2[[i]] <- paste(legend.values2[i][[1]],sprintf("%s = %s", "IC50", round(computeIC50(concentrations[[i]],viabilities[[i]], conc_as_log=FALSE, viability_as_pct=TRUE), digits=2, trunc=trunc)), sep=", ")
         }
 
       } else{ legend.values2[[i]] <- ""}
@@ -311,12 +311,12 @@ function(drug,
     switch(plot.type , "Actual"={
       lines(doses[[i]], responses[[i]], lty=1, lwd=lwd, col=mycol[i])
     }, "Fitted"={ 
-      log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]])
+      log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]], trunc=trunc)
       log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     },"Both"={
       lines(doses[[i]],responses[[i]],lty=1,lwd=lwd,col = mycol[i])
-      log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]])
+      log_logistic_params <- logLogisticRegression(conc = doses[[i]], viability = responses[[i]], trunc=trunc)
       log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
     })
