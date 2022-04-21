@@ -19,7 +19,7 @@
   \usepackage[utf8]{inputenc}
 \newlength{\cslhangindent}
 \setlength{\cslhangindent}{1.5em}
-\newenvironment{CSLReferences}%
+\newenvironment{cslreferences}%
 {\setlength{\parindent}{0pt}%
 \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces}%
 {\par}
@@ -144,13 +144,6 @@ $if(lang)$
   \usepackage[$lang$]{babel}
 \fi
 $endif$
-
-\newlength{\cslhangindent}
-\setlength{\cslhangindent}{1.5em}
-\newenvironment{CSLReferences}%
-{\setlength{\parindent}{0pt}%
-\everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces}%
-{\par}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Changes borrowed from @cboettig, added by @jhollist
