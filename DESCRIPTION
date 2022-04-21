@@ -54,13 +54,12 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate:
+Collate: 
     'ComputeGR.R'
     'GR.R'
     'GWC.R'
     'LogLogisticRegression.R'
     'MatthewCor.R'
-    'allGenerics.R'
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'PharmacoSet-utils.R'

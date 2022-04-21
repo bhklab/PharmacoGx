@@ -135,19 +135,19 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
       dd <- dd[ , rownames(pp), drop=FALSE]
     }
     if (!fill.missing) {
-      cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "cellid"]), "cellid"]))
+      cell.lines <- intersect(cell.lines, unique(pp[!is.na(pp[ , "sampleid"]), "sampleid"]))
     }
     if (length(cell.lines) == 0) {
       stop ("No cell lines in common")
     }
 
     ## select profiles with no replicates
-    duplix <- unique(pp[!is.na(pp[ , "cellid"]) & duplicated(pp[ , "cellid"]), "cellid"])
+    duplix <- unique(pp[!is.na(pp[ , "sampleid"]) & duplicated(pp[ , "sampleid"]), "sampleid"])
     ucell <- setdiff(cell.lines, duplix)
 
     ## keep the non ambiguous cases
-    dd2 <- dd[ , match(ucell, pp[ , "cellid"]), drop=FALSE]
-    pp2 <- pp[match(ucell, pp[ , "cellid"]), , drop=FALSE]
+    dd2 <- dd[ , match(ucell, pp[ , "sampleid"]), drop=FALSE]
+    pp2 <- pp[match(ucell, pp[ , "sampleid"]), , drop=FALSE]
     if (length(duplix) > 0) {
       if (verbose) {
         message(sprintf("Summarizing %s molecular data for:\t%s", mDataType, annotation(object)$name))
@@ -166,7 +166,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
       })
       ## there are some replicates to collapse
       for (x in duplix) {
-        myx <- which(!is.na(pp[ , "cellid"]) & is.element(pp[ , "cellid"], x))
+        myx <- which(!is.na(pp[ , "sampleid"]) & is.element(pp[ , "sampleid"], x))
         switch(summary.stat,
           "mean" = {
             ddt <- apply(dd[ , myx, drop=FALSE], 1, mean)
@@ -208,7 +208,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
     ## reorder cell lines
     dd2 <- dd2[ , cell.lines, drop=FALSE]
     pp2 <- pp2[cell.lines, , drop=FALSE]
-    pp2[ , "cellid"] <- cell.lines
+    pp2[ , "sampleid"] <- cell.lines
     res <- molecularProfilesSlot(object)[[mDataType]]
     if(S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation %in% c("mutation", "fusion")) {
       tt <- dd2
@@ -218,7 +218,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
     }
     res <- SummarizedExperiment::SummarizedExperiment(dd2)
     pp2 <- S4Vectors::DataFrame(pp2, row.names=rownames(pp2))
-    pp2$tissueid <- cellInfo(object)[pp2$cellid, "tissueid"]
+    pp2$tissueid <- cellInfo(object)[pp2$sampleid, "tissueid"]
     SummarizedExperiment::colData(res) <- pp2
     SummarizedExperiment::rowData(res) <- featureInfo(object, mDataType)
     ##TODO:: Generalize this to multiple assay SummarizedExperiments!

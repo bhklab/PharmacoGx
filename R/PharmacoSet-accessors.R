@@ -9,13 +9,26 @@
 ## method, while Ctrl +f '---- molecularProfiles' would take you to the slot
 ## section.
 
-#' @include PharmacoSet-class.R allGenerics.R
+#' @include PharmacoSet-class.R
 NULL
 
 ## Variables for dynamic inheritted roxygen2 docs
 
 .local_class <- 'PharmacoSet'
 .local_data <- 'CCLEsmall'
+
+#### CoreGx inherited methods
+####
+#### Note: The raw documentation lives in CoreGx, see the functions called
+#### in @eval tags for the content of the metaprogrammed roxygen2 docs.
+####
+#### See .parseToRoxygen method in utils-messages.R file of CoreGx to
+#### create similar metaprogrammed docs.
+####
+#### Warning: for dynamic docs to work, you must set
+#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### in the DESCRPTION file!
+
 
 #' @title .parseToRoxygen
 #'
@@ -53,7 +66,6 @@ NULL
 # --------------------------------------
 
 
-
 ## ==============
 ## ---- drug slot
 ## --------------
@@ -62,129 +74,44 @@ NULL
 ##
 ## == drugInfo
 
-#' @noRd
-.docs_PharmacoSet_get_drugInfo <- function(...) .parseToRoxygen(
-    "
-    @details
-
-    ## drug slot accessors
-
-    __drugInfo__: `data.frame` Retrieve the drug metadata from a
-    `{class_}` objects `@drug` slot.
-
-    @examples
-
-    ## drug slot
-
-    drugInfo({data_})
-
-    @md
-    @aliases drugInfo{class_}-method
-    @exportMethod drugInfo
-    ",
-    ...
-)
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_treatmentInfo(class_=.local_class,
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx treatmentInfo
+#' @aliases drugInfo
+drugInfo <- function(...) treatmentInfo(...)
 
 #' @rdname PharmacoSet-accessors
-#' @eval .docs_PharmacoSet_get_drugInfo(class_=.local_class, data_=.local_data)
-setMethod(drugInfo, signature=c(object='PharmacoSet'), function(object) {
-    object@drug
-})
+#' @eval CoreGx:::.docs_CoreSet_set_treatmentInfo(class_=.local_class,
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx treatmentInfo<-
+#' @aliases drugInfo<-
+`drugInfo<-` <- function(...) `treatmentInfo<-`(...)
 
-#' @noRd
-.docs_PharmacoSet_set_drugInfo <- function(...) .parseToRoxygen(
-    "
-    @details
-
-    __drugInfo__: Update the `@drug` slot of a `{class_}` object.
-    - value: `data.frame` of updated drug metadata to assign to a
-    `{class_}` objects `@drug` slot.
-
-    @examples
-    drugInfo({data_}) <- drugInfo({data_})
-
-    @md
-    @aliases drugInfo<-{class_},data.frame-method
-    @exportMethod drugInfo<-
-    ",
-    ...
-)
-
-#' @rdname PharmacoSet-accessors
-#' @eval .docs_PharmacoSet_set_drugInfo(class_=.local_class, data_=.local_data)
-setReplaceMethod("drugInfo", signature(object="PharmacoSet",
-    value="data.frame"), function(object, value)
-{
-    object@treatment <- value
-    object
-})
 
 
 ##
 ## == drugNames
 
 
-#' @noRd
-.docs_PharmacoSet_get_drugNames <- function(...) .parseToRoxygen(
-    "
-    @details
-    __drugNames__: `character()` The names of all drugs available in a specified
-    `{class_}` object.
+#' @rdname PharmacoSet-accessors
+#' @eval CoreGx:::.docs_CoreSet_get_treatmentNames(class_=.local_class,
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx treatmentNames
+#' @aliases drugNames
+#' @export
+drugNames <- function(...) treatmentNames(...)
 
-    @examples
-    drugNames({data_})
 
-    @md
-    @aliases drugNames,{class_}-method
-    @exportMethod drugNames
-    ",
-    ...
-)
 
 #' @rdname PharmacoSet-accessors
-#' @eval .docs_PharmacoSet_get_drugNames(class_=.local_class, data_=.local_data)
-setMethod(drugNames, signature="PharmacoSet", function(object) {
-    rownames(drugInfo(object))
-})
+#' @eval CoreGx:::.docs_CoreSet_set_treatmentNames(class_=.local_class,
+#' data_=.local_data)
+#' @importMethodsFrom CoreGx treatmentNames<-
+#' @aliases drugNames<-
+#' @export
+`drugNames<-` <- function(...) `treatmentNames<-`(...)
 
-.docs_PharmacoSet_set_drugNames <- function(...) .parseToRoxygen(
-    "
-    @details
-    __drugNames<-__:  Set the drug names available in a PharmacoSet object.
-    - value: A `character` vector of the new drug names. Must have the same
-    length equal to `nrow(drugInfo(object))`.
-
-    @examples
-    drugNames({data_}) <- drugNames({data_})
-
-    @md
-    @aliases drugNames<-,{class_},character-method
-    @exportMethod drugNames<-
-    ",
-    ...
-)
-
-#' @rdname PharmacoSet-accessors
-#' @eval .docs_PharmacoSet_set_drugNames(class_=.local_class, data_=.local_data)
-setReplaceMethod("drugNames", signature(object="PharmacoSet",
-    value="character"), function(object, value)
-{
-    object <- updateDrugId(object, value)
-    return(object)
-})
-
-
-#### CoreGx inherited methods
-####
-#### Note: The raw documentation lives in CoreGx, see the functions called
-#### in @eval tags for the content of the metaprogrammed roxygen2 docs.
-####
-#### See .parseToRoxygen method in utils-messages.R file of CoreGx to
-#### create similar metaprogrammed docs.
-####
-#### Warning: for dynamic docs to work, you must set
-#### Roxygen: list(markdown = TRUE, r6=FALSE)
-#### in the DESCRPTION file!
 
 
 

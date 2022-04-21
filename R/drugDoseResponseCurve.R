@@ -1,30 +1,30 @@
 #' Plot drug response curve of a given drug and a given cell for a list of pSets (objects of the PharmacoSet class).
-#' 
+#'
 #' Given a list of PharmacoSets, the function will plot the drug_response curve,
 #' for a given drug/cell pair. The y axis of the plot is the viability percentage
-#' and x axis is the log transformed concentrations. If more than one pSet is 
-#' provided, a light gray area would show the common concentration range between pSets. 
+#' and x axis is the log transformed concentrations. If more than one pSet is
+#' provided, a light gray area would show the common concentration range between pSets.
 #' User can ask for type of sensitivity measurment to be shown in the plot legend.
-#' The user can also provide a list of their own concentrations and viability values, 
-#' as in the examples below, and it will be treated as experiments equivalent to values coming 
-#' from a pset. The names of the concentration list determine the legend labels. 
-#' 
+#' The user can also provide a list of their own concentrations and viability values,
+#' as in the examples below, and it will be treated as experiments equivalent to values coming
+#' from a pset. The names of the concentration list determine the legend labels.
+#'
 #' @examples
 ##TODO:: How do you pass PSets to this?
 #' if (interactive()) {
 #' # Manually enter the plot parameters
 #' drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
 #'  viabilities=list(c(100,50,30,1)), plot.type="Both")
-#' 
+#'
 #' # Generate a plot from one or more PSets
 #' data(GDSCsmall)
 #' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
 #' }
-#' 
-#' @param drug `character(1)` A drug name for which the drug response curve should be 
+#'
+#' @param drug `character(1)` A drug name for which the drug response curve should be
 #' plotted. If the plot is desirable for more than one pharmaco set, A unique drug id
 #' should be provided.
-#' @param cellline `character(1)` A cell line name for which the drug response curve should be 
+#' @param cellline `character(1)` A cell line name for which the drug response curve should be
 #' plotted. If the plot is desirable for more than one pharmaco set, A unique cell id
 #' should be provided.
 #' @param pSets `list` a list of PharmacoSet objects, for which the function
@@ -35,61 +35,61 @@
 #' and that log10(ICn) should be returned instead of ICn. Applies only to the concentrations parameter.
 #' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
 #' than a percentage, and that E_inf passed in as decimal. Applies only to the viabilities parameter.
-#' @param legends.label `numeric` A vector of sensitivity measurment types which could 
+#' @param legends.label `numeric` A vector of sensitivity measurment types which could
 #' be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.
-#' A legend will be displayed on the top right of the plot which each line of the legend is 
+#' A legend will be displayed on the top right of the plot which each line of the legend is
 #' the values of requested sensitivity measerments for one of the requested pSets.
 #' If this parameter is missed no legend would be provided for the plot.
 #' @param ylim `numeric` A vector of two numerical values to be used as ylim of the plot.
 #' If this parameter would be missed c(0,100) would be used as the ylim of the plot.
 #' @param xlim `numeric` A vector of two numerical values to be used as xlim of the plot.
-#' If this parameter would be missed the minimum and maximum comncentrations between all 
+#' If this parameter would be missed the minimum and maximum comncentrations between all
 #' the pSets would be used as plot xlim.
-#' @param mycol `numeric` A vector with the same lenght of the pSets parameter which 
-#' will determine the color of the curve for the pharmaco sets. If this parameter is 
-#' missed default colors from Rcolorbrewer package will be used as curves color. 
-#' @param plot.type `character` Plot type which can be the actual one ("Actual") or 
+#' @param mycol `numeric` A vector with the same lenght of the pSets parameter which
+#' will determine the color of the curve for the pharmaco sets. If this parameter is
+#' missed default colors from Rcolorbrewer package will be used as curves color.
+#' @param plot.type `character` Plot type which can be the actual one ("Actual") or
 #' the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
-#' If this parameter is missed by default actual curve is plotted. 
-#' @param summarize.replicates `character` If this parameter is set to true replicates 
+#' If this parameter is missed by default actual curve is plotted.
+#' @param summarize.replicates `character` If this parameter is set to true replicates
 #' are summarized and replicates are plotted individually otherwise
 #' @param title `character` The title of the graph. If no title is provided, then it defaults to
 #' 'Drug':'Cell Line'.
 #' @param lwd `numeric` The line width to plot with
 #' @param cex `numeric` The cex parameter passed to plot
 #' @param cex.main `numeric` The cex.main parameter passed to plot, controls the size of the titles
-#' @param legend.loc And argument passable to xy.coords for the position to place the legend. 
+#' @param legend.loc And argument passable to xy.coords for the position to place the legend.
 #' @param trunc `logical(1)` Should the viability values be truncated to lie in \[0-100\] before doing the fitting
 #' @param verbose `logical(1)` Should warning messages about the data passed in be printed?
-#' 
+#'
 #' @return Plots to the active graphics device and returns an invisible NULL.
-#' 
+#'
 #' @import RColorBrewer
-#' 
+#'
 #' @importFrom graphics plot rect points lines legend
 #' @importFrom grDevices rgb
 #' @importFrom magicaxis magaxis
 #' @importFrom CoreGx .getSupportVec
-#' 
+#'
 #' @export
-drugDoseResponseCurve <- 
-function(drug, 
+drugDoseResponseCurve <-
+function(drug,
          cellline,
          pSets=list(),
          concentrations=list(),
-         viabilities=list(), 
+         viabilities=list(),
          conc_as_log = FALSE,
          viability_as_pct = TRUE,
          trunc=TRUE,
          legends.label = c("ic50_published", "gi50_published","auc_published","auc_recomputed","ic50_recomputed"),
-         ylim=c(0,100), 
-         xlim, mycol, 
+         ylim=c(0,100),
+         xlim, mycol,
          title,
-         plot.type=c("Fitted","Actual", "Both"), 
+         plot.type=c("Fitted","Actual", "Both"),
          summarize.replicates=TRUE,
          lwd = 0.5,
          cex = 0.7,
-         cex.main = 0.9, 
+         cex.main = 0.9,
          legend.loc = "topright",
          verbose=TRUE) {
   if(!missing(pSets)){
@@ -109,7 +109,7 @@ function(drug,
   #   if(missing(drug)){
   #   drug <- "Drug"}
   #   if(missing(cellline))
-  #   cellline <- "Cell Line" 
+  #   cellline <- "Cell Line"
   # }
   if(!missing(concentrations)){
     if(missing(viabilities)){
@@ -176,7 +176,7 @@ function(drug,
   doses <- list(); responses <- list(); legend.values <- list(); j <- 0; pSetNames <- list()
   if(!missing(pSets)){
     for(i in seq_len(length(pSets))) {
-      exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"cellid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"drugid"] == drug)
+      exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"sampleid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"treatmentid"] == drug)
       if(length(exp_i) > 0) {
         if (summarize.replicates) {
           pSetNames[[i]] <- name(pSets[[i]])
@@ -224,7 +224,7 @@ function(drug,
               }
             } else {
               tt <- unlist(strsplit(rownames(pSets[[i]]@sensitivity$info)[exp], split="_"))
-              if (tt[1] == "drugid") {
+              if (tt[1] == "treatmentid") {
                 legend.values[[j]] <- tt[2]
               }else{
                 legend.values[[j]] <- rownames(pSets[[i]]@sensitivity$info)[exp]
@@ -253,7 +253,7 @@ function(drug,
         }
 
       } else{ legend.values2[[i]] <- ""}
-      
+
       pSetNames2[[i]] <- names(concentrations)[[i]]
     }
     doses <- c(doses, doses2)
@@ -295,7 +295,7 @@ function(drug,
     } else {
       title <- "Drug Dose Response Curve"
     }
-    
+
   }
   plot(NA, xlab="Concentration (uM)", ylab="% Viability", axes =FALSE, main=title, log="x", ylim=viability.range, xlim=dose.range, cex=cex, cex.main=cex.main)
   magicaxis::magaxis(side=seq_len(2), frame.plot=TRUE, tcl=-.3, majorn=c(5,3), minorn=c(5,2))
@@ -310,7 +310,7 @@ function(drug,
 
     switch(plot.type , "Actual"={
       lines(doses[[i]], responses[[i]], lty=1, lwd=lwd, col=mycol[i])
-    }, "Fitted"={ 
+    }, "Fitted"={
       log_logistic_params <- logLogisticRegression(conc=doses[[i]], viability=responses[[i]])
       log10_x_vals <- .getSupportVec(log10(doses[[i]]))
       lines(10 ^ log10_x_vals, .Hill(log10_x_vals, pars=c(log_logistic_params$HS, log_logistic_params$E_inf/100, log10(log_logistic_params$EC50))) * 100 ,lty=1, lwd=lwd, col=mycol[i])
@@ -333,4 +333,3 @@ function(drug,
   legend(legend.loc, legend=legends, col=legends.col, bty="n", cex=cex, pch=c(15,15))
   return(invisible(NULL))
 }
-

@@ -2,12 +2,18 @@
 % Please edit documentation in R/PharmacoSet-accessors.R
 \name{PharmacoSet-accessors}
 \alias{PharmacoSet-accessors}
-\alias{drugInfo,PharmacoSet-method}
-\alias{drugInfoPharmacoSet-method}
-\alias{drugInfo<-,PharmacoSet,data.frame-method}
-\alias{drugInfo<-PharmacoSet,data.frame-method}
-\alias{drugNames,PharmacoSet-method}
-\alias{drugNames<-,PharmacoSet,character-method}
+\alias{drugInfo}
+\alias{treatmentInfo,PharmacoSet-method}
+\alias{treatmentInfo}
+\alias{drugInfo<-}
+\alias{treatmentInfo<-,PharmacoSet,data.frame-method}
+\alias{treatmentInfo<-}
+\alias{drugNames}
+\alias{treatmentNames,PharmacoSet-method}
+\alias{treatmentNames}
+\alias{drugNames<-}
+\alias{treatmentNames<-,PharmacoSet,character-method}
+\alias{treatmentNames<-}
 \alias{annotation,PharmacoSet-method}
 \alias{annotation}
 \alias{annotation<-,PharmacoSet,list-method}
@@ -107,13 +113,13 @@
 \alias{pertNumber<-}
 \title{Accessing and modifying information in a \code{PharmacoSet}}
 \usage{
-\S4method{drugInfo}{PharmacoSet}(object)
+drugInfo(...)
 
-\S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
+drugInfo(...) <- value
 
-\S4method{drugNames}{PharmacoSet}(object)
+drugNames(...)
 
-\S4method{drugNames}{PharmacoSet,character}(object) <- value
+drugNames(...) <- value
 
 \S4method{annotation}{PharmacoSet}(object)
 
@@ -196,6 +202,8 @@
 \S4method{pertNumber}{PharmacoSet,array}(object) <- value
 }
 \arguments{
+\item{...}{See details.}
+
 \item{object}{A \code{PharmacoSet} object.}
 
 \item{value}{See details.}
@@ -207,8 +215,6 @@ from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
 of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
 
 \item{dimension}{See details.}
-
-\item{...}{See details.}
 }
 \value{
 Accessors: See details.
@@ -220,25 +226,30 @@ Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{PharmacoSet} object.
 }
 \details{
-\subsection{drug slot accessors}{
-
-\strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
-\code{PharmacoSet} objects \verb{@drug} slot.
+\strong{treatmentInfo}: \code{data.frame} Metadata for all treatments in a \code{PharmacoSet}
+object. Arguments:
+\itemize{
+\item object: \code{PharmacoSet} An object to retrieve treatment metadata from.
 }
 
-\strong{drugInfo}: Update the \verb{@drug} slot of a \code{PharmacoSet} object.
+\strong{treatmentInfo<-}: \code{PharmacoSet} object with updated treatment metadata.
+object. Arguments:
 \itemize{
-\item value: \code{data.frame} of updated drug metadata to assign to a
-\code{PharmacoSet} objects \verb{@drug} slot.
+\item object: \code{PharmacoSet} An object to set treatment metadata for.
+\item value: \code{data.frame} A new table of treatment metadata for \code{object}.
 }
 
-\strong{drugNames}: \code{character()} The names of all drugs available in a specified
-\code{PharmacoSet} object.
-
-\strong{drugNames<-}:  Set the drug names available in a PharmacoSet object.
+\strong{treatmentNames}: \code{character} Names for all treatments in a \code{PharmacoSet}
+object. Arguments:
 \itemize{
-\item value: A \code{character} vector of the new drug names. Must have the same
-length equal to \code{nrow(drugInfo(object))}.
+\item object: \code{PharmacoSet} An object to retrieve treatment names from.
+}
+
+\strong{treatmentNames<-}: \code{PharmacoSet} Object with updates treatment names.
+object. Arguments:
+\itemize{
+\item object: \code{PharmacoSet} An object to set treatment names from.
+\item value: \code{character} A character vector of updated treatment names.
 }
 
 \subsection{@annotation}{
@@ -515,16 +526,13 @@ drug and sample, and data type
 }
 \examples{
 data(CCLEsmall)
+treatmentInfo(CCLEsmall)
 
-## drug slot
+treatmentInfo(CCLEsmall) <- treatmentInfo(CCLEsmall)
 
-drugInfo(CCLEsmall)
+treatmentNames(CCLEsmall)
 
-drugInfo(CCLEsmall) <- drugInfo(CCLEsmall)
-
-drugNames(CCLEsmall)
-
-drugNames(CCLEsmall) <- drugNames(CCLEsmall)
+treatmentNames(CCLEsmall) <- treatmentNames(CCLEsmall)
 
 
 ## @annotation

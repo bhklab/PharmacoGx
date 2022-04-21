@@ -1,7 +1,7 @@
 ##TODO:: Add function documentation
 getRawSensitivityMatrix <-
   function(pSet, cell.id, drug.id, max.conc, quality) {
-    cond <- "pSet@sensitivity$info$cellid == cell.id"
+    cond <- "pSet@sensitivity$info$sampleid == cell.id"
     if(!missing(quality)) {
       if(is.element("quality", colnames(pSet@sensitivity$info))) {
         cond <- paste(cond, "pSet@sensitivity$info$quality == quality", sep=" & ")
@@ -19,19 +19,19 @@ getRawSensitivityMatrix <-
       drug.id <- paste(drug.id, collapse="///")
     }
     cond <- paste(cond, "pSet@sensitivity$info$drugid == drug.id", sep=" & ")
-    
+
     exp.id <- which(eval(parse(text=cond)))
-    
+
     sensitivity.raw.matrix <- list()
     if(length(exp.id) > 0) {
       for(i in seq_len(length(exp.id))){
         if(length(grep("///", drug.id)) > 0) {
           all.exp.id <- which(pSet@sensitivity$info$combination.exp.id == pSet@sensitivity$info[exp.id[i], "combination.exp.id"])
-          drug.1 <- which(pSet@sensitivity$info[all.exp.id, "drugid"] == unlist(strsplit(drug.id, split="///"))[1])
-          drug.2 <- which(pSet@sensitivity$info[all.exp.id, "drugid"] == unlist(strsplit(drug.id, split="///"))[2])
+          drug.1 <- which(pSet@sensitivity$info[all.exp.id, "treatmentid"] == unlist(strsplit(drug.id, split="///"))[1])
+          drug.2 <- which(pSet@sensitivity$info[all.exp.id, "treatmentid"] == unlist(strsplit(drug.id, split="///"))[2])
           drug.1.doses <- length(which(!is.na(pSet@sensitivity$raw[all.exp.id[drug.1], , "Dose"])))
           drug.2.doses <- length(which(!is.na(pSet@sensitivity$raw[all.exp.id[drug.2], , "Dose"])))
-          
+
           tt <- matrix(NA, ncol=drug.2.doses, nrow=drug.1.doses)
           colnames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.2], seq_len(drug.2.doses), "Dose"]
           rownames(tt) <- pSet@sensitivity$raw[all.exp.id[drug.1], seq_len(drug.1.doses), "Dose"]
@@ -46,4 +46,3 @@ getRawSensitivityMatrix <-
     }
     return(sensitivity.raw.matrix)
   }
-

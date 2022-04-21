@@ -81,17 +81,17 @@ intersectPSet <- function(pSets,
     }
     if (("drugs" %in% intersectOn) & ("cell.lines" %in% intersectOn)) {
       common.exps <- .intersectList(lapply(pSets, function (x){
-        if ("cellid" %in% colnames(x@sensitivity$info) & "drugid" %in% colnames(x@sensitivity$info)) {
-          paste(x@sensitivity$info$cellid, x@sensitivity$info$drugid, sep = "_")
+        if ("sampleid" %in% colnames(sensitivityInfo(x)) & "treatmentid" %in% colnames(sensitivityInfo(x))) {
+          paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$treatmentid, sep = "_")
         } else { NULL }
       }))
       # expMatch <- data.frame(lapply(pSets,
       #   function (x, common.exps){
-      #     if ("cellid" %in% colnames(x@sensitivity$info) & "drugid" %in% colnames(x@sensitivity$info)){
+      #     if ("sampleid" %in% colnames(sensitivityInfo(x)) & "treatmentid" %in% colnames(sensitivityInfo(x))){
 
-      #       myx <- match(paste(x@sensitivity$info$cellid, x@sensitivity$info$drugid, sep = "_") ,common.exps)
+      #       myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$drugid, sep = "_") ,common.exps)
 
-      #       res <- rownames(x@sensitivity$info)[!is.na(myx)]
+      #       res <- rownames(sensitivityInfo(x))[!is.na(myx)]
 
       #       names(res) <- common.exps[na.omit(myx)]
 
@@ -103,11 +103,11 @@ intersectPSet <- function(pSets,
       #   }, common.exps=common.exps))
       expMatch <- lapply(pSets,
                          function (x, common.exps){
-                           if ("cellid" %in% colnames(x@sensitivity$info) & "drugid" %in% colnames(x@sensitivity$info)){
+                           if ("sampleid" %in% colnames(sensitivityInfo(x)) & "treatmentid" %in% colnames(sensitivityInfo(x))){
 
-                             myx <- match(paste(x@sensitivity$info$cellid, x@sensitivity$info$drugid, sep = "_") ,common.exps)
+                             myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$drugid, sep = "_") ,common.exps)
 
-                             res <- rownames(x@sensitivity$info)[!is.na(myx)]
+                             res <- rownames(sensitivityInfo(x))[!is.na(myx)]
 
                              names(res) <- common.exps[na.omit(myx)]
 
@@ -151,7 +151,7 @@ intersectPSet <- function(pSets,
       molecular.types  <- NULL
       for (pSet in pSets)
         {
-        for (SE in pSet@molecularProfiles) {
+        for (SE in molecularProfilesSlot(pSet)) {
           molecular.types <- union(molecular.types, ifelse (
             length(grep("rna", S4Vectors::metadata(SE)$annotation) > 0),
             "rna", S4Vectors::metadata(SE)$annotation))
@@ -164,7 +164,7 @@ intersectPSet <- function(pSets,
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function (pSet)
             {
-              SEs <- names(unlist(sapply(pSet@molecularProfiles, function(SE)
+              SEs <- names(unlist(sapply(molecularProfilesSlot(pSet), function(SE)
               {
                 grep(molecular.type, S4Vectors::metadata(SE)$annotation)})))
                 if(length(SEs) > 0)
@@ -173,9 +173,9 @@ intersectPSet <- function(pSets,
                   {
                     if (length(grep(
                       molecular.type, S4Vectors::metadata(
-                        pSet@molecularProfiles[[SE]])$annotation)) > 0)
+                        molecularProfilesSlot(pSet)[[SE]])$annotation)) > 0)
                       {
-                      intersect(colData(pSet@molecularProfiles[[SE]])$cellid, common.cells)
+                      intersect(colData(molecularProfilesSlot(pSet)[[SE]])$sampleid, common.cells)
                       }
                     })))
                 }
@@ -183,14 +183,14 @@ intersectPSet <- function(pSets,
         }else{
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function (pSet) {
-              SEs <- names(unlist(sapply(pSet@molecularProfiles, function(SE)
+              SEs <- names(unlist(sapply(molecularProfilesSlot(pSet), function(SE)
                 {
                 grep(molecular.type, S4Vectors::metadata(SE)$annotation)})))
                 return(CoreGx::.unionList(sapply(SEs, function(SE)
                   {
-                  if (length(grep(molecular.type, S4Vectors::metadata(pSet@molecularProfiles[[SE]])$annotation)) > 0)
+                  if (length(grep(molecular.type, S4Vectors::metadata(molecularProfilesSlot(pSet)[[SE]])$annotation)) > 0)
                     {
-                    intersect(SummarizedExperiment::colData(pSet@molecularProfiles[[SE]])$cellid, common.cells)
+                    intersect(SummarizedExperiment::colData(molecularProfilesSlot(pSet)[[SE]])$sampleid, common.cells)
                     }
                   })))
                 }))
@@ -220,5 +220,3 @@ intersectPSet <- function(pSets,
     return(pSets)
   }
 }
-
-

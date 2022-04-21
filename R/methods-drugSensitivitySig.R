@@ -228,10 +228,10 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
 
     }
 
-    drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
+    drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"sampleid"], celln), , drop = FALSE]})
 
-    molcellx <- phenoInfo(object, mDataType)[ ,"cellid"] %in% celln
-    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"cellid"], "tissueid"])
+    molcellx <- phenoInfo(object, mDataType)[ ,"sampleid"] %in% celln
+    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
     if("batchid" %in% colnames(phenoInfo(object, mDataType))){
       batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
     } else {
@@ -239,7 +239,7 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
     }
     batch[!is.na(batch) & batch == "NA"] <- NA
     batch <- as.factor(batch)
-    names(batch) <- phenoInfo(object, mDataType)[molcellx, "cellid"]
+    names(batch) <- phenoInfo(object, mDataType)[molcellx, "sampleid"]
     batch <- batch[rownames(drugpheno.all[[1]])]
     if (verbose) {
       message("Computing drug sensitivity signatures...")

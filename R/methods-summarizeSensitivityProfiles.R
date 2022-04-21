@@ -104,19 +104,19 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 
     # do the summary
     profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)),
-        by=.(drugid, cellid)]
+        by=.(treatmentid, sampleid)]
 
     # NA pad the missing cells and drugs
     if (fill.missing) {
         allCombos <- data.table(expand.grid(drugs, cell.lines))
-        colnames(allCombos) <- c('drugid', 'cellid')
-        profSummary <- profSummary[allCombos, on=c('drugid', 'cellid')]
+        colnames(allCombos) <- c("treatmentid", "sampleid")
+        profSummary <- profSummary[allCombos, on=c("treatmentid", "sampleid")]
     }
 
     # reshape and convert to matrix
-    setorderv(profSummary, c('cellid', 'drugid'))
-    profSummary <- dcast(profSummary, drugid ~ cellid, value.var='V1')
-    summaryMatrix <- as.matrix(profSummary, rownames='drugid')
+    setorderv(profSummary, c("sampleid", "treatmentid"))
+    profSummary <- dcast(profSummary, treatmentid ~ sampleid, value.var='V1')
+    summaryMatrix <- as.matrix(profSummary, rownames="treatmentid")
     return(summaryMatrix)
 
 }
@@ -147,12 +147,12 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     {
       drugs <- drugNames(object)
     }else{
-      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$drugid), "drugid"]
+      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$treatmentid), "treatmentid"]
     }
   }
 
   pp <- sensitivityInfo(object)
-  ppRows <- which(pp$cellid %in% cell.lines & pp$drugid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
+  ppRows <- which(pp$sampleid %in% cell.lines & pp$treatmentid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
   if(sensitivity.measure != "max.conc") {
     dd <- sensitivityProfiles(object)
   } else {
@@ -186,7 +186,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     dd[, sensitivity.measure] <- as.numeric(as.character(dd[, sensitivity.measure]))
   }
 
-  pp_dd <- cbind(pp[,c("cellid", "drugid")], "sensitivity.measure"=dd[, sensitivity.measure])
+  pp_dd <- cbind(pp[,c("sampleid", "treatmentid")], "sensitivity.measure"=dd[, sensitivity.measure])
 
 
   summary.function <- function(x) {
@@ -203,9 +203,9 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
         )
   }
 
-  pp_dd <- pp_dd[pp_dd[,"cellid"] %in% cell.lines & pp_dd[,"drugid"]%in%drugs,]
+  pp_dd <- pp_dd[pp_dd[,"sampleid"] %in% cell.lines & pp_dd[,"treatmentid"]%in%drugs,]
 
-  tt <- reshape2::acast(pp_dd, drugid ~ cellid, fun.aggregate=summary.function, value.var="sensitivity.measure")
+  tt <- reshape2::acast(pp_dd, treatmentid ~ sampleid, fun.aggregate=summary.function, value.var="sensitivity.measure")
  # tt <- tt[drugs, cell.lines]
 
 

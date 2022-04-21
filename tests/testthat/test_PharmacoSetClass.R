@@ -74,8 +74,8 @@ test_that("updateCellId works without duplicates", {
 
 	cellNames(GDSCsmall) <- newNames
 
-	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
-	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
 	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(newNames))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(newNames))
 
@@ -89,7 +89,7 @@ test_that("updateCellId works with duplicates", {
 
 	expect_warning(cellNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
 
-	expect_true(all(unique(sensitivityInfo(GDSCsmall)$cellid) %in% newNames))
+	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
 	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(unique(newNames)))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(unique(newNames)))
 
@@ -122,26 +122,3 @@ test_that("updateDrugId works with duplicates", {
     expect_equal(sort(colnames(sensNumber(GDSCsmall))), sort(unique(newNames)))
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
