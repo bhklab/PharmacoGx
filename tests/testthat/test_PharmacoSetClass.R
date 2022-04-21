@@ -114,7 +114,7 @@ test_that("updateTreatmentId works with duplicates", {
     data(GDSCsmall)
     newNames <- c("Test","Test",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
 
-    # expect_warning(drugNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateTreatmentId. Merging old ids into the same identifier")
+    expect_warning(drugNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateTreatmentId. Merging old ids into the same identifier")
 
     # expect_true(all(unique(sensitivityInfo(GDSCsmall)$treatmentid) %in% newNames))
     # expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(unique(newNames)))
