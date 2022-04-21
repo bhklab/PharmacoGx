@@ -7,12 +7,12 @@ PharmacoGx.Rproj
 */figure
 doc
 ^PSets/*
-..Rcheck/.*
-^.*Rcheck
 scripts/*
 scripts
 Psets/*
 check/*
 PSets/**
-local_data/**
-.VSCodeCounter/**
+.*
+
+# exceptions
+!.gitignore

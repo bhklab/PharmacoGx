@@ -99,4 +99,5 @@ Collate:
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
+    'updateObject-methods.R'
     'zzz.R'
