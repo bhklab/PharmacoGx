@@ -204,9 +204,9 @@ drugNames(...) <- value
 \arguments{
 \item{...}{See details.}
 
-\item{object}{A \code{PharmacoSet} object.}
-
 \item{value}{See details.}
+
+\item{object}{A \code{PharmacoSet} object.}
 
 \item{mDataType}{\code{character(1)} The name of a molecular datatype to access
 from the \code{molecularProfiles} of a \code{PharmacoSet} object.}

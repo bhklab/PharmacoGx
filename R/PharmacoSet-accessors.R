@@ -79,6 +79,7 @@ NULL
 #' data_=.local_data)
 #' @importMethodsFrom CoreGx treatmentInfo
 #' @aliases drugInfo
+#' @export
 drugInfo <- function(...) treatmentInfo(...)
 
 #' @rdname PharmacoSet-accessors
@@ -86,7 +87,8 @@ drugInfo <- function(...) treatmentInfo(...)
 #' data_=.local_data)
 #' @importMethodsFrom CoreGx treatmentInfo<-
 #' @aliases drugInfo<-
-`drugInfo<-` <- function(...) `treatmentInfo<-`(...)
+#' @export
+`drugInfo<-` <- function(..., value) `treatmentInfo<-`(..., value=value)
 
 
 
@@ -110,7 +112,7 @@ drugNames <- function(...) treatmentNames(...)
 #' @importMethodsFrom CoreGx treatmentNames<-
 #' @aliases drugNames<-
 #' @export
-`drugNames<-` <- function(...) `treatmentNames<-`(...)
+`drugNames<-` <- function(..., value) `treatmentNames<-`(..., value=value)
 
 
 
