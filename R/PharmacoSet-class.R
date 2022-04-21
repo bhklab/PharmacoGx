@@ -573,7 +573,7 @@ updateSampleId <- updateCellId <- function(object, new.ids = vector('character')
 }
 
 ### TODO:: Add updating of sensitivity Number tables
-updateDrugId <- function(object, new.ids = vector('character')){
+updateTreatmentId <- function(object, new.ids = vector('character')){
 
   if (length(new.ids) != nrow(drugInfo(object))) {
     stop('Wrong number of drug identifiers')
