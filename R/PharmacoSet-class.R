@@ -594,7 +594,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
   }
 
   if(any(duplicated(new.ids))){
-    warning('Duplicated ids passed to updateDrugId. Merging old ids into the same identifier')
+    warning('Duplicated ids passed to updateTreatmentId. Merging old ids into the same identifier')
 
     if(ncol(sensNumber(object))>0){
       sensMatch <- match(colnames(sensNumber(object)), rownames(drugInfo(object)))
