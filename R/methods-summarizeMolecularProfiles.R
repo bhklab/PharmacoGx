@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' data(GDSCsmall)
-#' GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=cellNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
+#' GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=sampleNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
 #' GDSCsmall
 #'
 #' @param object \code{PharmacoSet} The PharmacoSet to summarize
@@ -81,7 +81,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
     }
 
     if (missing(cell.lines)) {
-      cell.lines <- cellNames(object)
+      cell.lines <- sampleNames(object)
     }
 
     if(datasetType(object) %in% c("perturbation", "both") && removeTreated){
@@ -218,7 +218,7 @@ setMethod('summarizeMolecularProfiles', signature(object='PharmacoSet'),
     }
     res <- SummarizedExperiment::SummarizedExperiment(dd2)
     pp2 <- S4Vectors::DataFrame(pp2, row.names=rownames(pp2))
-    pp2$tissueid <- cellInfo(object)[pp2$sampleid, "tissueid"]
+    pp2$tissueid <- sampleInfo(object)[pp2$sampleid, "tissueid"]
     SummarizedExperiment::colData(res) <- pp2
     SummarizedExperiment::rowData(res) <- featureInfo(object, mDataType)
     ##TODO:: Generalize this to multiple assay SummarizedExperiments!

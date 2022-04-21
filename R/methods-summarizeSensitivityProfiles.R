@@ -56,8 +56,8 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
         fill.missing=TRUE) {
 
     # handle missing
-    if (missing(cell.lines)) cell.lines <- cellNames(object)
-    if (missing(drugs)) drugs <- drugNames(object)
+    if (missing(cell.lines)) cell.lines <- sampleNames(object)
+    if (missing(drugs)) drugs <- treatmentNames(object)
     if (missing(summary.stat)) summary.stat <- 'mean'
 
     # get LongTable object
@@ -140,12 +140,12 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
   if (missing(cell.lines)) {
-    cell.lines <- cellNames(object)
+    cell.lines <- sampleNames(object)
   }
   if (missing(drugs)) {
     if (sensitivity.measure != "Synergy_score")
     {
-      drugs <- drugNames(object)
+      drugs <- treatmentNames(object)
     }else{
       drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$treatmentid), "treatmentid"]
     }

@@ -12,8 +12,8 @@ data("GDSCsmall")
 
 test_that("Summarize Sensitivity Profiles function outputs data with right dimensions and dimnames, class", {
   testSummary <- summarizeSensitivityProfiles(GDSCsmall)
-  expect_equal(colnames(testSummary), cellNames(GDSCsmall))
-  expect_equal(rownames(testSummary), drugNames(GDSCsmall))
+  expect_equal(colnames(testSummary), sampleNames(GDSCsmall))
+  expect_equal(rownames(testSummary), treatmentNames(GDSCsmall))
   expect_equivalent(is(testSummary, "matrix"), TRUE)
 })
 
@@ -48,5 +48,5 @@ test_that("summarizeSensitivityProfiles produces correct values.",{
 test_that("Summarize Sensitivity Profiles parameters work as expected", {
   expect_silent(summarizeSensitivityProfiles(GDSCsmall, verbose = FALSE))
   expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = FALSE)), length(unique(GDSCsmall@sensitivity$info$sampleid)))
-  expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = TRUE)), length(cellNames(GDSCsmall)))
+  expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = TRUE)), length(sampleNames(GDSCsmall)))
 })

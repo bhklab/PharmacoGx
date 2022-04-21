@@ -65,7 +65,7 @@ perturbation dataset.
 }
 \examples{
 data(GDSCsmall)
-GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=cellNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
+GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=sampleNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
 GDSCsmall
 
 }

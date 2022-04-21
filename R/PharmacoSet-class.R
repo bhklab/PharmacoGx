@@ -46,7 +46,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   experiments for each cell-drug pair
 #' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame}
 #'   summarizing the available perturbation data,
-#' @slot curation A \code{list} containing mappings for \code{$drug},
+#' @slot curation A \code{list} containing mappings for \code{$treatment},
 #'   \code{cell}, \code{tissue} names  used in the data set to universal
 #'   identifiers used between different PharmacoSet objects
 #' @slot datasetType A \code{character} string of 'sensitivity',
@@ -178,7 +178,7 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     sensitivity$n <- sensitivityN
 
     curation <- list()
-    curation$drug <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
+    curation$treatment <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
     curation$cell <- as.data.frame(curationCell, stringsAsFactors = FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
     ### TODO:: Make sure to fix the curation to check for matching row names
@@ -352,7 +352,7 @@ checkPsetStructure <-
       nn <- names(mprof)[i]
 
       # Testing plot rendering for rna and rnaseq
-      if((S4Vectors::metadata(profile)$annotation == 'rna' | S4Vectors::metadata(profile)$annotation == 'rnaseq') & plotDist)
+      if((S4Vectors::metadata(profile)$annotation == 'rna' || S4Vectors::metadata(profile)$annotation == 'rnaseq') && plotDist)
       {
         pdf(file=file.path(result.dir, sprintf('%s.pdf', nn)))
         hist(assays(profile)[[1]], breaks = 100)
@@ -462,23 +462,23 @@ checkPsetStructure <-
 #            (curated cell ids)')
 #    }
 #
-#    if('unique.drugid' %in% colnames(curation(object)$drug)) {
-#      if(length(intersect(curation(object)$drug$unique.drugid,
+#    if('unique.treatmentid' %in% colnames(curation(object)$treatment)) {
+#      if(length(intersect(curation(object)$treatment$unique.treatmentid,
 #                          rownames(treatmentInfo(drug)))) != nrow(treatmentInfo(drug))) {
 #        print('rownames of drug slot should be curated drug ids')
 #      }
 #    } else {
-#      print('unique.drugid which is curated drug id across data set should be a
+#      print('unique.treatmentid which is curated drug id across data set should be a
 #            column of drug curation slot')
 #    }
 #
 ##     if("treatmentid" %in% colnames(treatmentInfo(drug))) {
-##       if(length(intersect(curation(object)$drug$drugid,
+##       if(length(intersect(curation(object)$treatment$treatmentid,
 ##    rownames(treatmentInfo(drug)))) != nrow(treatmentInfo(drug))) {
-##         print('values of drugid column should be curated drug ids')
+##         print('values of treatmentid column should be curated drug ids')
 ##       }
 ##     } else {
-##       print('drugid which is curated drug id across data set should be a
+##       print('treatmentid which is curated drug id across data set should be a
 ##    column of drug slot')
 ##     }
 #
@@ -513,7 +513,7 @@ checkPsetStructure <-
 #          print('not all the drugs in sensitivity data are in drug slot')
 #        }
 #      }else {
-#        warning('drugid does not exist in sensitivity info')
+#        warning('treatmentid does not exist in sensitivity info')
 #      }
 #
 #      if(any(!is.na(sensitivityRaw(object)))) {
@@ -561,7 +561,7 @@ setMethod('show', signature=signature(object='PharmacoSet'), function(object) {
 #' @return A named vector with the number of Cells and Drugs in the PharmacoSet
 #' @export
 setMethod('dim', signature=signature(x='PharmacoSet'), function(x){
-    return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
+    return(c(Cells=length(sampleNames(x)), Drugs=length(treatmentNames(x))))
 })
 
 

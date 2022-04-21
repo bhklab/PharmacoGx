@@ -18,7 +18,7 @@ getRawSensitivityMatrix <-
     if(length(drug.id) > 1) {
       drug.id <- paste(drug.id, collapse="///")
     }
-    cond <- paste(cond, "pSet@sensitivity$info$drugid == drug.id", sep=" & ")
+    cond <- paste(cond, "pSet@sensitivity$info$treatmentid == drug.id", sep=" & ")
 
     exp.id <- which(eval(parse(text=cond)))
 

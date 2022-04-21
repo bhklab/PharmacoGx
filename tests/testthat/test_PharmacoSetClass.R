@@ -5,12 +5,12 @@ context("Checking PharmacoSet Class Methods.")
 
 test_that("cellInfo result did not change since last time", {
 	data(GDSCsmall)
-	expect_equal_to_reference(cellInfo(GDSCsmall), "cellInfo.GDSCsmall.rds")
+	expect_equal_to_reference(sampleInfo(GDSCsmall), "cellInfo.GDSCsmall.rds")
 })
 
 test_that("drugInfo result did not change since last time", {
 	data(GDSCsmall)
-	expect_equal_to_reference(drugInfo(GDSCsmall), "drugInfo.GDSCsmall.rds")
+	expect_equal_to_reference(treatmentInfo(GDSCsmall), "drugInfo.GDSCsmall.rds")
 })
 
 test_that("phenoInfo result did not change since last time", {
@@ -47,12 +47,12 @@ test_that("sensitivityMeasures result did not change since last time", {
 
 test_that("drugNames result did not change since last time", {
 	data(GDSCsmall)
-	expect_equal_to_reference(drugNames(GDSCsmall), "drugNames.GDSCsmall.rds")
+	expect_equal_to_reference(treatmentNames(GDSCsmall), "drugNames.GDSCsmall.rds")
 })
 
 test_that("cellNames result did not change since last time", {
 	data(GDSCsmall)
-	expect_equal_to_reference(cellNames(GDSCsmall), "cellNames.GDSCsmall.rds")
+	expect_equal_to_reference(sampleNames(GDSCsmall), "cellNames.GDSCsmall.rds")
 })
 
 
@@ -69,14 +69,14 @@ test_that("name result did not change since last time", {
 
 test_that("updateSampleId works without duplicates", {
 	data(GDSCsmall)
-	newNames <- c("Test","Test2",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
+	newNames <- c("Test","Test2",sampleNames(GDSCsmall)[3:length(sampleNames(GDSCsmall))])
 
 
-	cellNames(GDSCsmall) <- newNames
+	sampleNames(GDSCsmall) <- newNames
 
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
-	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(newNames))
+	expect_equal(sort(unique(rownames(sampleInfo(GDSCsmall)))), sort(newNames))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(newNames))
 
 })
@@ -84,13 +84,13 @@ test_that("updateSampleId works without duplicates", {
 
 test_that("updateSampleId works with duplicates", {
 	data(GDSCsmall)
-	newNames <- c("Test","Test",cellNames(GDSCsmall)[3:length(cellNames(GDSCsmall))])
+	newNames <- c("Test","Test",sampleNames(GDSCsmall)[3:length(sampleNames(GDSCsmall))])
 
 
-	expect_warning(cellNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateSampleId. Merging old ids into the same identifier")
+	expect_warning(sampleNames(GDSCsmall) <- newNames, "Duplicated ids passed to updateSampleId. Merging old ids into the same identifier")
 
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$sampleid) %in% newNames))
-	expect_equal(sort(unique(rownames(cellInfo(GDSCsmall)))), sort(unique(newNames)))
+	expect_equal(sort(unique(rownames(sampleInfo(GDSCsmall)))), sort(unique(newNames)))
 	expect_equal(sort(rownames(sensNumber(GDSCsmall))), sort(unique(newNames)))
 
 })
@@ -99,12 +99,12 @@ test_that("updateSampleId works with duplicates", {
 
 test_that("updateTreatmentId works without duplicates", {
 	data(GDSCsmall)
-	newNames <- c("Test","Test2",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
+	newNames <- c("Test","Test2",treatmentNames(GDSCsmall)[3:length(treatmentNames(GDSCsmall))])
 
 	treatmentNames(GDSCsmall) <- newNames
 
 	expect_true(all(unique(sensitivityInfo(GDSCsmall)$treatmentid) %in% newNames))
-	expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(newNames))
+	expect_equal(sort(unique(rownames(treatmentInfo(GDSCsmall)))), sort(newNames))
 	expect_equal(sort(colnames(sensNumber(GDSCsmall))), sort(newNames))
 
 })
@@ -112,12 +112,12 @@ test_that("updateTreatmentId works without duplicates", {
 
 test_that("updateTreatmentId works with duplicates", {
     data(GDSCsmall)
-    newNames <- c("Test","Test",drugNames(GDSCsmall)[3:length(drugNames(GDSCsmall))])
+    newNames <- c("Test","Test",treatmentNames(GDSCsmall)[3:length(treatmentNames(GDSCsmall))])
 
-    expect_warning(drugNames(GDSCsmall) <- newNames,
+    expect_warning(treatmentNames(GDSCsmall) <- newNames,
 		"Duplicated ids passed to updateTreatmentId. Merging old ids into the same identifier")
 
     expect_true(all(unique(sensitivityInfo(GDSCsmall)$treatmentid) %in% newNames))
-    expect_equal(sort(unique(rownames(drugInfo(GDSCsmall)))), sort(unique(newNames)))
+    expect_equal(sort(unique(rownames(treatmentInfo(GDSCsmall)))), sort(unique(newNames)))
     expect_equal(sort(colnames(sensNumber(GDSCsmall))), sort(unique(newNames)))
 })

@@ -23,9 +23,9 @@
 #' @param features `character` a vector of features for which to compute the
 #'   signatures. Should match the names used in correspondant molecular data in PharmacoSet.
 #' @param cells `character` allows choosing exactly which cell lines to include for the signature fitting.
-#'   Should be a subset of cellNames(pSet)
+#'   Should be a subset of sampleNames(pSet)
 #' @param tissues `character` a vector of which tissue types to include in the signature fitting.
-#'   Should be a subset of cellInfo(pSet)$tissueid
+#'   Should be a subset of sampleInfo(pSet)$tissueid
 #' @param nthread `numeric` if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
 #' @param returnValues `character` Which of estimate, t-stat, p-value and fdr
@@ -157,12 +157,12 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
       sensitivity.cutoff <- NA
     }
     if (missing(drugs)){
-      drugn <- drugs <- drugNames(object)
+      drugn <- drugs <- treatmentNames(object)
     } else {
       drugn <- drugs
     }
     if (missing(cells)){
-      celln <- cells <- cellNames(object)
+      celln <- cells <- sampleNames(object)
     } else {
       celln <- cells
     }
@@ -212,9 +212,9 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
       celln <- celln[cix]
 
       if(!missing(tissues)){
-        celln <- celln[cellInfo(object)[celln,"tissueid"] %in% tissues]
+        celln <- celln[sampleInfo(object)[celln,"tissueid"] %in% tissues]
       } else {
-        tissues <- unique(cellInfo(object)$tissueid)
+        tissues <- unique(sampleInfo(object)$tissueid)
       }
       molecularProfilesSlot(object)[[mDataType]] <- summarizeMolecularProfiles(
           object=object, mDataType=mDataType, summary.stat=molecular.summary.stat,
@@ -231,7 +231,7 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
     drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"sampleid"], celln), , drop = FALSE]})
 
     molcellx <- phenoInfo(object, mDataType)[ ,"sampleid"] %in% celln
-    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
+    type <- as.factor(sampleInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
     if("batchid" %in% colnames(phenoInfo(object, mDataType))){
       batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
     } else {

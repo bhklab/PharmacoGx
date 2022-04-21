@@ -62,7 +62,7 @@ intersectPSet <- function(pSets,
 
     }
     if ("drugs" %in% intersectOn){
-      common.drugs <- .intersectList(lapply(pSets, function(x) return(drugNames(x))))
+      common.drugs <- .intersectList(lapply(pSets, function(x) return(treatmentNames(x))))
       if(!missing(drugs)) {
         common.drugs <- intersect(common.drugs, drugs)
       }
@@ -71,7 +71,7 @@ intersectPSet <- function(pSets,
       }
     }
     if ("cell.lines" %in% intersectOn){
-      common.cells <- .intersectList(lapply(pSets, function(x){return(cellNames(x))}))
+      common.cells <- .intersectList(lapply(pSets, function(x){return(sampleNames(x))}))
       if(!missing(cells)) {
         common.cells <- intersect(common.cells, cells)
       }
@@ -89,7 +89,7 @@ intersectPSet <- function(pSets,
       #   function (x, common.exps){
       #     if ("sampleid" %in% colnames(sensitivityInfo(x)) & "treatmentid" %in% colnames(sensitivityInfo(x))){
 
-      #       myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$drugid, sep = "_") ,common.exps)
+      #       myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$treatmentid, sep = "_") ,common.exps)
 
       #       res <- rownames(sensitivityInfo(x))[!is.na(myx)]
 
@@ -105,7 +105,7 @@ intersectPSet <- function(pSets,
                          function (x, common.exps){
                            if ("sampleid" %in% colnames(sensitivityInfo(x)) & "treatmentid" %in% colnames(sensitivityInfo(x))){
 
-                             myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$drugid, sep = "_") ,common.exps)
+                             myx <- match(paste(sensitivityInfo(x)$sampleid, sensitivityInfo(x)$treatmentid, sep = "_") ,common.exps)
 
                              res <- rownames(sensitivityInfo(x))[!is.na(myx)]
 

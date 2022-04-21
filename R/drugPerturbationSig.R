@@ -45,8 +45,8 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features,
 	}
   options("mc.cores"=nthread)
   if(!missing(cells)){
-    if(!all(cells%in%cellNames(pSet))){
-      stop("The cell names should match to the names used in cellNames(pSet)")
+    if(!all(cells%in%sampleNames(pSet))){
+      stop("The cell names should match to the names used in sampleNames(pSet)")
     }
     pSet <- subsetTo(pSet, cells=cells)
   }
@@ -61,7 +61,7 @@ drugPerturbationSig <- function(pSet, mDataType, drugs, cells, features,
 
 
   if (missing(drugs)) {
-    drugn <- drugNames(pSet)
+    drugn <- treatmentNames(pSet)
   } else {
     drugn <- drugs
   }

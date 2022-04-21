@@ -56,7 +56,7 @@ experiments for each cell-drug pair}
 \item{\code{perturbation}}{A \code{list} containting \code{$n}, a \code{data.frame}
 summarizing the available perturbation data,}
 
-\item{\code{curation}}{A \code{list} containing mappings for \code{$drug},
+\item{\code{curation}}{A \code{list} containing mappings for \code{$treatment},
 \code{cell}, \code{tissue} names  used in the data set to universal
 identifiers used between different PharmacoSet objects}
 

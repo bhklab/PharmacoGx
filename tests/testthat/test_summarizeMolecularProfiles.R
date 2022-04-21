@@ -15,7 +15,7 @@ test_that("Summarize Molecular Profiles fails gracefully.",{
 
 test_that("Summarize Molecular Profiles function outputs data with right dimensions and dimnames, class", {
   testSummary <- summarizeMolecularProfiles(GDSCsmall, "rna")
-  expect_equal(colnames(testSummary), cellNames(GDSCsmall))
+  expect_equal(colnames(testSummary), sampleNames(GDSCsmall))
   expect_equivalent(is(testSummary, "SummarizedExperiment"), TRUE)
   expect_length(rownames(testSummary), 300)
 })
@@ -51,5 +51,5 @@ test_that("Summarize Molecular Profiles parameters work as expected", {
   GDSCsmall2 <- GDSCsmall
   GDSCsmall2@molecularProfiles$rna <- GDSCsmall2@molecularProfiles$rna[,1]
   expect_equivalent(ncol(summarizeMolecularProfiles(GDSCsmall2, "rna", fill.missing = FALSE)), 1)
-  expect_equivalent(ncol(summarizeMolecularProfiles(GDSCsmall2, "rna", fill.missing = TRUE)), length(cellNames(GDSCsmall2)))
+  expect_equivalent(ncol(summarizeMolecularProfiles(GDSCsmall2, "rna", fill.missing = TRUE)), length(sampleNames(GDSCsmall2)))
 })

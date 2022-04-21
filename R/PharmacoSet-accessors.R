@@ -42,10 +42,9 @@ NULL
 #' @export
 #' @noRd
 .parseToRoxygen <- function(string, ...) {
-    unlist(strsplit(
-        with(list(...), glue::glue(string)),
-    '\n'))
+    CoreGx:::.parseToRoxygen(string, ...)
 }
+
 
 # =======================================
 # Accessor Method Documentation Object
@@ -129,6 +128,7 @@ drugNames <- function(...) treatmentNames(...)
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_get_annotation(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx annotation
+#' @export
 setMethod('annotation', signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
@@ -136,9 +136,9 @@ setMethod('annotation', signature("PharmacoSet"), function(object) {
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_annotation(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx annotation<-
+#' @export
 setReplaceMethod("annotation", signature("PharmacoSet", "list"),
-    function(object, value)
-{
+        function(object, value) {
     callNextMethod(object=object, value=value)
 })
 
@@ -150,6 +150,7 @@ setReplaceMethod("annotation", signature("PharmacoSet", "list"),
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_get_dateCreated(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx dateCreated
+#' @export
 setMethod('dateCreated', signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
@@ -157,9 +158,9 @@ setMethod('dateCreated', signature("PharmacoSet"), function(object) {
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_dateCreated(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx dateCreated<-
+#' @export
 setReplaceMethod('dateCreated', signature(object="PharmacoSet", value="character"),
-    function(object, value)
-{
+        function(object, value) {
     callNextMethod(object=object, value=value)
 })
 
@@ -172,15 +173,15 @@ setReplaceMethod('dateCreated', signature(object="PharmacoSet", value="character
 #' @eval CoreGx:::.docs_CoreSet_get_name(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx name
 setMethod('name', signature("PharmacoSet"), function(object){
-    return(object@annotation$name)
+    callNextMethod(object)
 })
 
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_name(class_=.local_class, data_=.local_data)
 #' @importMethodsFrom CoreGx name<-
 setReplaceMethod('name', signature("PharmacoSet"), function(object, value){
-    object@annotation$name <- value
-    return(object)
+    object <- callNextMethod(object, value=value)
+    return(invisible(object))
 })
 
 ## ==============
@@ -196,21 +197,19 @@ setReplaceMethod('name', signature("PharmacoSet"), function(object, value){
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_get_sampleInfo(class_=.local_class, sample_=.local_sample)
 #' @importFrom CoreGx sampleInfo
+#' @export
 setMethod("sampleInfo", "PharmacoSet", function(object) {
     callNextMethod(object)
 })
 
-## FIXME:: Do I need this? Maybe the aliased generic from CoreGx already does this?
-# #' @export
-# cellInfo <- sampleInfo
 
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_sampleInfo(class_=.local_class,
 #' data_=.local_data, sample_="cell")
 #' @importFrom CoreGx cellInfo<-
+#' @export
 setReplaceMethod("sampleInfo", signature(object="PharmacoSet",
-    value="data.frame"), function(object, value)
-{
+        value="data.frame"), function(object, value) {
     callNextMethod(object, value=value)
 })
 
