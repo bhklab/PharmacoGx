@@ -26,6 +26,7 @@ Suggests: pander,
 Encoding: UTF-8
 Imports:
     BiocGenerics,
+    MatrixGenerics,
     Biobase,
     S4Vectors,
     SummarizedExperiment,
@@ -56,7 +57,7 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate: 
+Collate:
     'ComputeGR.R'
     'GR.R'
     'GWC.R'

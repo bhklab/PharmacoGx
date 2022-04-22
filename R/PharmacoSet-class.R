@@ -118,7 +118,7 @@ PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
         colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForSampleId(
             colData(molecularProfiles[[nm]]))
         # handle perturbation case
-        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForIdColumns(
+        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForIdColumn(
             colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
             error=FALSE)
     }
