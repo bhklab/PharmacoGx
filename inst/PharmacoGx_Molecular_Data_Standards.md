@@ -22,35 +22,6 @@ Currently, there is a mixed bag of molecular data names used across psets, as no
 
 Currently, we meet the following names in PSets downloaded from orcestra:
 
-<<<<<<< HEAD
-+---------------------------------+--------------------------------------------------------------+
-| Name                            | Data type                                                    |
-+=================================+==============================================================+
-| rnaseq                          | rnaseq (gene tpm??)                                          |
-+---------------------------------+--------------------------------------------------------------+
-| rna                             | microarray rna                                               |
-+---------------------------------+--------------------------------------------------------------+
-| Kallisto_0.46.1.rnaseq          | rnaseq gene level tpm                                        |
-+---------------------------------+--------------------------------------------------------------+
-| Kallisto_0.46.1.rnaseq.counts   | rnaseq gene level counts                                     |
-+---------------------------------+--------------------------------------------------------------+
-| Kallisto_0.46.1.isoforms        | rnaseq isoform level tpm                                     |
-+---------------------------------+--------------------------------------------------------------+
-| Kallisto_0.46.1.isoforms.counts | rnaseq isoform level counts                                  |
-+---------------------------------+--------------------------------------------------------------+
-| cnv                             | snp array derived copy number                                |
-+---------------------------------+--------------------------------------------------------------+
-| mutation                        | mutation data, at protein level                              |
-+---------------------------------+--------------------------------------------------------------+
-| fusion                          | presence of fusion data, as binary                           |
-+---------------------------------+--------------------------------------------------------------+
-| mutationall                     | mutation data, at protein level                              |
-+---------------------------------+--------------------------------------------------------------+
-| mutationchosen                  | mutation data, at protein level                              |
-+---------------------------------+--------------------------------------------------------------+
-| mutation_exome                  | mutation data, at protein level, specifically from exome seq |
-+---------------------------------+--------------------------------------------------------------+
-=======
 | Name                            | Data type                                                    |
 |---------------------------------|--------------------------------------------------------------|
 | rnaseq                          | rnaseq (gene tpm??)                                          |
@@ -66,7 +37,6 @@ Currently, we meet the following names in PSets downloaded from orcestra:
 | mutationchosen                  | mutation data, at protein level                              |
 | mutation_exome                  | mutation data, at protein level, specifically from exome seq |
 
->>>>>>> master
 
 Of these, `show` is aware of:
 
@@ -99,7 +69,7 @@ The currently allowed vocabulary is:
 
 ### Annotation of the right version for the PSet
 
-Finally, if in the creation of your PSet, you include SummarizedExperiments and not the older ExpressionSet objects, you must set an annotation on the PSet to signify this. The original PSet used ExpressionSets. 
+Finally, if in the creation of your PSet, you include SummarizedExperiments and not the older ExpressionSet objects, you must set an annotation on the PSet to signify this. The original PSet used ExpressionSets.
 
 To do this, set `annotation(PSet)$version <- 2` or larger.
 
@@ -113,8 +83,4 @@ We should have a more standardized set of annotations for each SE. Proposed addi
 - transformation: any transformation applied to the raw output of the pipeline
 
 
-We should support methylation data soon. 
-
-
-
-
+We should support methylation data soon.
