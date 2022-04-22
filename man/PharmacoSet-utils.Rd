@@ -74,7 +74,7 @@ data(CCLEsmall)
 ## subset methods
 
 ### subsetBySample
-samples <- cellInfo(CCLEsmall)$cellid[seq_len(10)]
+samples <- sampleInfo(CCLEsmall)$sampleid[seq_len(10)]
 CCLEsmall_sub <- subsetBySample(CCLEsmall, samples)
 
 

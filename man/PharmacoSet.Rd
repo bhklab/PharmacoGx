@@ -7,18 +7,19 @@
 PharmacoSet(
   name,
   molecularProfiles = list(),
-  cell = data.frame(),
-  drug = data.frame(),
+  sample = data.frame(),
+  treatment = data.frame(),
   sensitivityInfo = data.frame(),
   sensitivityRaw = array(dim = c(0, 0, 0)),
   sensitivityProfiles = matrix(),
   sensitivityN = matrix(nrow = 0, ncol = 0),
   perturbationN = array(NA, dim = c(0, 0, 0)),
-  curationDrug = data.frame(),
-  curationCell = data.frame(),
+  curationTreatment = data.frame(),
+  curationSample = data.frame(),
   curationTissue = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
-  verify = TRUE
+  verify = TRUE,
+  ...
 )
 }
 \arguments{
@@ -27,13 +28,19 @@ PharmacoSet(
 \item{molecularProfiles}{A \code{list} of SummarizedExperiment objects containing
 molecular profiles for each molecular data type.}
 
-\item{cell}{A \code{data.frame} containing the annotations for all the cell
-lines profiled in the data set, across all data types}
+\item{sample}{A \code{data.frame} containing the annotations for all the sample
+profiled in the data set, across all data types. Must contain the mandatory
+\code{sampleid} column which uniquely identifies each sample in the object.}
 
-\item{drug}{A \code{data.frame} containg the annotations for all the drugs}
+\item{treatment}{A \code{data.frame} containing annotations for all treatments
+profiled in the dataset. Must contain the mandatory \code{treatmentid} column
+which uniquely identifies each treatment in the object.}
 
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the
-sensitivity experiments}
+sensitivity experiments. Must contain a 'sampleid' column with unique
+identifiers to each sample, matching the \code{sample} object and a 'treatmentid'
+columns with unique indenifiers for each treatment, matching the \code{treatment}
+object.}
 
 \item{sensitivityRaw}{A 3 Dimensional \code{array} contaning the raw drug
 dose response data for the sensitivity experiments}
@@ -47,19 +54,29 @@ available sensitivity/perturbation data}
 \item{perturbationN}{A \code{data.frame} summarizing the
 available sensitivity/perturbation data}
 
-\item{curationDrug, curationCell, curationTissue}{A \code{data.frame} mapping
-the names for drugs, cells and tissues used in the data set to universal
-identifiers used between different PharmacoSet objects}
+\item{curationTreatment}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
 
-\item{datasetType}{A \code{character} string of 'sensitivity',
-'preturbation', or both detailing what type of data can be found in the
-CoreSet, for proper processing of the data}
+\item{curationSample}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
 
-\item{verify}{\code{boolean} Should the function verify the CoreSet and
+\item{curationTissue}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
+
+\item{datasetType}{A \code{character(1)} string of 'sensitivity',
+'preturbation', or 'both' detailing what type of data can be found in the
+\code{CoreSet}, for proper processing of the data}
+
+\item{verify}{\code{logical(1)}Should the function verify the CoreSet and
 print out any errors it finds after construction?}
+
+\item{...}{Catch and parse any renamed constructor arguments.}
 }
 \value{
-An object of class PharmacoSet
+An object of class \code{PharmacoSet}
 }
 \description{
 A constructor that simplifies the process of creating PharmacoSets, as well
@@ -69,7 +86,6 @@ methods. For a much more detailed instruction on creating PharmacoSets, please
 see the "CreatingPharmacoSet" vignette.
 }
 \examples{
- 
 ## For help creating a PharmacoSet object, please see the following vignette:
 browseVignettes("PharmacoGx")
 

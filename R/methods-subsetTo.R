@@ -13,8 +13,8 @@
 #'
 #' @examples
 #' data(CCLEsmall)
-#' CCLEdrugs  <- drugNames(CCLEsmall)
-#' CCLEcells <- cellNames(CCLEsmall)
+#' CCLEdrugs  <- treatmentNames(CCLEsmall)
+#' CCLEcells <- sampleNames(CCLEsmall)
 #' pSet <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
 #' pSet
 #'
@@ -35,18 +35,18 @@
 #'
 #' @importMethodsFrom CoreGx subsetTo
 #' @export
-setMethod('subsetTo', signature(object='PharmacoSet'), function(object, 
+setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
   cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...)
 {
-    .subsetToPharmacoSet(object, cells=cells, drugs=drugs, 
+    .subsetToPharmacoSet(object, cells=cells, drugs=drugs,
         molecular.data.cells=molecular.data.cells, keep.controls=keep.controls)
 })
 
 
 #' @importFrom CoreGx .intersectList
 #' @keywords internal
-.subsetToPharmacoSet <- function(object, cells=NULL, drugs=NULL, 
-    molecular.data.cells=NULL, keep.controls=TRUE, ...) 
+.subsetToPharmacoSet <- function(object, cells=NULL, drugs=NULL,
+    molecular.data.cells=NULL, keep.controls=TRUE, ...)
 {
   drop=FALSE #TODO:: Is this supposed to be here?
 
@@ -81,7 +81,7 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
     ### the function missing does not work as expected in the context below, because the arguments are passed to the anonymous
     ### function in lapply, so it does not recognize them as missing
 
-  object@molecularProfiles <- lapply(object@molecularProfiles, function(SE, cells, drugs, molecular.data.cells){
+  molecularProfilesSlot(object) <- lapply(molecularProfilesSlot(object), function(SE, cells, drugs, molecular.data.cells){
 
     molecular.data.type <- ifelse(length(grep('rna', S4Vectors::metadata(SE)$annotation) > 0), 'rna', S4Vectors::metadata(SE)$annotation)
     if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
@@ -93,27 +93,27 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
       if (length(cells)==0 && length(drugs)==0) {
           column_indices <- seq_len(ncol(SE)) # This still returns the number of samples in an SE, but without a label
       }
-      if(length(cells)==0 && object@datasetType=='sensitivity') {
+      if(length(cells)==0 && datasetType(object)=='sensitivity') {
         column_indices <- seq_len(ncol(SE))
       }
 
       cell_line_index <- NULL
       if(length(cells)!=0) {
-        if (!all(cells %in% cellNames(object))) {
+        if (!all(cells %in% sampleNames(object))) {
               stop('Some of the cell names passed to function did not match to names in the PharmacoSet. Please ensure you are using cell names as returned by the cellNames function')
         }
-          cell_line_index <- which(SummarizedExperiment::colData(SE)[['cellid']] %in% cells)
+          cell_line_index <- which(SummarizedExperiment::colData(SE)[["sampleid"]] %in% cells)
         # if (length(na.omit(cell_line_index))==0){
     #       stop('No cell lines matched')
     #     }
       }
       drugs_index <- NULL
-      if(object@datasetType=='perturbation' || object@datasetType=='both'){
+      if(datasetType(object)=='perturbation' || datasetType(object)=='both'){
         if(length(drugs) != 0) {
-            if (!all(drugs %in% drugNames(object))){
+            if (!all(drugs %in% treatmentNames(object))){
                   stop('Some of the drug names passed to function did not match to names in the PharmacoSet. Please ensure you are using drug names as returned by the drugNames function')
             }
-          drugs_index <- which(SummarizedExperiment::colData(SE)[['drugid']] %in% drugs)
+          drugs_index <- which(SummarizedExperiment::colData(SE)[["treatmentid"]] %in% drugs)
           # if (length(drugs_index)==0){
     #         stop('No drugs matched')
     #       }
@@ -145,22 +145,22 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
 
   }, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells)
 
-  if ((object@datasetType == 'sensitivity' | object@datasetType == 'both') & length(exps) != 0) {
-      object@sensitivity$info <- object@sensitivity$info[exps, , drop=drop]
-      rownames(object@sensitivity$info) <- names(exps)
-      if(length(object@sensitivity$raw) > 0) {
-        object@sensitivity$raw <- object@sensitivity$raw[exps, , , drop=drop]
-        dimnames(object@sensitivity$raw)[[1]] <- names(exps)
+  if ((datasetType(object) == 'sensitivity' | datasetType(object) == 'both') & length(exps) != 0) {
+      sensitivityInfo(object) <- sensitivityInfo(object)[exps, , drop=drop]
+      rownames(sensitivityInfo(object)) <- names(exps)
+      if(length(sensitivityRaw(object)) > 0) {
+        sensitivityRaw(object) <- sensitivityRaw(object)[exps, , , drop=drop]
+        dimnames(sensitivityRaw(object))[[1]] <- names(exps)
       }
-      object@sensitivity$profiles <- object@sensitivity$profiles[exps, , drop=drop]
-      rownames(object@sensitivity$profiles) <- names(exps)
+      sensitivityProfiles(object) <- sensitivityProfiles(object)[exps, , drop=drop]
+      rownames(sensitivityProfiles(object)) <- names(exps)
 
-      object@sensitivity$n <- .summarizeSensitivityNumbers(object)
+      sensNumber(object) <- .summarizeSensitivityNumbers(object)
   }
-  else if ((object@datasetType == 'sensitivity' | object@datasetType == 'both') & (length(drugs) != 0 | length(cells) != 0)) {
+  else if ((datasetType(object) == 'sensitivity' | datasetType(object) == 'both') & (length(drugs) != 0 | length(cells) != 0)) {
 
-        drugs_index <- which (sensitivityInfo(object)[, 'drugid'] %in% drugs)
-        cell_line_index <- which (sensitivityInfo(object)[,'cellid'] %in% cells)
+        drugs_index <- which(sensitivityInfo(object)[, "treatmentid"] %in% drugs)
+        cell_line_index <- which(sensitivityInfo(object)[,"sampleid"] %in% cells)
         if (length(drugs_index) !=0 & length(cell_line_index) !=0 ) {
           if (length(intersect(drugs_index, cell_line_index)) == 0) {
             stop('This Drug - Cell Line combination was not tested together.')
@@ -177,7 +177,7 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
               }
           }
        }
-        object@sensitivity[names(object@sensitivity)[names(object@sensitivity)!='n']] <- lapply(object@sensitivity[names(object@sensitivity)[names(object@sensitivity)!='n']], function(x,i, drop){
+        sensitivitySlot(object)[names(sensitivitySlot(object))[names(sensitivitySlot(object))!='n']] <- lapply(sensitivitySlot(object)[names(sensitivitySlot(object))[names(sensitivitySlot(object))!='n']], function(x,i, drop){
             #browser()
           if (length(dim(x))==2){
             return(x[i,,drop=drop])
@@ -189,29 +189,29 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
   }
 
 	if (length(drugs)==0) {
-		if(object@datasetType == 'sensitivity' | object@datasetType == 'both'){
-			drugs <- unique(sensitivityInfo(object)[['drugid']])
+		if(datasetType(object) == 'sensitivity' | datasetType(object) == 'both'){
+			drugs <- unique(sensitivityInfo(object)[["treatmentid"]])
 		}
-		if(object@datasetType == 'perturbation' | object@datasetType == 'both'){
-			drugs <- union(drugs, na.omit(CoreGx::.unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[['drugid']])}))))
+		if(datasetType(object) == 'perturbation' | datasetType(object) == 'both'){
+			drugs <- union(drugs, na.omit(CoreGx::.unionList(lapply(molecularProfilesSlot(object), function(SE){unique(colData(SE)[["treatmentid"]])}))))
 		}
 	}
 	if (length(cells)==0) {
-		cells <- union(cells, na.omit(CoreGx::.unionList(lapply(object@molecularProfiles, function(SE){unique(colData(SE)[['cellid']])}))))
-        if (object@datasetType =='sensitivity' | object@datasetType == 'both'){
-            cells <- union(cells, sensitivityInfo(object)[['cellid']])
+		cells <- union(cells, na.omit(CoreGx::.unionList(lapply(molecularProfilesSlot(object), function(SE){unique(colData(SE)[["sampleid"]])}))))
+        if (datasetType(object) =='sensitivity' | datasetType(object) == 'both'){
+            cells <- union(cells, sensitivityInfo(object)[["sampleid"]])
         }
 	}
-	drugInfo(object) <- drugInfo(object)[drugs , , drop=drop]
-	cellInfo(object) <- cellInfo(object)[cells , , drop=drop]
-	object@curation$drug <- object@curation$drug[drugs , , drop=drop]
-	object@curation$cell <- object@curation$cell[cells , , drop=drop]
-	object@curation$tissue <- object@curation$tissue[cells , , drop=drop]
-	if (object@datasetType == 'sensitivity' | object@datasetType == 'both'  & length(exps) == 0) {
-	  object@sensitivity$n <- object@sensitivity$n[cells, drugs, drop=drop]
+	treatmentInfo(object) <- treatmentInfo(object)[drugs, , drop=drop]
+	sampleInfo(object) <- sampleInfo(object)[cells, , drop=drop]
+	curation(object)$treatment <- curation(object)$treatment[drugs, , drop=drop]
+	curation(object)$sample <- curation(object)$sample[cells, , drop=drop]
+	curation(object)$tissue <- curation(object)$tissue[cells, , drop=drop]
+	if (datasetType(object) == 'sensitivity' | datasetType(object) == 'both'  & length(exps) == 0) {
+	  sensNumber(object) <- sensNumber(object)[cells, drugs, drop=drop]
 	}
-	if (object@datasetType == 'perturbation' | object@datasetType == 'both') {
-	  object@perturbation$n <- object@perturbation$n[cells, drugs, , drop=drop]
+	if (datasetType(object) == 'perturbation' | datasetType(object) == 'both') {
+	  pertNumber(object) <- pertNumber(object)[cells, drugs, , drop=drop]
     }
-      return(object)
+  return(object)
 }

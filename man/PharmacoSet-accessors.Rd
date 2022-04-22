@@ -2,12 +2,18 @@
 % Please edit documentation in R/PharmacoSet-accessors.R
 \name{PharmacoSet-accessors}
 \alias{PharmacoSet-accessors}
-\alias{drugInfo,PharmacoSet-method}
-\alias{drugInfoPharmacoSet-method}
-\alias{drugInfo<-,PharmacoSet,data.frame-method}
-\alias{drugInfo<-PharmacoSet,data.frame-method}
-\alias{drugNames,PharmacoSet-method}
-\alias{drugNames<-,PharmacoSet,character-method}
+\alias{drugInfo}
+\alias{treatmentInfo,PharmacoSet-method}
+\alias{treatmentInfo}
+\alias{drugInfo<-}
+\alias{treatmentInfo<-,PharmacoSet,data.frame-method}
+\alias{treatmentInfo<-}
+\alias{drugNames}
+\alias{treatmentNames,PharmacoSet-method}
+\alias{treatmentNames}
+\alias{drugNames<-}
+\alias{treatmentNames<-,PharmacoSet,character-method}
+\alias{treatmentNames<-}
 \alias{annotation,PharmacoSet-method}
 \alias{annotation}
 \alias{annotation<-,PharmacoSet,list-method}
@@ -22,20 +28,24 @@
 \alias{name<-,PharmacoSet-method}
 \alias{name<-,PharmacoSet,character-method}
 \alias{name<-}
+\alias{sampleInfo,PharmacoSet-method}
+\alias{sampleInfo}
 \alias{cellInfo,PharmacoSet-method}
 \alias{cellInfo}
-\alias{sampleInfo}
+\alias{sampleInfo<-,PharmacoSet,data.frame-method}
+\alias{sampleInfo<-}
 \alias{cellInfo<-,PharmacoSet,data.frame-method}
 \alias{cellInfo<-}
-\alias{sampleInfo<-}
-\alias{cellNames,PharmacoSet-method}
+\alias{sampleNames,PharmacoSet-method}
+\alias{sampleName,PharmacoSet-method}
+\alias{sampleNames}
 \alias{cellName,PharmacoSet-method}
 \alias{cellNames}
-\alias{sampleNames}
-\alias{cellNames<-,PharmacoSet,character-method}
+\alias{sampleNames<-,PharmacoSet,character-method}
+\alias{sampleNames<-,PharmacoSet,list-method}
+\alias{sampleNames<-}
 \alias{cellNames<-,PharmacoSet,list-method}
 \alias{cellNames<-}
-\alias{sampleNames<-}
 \alias{curation,PharmacoSet-method}
 \alias{curation}
 \alias{curation<-,PharmacoSet,list-method}
@@ -71,7 +81,7 @@
 \alias{molecularProfilesSlot,PharmacoSet-method}
 \alias{moleculerProfilesSlot,PharmacoSet-method}
 \alias{molecularProfilesSlot}
-\alias{molecularProfilesSlot<-,PharmacoSet,list_or_MAE-method}
+\alias{molecularProfilesSlot<-,PharmacoSet,list_OR_MAE-method}
 \alias{molecularProfilesSlot<-,PharmacoSet,list-method}
 \alias{molecularProfilesSlot<-PharmacoSet,MultiAssayExperiment-method}
 \alias{molecularProfilesSlot<-}
@@ -89,7 +99,7 @@
 \alias{sensitivityRaw<-,PharmacoSet,array-method}
 \alias{sensitivitySlot,PharmacoSet-method}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,PharmacoSet,list_or_LongTable-method}
+\alias{sensitivitySlot<-,PharmacoSet,list_OR_LongTable-method}
 \alias{sensitivitySlot<-}
 \alias{sensitivitySlot<-,PharmacoSet,list-method}
 \alias{sensitivitySlot<-,PharmacoSet,LongTable-method}
@@ -103,13 +113,13 @@
 \alias{pertNumber<-}
 \title{Accessing and modifying information in a \code{PharmacoSet}}
 \usage{
-\S4method{drugInfo}{PharmacoSet}(object)
+drugInfo(...)
 
-\S4method{drugInfo}{PharmacoSet,data.frame}(object) <- value
+drugInfo(...) <- value
 
-\S4method{drugNames}{PharmacoSet}(object)
+drugNames(...)
 
-\S4method{drugNames}{PharmacoSet,character}(object) <- value
+drugNames(...) <- value
 
 \S4method{annotation}{PharmacoSet}(object)
 
@@ -123,13 +133,13 @@
 
 \S4method{name}{PharmacoSet}(object) <- value
 
-\S4method{cellInfo}{PharmacoSet}(object)
+\S4method{sampleInfo}{PharmacoSet}(object)
 
-\S4method{cellInfo}{PharmacoSet,data.frame}(object) <- value
+\S4method{sampleInfo}{PharmacoSet,data.frame}(object) <- value
 
-\S4method{cellNames}{PharmacoSet}(object)
+\S4method{sampleNames}{PharmacoSet}(object)
 
-\S4method{cellNames}{PharmacoSet,character}(object) <- value
+\S4method{sampleNames}{PharmacoSet,character}(object) <- value
 
 \S4method{curation}{PharmacoSet}(object)
 
@@ -161,7 +171,7 @@
 
 \S4method{molecularProfilesSlot}{PharmacoSet}(object)
 
-\S4method{molecularProfilesSlot}{PharmacoSet,list_or_MAE}(object) <- value
+\S4method{molecularProfilesSlot}{PharmacoSet,list_OR_MAE}(object) <- value
 
 \S4method{sensitivityInfo}{PharmacoSet}(object, dimension, ...)
 
@@ -181,7 +191,7 @@
 
 \S4method{sensitivitySlot}{PharmacoSet}(object)
 
-\S4method{sensitivitySlot}{PharmacoSet,list_or_LongTable}(object) <- value
+\S4method{sensitivitySlot}{PharmacoSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{PharmacoSet}(object)
 
@@ -192,9 +202,11 @@
 \S4method{pertNumber}{PharmacoSet,array}(object) <- value
 }
 \arguments{
-\item{object}{A \code{PharmacoSet} object.}
+\item{...}{See details.}
 
 \item{value}{See details.}
+
+\item{object}{A \code{PharmacoSet} object.}
 
 \item{mDataType}{\code{character(1)} The name of a molecular datatype to access
 from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
@@ -203,8 +215,6 @@ from the \code{molecularProfiles} of a \code{PharmacoSet} object.}
 of \verb{@molecularProfiles} of a PharmacoSet object for data type \code{mDataType}.}
 
 \item{dimension}{See details.}
-
-\item{...}{See details.}
 }
 \value{
 Accessors: See details.
@@ -216,25 +226,30 @@ Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{PharmacoSet} object.
 }
 \details{
-\subsection{drug slot accessors}{
-
-\strong{drugInfo}: \code{data.frame} Retrieve the drug metadata from a
-\code{PharmacoSet} objects \verb{@drug} slot.
+\strong{treatmentInfo}: \code{data.frame} Metadata for all treatments in a \code{PharmacoSet}
+object. Arguments:
+\itemize{
+\item object: \code{PharmacoSet} An object to retrieve treatment metadata from.
 }
 
-\strong{drugInfo}: Update the \verb{@drug} slot of a \code{PharmacoSet} object.
+\strong{treatmentInfo<-}: \code{PharmacoSet} object with updated treatment metadata.
+object. Arguments:
 \itemize{
-\item value: \code{data.frame} of updated drug metadata to assign to a
-\code{PharmacoSet} objects \verb{@drug} slot.
+\item object: \code{PharmacoSet} An object to set treatment metadata for.
+\item value: \code{data.frame} A new table of treatment metadata for \code{object}.
 }
 
-\strong{drugNames}: \code{character()} The names of all drugs available in a specified
-\code{PharmacoSet} object.
-
-\strong{drugNames<-}:  Set the drug names available in a PharmacoSet object.
+\strong{treatmentNames}: \code{character} Names for all treatments in a \code{PharmacoSet}
+object. Arguments:
 \itemize{
-\item value: A \code{character} vector of the new drug names. Must have the same
-length equal to \code{nrow(drugInfo(object))}.
+\item object: \code{PharmacoSet} An object to retrieve treatment names from.
+}
+
+\strong{treatmentNames<-}: \code{PharmacoSet} Object with updates treatment names.
+object. Arguments:
+\itemize{
+\item object: \code{PharmacoSet} An object to set treatment names from.
+\item value: \code{character} A character vector of updated treatment names.
 }
 
 \subsection{@annotation}{
@@ -270,20 +285,23 @@ the \verb{@annotation} slot.
 \item value: \code{character(1)} The name of the \code{PharmacoSet} object.
 }
 
-\strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{PharmacoSet} object.
+\strong{cellInfo}: \code{data.frame} Metadata for all sample in a \code{PharmacoSet} object.
 
-\strong{cellInfo<-}: assign updated cell-line annotations to the \code{PharmacoSet} object. Arguments:
+\strong{sampleInfo<-}: assign updated sample annotations to the \code{PharmacoSet}
+object.
+Arguments:
 \itemize{
 \item value: a \code{data.frame} object.
 }
 
-\strong{cellNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
-the \code{cell} slot from a PharmacoSet object.
+\strong{sampleNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
+the \code{sample} slot from a PharmacoSet object.
 
-\strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
-a PharmacoSet object. Arguments:
+\strong{sampleNames<-}: assign new rownames to the sampleInfo \code{data.frame} for
+a PharmacoSet object.
+Arguments:
 \itemize{
-\item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
+\item value: \code{character} vector of rownames for the \code{sampleInfo(object)} \code{data.frame}.
 }
 
 \subsection{@curation}{
@@ -405,13 +423,13 @@ slot of a \code{PharmacoSet} object. Arguemnts:
 \code{SummarizedExperiment}.
 }
 
-\subsection{@sensitivity}{
+\subsection{@treatmentResponse}{
 \subsection{Arguments:}{
 \itemize{
-\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
-retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
-\code{PharmacoSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
-warning if \verb{@sensitivity} is not a \code{LongTable} object.
+\item \code{dimension}: Optional \code{character(1)} One of 'treatment', 'sample' or
+'assay' to retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from
+the \code{PharmacoSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+warning if \verb{@treatmentResponse} is not a \code{LongTable} object.
 \item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
 \code{LongTable} methods. Only used if the sensitivity slot contains a
 \code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
@@ -422,32 +440,32 @@ specified.
 \subsection{Methods:}{
 
 \strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
-by cell-line metadata for the \code{PharmacoSet} object. When the \code{dimension}
+by sample metadata for the \code{PharmacoSet} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
-from the \code{LongTable} object in \verb{@sensitivity} of a PharmacoSet object.
+from the \code{LongTable} object in \verb{@treatmentResponse} of a PharmacoSet object.
 }
 
 }
 
-\strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
+\strong{sensitivityInfo}<-: Update the \verb{@treatmentResponse} slot metadata for a
 \code{PharmacoSet} object. When used without the \code{dimension} argument is behaves
-similar to the old PharmacoSet implementation, where the \verb{@sensitivity} slot
+similar to the old PharmacoSet implementation, where the \verb{@treatmentResponse} slot
 contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
-arugment is used, more complicated assignments can occur where 'cell'
+arugment is used, more complicated assignments can occur where 'sample'
 modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
 'assay' the 'assay_metadata' assay.
 Arguments:
 \itemize{
 \item value: A \code{data.frame} of treatment response experiment metadata,
-documenting experiment level metadata (mapping to drugs and cells). If
-the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimension} is
+documenting experiment level metadata (mapping to drugs and samples). If
+the \verb{@treatmentResponse} slot doesn't contain a \code{LongTable} and \code{dimension} is
 not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
 }
 
 \strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{PharmacoSet}
-object. Each measure reprents some summary of cell-line sensitivity to a given
-dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+object. Each measure reprents some summary of sample sensitivity to a given
+drug, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
 \code{character} vector with all available metrics for the PSet object.
 
 \strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{PharmacoSet}
@@ -474,7 +492,7 @@ computation of additional summary metrics.
 \strong{sensitivityRaw}: Access the raw sensitiity measurents for a PharmacoSet
 object. A 3D \code{array} where rows are experiment_ids, columns are doses
 and the third dimension is metric, either 'Dose' for the doses used or
-'Viability' for the cell-line viability at that dose.
+'Viability' for the sample viability at that dose.
 
 \strong{sensitvityRaw<-}: Update the raw dose and viability data in a \code{PharmacoSet}.
 \itemize{
@@ -484,40 +502,37 @@ dose or viability measurement for that experiment_id and replicate.
 }
 
 \strong{sensNumber}: Return a count of viability observations in a \code{PharmacoSet}
-object for each drug-combo by cell-line combination.
+object for each drug-combo by sample combination.
 
 \strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
-of drug by cell-line experiment counts, in the \code{list} in \verb{@sensitivity}
+of drug by sample-line experiment counts, in the \code{list} in \verb{@treatmentResponse}
 slot of a \code{PharmacoSet} object. Will error when \verb{@sensitviity} contains
 a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \itemize{
-\item value: A \code{matrix} where rows are cells and columns are drugs, with a
+\item value: A \code{matrix} where rows are samples and columns are drugs, with a
 count of the number of experiments for each combination as the values.
 }
 
 \strong{pertNumber}: \code{array} Summary of available perturbation experiments
 from in a \code{PharmacoSet} object. Returns a 3D \code{array} with the number of
-perturbation experiments per drug and cell line, and data type.
+perturbation experiments per drug and sample, and data type.
 
 \strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{PharmacoSet} object,
 which stores a summary of the available perturbation experiments. Arguments:
 \itemize{
 \item value: A new 3D \code{array} with the number of perturbation experiments per
-drug and cell line, and data type
+drug and sample, and data type
 }
 }
 \examples{
 data(CCLEsmall)
+treatmentInfo(CCLEsmall)
 
-## drug slot
+treatmentInfo(CCLEsmall) <- treatmentInfo(CCLEsmall)
 
-drugInfo(CCLEsmall)
+treatmentNames(CCLEsmall)
 
-drugInfo(CCLEsmall) <- drugInfo(CCLEsmall)
-
-drugNames(CCLEsmall)
-
-drugNames(CCLEsmall) <- drugNames(CCLEsmall)
+treatmentNames(CCLEsmall) <- treatmentNames(CCLEsmall)
 
 
 ## @annotation
@@ -535,11 +550,11 @@ name(CCLEsmall)
 
 name(CCLEsmall) <- 'new_name'
 
-cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
+sampleInfo(CCLEsmall) <- sampleInfo(CCLEsmall)
 
-cellNames(CCLEsmall)
+sampleNames(CCLEsmall)
 
-cellNames(CCLEsmall) <- cellNames(CCLEsmall)
+sampleNames(CCLEsmall) <- sampleNames(CCLEsmall)
 
 ## curation
 curation(CCLEsmall)
@@ -554,7 +569,7 @@ datasetType(CCLEsmall) <- 'both'
 molecularProfiles(CCLEsmall, 'rna') <- molecularProfiles(CCLEsmall, 'rna')
 
 # Specific assay
-molecularProfiles(CCLEsmall, 'rna', 'exprs') <- 
+molecularProfiles(CCLEsmall, 'rna', 'exprs') <-
     molecularProfiles(CCLEsmall, 'rna', 'exprs')
 
 featureInfo(CCLEsmall, 'rna')

@@ -9,13 +9,15 @@ doc
 Meta
 */*.so
 ^PSets/*
-..Rcheck/.*
-^.*Rcheck
 scripts/*
 scripts
 Psets/*
 check/*
 PSets/**
+.*
+
+# exceptions
+!.gitignore
 local_data/**
 .VSCodeCounter/**
 *.o

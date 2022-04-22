@@ -1,38 +1,38 @@
-#' Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response 
+#' Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
 #' to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
-#' 
+#'
 #' @examples
 #' data(GDSCsmall)
 #' filterNoisyCurves(GDSCsmall)
 #'
 #' @param pSet [PharmacoSet] a PharmacoSet object
-#' @param epsilon `numeric` a value indicates assumed threshold for the 
+#' @param epsilon `numeric` a value indicates assumed threshold for the
 #'   distance between to consecutive viability values on the drug-response curve
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
-#' @param positive.cutoff.percent `numeric` This value indicates that function 
-#'   may violate epsilon rule for how many points on drug-response curve 
+#' @param positive.cutoff.percent `numeric` This value indicates that function
+#'   may violate epsilon rule for how many points on drug-response curve
 #' @param mean.viablity `numeric` average expected viability value
 #' @param nthread `numeric` if multiple cores are available, how many cores
-#'   should the computation be parallelized over? 
-#' 
-#' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the 
+#'   should the computation be parallelized over?
+#'
+#' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the
 #'   rownames of the non-noisy curves
-#' 
+#'
 #' @export
 filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
-    
+
     acceptable <- mclapply(rownames(sensitivityInfo(pSet)), function(xp) {
         #for(xp in rownames(sensitivityInfo(pSet))){
-        drug.responses <- as.data.frame(apply(pSet@sensitivity$raw[xp , ,], 2, as.numeric), stringsAsFactors=FALSE)
+        drug.responses <- as.data.frame(apply(sensitivityRaw(pSet)[xp , ,], 2, as.numeric), stringsAsFactors=FALSE)
         drug.responses <- drug.responses[complete.cases(drug.responses), ]
         doses.no <- nrow(drug.responses)
-        
+
         drug.responses[,"delta"] <- .computeDelta(drug.responses$Viability)
-        
+
         delta.sum <- sum(drug.responses$delta, na.rm = TRUE)
-        
+
         max.cum.sum <- .computeCumSumDelta(drug.responses$Viability)
-        
+
         if ((table(drug.responses$delta < epsilon)["TRUE"] >= (doses.no * positive.cutoff.percent)) &
         (delta.sum < epsilon) &
         (max.cum.sum < (2 * epsilon)) &

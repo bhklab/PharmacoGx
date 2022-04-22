@@ -25,15 +25,15 @@
 #' @param fill.missing \code{boolean} should the missing cell lines not in the
 #'   molecular data object be filled in with missing values?
 #' @param verbose Should the function print progress messages?
-#' 
+#'
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
 #'   the columns, with the selected sensitivity statistic for each pair.
-#'   
+#'
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-        function(object, sensitivity.measure="auc_recomputed", cell.lines, 
-        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"), 
+        function(object, sensitivity.measure="auc_recomputed", cell.lines,
+        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
         fill.missing=TRUE, verbose=TRUE) {
     if (is(sensitivitySlot(object), 'LongTable'))
         .summarizeSensProfiles(object, sensitivity.measure,
@@ -52,12 +52,12 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
-        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat, 
+        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat,
         fill.missing=TRUE) {
 
     # handle missing
-    if (missing(cell.lines)) cell.lines <- cellNames(object)
-    if (missing(drugs)) drugs <- drugNames(object)
+    if (missing(cell.lines)) cell.lines <- sampleNames(object)
+    if (missing(drugs)) drugs <- treatmentNames(object)
     if (missing(summary.stat)) summary.stat <- 'mean'
 
     # get LongTable object
@@ -70,7 +70,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     # compute max concentration and add it to the profiles
     if (sensitivity.measure == 'max.conc') {
         dose <- copy(assay(longTable, 'dose', withDimnames=TRUE, key=FALSE))
-        dose[, max.conc := max(.SD, na.rm=TRUE), 
+        dose[, max.conc := max(.SD, na.rm=TRUE),
             .SDcols=grep('dose\\d+id', colnames(dose))]
         dose <- dose[, .SD, .SDcols=!grepl('dose\\d+id', colnames(dose))]
         sensProfiles <- dose[sensProfiles, on=idCols(longTable)]
@@ -103,20 +103,20 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     }
 
     # do the summary
-    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)), 
-        by=.(drugid, cellid)]
+    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)),
+        by=.(treatmentid, sampleid)]
 
     # NA pad the missing cells and drugs
     if (fill.missing) {
         allCombos <- data.table(expand.grid(drugs, cell.lines))
-        colnames(allCombos) <- c('drugid', 'cellid')
-        profSummary <- profSummary[allCombos, on=c('drugid', 'cellid')]
+        colnames(allCombos) <- c("treatmentid", "sampleid")
+        profSummary <- profSummary[allCombos, on=c("treatmentid", "sampleid")]
     }
 
     # reshape and convert to matrix
-    setorderv(profSummary, c('cellid', 'drugid'))
-    profSummary <- dcast(profSummary, drugid ~ cellid, value.var='V1')
-    summaryMatrix <- as.matrix(profSummary, rownames='drugid')
+    setorderv(profSummary, c("sampleid", "treatmentid"))
+    profSummary <- dcast(profSummary, treatmentid ~ sampleid, value.var='V1')
+    summaryMatrix <- as.matrix(profSummary, rownames="treatmentid")
     return(summaryMatrix)
 
 }
@@ -137,22 +137,22 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 	summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
   if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(object)), "max.conc"))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
+    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
   if (missing(cell.lines)) {
-    cell.lines <- cellNames(object)
+    cell.lines <- sampleNames(object)
   }
   if (missing(drugs)) {
     if (sensitivity.measure != "Synergy_score")
     {
-      drugs <- drugNames(object)
+      drugs <- treatmentNames(object)
     }else{
-      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$drugid), "drugid"]
+      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$treatmentid), "treatmentid"]
     }
   }
 
   pp <- sensitivityInfo(object)
-  ppRows <- which(pp$cellid %in% cell.lines & pp$drugid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
+  ppRows <- which(pp$sampleid %in% cell.lines & pp$treatmentid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
   if(sensitivity.measure != "max.conc") {
     dd <- sensitivityProfiles(object)
   } else {
@@ -172,7 +172,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 
   # if(verbose){
 
-  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, object@annotation$name))
+  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, annotation(object)$name))
   #   total <- length(drugs)*length(cell.lines)
   #   # create progress bar
   #   pb <- utils::txtProgressBar(min=0, max=total, style=3)
@@ -186,7 +186,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     dd[, sensitivity.measure] <- as.numeric(as.character(dd[, sensitivity.measure]))
   }
 
-  pp_dd <- cbind(pp[,c("cellid", "drugid")], "sensitivity.measure"=dd[, sensitivity.measure])
+  pp_dd <- cbind(pp[,c("sampleid", "treatmentid")], "sensitivity.measure"=dd[, sensitivity.measure])
 
 
   summary.function <- function(x) {
@@ -203,9 +203,9 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
         )
   }
 
-  pp_dd <- pp_dd[pp_dd[,"cellid"] %in% cell.lines & pp_dd[,"drugid"]%in%drugs,]
+  pp_dd <- pp_dd[pp_dd[,"sampleid"] %in% cell.lines & pp_dd[,"treatmentid"]%in%drugs,]
 
-  tt <- reshape2::acast(pp_dd, drugid ~ cellid, fun.aggregate=summary.function, value.var="sensitivity.measure")
+  tt <- reshape2::acast(pp_dd, treatmentid ~ sampleid, fun.aggregate=summary.function, value.var="sensitivity.measure")
  # tt <- tt[drugs, cell.lines]
 
 

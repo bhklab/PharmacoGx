@@ -1,14 +1,14 @@
 
 cor.boot <- function(data, w){
   ddd <- data[w,]
-        ## A question here is what to do when our bootstrap sample has 0 variance in one of 
+        ## A question here is what to do when our bootstrap sample has 0 variance in one of
       ## the two variables (usually the molecular feature)
-      ## If we return NA, we effectively condition on a sampling procedure that samples at least 
-      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned 
-      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more 
+      ## If we return NA, we effectively condition on a sampling procedure that samples at least
+      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned
+      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more
       ## conservative. We probably want to use a completely different model to discover "rare" biomarkers
-      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on 
-      ## the behaviour of coop. 
+      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on
+      ## the behaviour of coop.
 
   if(length(unique(ddd[,1]))<2 || length(unique(ddd[,2]))<2){
     return(0)
@@ -19,30 +19,30 @@ cor.boot <- function(data, w){
 
 
 #' Calculate The Gene Drug Sensitivity
-#' 
-#' This version of the function uses a partial correlation instead of standardized linear models. 
-#' 
+#'
+#' This version of the function uses a partial correlation instead of standardized linear models.
+#'
 #' @param x A \code{numeric} vector of gene expression values
 #' @param type A \code{vector} of factors specifying the cell lines or type types
 #' @param batch A \code{vector} of factors specifying the batch
-#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g., 
+#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g.,
 #'   IC50 or AUC)
 #' @param test A \code{character} string indicating whether resampling or analytic based tests should be used
 #' @param req_alpha \code{numeric}, number of permutations for p value calculation
 #' @param nBoot \code{numeric}, number of bootstrap resamplings for confidence interval estimation
 #' @param conf.level \code{numeric}, between 0 and 1. Size of the confidence interval required
-#' @param max_perm \code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA. 
+#' @param max_perm \code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA.
 #'   Can be set globally by setting the option "PharmacoGx_Max_Perm", or left at the default of \code{ceiling(1/req_alpha*100)}.
 #' @param verbose \code{boolean} Should the function display messages?
-#'  
-#' @return A \code{vector} reporting the effect size (estimateof the coefficient 
-#'   of drug concentration), standard error (se), sample size (n), t statistic, 
+#'
+#' @return A \code{vector} reporting the effect size (estimateof the coefficient
+#'   of drug concentration), standard error (se), sample size (n), t statistic,
 #'   and F statistics and its corresponding p-value.
 #'
-#' @importFrom stats sd complete.cases lm glm anova pf formula var pt qnorm cor residuals runif 
+#' @importFrom stats sd complete.cases lm glm anova pf formula var pt qnorm cor residuals runif
 #' @importFrom boot boot boot.ci
 #' @importFrom coop pcor
-geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno, 
+geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   test = c("resampling", "analytic"),
   req_alpha = 0.05,
   nBoot = 1e3,
@@ -52,8 +52,8 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
 
   test <- match.arg(test)
 
-  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")  
-  
+  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
+
   drugpheno <- data.frame(vapply(drugpheno, function(x) {
     if (!is.factor(x)) {
       x[is.infinite(x)] <- NA
@@ -90,7 +90,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   dd <- data.frame(drugpheno, "x"=xx)
 
   ## control for tissue type
-  if(length(sort(unique(type[ccix]))) > 1) { 
+  if(length(sort(unique(type[ccix]))) > 1) {
     dd <- cbind(dd, type=type[ccix])
   }
   ## control for batch
@@ -123,7 +123,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       lm1 <- lm(formula(ffd), dd)
       var1 <- residuals(lm1)
       var2 <- residuals(lm(formula(ffx), dd))
-      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor. 
+      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor.
     } else { ## doing this if statement in the case there are some numerical differences between mean centred values and raw values
     var1 <- dd[,"drugpheno.1"]
     var2 <- dd[,"x"]
@@ -141,14 +141,14 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
   if(test == "resampling"){
       ## While the logic is equivalent regardless of if there are covariates for calculating the point estimate,
       ## (correlation is a subcase of partial correlation), for computational efficency in permuation testing we
-      ## split here and don't do extranous calls to lm if it is unnecessay. 
+      ## split here and don't do extranous calls to lm if it is unnecessay.
 
     if(ncol(dd) > 2){
 
       if(!getOption("PharmacoGx_useC")|| ncol(dd)!=3){ ## currently implementing c code only for 1 single grouping variable
 
-        ## implementing a much more efficient method for the particular case where we have 3 columns with assumption that 
-        ## column 3 is the tissue. 
+        ## implementing a much more efficient method for the particular case where we have 3 columns with assumption that
+        ## column 3 is the tissue.
         if(ncol(dd)==3){
           sample_function <- function(){
 
@@ -175,7 +175,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
 
             perm.cor <- coop::pcor(partial.dp, partial.x, use="complete.obs")
             return(abs(obs.cor) < abs(perm.cor))
-          }          
+          }
         }
 
         p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
@@ -192,29 +192,29 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
         NG <- length(table(factor(dd[,3])))
         N <- as.numeric(length(x))
 
-        p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2)) 
+        p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2))
         significant <- p.value[[1]]
-        p.value <- p.value[[2]]        
+        p.value <- p.value[[2]]
       }
 
 
     pcor.boot <- function(ddd, w){
-      ddd <- ddd[w,] 
+      ddd <- ddd[w,]
           ## Taking care of an edge case where only one factor level is left after resampling
           ## However, we need to keep the first two numeric columns to properly return a value, otherwise
-          ## if we remove gene expression because there were only non-detected samples, for example, 
-          ## we will try to take the correlation against a character vector.  
-      ddd <- ddd[,c(TRUE, TRUE, apply(ddd[,-c(1,2),drop=F], 2, function(x) return(length(unique(x))))>=2)]
+          ## if we remove gene expression because there were only non-detected samples, for example,
+          ## we will try to take the correlation against a character vector.
+      ddd <- ddd[,c(TRUE, TRUE, apply(ddd[,-c(1,2),drop=FALSE], 2, function(x) return(length(unique(x))))>=2)]
 
 
-      ## A question here is what to do when our bootstrap sample has 0 variance in one of 
+      ## A question here is what to do when our bootstrap sample has 0 variance in one of
       ## the two variables (usually the molecular feature)
-      ## If we return NA, we effectively condition on a sampling procedure that samples at least 
-      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned 
-      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more 
+      ## If we return NA, we effectively condition on a sampling procedure that samples at least
+      ## one expressor. If we return near 0 (the default of coop::pcor), then we effectively say that conditioned
+      ## on not sampling any expressors, there is no association. Neither is correct, but the latter is certainly more
       ## conservative. We probably want to use a completely different model to discover "rare" biomarkers
-      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on 
-      ## the behaviour of coop. 
+      ## We will go with the later conservative option, however we will set it to zero exactly instead of relying on
+      ## the behaviour of coop.
 
       if(length(unique(ddd[,1]))<2 || length(unique(ddd[,2]))<2){
         return(0)
@@ -270,9 +270,9 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
       NG <- 1L
       N <- as.numeric(length(x))
 
-      p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2)) 
+      p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, max_perm, N, req_alpha, req_alpha/100, 10L, runif(2))
       significant <- p.value[[1]]
-      p.value <- p.value[[2]]        
+      p.value <- p.value[[2]]
     }
 
 

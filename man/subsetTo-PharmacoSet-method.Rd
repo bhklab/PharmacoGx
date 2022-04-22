@@ -46,8 +46,8 @@ to keep track of all the metadata conventions between different datasets.
 }
 \examples{
 data(CCLEsmall)
-CCLEdrugs  <- drugNames(CCLEsmall)
-CCLEcells <- cellNames(CCLEsmall)
+CCLEdrugs  <- treatmentNames(CCLEsmall)
+CCLEcells <- sampleNames(CCLEsmall)
 pSet <- subsetTo(CCLEsmall, drugs = CCLEdrugs[1], cells = CCLEcells[1])
 pSet
 

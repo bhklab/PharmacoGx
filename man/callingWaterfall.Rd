@@ -31,7 +31,7 @@ require?}
 }
 \value{
 \code{factor} Containing the drug sensitivity status of each
-cellline.
+sample.
 }
 \description{
 \enumerate{
@@ -40,7 +40,7 @@ cellline.
 }
 \details{
 \enumerate{
-\item Sort log IC50s (or ActArea or Amax) of the cell lines to generate a
+\item Sort log IC50s (or ActArea or Amax) of the samples to generate a
 “waterfall distribution”
 \item Identify cutoff:
 }
@@ -53,12 +53,12 @@ the start and end points of the distribution.
 3.2 If the waterfall distribution appears linear (pearson cc to the linear
 fit > 0.95), then use the median IC50 instead.
 \enumerate{
-\item Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20\% Amax
+\item Samples within a 4-fold IC50 (or within a 1.2-fold ActArea or 20\% Amax
 difference) difference centered around this inflection point are classified
-as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax
+as being “intermediate”,  samples with lower IC50s (or ActArea/Amax
 values) than this range are defined as sensitive, and those with IC50s (or
 ActArea/Amax) higher than this range are called “insensitive”.
-\item Require at least x sensitive and x insensitive cell lines after applying
+\item Require at least x sensitive and x insensitive samples after applying
 these criteria (x=5 in our case).
 }
 }

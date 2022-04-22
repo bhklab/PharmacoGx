@@ -3,8 +3,8 @@
 %% upated by @jhollist 09/15/2014
 %% inspired by @cboetting https://github.com/cboettig/template and
 %% @rmflight blog posts:
-%% http://rmflight.github.io/posts/2014/07/analyses_as_packages.html 
-%% http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html).  
+%% http://rmflight.github.io/posts/2014/07/analyses_as_packages.html
+%% http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$lang$,$endif$$if(papersize)$$papersize$,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
@@ -146,16 +146,16 @@ $if(lang)$
 $endif$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Changes borrowed from @cboettig, added by @jhollist 
-% A modified page layout 
+%Changes borrowed from @cboettig, added by @jhollist
+% A modified page layout
 \textwidth 6.75in
 \oddsidemargin -0.15in
 \evensidemargin -0.15in
 \textheight 9in
 \topmargin -0.5in
-\usepackage{lineno} % add 
+\usepackage{lineno} % add
 $if(linenumbers)$
-  \linenumbers % turns line numbering on 
+  \linenumbers % turns line numbering on
 $endif$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -208,11 +208,11 @@ $header-includes$
 $endfor$
 
 %%Fix tightlist error: https://stackoverflow.com/questions/40438037/tightlist-error-using-pandoc-with-markdown
-%%Added 2018-03-26 
+%%Added 2018-03-26
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-%%%  
-  
+%%%
+
 
 \begin{document}
 %%Edited by @jhollist 09/15/2014
@@ -236,7 +236,7 @@ $endfor$
 \end{center}
 %%Adds affiliations from YAML
 \begin{justify}
-\footnotesize \emph{ 
+\footnotesize \emph{
 $for(affiliation)$
 \\*
 \textsuperscript{$affiliation.affilnum$}$affiliation.affil$\\*
@@ -246,7 +246,7 @@ $endfor$
 \newcounter{num}
 \setcounter{num}{1}
 \\[0.1cm]
-\footnotesize \emph{ 
+\footnotesize \emph{
 $for(author)$
 $if(author.email)$
 \ifnum\value{num}=1%

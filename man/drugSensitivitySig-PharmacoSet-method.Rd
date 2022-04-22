@@ -42,10 +42,10 @@ signatures. Should match the names used in the PharmacoSet.}
 signatures. Should match the names used in correspondant molecular data in PharmacoSet.}
 
 \item{cells}{\code{character} allows choosing exactly which cell lines to include for the signature fitting.
-Should be a subset of cellNames(pSet)}
+Should be a subset of sampleNames(pSet)}
 
 \item{tissues}{\code{character} a vector of which tissue types to include in the signature fitting.
-Should be a subset of cellInfo(pSet)$tissueid}
+Should be a subset of sampleInfo(pSet)$tissueid}
 
 \item{sensitivity.measure}{\code{character} which measure of the drug dose
 sensitivity should the function use for its computations? Use the
@@ -101,7 +101,7 @@ drugs in the second, and the selected return values in the third.
 }
 \examples{
 data(GDSCsmall)
-drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
   nthread=1, features = fNames(GDSCsmall, "rna")[1])
 print(drug.sensitivity)
 
