@@ -86,7 +86,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'
 #' @inheritParams CoreGx::CoreSet
 #'
-#' @return An object of class PharmacoSet
+#' @return An object of class `PharmacoSet`
 #
 #' @import methods
 #' @importFrom utils sessionInfo
@@ -99,93 +99,40 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
         treatment=data.frame(), sensitivityInfo=data.frame(),
         sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(),
-        sensitivityN=matrix(nrow=0, ncol=0),
-        perturbationN=array(NA, dim=c(0,0,0)), curationTreatment=data.frame(),
-        curationSample = data.frame(), curationTissue = data.frame(),
-        datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE) {
+        sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)),
+        curationTreatment=data.frame(), curationSample = data.frame(),
+        curationTissue = data.frame(), datasetType=c("sensitivity", "perturbation", "both"),
+        verify = TRUE, ...) {
 
     #.Deprecated("PharmacoSet2", )
 
-    ## FIXME:: Inherit this from CoreSet!!
-    # ensure new sampleid and treatmentid identifiers are honoured
-    sample <- CoreGx:::.checkForSampleId(sample)
-    treatment <- CoreGx:::.checkForTreatmentId(treatment)
-    sensitivityInfo <- CoreGx:::.checkForSampleId(sensitivityInfo)
-    sensitivityInfo <- CoreGx:::.checkForTreatmentId(sensitivityInfo)
-    curationSample <- CoreGx:::.checkForSampleId(curationSample)
-    curationTreatment <- CoreGx:::.checkForTreatmentId(curationTreatment)
-    for (nm in names(molecularProfiles)) {
-        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForSampleId(
-            colData(molecularProfiles[[nm]]))
-        # handle perturbation case
-        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForIdColumn(
-            colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
-            error=FALSE)
-    }
+    cSet <- CoreGx::CoreSet(
+        name=name,
+        sample=sample,
+        treatment=treatment,
+        sensitivityInfo=sensitivityInfo,
+        sensitivityRaw=sensitivityRaw,
+        sensitivityProfiles=sensitivityProfiles,
+        sensitivityN=sensitivityN,
+        perturbationN=perturbationN,
+        curationTreatment=curationTreatment,
+        curationSample=curationSample,
+        curationTissue=curationTissue,
+        datasetType=datasetType,
+        verify=verify,
+        ...
+    )
 
-    datasetType <- match.arg(datasetType)
-
-    annotation <- list()
-    annotation$name <- as.character(name)
-    annotation$dateCreated <- date()
-    annotation$sessionInfo <- sessionInfo()
-    annotation$call <- match.call()
-
-    ## TODO:: If the colnames and rownames are not found below, it will fill
-    ##>with NAs. This is undersirable behaviour.
-    #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
-    ## TODO:: Determine if I should use SummarizedExperiment construtor here?
-    for (i in seq_along(molecularProfiles)) {
-        if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
-            stop(sprintf("Please provide the %s data as a SummarizedExperiment",
-                names(molecularProfiles[i])))
-        } else {
-            rowData(molecularProfiles[[i]]) <- rowData(molecularProfiles[[i]])[
-                rownames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
-            ]
-            colData(molecularProfiles[[i]]) <- colData(molecularProfiles[[i]])[
-                colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
-            ]
-        }
-    }
-
-    sensitivity <- list()
-
-    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) &
-            rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])) {
-        stop("Please ensure all the row names match between the sensitivity ",
-            "data.")
-    }
-
-    sensitivity$info <- as.data.frame(sensitivityInfo, stringsAsFactors = FALSE)
-    sensitivity$raw <- sensitivityRaw
-    sensitivity$profiles <- as.data.frame(sensitivityProfiles,
-        stringsAsFactors = FALSE)
-    sensitivity$n <- sensitivityN
-
-    curation <- list()
-    curation$treatment <- as.data.frame(curationTreatment, stringsAsFactors = FALSE)
-    curation$sample <- as.data.frame(curationSample, stringsAsFactors = FALSE)
-    curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
-    ### TODO:: Make sure to fix the curation to check for matching row names
-    ##> to the drug and cell line matrices!
-
-    perturbation <- list()
-    perturbation$n <- perturbationN
-    if (datasetType == "perturbation" || datasetType == "both") {
-        perturbation$info <- "The metadata for the perturbation experiments is
-            available for each molecular type by calling the appropriate info
-            function. \n For example, for RNA transcriptome perturbations,
-            the metadata can be accessed using rnaInfo(object)."
-    } else {
-        perturbation$info <- "Not a perturbation dataset."
-    }
-
-    pSet  <- .PharmacoSet(annotation=annotation,
-        molecularProfiles=molecularProfiles, sample=as.data.frame(sample),
-        treatment=as.data.frame(treatment), datasetType=datasetType,
-        treatmentResponse=sensitivity, perturbation=perturbation,
-        curation=curation)
+    pSet  <- .PharmacoSet(
+        annotation=cSet@annotation,
+        molecularProfiles=cSet@olecularProfiles,
+        sample=cSet@sample,
+        treatment=cSet@treatment,
+        datasetType=cSet@datasetTypes,
+        treatmentResponse=cSet@treatmentResponse,
+        perturbation=cSet@perturbation,
+        curation=cSet@curation
+    )
     if (verify) checkPsetStructure(pSet)
     if (length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
         pSet@treatmentResponse$n <- .summarizeSensitivityNumbers(pSet)

@@ -204,7 +204,7 @@ geneDrugSensitivityPCorr <- function(x, type, batch, drugpheno,
           ## However, we need to keep the first two numeric columns to properly return a value, otherwise
           ## if we remove gene expression because there were only non-detected samples, for example,
           ## we will try to take the correlation against a character vector.
-      ddd <- ddd[,c(TRUE, TRUE, apply(ddd[,-c(1,2),drop=F], 2, function(x) return(length(unique(x))))>=2)]
+      ddd <- ddd[,c(TRUE, TRUE, apply(ddd[,-c(1,2),drop=FALSE], 2, function(x) return(length(unique(x))))>=2)]
 
 
       ## A question here is what to do when our bootstrap sample has 0 variance in one of

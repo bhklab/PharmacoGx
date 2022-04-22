@@ -240,9 +240,9 @@ setMethod("drugSensitivitySig",
     celln <- celln[cix]
 
     if(!missing(tissues)){
-      celln <- celln[cellInfo(object)[celln,"tissueid"] %in% tissues]
+      celln <- celln[sampleInfo(object)[celln,"tissueid"] %in% tissues]
     } else {
-      tissues <- unique(cellInfo(object)[celln,"tissueid"])
+      tissues <- unique(sampleInfo(object)[celln,"tissueid"])
     }
 
     molecularProfilesSlot(object)[[mDataType]] <- summarizeMolecularProfiles(object = object,
@@ -262,7 +262,7 @@ setMethod("drugSensitivitySig",
 
     molcellx <- phenoInfo(object, mDataType)[ ,"sampleid"] %in% celln
 
-    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
+    type <- as.factor(sampleInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
 
     if("batchid" %in% colnames(phenoInfo(object, mDataType))){
       batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]

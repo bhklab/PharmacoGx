@@ -3,7 +3,7 @@
 #' @importFrom stats lm
 #' @importFrom stats anova
 #' @importFrom stats pf
-#' 
+#'
 
 ## function computing gene-drug associations from perturbation data (CMAP)
 geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=FALSE) {
@@ -16,10 +16,10 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
 ##  model: Should the full linear model be returned? Default set to FALSE
 ##
 ## output:
-##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and F statistics and its corresponding p-value
-    
-  
-  
+##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and f statistics and its corresponding p-value
+
+
+
     nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
     if (length(sort(unique(concentration))) < 2) {
         warning("No drug concentrations tested")
@@ -29,9 +29,9 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
     }
     ff0 <- sprintf("x ~ 1")
     ff <- sprintf("%s + concentration", ff0)
-    
 
-    if (length(sort(unique(type))) > 1) { 
+
+    if (length(sort(unique(type))) > 1) {
         ff0 <- sprintf("%s + type", ff0)
         ff <- sprintf("%s + type", ff)
     }
@@ -39,7 +39,7 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
         ff0 <- sprintf("%s + batch", ff0)
         ff <- sprintf("%s + batch", ff)
     }
-  
+
 ### add experiment duration if the vector consists of more than one different value
 
   if(length(sort(unique(duration))) > 2){

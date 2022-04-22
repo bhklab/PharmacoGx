@@ -18,7 +18,8 @@ PharmacoSet(
   curationSample = data.frame(),
   curationTissue = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
-  verify = TRUE
+  verify = TRUE,
+  ...
 )
 }
 \arguments{
@@ -71,9 +72,11 @@ universal identifiers used between different CoreSet objects}
 
 \item{verify}{\code{logical(1)}Should the function verify the CoreSet and
 print out any errors it finds after construction?}
+
+\item{...}{Catch and parse any renamed constructor arguments.}
 }
 \value{
-An object of class PharmacoSet
+An object of class \code{PharmacoSet}
 }
 \description{
 A constructor that simplifies the process of creating PharmacoSets, as well

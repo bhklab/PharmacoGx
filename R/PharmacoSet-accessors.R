@@ -39,10 +39,11 @@ NULL
 #'   subtituting any string in { } for the argument of the same name in `...`.
 #'
 #' @keywords internal
+#' @importFrom CoreGx .parseToRoxygen
 #' @export
 #' @noRd
 .parseToRoxygen <- function(string, ...) {
-    CoreGx:::.parseToRoxygen(string, ...)
+    CoreGx::.parseToRoxygen(string, ...)
 }
 
 
