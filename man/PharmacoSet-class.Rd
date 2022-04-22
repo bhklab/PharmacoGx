@@ -40,18 +40,18 @@ type object for holding data for RNA, DNA, SNP and CNV
 measurements, with associated \code{fData} and \code{pData}
 containing the row and column metadata}
 
-\item{\code{cell}}{A \code{data.frame} containing the annotations for all the cell
+\item{\code{sample}}{A \code{data.frame} containing the annotations for all the cell
 lines profiled in the data set, across all data types}
 
-\item{\code{drug}}{A \code{data.frame} containg the annotations for all the drugs
+\item{\code{treatment}}{A \code{data.frame} containg the annotations for all the drugs
 profiled in the data set, across all data types}
 
-\item{\code{sensitivity}}{A \code{list} containing all the data for the sensitivity
-experiments, including \code{$info}, a \code{data.frame} containing the
-experimental info,\code{$raw} a 3D \code{array} containing raw data,
-\code{$profiles}, a \code{data.frame} containing sensitivity profiles
-statistics, and \code{$n}, a \code{data.frame} detailing the number of
-experiments for each cell-drug pair}
+\item{\code{treatmentResponse}}{A \code{list} containing all the data for the
+sensitivity experiments, including \code{$info}, a \code{data.frame}
+containing the experimental info,\code{$raw} a 3D \code{array} containing
+raw data, \code{$profiles}, a \code{data.frame} containing sensitivity
+profiles statistics, and \code{$n}, a \code{data.frame} detailing the
+number of experiments for each cell-drug pair}
 
 \item{\code{perturbation}}{A \code{list} containting \code{$n}, a \code{data.frame}
 summarizing the available perturbation data,}

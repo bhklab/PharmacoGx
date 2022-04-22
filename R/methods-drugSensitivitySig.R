@@ -75,7 +75,7 @@ setMethod("drugSensitivitySig", signature(object="PharmacoSet"),
 
 #' @import parallel
 #' @importFrom SummarizedExperiment assayNames assay
-#' @importMethodsFrom MultiAssayExperiment experiments
+#' @importFrom MultiAssayExperiment experiments
 #' @keywords internal
 .drugSensitivitySigPharmacoSet <- function(object, mDataType, drugs, features,
     cells,  tissues, sensitivity.measure = "auc_recomputed",

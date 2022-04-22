@@ -206,7 +206,7 @@ setMethod("sampleInfo", "PharmacoSet", function(object) {
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_sampleInfo(class_=.local_class,
 #' data_=.local_data, sample_="cell")
-#' @importFrom CoreGx cellInfo<-
+#' @importFrom CoreGx sampleInfo<-
 #' @export
 setReplaceMethod("sampleInfo", signature(object="PharmacoSet",
         value="data.frame"), function(object, value) {

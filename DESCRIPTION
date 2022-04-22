@@ -45,7 +45,6 @@ Imports:
     reshape2,
     jsonlite,
     data.table,
-    glue,
     checkmate
 Depends: R (>= 3.6), CoreGx
 Roxygen: list(markdown = TRUE, r6=FALSE)

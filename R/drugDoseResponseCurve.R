@@ -181,12 +181,12 @@ function(drug,
         if (summarize.replicates) {
           pSetNames[[i]] <- name(pSets[[i]])
           if (length(exp_i) == 1) {
-            drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
+            drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
+              "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }else{
-            drug.responses <- as.data.frame(cbind("Dose"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
-              "Viability"=apply(pSets[[i]]@sensitivity$raw[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
+            drug.responses <- as.data.frame(cbind("Dose"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
+              "Viability"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
           }
           doses[[i]] <- drug.responses$Dose
@@ -195,10 +195,10 @@ function(drug,
           if (!missing(legends.label)) {
             if (length(legends.label) > 1) {
               legend.values[[i]] <- paste(unlist(lapply(legends.label, function(x){
-                sprintf("%s = %s", x, round(as.numeric(pSets[[i]]@sensitivity$profiles[exp_i,x]), digits=2))
+                sprintf("%s = %s", x, round(as.numeric(sensitivityProfiles(pSets[[i]])[exp_i,x]), digits=2))
               })), collapse = ", ")
             } else {
-              legend.values[[i]] <- sprintf("%s = %s", legends.label, round(as.numeric(pSets[[i]]@sensitivity$profiles[exp_i, legends.label]), digits=2))
+              legend.values[[i]] <- sprintf("%s = %s", legends.label, round(as.numeric(sensitivityProfiles(pSets[[i]])[exp_i, legends.label]), digits=2))
             }
           } else {
             legend.values[[i]] <- ""
@@ -208,8 +208,8 @@ function(drug,
             j <- j + 1
             pSetNames[[j]] <- name(pSets[[i]])
 
-            drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Dose"])),
-              "Viability"=as.numeric(as.vector(pSets[[i]]@sensitivity$raw[exp, , "Viability"]))), stringsAsFactors=FALSE)
+            drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp, , "Dose"])),
+              "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp, , "Viability"]))), stringsAsFactors=FALSE)
             drug.responses <- drug.responses[complete.cases(drug.responses), ]
             doses[[j]] <- drug.responses$Dose
             responses[[j]] <- drug.responses$Viability
@@ -217,17 +217,17 @@ function(drug,
             if (!missing(legends.label)) {
               if (length(legends.label) > 1) {
                 legend.values[[j]] <- paste(unlist(lapply(legends.label, function(x){
-                  sprintf("%s = %s", x, round(as.numeric(pSets[[i]]@sensitivity$profiles[exp, x]), digits=2))
+                  sprintf("%s = %s", x, round(as.numeric(sensitivityProfiles(pSets[[i]])[exp, x]), digits=2))
                 })), collapse = ", ")
               } else {
-                legend.values[[j]] <- sprintf(" Exp %s %s = %s", rownames(pSets[[i]]@sensitivity$info)[exp], legends.label, round(as.numeric(pSets[[i]]@sensitivity$profiles[exp, legends.label]), digits=2))
+                legend.values[[j]] <- sprintf(" Exp %s %s = %s", rownames(sensitivityInfo(pSets[[i]]))[exp], legends.label, round(as.numeric(sensitivityProfiles(pSets[[i]])[exp, legends.label]), digits=2))
               }
             } else {
-              tt <- unlist(strsplit(rownames(pSets[[i]]@sensitivity$info)[exp], split="_"))
+              tt <- unlist(strsplit(rownames(sensitivityInfo(pSets[[i]]))[exp], split="_"))
               if (tt[1] == "treatmentid") {
                 legend.values[[j]] <- tt[2]
               }else{
-                legend.values[[j]] <- rownames(pSets[[i]]@sensitivity$info)[exp]
+                legend.values[[j]] <- rownames(sensitivityInfo(pSets[[i]]))[exp]
               }
             }
           }

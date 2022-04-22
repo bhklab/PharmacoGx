@@ -20,7 +20,7 @@ test_that("Summarize Sensitivity Profiles function outputs data with right dimen
 test_that("summarizeSensitivityProfiles produces correct values.",{
 
   GDSCsmall2 <- subsetTo(GDSCsmall, drugs="AZD6482")
-  testCells <- GDSCsmall2@sensitivity$profiles[order(GDSCsmall2@sensitivity$info$sampleid),"auc_recomputed", drop=FALSE]
+  testCells <- sensitivityProfiles(GDSCsmall2)[order(sensitivityInfo(GDSCsmall2)$sampleid),"auc_recomputed", drop=FALSE]
 
   testSummary <- summarizeSensitivityProfiles(GDSCsmall2, summary.stat = "median", fill.missing=FALSE)
   testSummary <- testSummary[order(names(testSummary))]
@@ -47,6 +47,6 @@ test_that("summarizeSensitivityProfiles produces correct values.",{
 
 test_that("Summarize Sensitivity Profiles parameters work as expected", {
   expect_silent(summarizeSensitivityProfiles(GDSCsmall, verbose = FALSE))
-  expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = FALSE)), length(unique(GDSCsmall@sensitivity$info$sampleid)))
+  expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = FALSE)), length(unique(sensitivityInfo(GDSCsmall)$sampleid)))
   expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = TRUE)), length(sampleNames(GDSCsmall)))
 })

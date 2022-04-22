@@ -34,16 +34,16 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   type object for holding data for RNA, DNA, SNP and CNV
 #'   measurements, with associated \code{fData} and \code{pData}
 #'   containing the row and column metadata
-#' @slot cell A \code{data.frame} containing the annotations for all the cell
+#' @slot sample A \code{data.frame} containing the annotations for all the cell
 #'   lines profiled in the data set, across all data types
-#' @slot drug A \code{data.frame} containg the annotations for all the drugs
+#' @slot treatment A \code{data.frame} containg the annotations for all the drugs
 #'   profiled in the data set, across all data types
-#' @slot sensitivity A \code{list} containing all the data for the sensitivity
-#'   experiments, including \code{$info}, a \code{data.frame} containing the
-#'   experimental info,\code{$raw} a 3D \code{array} containing raw data,
-#'   \code{$profiles}, a \code{data.frame} containing sensitivity profiles
-#'   statistics, and \code{$n}, a \code{data.frame} detailing the number of
-#'   experiments for each cell-drug pair
+#' @slot treatmentResponse A \code{list} containing all the data for the
+#'   sensitivity experiments, including \code{$info}, a \code{data.frame}
+#'   containing the experimental info,\code{$raw} a 3D \code{array} containing
+#'   raw data, \code{$profiles}, a \code{data.frame} containing sensitivity
+#'   profiles statistics, and \code{$n}, a \code{data.frame} detailing the
+#'   number of experiments for each cell-drug pair
 #' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame}
 #'   summarizing the available perturbation data,
 #' @slot curation A \code{list} containing mappings for \code{$treatment},
@@ -59,7 +59,6 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'
 #' @return An object of the PharmacoSet class
 .PharmacoSet <- setClass('PharmacoSet',
-    slots = list(drug='data.frame'),
     contains='CoreSet')
 
 
@@ -85,37 +84,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' ## For help creating a PharmacoSet object, please see the following vignette:
 #' browseVignettes("PharmacoGx")
 #'
-##TODO:: Determine how to generalise the constructor documentation in CoreGx
-## to make sense with all three packages which depend on it. For now it says
-## CoreSet instead of PharmacoSet
-##TODO:: Determine if there is any way to execute R code when making roxygen2:
-#>Yes there is via @eval
-## documentation. Then we could use a variable to fill in the class for each
-## package.
 #' @inheritParams CoreGx::CoreSet
-# @param name A \code{character} string detailing the name of the dataset
-# @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
-#   molecular profiles for each data type.
-# @param cell A \code{data.frame} containg the annotations for all the cell
-#   lines profiled in the data set, across all data types
-#' @param drug A \code{data.frame} containg the annotations for all the drugs
-#   profiled in the data set, across all data types
-# @param sensitivityInfo A \code{data.frame} containing the information for the
-#   sensitivity experiments
-# @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
-#   dose response data for the sensitivity experiments
-# @param sensitivityProfiles \code{data.frame} containing drug sensitivity profile
-#   statistics such as IC50 and AUC
-# @param sensitivityN,perturbationN A \code{data.frame} summarizing the
-#   available sensitivity/perturbation data
-#' @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
-#'   the names for drugs, cells and tissues used in the data set to universal
-#'   identifiers used between different PharmacoSet objects
-# @param datasetType A \code{character} string of 'sensitivity',
-#   'preturbation', or both detailing what type of data can be found in the
-#   PharmacoSet, for proper processing of the data
-# @param verify \code{boolean} Should the function verify the PharmacoSet and
-#   print out any errors it finds after construction?
 #'
 #' @return An object of class PharmacoSet
 #
@@ -127,15 +96,32 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom CoreGx CoreSet
 #'
 #' @export
-PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
-        drug=data.frame(), sensitivityInfo=data.frame(),
+PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
+        treatment=data.frame(), sensitivityInfo=data.frame(),
         sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(),
         sensitivityN=matrix(nrow=0, ncol=0),
-        perturbationN=array(NA, dim=c(0,0,0)), curationDrug=data.frame(),
-        curationCell = data.frame(), curationTissue = data.frame(),
+        perturbationN=array(NA, dim=c(0,0,0)), curationTreatment=data.frame(),
+        curationSample = data.frame(), curationTissue = data.frame(),
         datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE) {
 
-    .Deprecated("PharmacoSet2", )
+    #.Deprecated("PharmacoSet2", )
+
+    ## FIXME:: Inherit this from CoreSet!!
+    # ensure new sampleid and treatmentid identifiers are honoured
+    sample <- CoreGx:::.checkForSampleId(sample)
+    treatment <- CoreGx:::.checkForTreatmentId(treatment)
+    sensitivityInfo <- CoreGx:::.checkForSampleId(sensitivityInfo)
+    sensitivityInfo <- CoreGx:::.checkForTreatmentId(sensitivityInfo)
+    curationSample <- CoreGx:::.checkForSampleId(curationSample)
+    curationTreatment <- CoreGx:::.checkForTreatmentId(curationTreatment)
+    for (nm in names(molecularProfiles)) {
+        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForSampleId(
+            colData(molecularProfiles[[nm]]))
+        # handle perturbation case
+        colData(molecularProfiles[[nm]]) <- CoreGx:::.checkForIdColumns(
+            colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
+            error=FALSE)
+    }
 
     datasetType <- match.arg(datasetType)
 
@@ -178,8 +164,8 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     sensitivity$n <- sensitivityN
 
     curation <- list()
-    curation$treatment <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
-    curation$cell <- as.data.frame(curationCell, stringsAsFactors = FALSE)
+    curation$treatment <- as.data.frame(curationTreatment, stringsAsFactors = FALSE)
+    curation$sample <- as.data.frame(curationSample, stringsAsFactors = FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
     ### TODO:: Make sure to fix the curation to check for matching row names
     ##> to the drug and cell line matrices!
@@ -196,13 +182,13 @@ PharmacoSet <-  function(name, molecularProfiles=list(), cell=data.frame(),
     }
 
     pSet  <- .PharmacoSet(annotation=annotation,
-        molecularProfiles=molecularProfiles, cell=as.data.frame(cell),
-        drug=as.data.frame(drug), datasetType=datasetType,
-        sensitivity=sensitivity, perturbation=perturbation,
+        molecularProfiles=molecularProfiles, sample=as.data.frame(sample),
+        treatment=as.data.frame(treatment), datasetType=datasetType,
+        treatmentResponse=sensitivity, perturbation=perturbation,
         curation=curation)
     if (verify) checkPsetStructure(pSet)
     if (length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
-        pSet@sensitivity$n <- .summarizeSensitivityNumbers(pSet)
+        pSet@treatmentResponse$n <- .summarizeSensitivityNumbers(pSet)
     }
     if (!length(perturbationN) &&
             datasetType %in% c("perturbation", "both")) {
@@ -224,12 +210,13 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
         treatmentResponse=TreatmentResponseExperiment(),
         perturbation=list(),
         curation=list(sample=data.frame(), treatment=data.frame(),
-        tissue=data.frame())
+        tissue=data.frame()), datasetType="sensitivity"
 ) {
     # -- Leverage existing checks in CoreSet constructor
     cSet <- CoreSet2(name=name, treatment=treatment,
         sample=sample, treatmentResponse=treatmentResponse,
-        molecularProfiles=molecularProfiles, curation=curation)
+        molecularProfiles=molecularProfiles, curation=curation,
+        perturbation=perturbation, datasetType=datasetType)
 
     ## -- data integrity
     # treatment
@@ -238,11 +225,12 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
     .PharmacoSet(
         annotation=cSet@annotation,
         cell=cSet@sample,
-        drug=treatment,
+        treatment=cSet@treatment,
         molecularProfiles=cSet@molecularProfiles,
-        sensitivity=cSet@sensitivity,
+        treatmentResponse=cSet@treatmentResponse,
         datasetType=cSet@datasetType,
-        curation=cSet@curation
+        curation=cSet@curation,
+        perturbation=cSet@perturbation
     )
 }
 
@@ -290,7 +278,7 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
     ## consider all cell lines
     celln <- sampleNames(object)
 
-    mprof <- molecularProfileSlot(object)
+    mprof <- molecularProfilesSlot(object)
     perturbation.info <- array(0, dim=c(length(celln), length(drugn),
         length(mprof)),
         dimnames=list(celln, drugn, names(mprof))

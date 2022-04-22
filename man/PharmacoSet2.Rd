@@ -12,7 +12,8 @@ PharmacoSet2(
   treatmentResponse = TreatmentResponseExperiment(),
   perturbation = list(),
   curation = list(sample = data.frame(), treatment = data.frame(), tissue =
-    data.frame())
+    data.frame()),
+  datasetType = "sensitivity"
 )
 }
 \arguments{
@@ -30,8 +31,14 @@ of samples in \code{treatmentResponse} and \code{molecularProfiles}. Samples in 
 containing all treatment response data associated with the \code{PharmacoSet}
 object.}
 
+\item{perturbation}{A deprecated slot in a \code{PharmacoSet} object included
+for backwards compatibility. This may be removed in future releases.}
+
 \item{curation}{This class requires an additional curation item, tissue, which maps
 from published to standardized tissue idenifiers.}
+
+\item{datasetType}{A deprecated slot in a \code{PharmacoSet} object included
+for backwards compatibility. This may be removed in future releases.}
 }
 \value{
 A \code{CoreSet} object storing standardized and curated treatment
