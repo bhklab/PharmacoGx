@@ -25,3 +25,6 @@ local_data/.*
 scripts
 scripts/.*
 .VSCodeCounter
+.scripts
+.local_data
+.github

@@ -119,13 +119,13 @@ setMethod("drugSensitivitySig",
 
 
   if (!all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", object@annotation$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
+    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
   }
 
-  if (!(mDataType %in% names(object@molecularProfiles))) {
-    stop (sprintf("Invalid mDataType for %s, choose among: %s", object@annotation$name, paste(names(object@molecularProfiles), collapse=", ")))
+  if (!(mDataType %in% names(molecularProfilesSlot(object)))) {
+    stop (sprintf("Invalid mDataType for %s, choose among: %s", annotation(object)$name, paste(names(molecularProfilesSlot(object)), collapse=", ")))
   }
-  switch (S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation,
+  switch (S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation,
     "mutation" = {
       if (!is.element(molecular.summary.stat, c("or", "and"))) {
         stop ("Molecular summary statistic for mutation must be either 'or' or 'and'")
@@ -154,7 +154,7 @@ setMethod("drugSensitivitySig",
       if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
         stop ("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
     }},
-    stop (sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(object@molecularProfiles[[mDataType]])$annotation))
+    stop (sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation))
   )
 
   if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
@@ -165,13 +165,13 @@ setMethod("drugSensitivitySig",
     sensitivity.cutoff <- NA
   }
   if (missing(drugs)){
-    drugn <- drugs <- drugNames(object)
+    drugn <- drugs <- treatmentNames(object)
   } else {
     drugn <- drugs
   }
 
   if (missing(cells)){
-    celln <- cells <- cellNames(object)
+    celln <- cells <- sampleNames(object)
   } else {
     celln <- cells
   }
@@ -245,7 +245,7 @@ setMethod("drugSensitivitySig",
       tissues <- unique(cellInfo(object)[celln,"tissueid"])
     }
 
-    object@molecularProfiles[[mDataType]] <- summarizeMolecularProfiles(object = object,
+    molecularProfilesSlot(object)[[mDataType]] <- summarizeMolecularProfiles(object = object,
       mDataType = mDataType,
       summary.stat = molecular.summary.stat,
       binarize.threshold = molecular.cutoff,
@@ -254,15 +254,15 @@ setMethod("drugSensitivitySig",
 
     if(!is.null(dots[["mProfiles"]])){
       mProfiles <- dots[["mProfiles"]]
-      SummarizedExperiment::assay(object@molecularProfiles[[mDataType]]) <- mProfiles[features, colnames(object@molecularProfiles[[mDataType]]), drop = FALSE]
+      SummarizedExperiment::assay(molecularProfilesSlot(object)[[mDataType]]) <- mProfiles[features, colnames(molecularProfilesSlot(object)[[mDataType]]), drop = FALSE]
 
     }
 
-    drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"cellid"], celln), , drop = FALSE]})
+    drugpheno.all <- lapply(drugpheno.all, function(x) {x[intersect(phenoInfo(object, mDataType)[ ,"sampleid"], celln), , drop = FALSE]})
 
-    molcellx <- phenoInfo(object, mDataType)[ ,"cellid"] %in% celln
+    molcellx <- phenoInfo(object, mDataType)[ ,"sampleid"] %in% celln
 
-    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"cellid"], "tissueid"])
+    type <- as.factor(cellInfo(object)[phenoInfo(object, mDataType)[molcellx,"sampleid"], "tissueid"])
 
     if("batchid" %in% colnames(phenoInfo(object, mDataType))){
       batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
@@ -282,7 +282,7 @@ setMethod("drugSensitivitySig",
 
 
     if(is.null(dots[["req_alpha"]])){
-      req_alpha <- 0.05/(nrow(object@molecularProfiles[[mDataType]])) ## bonferonni correction
+      req_alpha <- 0.05/(nrow(molecularProfilesSlot(object)[[mDataType]])) ## bonferonni correction
     } else {
       req_alpha <- dots[["req_alpha"]]
     }
