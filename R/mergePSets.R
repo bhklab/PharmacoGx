@@ -17,7 +17,7 @@ mergePSets <- function(mDataPSet, sensDataPSet, commonCellsOnly=FALSE, ...){
 
   ### number of sensitivity experiments
   #acell <- setdiff(rownames(cellInfo(mDataPSet)), rownames(cellInfo(sensDataPSet)))
-  
+
 	### cell line annotations
 	new.cell.info <- c(union(colnames(cellInfo(sensDataPSet)), colnames(cellInfo(mDataPSet))), "dataset")
 	cell.info.df <- data.frame(matrix(NA, nrow=length(ucell), ncol=length(new.cell.info), dimnames=list(ucell, new.cell.info)), check.names=FALSE)
@@ -48,7 +48,7 @@ mergePSets <- function(mDataPSet, sensDataPSet, commonCellsOnly=FALSE, ...){
 	tissue.curation.df[intersect(rownames(mDataPSet@curation$tissue), rownames(sensDataPSet@curation$tissue)), "dataset"] <- paste0(name(sensDataPSet), "///", name(mDataPSet))
 	mergePSet@curation$tissue <- tissue.curation.df
 
-	mergePSet@sensitivity$n <- PharmacoGx:::.summarizeSensitivityNumbers(mergePSet)
+	mergePSet@treatmentResponse$n <- PharmacoGx:::.summarizeSensitivityNumbers(mergePSet)
 
 	mergePSet@annotation$name <- paste(name(mDataPSet), name(sensDataPSet), sep=".")
 
