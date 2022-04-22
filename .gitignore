@@ -6,6 +6,8 @@ PharmacoGx.Rproj
 */.DS_store
 */figure
 doc
+Meta
+*/*.so
 ^PSets/*
 scripts/*
 scripts
@@ -16,3 +18,6 @@ PSets/**
 
 # exceptions
 !.gitignore
+local_data/**
+.VSCodeCounter/**
+*.o

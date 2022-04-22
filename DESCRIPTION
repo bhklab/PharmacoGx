@@ -1,7 +1,7 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 2.7.1
+Version: 2.99.0
 Date: 2021-10-24
 Authors@R: c(
     person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
@@ -45,15 +45,18 @@ Imports:
     reshape2,
     jsonlite,
     data.table,
-    checkmate
+    checkmate,
+    boot,
+    coop
 Depends: R (>= 3.6), CoreGx
+LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate: 
+Collate:
     'ComputeGR.R'
     'GR.R'
     'GWC.R'
@@ -62,6 +65,7 @@ Collate:
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'PharmacoSet-utils.R'
+    'RcppExports.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
@@ -85,9 +89,12 @@ Collate:
     'filterNoisyCurves.R'
     'geneDrugPerturbation.R'
     'geneDrugSensitivity.R'
+    'geneDrugSensitivityPBCorr.R'
+    'geneDrugSensitivityPCorr.R'
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
+    'mergePSets.R'
     'methods-[.R'
     'methods-drugSensitivitySig.R'
     'methods-intersect.R'
