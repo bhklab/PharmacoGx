@@ -44,7 +44,7 @@ env:
   run_covr: 'false'
   run_pkgdown: 'false'
   has_RUnit: 'false'
-  cache-version: 'cache-v3'
+  cache-version: 'cache-v1'
   run_docker: 'false'
   github_dependencies: 'true'
 
