@@ -65,6 +65,7 @@ Collate:
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'PharmacoSet-utils.R'
+    'RcppExports.R'
     'SanityCheck.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
