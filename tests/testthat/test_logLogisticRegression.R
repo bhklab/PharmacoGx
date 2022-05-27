@@ -39,7 +39,8 @@ test_that("Values returned as expected (previous runs of function).",{
         tolerance=1e-3) #should run with no objections
 
 	expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(100,70, 60, 50,40), trunc=FALSE), 
-        structure(list(HS = 1.375, E_inf = 38.125, EC50 = 1.1139738599948), Rsquare = 0.992907719144335), 
+        structure(structure(list(HS = 1.33880390747459, E_inf = 36.8315342784204, 
+        EC50 = 1.17467467087487), Rsquare = 0.993325611444731), Rsquare = 0.992907719144335), 
         tolerance=1e-3) #should run with no objections
 
     expect_equal(logLogisticRegression(c(0.1,1, 2, 3,10), c(100,70, 60, 50,40), trunc=FALSE, family="Cauchy"), 
