@@ -439,7 +439,7 @@ specified.
 
 \subsection{Methods:}{
 
-\strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
+\strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity treatment combo
 by sample metadata for the \code{PharmacoSet} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
 from the \code{LongTable} object in \verb{@treatmentResponse} of a PharmacoSet object.
@@ -452,12 +452,12 @@ from the \code{LongTable} object in \verb{@treatmentResponse} of a PharmacoSet o
 similar to the old PharmacoSet implementation, where the \verb{@treatmentResponse} slot
 contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
 arugment is used, more complicated assignments can occur where 'sample'
-modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
+modifies the \verb{@sensitvity} \code{LongTable} colData, 'treatment' the rowData and
 'assay' the 'assay_metadata' assay.
 Arguments:
 \itemize{
 \item value: A \code{data.frame} of treatment response experiment metadata,
-documenting experiment level metadata (mapping to drugs and samples). If
+documenting experiment level metadata (mapping to treatments and samples). If
 the \verb{@treatmentResponse} slot doesn't contain a \code{LongTable} and \code{dimension} is
 not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
@@ -465,7 +465,7 @@ not specified, you can only modify existing columns as returned by
 
 \strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{PharmacoSet}
 object. Each measure reprents some summary of sample sensitivity to a given
-drug, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+treatment, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
 \code{character} vector with all available metrics for the PSet object.
 
 \strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{PharmacoSet}
@@ -481,7 +481,7 @@ then length of the character vector must matcht he number of columns of the
 \strong{sensitivityProfiles}: Return the sensitivity profile summaries from the
 sensitivity slot. This data.frame cotanins vaarious sensitivity summary
 metrics, such as ic50, amax, EC50, aac, HS, etc as columns, with rows as
-drug by sample experiments.
+treatment by sample experiments.
 
 \strong{sensitivityProfiles<-}: Update the sensitivity profile summaries the
 sensitivity slot. Arguments:
@@ -502,26 +502,26 @@ dose or viability measurement for that experiment_id and replicate.
 }
 
 \strong{sensNumber}: Return a count of viability observations in a \code{PharmacoSet}
-object for each drug-combo by sample combination.
+object for each treatment-combo by sample combination.
 
 \strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
-of drug by sample-line experiment counts, in the \code{list} in \verb{@treatmentResponse}
+of treatment by sample-line experiment counts, in the \code{list} in \verb{@treatmentResponse}
 slot of a \code{PharmacoSet} object. Will error when \verb{@sensitviity} contains
 a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \itemize{
-\item value: A \code{matrix} where rows are samples and columns are drugs, with a
+\item value: A \code{matrix} where rows are samples and columns are treatments, with a
 count of the number of experiments for each combination as the values.
 }
 
 \strong{pertNumber}: \code{array} Summary of available perturbation experiments
 from in a \code{PharmacoSet} object. Returns a 3D \code{array} with the number of
-perturbation experiments per drug and sample, and data type.
+perturbation experiments per treatment and sample, and data type.
 
 \strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{PharmacoSet} object,
 which stores a summary of the available perturbation experiments. Arguments:
 \itemize{
 \item value: A new 3D \code{array} with the number of perturbation experiments per
-drug and sample, and data type
+treatment and sample, and data type
 }
 }
 \examples{
