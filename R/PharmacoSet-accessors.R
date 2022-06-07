@@ -564,24 +564,24 @@ setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"),
 
 
 #
-# == sensitivitySlot
+# == treatmentResponse
 
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_get_sensitivitySlot(class_=.local_class,
+#' @eval CoreGx:::.docs_CoreSet_get_treatmentResponse(class_=.local_class,
 #'   data_=.local_data)
-#' @importMethodsFrom CoreGx sensitivitySlot
-setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
+#' @importMethodsFrom CoreGx treatmentResponse
+setMethod("treatmentResponse", signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
 
 
 
 #' @rdname PharmacoSet-accessors
-#' @importMethodsFrom CoreGx sensitivitySlot<-
-#' @eval CoreGx:::.docs_CoreSet_set_sensitivitySlot(class_=.local_class,
+#' @importMethodsFrom CoreGx treatmentResponse<-
+#' @eval CoreGx:::.docs_CoreSet_set_treatmentResponse(class_=.local_class,
 #' data_=.local_data)
-setReplaceMethod('sensitivitySlot', signature(object='PharmacoSet',
+setReplaceMethod('treatmentResponse', signature(object='PharmacoSet',
     value='list_OR_LongTable'), function(object, value)
 {
     callNextMethod(object=object, value=value)

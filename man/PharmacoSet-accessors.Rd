@@ -97,12 +97,14 @@
 \alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
 \alias{sensitivityRaw,PharmacoSet-method}
 \alias{sensitivityRaw<-,PharmacoSet,array-method}
-\alias{sensitivitySlot,PharmacoSet-method}
+\alias{treatmentResponse,PharmacoSet-method}
+\alias{treatmentResponse}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,PharmacoSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-,PharmacoSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-}
+\alias{treamentResponse<-,PharmacoSet,list-method}
+\alias{treatmentResponse<-,PharmacoSet,LongTable-method}
 \alias{sensitivitySlot<-}
-\alias{sensitivitySlot<-,PharmacoSet,list-method}
-\alias{sensitivitySlot<-,PharmacoSet,LongTable-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{sensNumber}
 \alias{sensNumber<-,PharmacoSet,matrix-method}
@@ -189,9 +191,9 @@ drugNames(...) <- value
 
 \S4method{sensitivityRaw}{PharmacoSet,array}(object) <- value
 
-\S4method{sensitivitySlot}{PharmacoSet}(object)
+\S4method{treatmentResponse}{PharmacoSet}(object)
 
-\S4method{sensitivitySlot}{PharmacoSet,list_OR_LongTable}(object) <- value
+\S4method{treatmentResponse}{PharmacoSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{PharmacoSet}(object)
 
@@ -608,9 +610,9 @@ head(sensitivityRaw(CCLEsmall))
 
 sensitivityRaw(CCLEsmall) <- sensitivityRaw(CCLEsmall)
 
-sensitivitySlot(CCLEsmall)
+treatmentResponse(CCLEsmall)
 
-sensitivitySlot(CCLEsmall) <- sensitivitySlot(CCLEsmall)
+treatmentResponse(CCLEsmall) <- treatmentResponse(CCLEsmall)
 
 sensNumber(CCLEsmall)
 

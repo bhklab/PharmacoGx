@@ -35,7 +35,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
         function(object, sensitivity.measure="auc_recomputed", cell.lines,
         drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
         fill.missing=TRUE, verbose=TRUE) {
-    if (is(sensitivitySlot(object), 'LongTable'))
+    if (is(treatmentResponse(object), 'LongTable'))
         .summarizeSensProfiles(object, sensitivity.measure,
             cell.lines, drugs, summary.stat, fill.missing)
     else
@@ -61,7 +61,7 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
     if (missing(summary.stat)) summary.stat <- 'mean'
 
     # get LongTable object
-    longTable <- sensitivitySlot(object)
+    longTable <- treatmentResponse(object)
 
     # extract the sensitivty profiles
     sensProfiles <- assay(longTable, 'profiles', withDimnames=TRUE, key=FALSE)

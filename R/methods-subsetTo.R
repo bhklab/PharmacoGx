@@ -177,7 +177,7 @@ setMethod('subsetTo', signature(object='PharmacoSet'), function(object,
               }
           }
        }
-        sensitivitySlot(object)[names(sensitivitySlot(object))[names(sensitivitySlot(object))!='n']] <- lapply(sensitivitySlot(object)[names(sensitivitySlot(object))[names(sensitivitySlot(object))!='n']], function(x,i, drop){
+        treatmentResponse(object)[names(treatmentResponse(object))[names(treatmentResponse(object))!='n']] <- lapply(treatmentResponse(object)[names(treatmentResponse(object))[names(treatmentResponse(object))!='n']], function(x,i, drop){
             #browser()
           if (length(dim(x))==2){
             return(x[i,,drop=drop])
