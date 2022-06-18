@@ -58,6 +58,8 @@
 \alias{molecularProfiles}
 \alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
 \alias{molecularProfiles<-,PharmacoSet,character,missing,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,missing,missing,list-method}
+\alias{molecularProfiles<-,PharmacoSet,missing,missing,MutliAssayExperiment-method}
 \alias{molecularProfiles<-}
 \alias{featureInfo,PharmacoSet-method}
 \alias{featureInfo}
@@ -338,7 +340,8 @@ or 'both'
 \strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
 \code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{PharmacoSet}
 object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
-found with \code{mDataNames(object)}. Arguments:
+found with \code{mDataNames(object)}. Exclude \code{mDataType} and \code{assay} to
+access the entire slot. Arguments:
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -351,7 +354,7 @@ the given \code{mDataType}.
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
 the \code{molecularProfiles} slot of a PharmacoSet object with the specified
 \code{mDataType}. Valid \code{mDataType} arguments can be found with
-\code{mDataNames(object)}.
+\code{mDataNames(object)}. Omit \code{mDataType} and \code{assay} to update the slot.
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -573,6 +576,9 @@ molecularProfiles(CCLEsmall, 'rna') <- molecularProfiles(CCLEsmall, 'rna')
 # Specific assay
 molecularProfiles(CCLEsmall, 'rna', 'exprs') <-
     molecularProfiles(CCLEsmall, 'rna', 'exprs')
+
+# Replace the whole slot
+molecularProfiles(CCLEsmall) <- molecularProfiles(CCLEsmall)
 
 featureInfo(CCLEsmall, 'rna')
 

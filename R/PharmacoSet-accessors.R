@@ -562,7 +562,6 @@ setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"),
     callNextMethod(object=object, value=value)
 })
 
-
 #
 # == treatmentResponse
 
