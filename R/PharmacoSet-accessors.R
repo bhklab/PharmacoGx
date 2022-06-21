@@ -309,7 +309,7 @@ setReplaceMethod("datasetType", signature(object="PharmacoSet",
 #' @importMethodsFrom CoreGx molecularProfiles
 setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay)
 {
-    callNextMethod(object=object, mDataType=mDataType, assay=assay)
+    callNextMethod()
 })
 
 #' @rdname PharmacoSet-accessors

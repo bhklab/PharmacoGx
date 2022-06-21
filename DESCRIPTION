@@ -79,6 +79,7 @@ Collate:
     'computeIC50.R'
     'computeICn.R'
     'computeSlope.R'
+    'computeSynergy.R'
     'connectivityScore.R'
     'cosinePerm.R'
     'datasets.R'
