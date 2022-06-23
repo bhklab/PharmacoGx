@@ -26,6 +26,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
                                 interaction.typexgene=FALSE,
                                 model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
 
+  ## NOTE:: The use of T/F warning from BiocCheck is a false positive on the string 'Pr(>F)'
   standardize <- match.arg(standardize)
 
   colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
