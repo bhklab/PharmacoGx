@@ -53,9 +53,9 @@
 #' @importFrom stats optim dcauchy dnorm pcauchy rcauchy rnorm pnorm integrate
 logLogisticRegression <- function(conc,
                                   viability,
-                                  density = c(2, 10, 2),
+                                  density = c(2, 10, 5),
                                   step = .5 / density,
-                                  precision = 0.05,
+                                  precision = 1e-4,
                                   lower_bounds = c(0, 0, -6),
                                   upper_bounds = c(4, 1, 6),
                                   scale = 0.07,
