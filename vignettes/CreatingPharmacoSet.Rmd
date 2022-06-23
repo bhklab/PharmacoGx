@@ -1,61 +1,30 @@
 ---
-title: 'PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets'
-
+title: "PharmacoGx: An R Package for Analysis of Large Pharmacogenomic Datasets"
 author:
 - name: Petr Smirnov
-  affilnum: 1
-
+  affiliation: &pm Princess Margaret Cancer Centre, University Health Network, Toronto Canada
+  email: petr.smirnov@uhnresearch.ca
+- name: Christopher Eeles
+  email: christopher.eeles@uhnresearch.ca
+  affil: *pm
 - name: Zhaleh Safikhani
-  affilnum: '1,2'
-
+  affiliation:
+    - *pm
+    - &mbp Department of Medical Biophysics, University of Toronto, Toronto Canada
 - name: Benjamin Haibe-Kains
-  affilation: '1, 2, 3'
-
-affiliation:
-
-- affilnum: 1
-  affil: Princess Margaret Cancer Centre, University Health Network, Toronto Canada
-
-- affilnum: 2
-  affil: Department of Medical Biophysics, University of Toronto, Toronto Canada
-
-- affilnum: 3
-  affil: Department of Computer Science, University of Toronto, Toronto Canada
-
+  email: benjamin.haibe.kains@utoronto.ca
+  affiltiation:
+    - *pm
+    - *mbp
+    - &cs Department of Computer Science, University of Toronto, Toronto Canada
+package: PharmacoGx
+bibliography: pharmacogx.bib
 output:
-
-  pdf_document:
-    fig_caption: yes
-    fig_width: 7
-    fig_height: 7
-    keep_tex: yes
-    number_sections: no
-    template: manuscript.latex
-    includes:
-      in_header: header.tex
-
-  html_document: null
-
-  word_document: null
-
-documentclass: article
-toc: true
-classoption: a4paper
-capsize: normalsize
-geometry: margin=1in
-fontsize: 11pt
-spacing: singlespacing
-footerdate: no
-abstractt: no
-bibliography:
-  - pharmacogx.bib
-csl: ecology.csl
-
-vignette: >
+  BiocStyle::html_document
+vignette: |
+  %\VignetteIndexEntry{Creating a PharmacoSet Object}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\usepackage[UTF-8]{inputenc}
-  %\VignetteIndexEntry{Creating a PharmacoSet Object}
 ---
 
 \vspace{5pt}
@@ -335,4 +304,4 @@ isincluded in the datset, and verify is a flag for running the verification of
 the pSet after its construction. Any data detailed above but missing from this
 constructor call will be created by the constructor, and the default empty
 values are as in the call above. Notice that none of the values should be set
-as NA, they should be ommited if the data is not being provided.
+as NA, they should be omited if the data is not being provided.
