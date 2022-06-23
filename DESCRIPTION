@@ -1,7 +1,7 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.1.2
+Version: 3.1.3
 Date: 2022-6-22
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
@@ -10,7 +10,7 @@ Authors@R: c(
         email="christopher.eeles@uhnresearch.ca", role=c("aut")),
     person(given="Zhaleh", family="Safikhani", role=c("aut")),
     person(given="Mark", family="Freeman", role=c("aut")),
-    person(given="Feifei", family="Li", role=c("aut")),
+    person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca", role=c("aut")),
     person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
     )
 Description: Contains a set of functions to perform large-scale analysis of
@@ -60,7 +60,7 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate: 
+Collate:
     'GR.R'
     'GWC.R'
     'PharmacoSet-class.R'
