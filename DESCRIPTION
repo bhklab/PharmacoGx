@@ -25,7 +25,8 @@ Suggests: pander,
     knitcitations,
     crayon,
     testthat,
-    markdown
+    markdown,
+    BiocStyle
 Encoding: UTF-8
 Imports:
     BiocGenerics,
