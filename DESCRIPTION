@@ -1,13 +1,16 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.1.1
-Date: 2022-5-20
+Version: 3.1.2
+Date: 2022-6-22
 Authors@R: c(
-    person("Petr", "Smirnov", email="petr.smirnov@uhnresearch.ca", role=c("aut")),
-    person("Zhaleh", "Safikhani", role=c("aut")),
-    person("Christopher", "Eeles", email="christopher.eeles@uhnresearch.ca", role=c("aut")),
-    person("Mark", "Freeman", role=c("aut")),
+    person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
+        role=c("aut")),
+    person(given="Christopher", family="Eeles",
+        email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+    person(given="Zhaleh", family="Safikhani", role=c("aut")),
+    person(given="Mark", family="Freeman", role=c("aut")),
+    person(given="Feifei", family="Li", role=c("aut")),
     person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
     )
 Description: Contains a set of functions to perform large-scale analysis of

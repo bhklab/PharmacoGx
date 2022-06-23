@@ -20,7 +20,7 @@ the Loewe additive null assumption.}
 }
 \arguments{
 \item{viability}{\code{numeric} is a vector whose entries are the viability values
-in the range \link{0, 1}.}
+in the range [0, 1].}
 
 \item{treatment1dose}{\code{numeric} a vector of concentrations for treatment 1}
 

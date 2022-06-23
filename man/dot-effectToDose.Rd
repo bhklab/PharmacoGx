@@ -3,6 +3,7 @@
 \name{.effectToDose}
 \alias{.effectToDose}
 \title{Inverse function of Hill equation
+
 For the dose-response Hill equation of a drug defined by
 \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
 that computes the response in viability from a dose in micromole fir a drug,
@@ -17,7 +18,7 @@ computes the dose required from a response:
 }
 \arguments{
 \item{viability}{\code{numeric} is a vector whose entries are the viability values
-in the range \link{0, 1}.}
+in the range [0, 1].}
 
 \item{EC50}{\code{numeric} is a vector of relative EC50 for drug-response equation.}
 
@@ -33,6 +34,7 @@ when it is administered with a infinitely high concentration.}
 }
 \description{
 Inverse function of Hill equation
+
 For the dose-response Hill equation of a drug defined by
 \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
 that computes the response in viability from a dose in micromole fir a drug,
