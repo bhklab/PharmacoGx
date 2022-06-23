@@ -27,11 +27,11 @@ sanitizeInput <- function(conc,
 		stop("'verbose' should be a logical (or numerical) argument.")
 	}
 	if(!missing(viability)&&!missing(conc)&&missing(Hill_fit))
-	{ 
+	{
 	  if (length(conc) != length(viability)) {
 	    if(verbose==2){
 	      print(conc)
-	      print(viability) 
+	      print(viability)
 	    }
 	    stop("Log concentration vector is not of same length as viability vector.")
 	  }
@@ -42,9 +42,9 @@ sanitizeInput <- function(conc,
 			conc <- as.numeric(conc[myx])
 			viability <- as.numeric(viability[myx])
 
-		} 
+		}
 		if(any((!is.na(conc))&is.na(viability))){
-			
+
 			warning("Missing viability with non-missing concentrations values encountered. Removing concentrations values correspoding to those viabilities")
 			myx <- !is.na(viability)
 			conc <- as.numeric(conc[myx])
@@ -64,7 +64,7 @@ sanitizeInput <- function(conc,
 			print(viability)
 			stop("Viability vector contains elements which are not real numbers.")
 		}
-		
+
 
 		if (min(viability) < 0) {
 			if (verbose) {
@@ -101,7 +101,7 @@ sanitizeInput <- function(conc,
 			warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
 			if (verbose == 2) {
 				print(viability)
-				print(viability_as_pct)	
+				print(viability_as_pct)
 			}
 		}
 
@@ -134,7 +134,7 @@ sanitizeInput <- function(conc,
 		}
 
 		return(list("log_conc"=log_conc, "viability"=viability))
-	} 
+	}
 	if(!missing(Hill_fit) && missing(viability)){
 		if(is.list(Hill_fit)){
 
@@ -146,13 +146,13 @@ sanitizeInput <- function(conc,
 			stop("'conc_as_log' flag may be set incorrectly, as the EC50 is negative when positive value is expected.")
 		}
 
-		
+
 		if (viability_as_pct == FALSE && Hill_fit[[2]] > 1) {
 			print("Einf passed in as:")
 			print(Hill_fit[[2]])
-			
+
 			warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
-			
+
 		}
 		if (conc_as_log == FALSE){
 			Hill_fit[[3]] <- log10(Hill_fit[[3]])
@@ -164,7 +164,7 @@ sanitizeInput <- function(conc,
 			return(list("Hill_fit"=Hill_fit))
 		} else {
 			conc <- as.numeric(conc[!is.na(conc)])
-			
+
 			if (prod(is.finite(conc)) != 1) {
 				print(conc)
 				stop("Concentration vector contains elements which are not real numbers.")
@@ -190,7 +190,7 @@ sanitizeInput <- function(conc,
 			}
 			return(list("Hill_fit"=Hill_fit, "log_conc" = log_conc))
 		}
-		
+
 
 	}
 	if(!missing(Hill_fit)&&!missing(viability)){

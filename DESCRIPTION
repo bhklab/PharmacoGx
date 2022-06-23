@@ -60,17 +60,13 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/PharmacoGx/issues
-Collate:
-    'ComputeGR.R'
+Collate: 
     'GR.R'
     'GWC.R'
-    'LogLogisticRegression.R'
-    'MatthewCor.R'
     'PharmacoSet-class.R'
     'PharmacoSet-accessors.R'
     'PharmacoSet-utils.R'
     'RcppExports.R'
-    'SanityCheck.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
     'class-SignatureClass.R'
@@ -80,6 +76,7 @@ Collate:
     'computeAmax.R'
     'computeDSS.R'
     'computeDrugSensitivity.R'
+    'computeGR.R'
     'computeIC50.R'
     'computeICn.R'
     'computeSlope.R'
@@ -99,6 +96,8 @@ Collate:
     'getRawSensitivityMatrix.R'
     'globals.R'
     'intersectPSets.R'
+    'logLogisticRegression.R'
+    'matthewCor.R'
     'mergePSets.R'
     'methods-[.R'
     'methods-drugSensitivitySig.R'
@@ -109,5 +108,6 @@ Collate:
     'plotPSig.R'
     'rankGeneDrugPerturbation.R'
     'rankGeneDrugSensitivity.R'
+    'sanityCheck.R'
     'updateObject-methods.R'
     'zzz.R'

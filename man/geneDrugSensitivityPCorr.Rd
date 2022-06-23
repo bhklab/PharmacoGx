@@ -48,3 +48,7 @@ and F statistics and its corresponding p-value.
 \description{
 This version of the function uses a partial correlation instead of standardized linear models.
 }
+\examples{
+print("TODO::")
+
+}

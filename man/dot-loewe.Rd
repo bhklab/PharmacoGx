@@ -2,12 +2,7 @@
 % Please edit documentation in R/computeSynergy.R
 \name{.loewe}
 \alias{.loewe}
-\title{Loewe Additive Combination Index (CI)
-Computes the Loewe additive combination index (CI) from its definition
-\eqn{
-    CI = \frac{x_1}{f_1^{-1}(E)} +
-         \frac{x_2}{f_2^{-1}(E)}
-}}
+\title{Loewe Additive Combination Index (CI)}
 \usage{
 .loewe(
   viability,
@@ -45,10 +40,13 @@ in the range [0, 1].}
 CI under Loewe additive definition
 }
 \description{
-Loewe Additive Combination Index (CI)
 Computes the Loewe additive combination index (CI) from its definition
 \eqn{
     CI = \frac{x_1}{f_1^{-1}(E)} +
          \frac{x_2}{f_2^{-1}(E)}
 }
+}
+\examples{
+print("TODO::")
+
 }

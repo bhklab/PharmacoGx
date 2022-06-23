@@ -2,6 +2,7 @@
 
 #' @title Inverse function of Hill equation
 #'
+#' @description
 #' For the dose-response Hill equation of a drug defined by
 #' \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
 #' that computes the response in viability from a dose in micromole fir a drug,
@@ -23,6 +24,9 @@
 #' @return `numeric` concentrations in micromoles required to produce
 #'     `viability` in the corresponding entries.
 #'
+#' @examples
+#' print("TODO::")
+#'
 #' @export
 .effectToDose <- function(viability, EC50, HS, E_inf) {
     ## TODO:: Check input validity
@@ -32,6 +36,8 @@
 }
 
 #' @title Loewe Additive Combination Index (CI)
+#'
+#' @description
 #' Computes the Loewe additive combination index (CI) from its definition
 #' \eqn{
 #'     CI = \frac{x_1}{f_1^{-1}(E)} +
@@ -50,6 +56,9 @@
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
 #'
 #' @return CI under Loewe additive definition
+#'
+#' @examples
+#' print("TODO::")
 #'
 #' @export
 .loewe <- function(viability,
@@ -80,6 +89,7 @@
 
 #' @title Computes Loewe Null References
 #'
+#' @description
 #' Predict the response of a treatment combination under
 #' the Loewe additive null assumption.
 #'
@@ -97,6 +107,9 @@
 #' @return `numeric` expected viability under Loewe additive null assumption.
 #'
 #' @export
+#'
+#' @examples
+#' print("TODO::")
 #'
 #' @importFrom stats optimise
 .computeLoewe <- function(viability,

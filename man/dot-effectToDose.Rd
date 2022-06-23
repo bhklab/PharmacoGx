@@ -2,17 +2,7 @@
 % Please edit documentation in R/computeSynergy.R
 \name{.effectToDose}
 \alias{.effectToDose}
-\title{Inverse function of Hill equation
-
-For the dose-response Hill equation of a drug defined by
-\eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
-that computes the response in viability from a dose in micromole fir a drug,
-this function is the inverse function of the Hill curve that
-computes the dose required from a response:
-\eqn{
-    f^{-1}(E) = EC50 (
-    \frac{1-E}{E-E_{inf}} )^{\frac{1}{HS}}
-}}
+\title{Inverse function of Hill equation}
 \usage{
 .effectToDose(viability, EC50, HS, E_inf)
 }
@@ -33,8 +23,6 @@ when it is administered with a infinitely high concentration.}
 \code{viability} in the corresponding entries.
 }
 \description{
-Inverse function of Hill equation
-
 For the dose-response Hill equation of a drug defined by
 \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
 that computes the response in viability from a dose in micromole fir a drug,
@@ -44,4 +32,8 @@ computes the dose required from a response:
     f^{-1}(E) = EC50 (
     \frac{1-E}{E-E_{inf}} )^{\frac{1}{HS}}
 }
+}
+\examples{
+print("TODO::")
+
 }

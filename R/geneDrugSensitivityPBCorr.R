@@ -79,13 +79,13 @@ corPermute <- function(sample_function, req_alpha=0.05, tolerance_par = req_alph
     # if(cur_success == 0){
     #   next
     # }
-    
+
     if(log_cur_PiN - log_cur_suph2 > log_decision_boundary){
       return(list(significant = TRUE, "p.value" = pr_min_1, num_iter=cur_iter, num_larger=cur_success))
     }
     if(log_cur_PiN - log_cur_suph1 > log_decision_boundary){
       return(list(significant = FALSE, "p.value" = pr_min_1, num_iter=cur_iter, num_larger=cur_success))
-    } 
+    }
   }
   return(list(significant = NA, "p.value" = pr_min_1, num_iter=cur_iter, num_larger=cur_success))
 }
@@ -95,7 +95,7 @@ corPermute <- function(sample_function, req_alpha=0.05, tolerance_par = req_alph
 ## Helper Functions
 ##TODO:: Add  function documentation
 #' @importFrom stats quantile
-.rescale <- function(x, na.rm=FALSE, q=0) 
+.rescale <- function(x, na.rm=FALSE, q=0)
 {
   if(q == 0) {
     ma <- max(x, na.rm=na.rm)
@@ -108,37 +108,40 @@ corPermute <- function(sample_function, req_alpha=0.05, tolerance_par = req_alph
   return(xx)
 }
 
-## TODO: decide better what to do with no variance cases. 
+## TODO: decide better what to do with no variance cases.
 cor.boot <- function(data, w){
   return(cor(data[w,1], data[w,2]))
 }
 
 
 #' Calculate The Gene Drug Sensitivity
-#' 
+#'
 #' This version of the function uses a partial correlation instead of standardized linear models, for discrete predictive features
-#' Requires at least 3 observations per group. 
-#' 
+#' Requires at least 3 observations per group.
+#'
 #' @param x A \code{numeric} vector of gene expression values
 #' @param type A \code{vector} of factors specifying the cell lines or type types
 #' @param batch A \code{vector} of factors specifying the batch
-#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g., 
+#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g.,
 #'   IC50 or AUC)
 #' @param test A \code{character} string indicating whether resampling or analytic based tests should be used
 #' @param req_alpha \code{numeric}, number of permutations for p value calculation
 #' @param nBoot \code{numeric}, number of bootstrap resamplings for confidence interval estimation
 #' @param conf.level \code{numeric}, between 0 and 1. Size of the confidence interval required
-#' @param max_perm \code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA. 
+#' @param max_perm \code{numeric} the maximum number of permutations that QUICKSTOP can do before giving up and returning NA.
 #'   Can be set globally by setting the option "PharmacoGx_Max_Perm", or left at the default of \code{ceiling(1/req_alpha*100)}.
 #' @param verbose \code{boolean} Should the function display messages?
-#'  
-#' @return A \code{vector} reporting the effect size (estimateof the coefficient 
-#'   of drug concentration), standard error (se), sample size (n), t statistic, 
+#'
+#' @return A \code{vector} reporting the effect size (estimateof the coefficient
+#'   of drug concentration), standard error (se), sample size (n), t statistic,
 #'   and F statistics and its corresponding p-value.
+#'
+#' @examples
+#' print("TODO::")
 #'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var
 #' @importFrom boot boot boot.ci
-geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno, 
+geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
   test = c("resampling", "analytic"),
   req_alpha = 0.05,
   nBoot = 1e3,
@@ -148,8 +151,8 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
 
   test <- match.arg(test)
 
-  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")  
-  
+  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
+
   drugpheno <- data.frame(vapply(drugpheno, function(x) {
     if (!is.factor(x)) {
       x[is.infinite(x)] <- NA
@@ -170,7 +173,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
   }
 
   ## taking at least 5 times the number of boot samples as number of observations, as with binary data many boot samples
-  ## tend to be NA, and if the number of non-NA drops below number of obs, the emperical influence cannot be determined 
+  ## tend to be NA, and if the number of non-NA drops below number of obs, the emperical influence cannot be determined
   ## for BCA interval calculation
 
   if(test=="resampling"){
@@ -195,7 +198,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
   dd <- data.frame(drugpheno, "x"=xx)
 
   ## control for tissue type
-  if(length(sort(unique(type[ccix]))) > 1) { 
+  if(length(sort(unique(type[ccix]))) > 1) {
     dd <- cbind(dd, type=type[ccix])
   }
   ## control for batch
@@ -230,7 +233,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
       lm1 <- lm(formula(ffd), dd)
       var1 <- residuals(lm1)
       var2 <- residuals(lm(formula(ffx), dd))
-      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor. 
+      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor.
     } else { ## doing this if statement in the case there are some numerical differences between mean centred values and raw values
     var1 <- dd[,"drugpheno.1"]
     var2 <- dd[,"x"]
@@ -248,14 +251,14 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
   if(test == "resampling"){
       ## While the logic is equivalent regardless of if there are covariates for calculating the point estimate,
       ## (correlation is a subcase of partial correlation), for computational efficency in permuation testing we
-      ## split here and don't do extranous calls to lm if it is unnecessay. 
+      ## split here and don't do extranous calls to lm if it is unnecessay.
 
     if(ncol(dd) > 2){
 
       # if(!getOption("PharmacoGx_useC")|| ncol(dd)!=3){ ## not yet implemented
 
-        ## implementing a much more efficient method for the particular case where we have 3 columns with assumption that 
-        ## column 3 is the tissue. 
+        ## implementing a much more efficient method for the particular case where we have 3 columns with assumption that
+        ## column 3 is the tissue.
       if(ncol(dd)==3){
         sample_function <- function(){
 
@@ -282,7 +285,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
 
           perm.cor <- cor(partial.dp, partial.x, use="complete.obs")
           return(abs(obs.cor) < abs(perm.cor))
-        }          
+        }
       }
 
       p.value <- corPermute(sample_function, req_alpha = req_alpha, max_iter=max_perm)
@@ -299,15 +302,15 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
       #   NG <- length(table(factor(dd[,3])))
       #   N <- as.numeric(length(x))
 
-      #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2)) 
+      #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
       #   significant <- p.value[[1]]
-      #   p.value <- p.value[[2]]        
+      #   p.value <- p.value[[2]]
       # }
 
 
       pcor.boot <- function(ddd, w){
-        ddd <- ddd[w,] 
-          ## Taking care of an edge case where only one covariate factor level is left after resampling 
+        ddd <- ddd[w,]
+          ## Taking care of an edge case where only one covariate factor level is left after resampling
         ddd[,-c(1,2)] <- ddd[,-c(1,2),drop=FALSE][,apply(ddd[,-c(1,2),drop=FALSE], 2, function(x) return(length(unique(x))))>=2]
 
         if(ncol(ddd)==3){
@@ -346,14 +349,14 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
     # if(!getOption("PharmacoGx_useC")){
 
       ## At this point we have verified that we are doing the normal (nor partial) PBCC,
-      ## and we also verified that only 2 unique values of var2 exist. Therefore, diff 
-      ## should return a single result. 
-      ## Note that the PBCC permutation only depends on the mean differences, the 
+      ## and we also verified that only 2 unique values of var2 exist. Therefore, diff
+      ## should return a single result.
+      ## Note that the PBCC permutation only depends on the mean differences, the
       ## denominator is proprtional to the total variance
       ## in var1 and inverse of the sqrt of the proportions between groups,
       ## both of which stay constant through the permutation. Therefore, we skip
-      ## the needless normalization step in this permutation procedure. 
-      ## Note that this does not apply to bootstrapping. 
+      ## the needless normalization step in this permutation procedure.
+      ## Note that this does not apply to bootstrapping.
 
       obs.mean.diff <- diff(tapply(var1, var2, mean))
       sample_function <- function(){
@@ -373,9 +376,9 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
     #   NG <- 1
     #   N <- as.numeric(length(x))
 
-    #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2)) 
+    #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
     #   significant <- p.value[[1]]
-    #   p.value <- p.value[[2]]        
+    #   p.value <- p.value[[2]]
     # }
 
 
@@ -393,7 +396,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
         })
     }
 
-      ## Think about if the partial cor should also be refit for each (Probably, different lines would be fit if points are missing...) 
+      ## Think about if the partial cor should also be refit for each (Probably, different lines would be fit if points are missing...)
 
   } else if(test == "analytic"){
       # if(ncol(dd) > 2){

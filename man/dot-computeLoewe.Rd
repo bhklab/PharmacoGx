@@ -2,9 +2,7 @@
 % Please edit documentation in R/computeSynergy.R
 \name{.computeLoewe}
 \alias{.computeLoewe}
-\title{Computes Loewe Null References
-Predict the response of a treatment combination under
-the Loewe additive null assumption.}
+\title{Computes Loewe Null References}
 \usage{
 .computeLoewe(
   viability,
@@ -42,7 +40,10 @@ in the range [0, 1].}
 \code{numeric} expected viability under Loewe additive null assumption.
 }
 \description{
-Computes Loewe Null References
 Predict the response of a treatment combination under
 the Loewe additive null assumption.
+}
+\examples{
+print("TODO::")
+
 }

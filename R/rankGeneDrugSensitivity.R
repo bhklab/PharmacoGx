@@ -1,11 +1,10 @@
-
 #' @importFrom stats complete.cases
 #' @importFrom stats p.adjust
 
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
-## inputs:    
+## inputs:
 ##      - data: gene expression data matrix
 ##            - drugpheno: sensititivity values fo thr drug of interest
 ##            - type: cell or tissue type for each experiment
@@ -20,9 +19,9 @@
 ## Notes:    duration is not taken into account as only 4 perturbations lasted 12h, the other 6096 lasted 6h
 #################################################
 
-rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, 
+rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
                                      single.type=FALSE, standardize = "SD",
-                                     nthread=1, verbose=FALSE, 
+                                     nthread=1, verbose=FALSE,
                                      modeling.method = c("anova", "pearson"),
                                      inference.method = c("analytic", "resampling"), req_alpha = 0.05) {
 
@@ -60,7 +59,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
     stop("length of drugpheno, type, duration, and batch should be equal to the number of rows of data!")
   }
   rownames(drugpheno) <- names(type) <- names(batch) <- rownames(data)
-  
+
   res <- NULL
   utype <- sort(unique(as.character(type)))
   ltype <- list("all"=utype)
@@ -93,15 +92,15 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
       }
     } else {
       nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
-    }  
+    }
   } else if (modeling.method == "pearson") {
     nc <- c("estimate", "n", "df", "significant", "pvalue", "lower", "upper")
   }
-  
+
   for (ll in seq_len(length(ltype))) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
     # ccix <- complete.cases(data[iix, , drop=FALSE], drugpheno[iix,,drop=FALSE], type[iix], batch[iix]) ### HACK???
-    
+
     ccix <- rowSums(!is.na(data)) > 0 | rowSums(!is.na(drugpheno)) > 0 | is.na(type) | is.na(batch)
     ccix <- ccix[iix]
     # ccix <- !vapply(seq_len(NROW(data[iix,,drop=FALSE])), function(x) {
@@ -120,22 +119,22 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
           res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivity, type=type, batch=batch, drugpheno=drugpheno, verbose=verbose, standardize=standardize))
         } else if(modeling.method == "pearson") {
           if(!is.character(data)){
-            res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr, 
+            res <- t(apply(data[ , x, drop=FALSE], 2, geneDrugSensitivityPCorr,
                                                       type=type,
-                                                      batch=batch, 
-                                                      drugpheno=drugpheno, 
-                                                      verbose=verbose, 
-                                                      test=inference.method, 
+                                                      batch=batch,
+                                                      drugpheno=drugpheno,
+                                                      verbose=verbose,
+                                                      test=inference.method,
                                                       req_alpha = req_alpha))
           } else {
             res <- t(apply(data[ , x, drop=FALSE], 2, function(dataIn) {
-              geneDrugSensitivityPBCorr(as.factor(dataIn),  
+              geneDrugSensitivityPBCorr(as.factor(dataIn),
                                                       type=type,
-                                                      batch=batch, 
-                                                      drugpheno=drugpheno, 
-                                                      verbose=verbose, 
-                                                      test=inference.method, 
-                                                      req_alpha = req_alpha)}))            
+                                                      batch=batch,
+                                                      drugpheno=drugpheno,
+                                                      verbose=verbose,
+                                                      test=inference.method,
+                                                      req_alpha = req_alpha)}))
           }
 
         }
@@ -144,9 +143,9 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch,
         return(res)
       }, data=data[iix, , drop=FALSE],
          type=type[iix], batch=batch[iix],
-         drugpheno=drugpheno[iix,,drop=FALSE], 
-         standardize=standardize, 
-         modeling.method = modeling.method, 
+         drugpheno=drugpheno[iix,,drop=FALSE],
+         standardize=standardize,
+         modeling.method = modeling.method,
          inference.method = inference.method,
          req_alpha = req_alpha, mc.cores = nthread, mc.preschedule = TRUE)
       rest <- do.call(rbind, mcres)

@@ -1,11 +1,3 @@
-########################
-## Mark Freeman
-## All rights Reserved
-## August 18, 2015
-## Function to calculate area between dose-response curves over their
-#   common concentration range
-########################
-
 #' Fits dose-response curves to data given by the user
 #' and returns the ABC of the fitted curves.
 #'
@@ -38,6 +30,8 @@
 #' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
+#'
+#' @author Mark Freeman
 #'
 #' @return The numeric area of the absolute difference between the two hill slopes
 #'

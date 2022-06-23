@@ -35,3 +35,7 @@ A \code{PharmacoSig} object build from the provided signature data
 \description{
 Contructor for the PharmacoSig S4 class
 }
+\examples{
+PharmacoSig()
+
+}

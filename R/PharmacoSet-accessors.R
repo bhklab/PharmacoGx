@@ -32,9 +32,11 @@ NULL
 
 #' @title .parseToRoxygen
 #'
+#' @description
 #' Helper for metaprogramming roxygen2 documentation
 #'
-#' @description Takes a string block of roxygen2 tags sepearated by new-line
+#' @details
+#' Takes a string block of roxygen2 tags sepearated by new-line
 #'   characteres and parses it to the appropriate format for the @eval tag,
 #'   subtituting any string in { } for the argument of the same name in `...`.
 #'
