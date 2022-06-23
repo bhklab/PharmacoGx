@@ -53,6 +53,9 @@ curve-fitting is performed.}
 assumed to be a decimal value.}
 }
 \value{
+\code{numeric(1)} The ICn of the Hill curve over the specified dose
+range.
+
 a numeric value for the concentration of the nth precentile viability reduction
 }
 \description{

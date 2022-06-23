@@ -1,6 +1,6 @@
-# Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking 
+# Return AUC (Area Under the drug response curve) for an experiment of a pSet by taking
 # its concentration and viability as input.
-# 
+#
 # @param conc `numeric` A concentration range that the AUC should be computed for that range.
 # Concentration range by default considered as not logarithmic scaled.
 # @param viability `numeric` Viablities correspondant to the concentration range passed as first parameter.
@@ -10,15 +10,17 @@
 # range of (0,100)
 # @param verbose `logical(1)` If 'TRUE' the function will retrun warnings and other infomrative messages.
 # @import caTools
-computeAUC_old <- function(conc, viability, 
+#' @keywords internal
+#' @noRd
+computeAUC_old <- function(conc, viability,
                        conc_as_log = FALSE,
                        viability_as_pct = TRUE,
-                       trunc=TRUE, 
-                       verbose=TRUE, 
+                       trunc=TRUE,
+                       verbose=TRUE,
                        area.type=c("Fitted","Actual")) {
     cleanData <- sanitizeInput(conc, viability,
                              conc_as_log=conc_as_log,
-                             viability_as_pct=viability_as_pct, 
+                             viability_as_pct=viability_as_pct,
                              trunc=trunc, verbose=verbose)
     log_conc <- cleanData[["log_conc"]]
     viability <- cleanData[["viability"]]
@@ -28,7 +30,7 @@ computeAUC_old <- function(conc, viability,
 #     concentration <- concentration[-ii]
 #     viability <- viability[-ii]
 #   }
-  
+
   if(missing(area.type)){
     area.type <- "Fitted"
   }
@@ -44,4 +46,3 @@ computeAUC_old <- function(conc, viability,
   }
   return (AUC)
 }
-  

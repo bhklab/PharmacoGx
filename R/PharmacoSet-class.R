@@ -171,7 +171,7 @@ PharmacoSet2 <- function(name="emptySet", treatment=data.frame(),
 
     .PharmacoSet(
         annotation=cSet@annotation,
-        cell=cSet@sample,
+        sample=cSet@sample,
         treatment=cSet@treatment,
         molecularProfiles=cSet@molecularProfiles,
         treatmentResponse=cSet@treatmentResponse,

@@ -19,7 +19,7 @@ for the session in which the computation was done. Useful for determining the ex
 }
 \examples{
 data(GDSCsmall)
-drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 showSigAnnot(drug.sensitivity)
 

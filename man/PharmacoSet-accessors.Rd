@@ -58,6 +58,8 @@
 \alias{molecularProfiles}
 \alias{molecularProfiles<-,PharmacoSet,character,character,matrix-method}
 \alias{molecularProfiles<-,PharmacoSet,character,missing,matrix-method}
+\alias{molecularProfiles<-,PharmacoSet,missing,missing,list-method}
+\alias{molecularProfiles<-,PharmacoSet,missing,missing,MutliAssayExperiment-method}
 \alias{molecularProfiles<-}
 \alias{featureInfo,PharmacoSet-method}
 \alias{featureInfo}
@@ -97,12 +99,14 @@
 \alias{sensitivityProfiles<-,PharmacoSet,data.frame-method}
 \alias{sensitivityRaw,PharmacoSet-method}
 \alias{sensitivityRaw<-,PharmacoSet,array-method}
-\alias{sensitivitySlot,PharmacoSet-method}
+\alias{treatmentResponse,PharmacoSet-method}
+\alias{treatmentResponse}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,PharmacoSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-,PharmacoSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-}
+\alias{treamentResponse<-,PharmacoSet,list-method}
+\alias{treatmentResponse<-,PharmacoSet,LongTable-method}
 \alias{sensitivitySlot<-}
-\alias{sensitivitySlot<-,PharmacoSet,list-method}
-\alias{sensitivitySlot<-,PharmacoSet,LongTable-method}
 \alias{sensNumber,PharmacoSet-method}
 \alias{sensNumber}
 \alias{sensNumber<-,PharmacoSet,matrix-method}
@@ -189,9 +193,9 @@ drugNames(...) <- value
 
 \S4method{sensitivityRaw}{PharmacoSet,array}(object) <- value
 
-\S4method{sensitivitySlot}{PharmacoSet}(object)
+\S4method{treatmentResponse}{PharmacoSet}(object)
 
-\S4method{sensitivitySlot}{PharmacoSet,list_OR_LongTable}(object) <- value
+\S4method{treatmentResponse}{PharmacoSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{PharmacoSet}(object)
 
@@ -336,7 +340,8 @@ or 'both'
 \strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
 \code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{PharmacoSet}
 object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
-found with \code{mDataNames(object)}. Arguments:
+found with \code{mDataNames(object)}. Exclude \code{mDataType} and \code{assay} to
+access the entire slot. Arguments:
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -349,7 +354,7 @@ the given \code{mDataType}.
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
 the \code{molecularProfiles} slot of a PharmacoSet object with the specified
 \code{mDataType}. Valid \code{mDataType} arguments can be found with
-\code{mDataNames(object)}.
+\code{mDataNames(object)}. Omit \code{mDataType} and \code{assay} to update the slot.
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -572,6 +577,9 @@ molecularProfiles(CCLEsmall, 'rna') <- molecularProfiles(CCLEsmall, 'rna')
 molecularProfiles(CCLEsmall, 'rna', 'exprs') <-
     molecularProfiles(CCLEsmall, 'rna', 'exprs')
 
+# Replace the whole slot
+molecularProfiles(CCLEsmall) <- molecularProfiles(CCLEsmall)
+
 featureInfo(CCLEsmall, 'rna')
 
 featureInfo(CCLEsmall, 'rna') <- featureInfo(CCLEsmall, 'rna')
@@ -608,9 +616,9 @@ head(sensitivityRaw(CCLEsmall))
 
 sensitivityRaw(CCLEsmall) <- sensitivityRaw(CCLEsmall)
 
-sensitivitySlot(CCLEsmall)
+treatmentResponse(CCLEsmall)
 
-sensitivitySlot(CCLEsmall) <- sensitivitySlot(CCLEsmall)
+treatmentResponse(CCLEsmall) <- treatmentResponse(CCLEsmall)
 
 sensNumber(CCLEsmall)
 

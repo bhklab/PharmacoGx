@@ -43,3 +43,7 @@ and F statistics and its corresponding p-value.
 \description{
 TODO:: Write a description!
 }
+\examples{
+print("TODO::")
+
+}

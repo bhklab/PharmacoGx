@@ -32,9 +32,11 @@ NULL
 
 #' @title .parseToRoxygen
 #'
+#' @description
 #' Helper for metaprogramming roxygen2 documentation
 #'
-#' @description Takes a string block of roxygen2 tags sepearated by new-line
+#' @details
+#' Takes a string block of roxygen2 tags sepearated by new-line
 #'   characteres and parses it to the appropriate format for the @eval tag,
 #'   subtituting any string in { } for the argument of the same name in `...`.
 #'
@@ -309,7 +311,7 @@ setReplaceMethod("datasetType", signature(object="PharmacoSet",
 #' @importMethodsFrom CoreGx molecularProfiles
 setMethod(molecularProfiles, "PharmacoSet", function(object, mDataType, assay)
 {
-    callNextMethod(object=object, mDataType=mDataType, assay=assay)
+    callNextMethod()
 })
 
 #' @rdname PharmacoSet-accessors
@@ -562,26 +564,25 @@ setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"),
     callNextMethod(object=object, value=value)
 })
 
-
 #
-# == sensitivitySlot
+# == treatmentResponse
 
 
 #' @rdname PharmacoSet-accessors
-#' @eval CoreGx:::.docs_CoreSet_get_sensitivitySlot(class_=.local_class,
+#' @eval CoreGx:::.docs_CoreSet_get_treatmentResponse(class_=.local_class,
 #'   data_=.local_data)
-#' @importMethodsFrom CoreGx sensitivitySlot
-setMethod("sensitivitySlot", signature("PharmacoSet"), function(object) {
+#' @importMethodsFrom CoreGx treatmentResponse
+setMethod("treatmentResponse", signature("PharmacoSet"), function(object) {
     callNextMethod(object=object)
 })
 
 
 
 #' @rdname PharmacoSet-accessors
-#' @importMethodsFrom CoreGx sensitivitySlot<-
-#' @eval CoreGx:::.docs_CoreSet_set_sensitivitySlot(class_=.local_class,
+#' @importMethodsFrom CoreGx treatmentResponse<-
+#' @eval CoreGx:::.docs_CoreSet_set_treatmentResponse(class_=.local_class,
 #' data_=.local_data)
-setReplaceMethod('sensitivitySlot', signature(object='PharmacoSet',
+setReplaceMethod('treatmentResponse', signature(object='PharmacoSet',
     value='list_OR_LongTable'), function(object, value)
 {
     callNextMethod(object=object, value=value)
