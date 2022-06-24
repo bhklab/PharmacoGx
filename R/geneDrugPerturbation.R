@@ -18,7 +18,7 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
 ## output:
 ##  vector reporting the effect size (estimateof the coefficient of drug concentration), standard error (se), sample size (n), t statistic, and f statistics and its corresponding p-value
 
-
+    ## NOTE:: The use of T/F warning from BiocCheck is a false positive on the string 'Pr(>F)'
 
     nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
     if (length(sort(unique(concentration))) < 2) {
@@ -42,7 +42,7 @@ geneDrugPerturbation <- function(x, concentration, type, batch, duration, model=
 
 ### add experiment duration if the vector consists of more than one different value
 
-  if(length(sort(unique(duration))) > 2){
+  if (length(sort(unique(duration))) > 2) {
       ff0 <- sprintf("%s + duration", ff0)
       ff <- sprintf("%s + duration", ff)
   }

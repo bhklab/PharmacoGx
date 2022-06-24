@@ -12,19 +12,24 @@
 #'     f^{-1}(E) = EC50 (
 #'     \frac{1-E}{E-E_{inf}} )^{\frac{1}{HS}}
 #' }
-#' 
+#'
 #' @param viability `numeric` is a vector whose entries are the viability values
-#'     in the range [0, 1].
+#'     in the range \[0, 1\].
 #' @param EC50 `numeric` is a vector of relative EC50 for drug-response equation.
 #' @param HS `numeric` Hill coefficient of the drug-response equation
 #'     that represents the sigmoidity of the curve.
 #' @param E_inf `numeric` the maximum attanable effect of a drug
 #'     when it is administered with a infinitely high concentration.
-#' 
+#'
 #' @return `numeric` concentrations in micromoles required to produce
 #'     `viability` in the corresponding entries.
 #' 
 #' @noRd
+#'
+#' @examples
+#' print("TODO::")
+#'
+#' @export
 .effectToDose <- function(viability, EC50, HS, E_inf) {
     ## TODO:: Check input validity
     EC50 * (
@@ -36,13 +41,13 @@
 #'
 #' @description
 #' Computes the Loewe additive combination index (CI) from its definition
-#' \deqn{
+#' \eqn{
 #'     CI = \frac{x_1}{f_1^{-1}(E)} +
 #'          \frac{x_2}{f_2^{-1}(E)}
 #' }
-#' 
+#'
 #' @param viability `numeric` is a vector whose entries are the viability values
-#'     in the range `c(0, 1)`.
+#'     in the range \[0, 1\].
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param E_inf_1 `numeric` the maximum attainable effect of treatment 1.
@@ -51,13 +56,16 @@
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
-#' 
+#'
 #' @return CI under Loewe additive definition
-#' 
+#'
+#' @examples
+#' print("TODO::")
+#'
 #' @export
 LoeweCI <- function(viability,
-                   treatment1dose, HS_1, E_inf_1, EC50_1,
-                   treatment2dose, HS_2, E_inf_2, EC50_2) {
+                    treatment1dose, HS_1, E_inf_1, EC50_1,
+                    treatment2dose, HS_2, E_inf_2, EC50_2) {
     (treatment1dose / .effectToDose(
         viability = viability,
         EC50 = EC50_1,
@@ -69,7 +77,6 @@ LoeweCI <- function(viability,
         HS = HS_2,
         E_inf = E_inf_2))
 }
-
 ## Objective function to mimimise for solving E_Loewe
 #' @param viability `numeric` is a vector whose entries are the viability values
 #'     in the range [0, 1].
@@ -100,7 +107,7 @@ LoeweCI <- function(viability,
 #' @description
 #' Predict the response of a treatment combination under
 #' the Loewe additive null assumption.
-#' 
+#'
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param E_inf_1 `numeric` the maximum attainable effect of treatment 1.
@@ -109,11 +116,14 @@ LoeweCI <- function(viability,
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
-#' 
+#'
 #' @return `numeric` expected viability under Loewe additive null assumption.
-#' 
+#'
 #' @export
-#' 
+#'
+#' @examples
+#' print("TODO::")
+#'
 #' @importFrom stats optimise
 computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
                          treatment2dose, HS_2, E_inf_2, EC50_2) {
@@ -355,5 +365,4 @@ computeHSA <- function(viability_1, viability_2) {
     HSA_ref <- min(viability_1, viability_2)
     return(HSA_ref)
 }
-
 

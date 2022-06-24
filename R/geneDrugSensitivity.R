@@ -1,33 +1,36 @@
 #' Calcualte The Gene Drug Sensitivity
-#' 
+#'
 #' TODO:: Write a description!
-#' 
+#' @examples
+#' print("TODO::")
+#'
 #' @param x A \code{numeric} vector of gene expression values
 #' @param type A \code{vector} of factors specifying the cell lines or type types
 #' @param batch A \code{vector} of factors specifying the batch
-#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g., 
+#' @param drugpheno A \code{numeric} vector of drug sensitivity values (e.g.,
 #'   IC50 or AUC)
 # @param duration A \code{numeric} vector of experiment duration in hours
-#' @param interaction.typexgene \code{boolean} Should interaction between gene 
-#'   expression and cell/type type be computed? Default set to FALSE 
+#' @param interaction.typexgene \code{boolean} Should interaction between gene
+#'   expression and cell/type type be computed? Default set to FALSE
 #' @param model \code{boolean} Should the full linear model be returned? Default
 #'   set to FALSE
 #' @param standardize \code{character} One of 'SD', 'rescale' or 'none'
 #' @param verbose \code{boolean} Should the function display messages?
-#'  
-#' @return A \code{vector} reporting the effect size (estimate of the coefficient 
-#'   of drug concentration), standard error (se), sample size (n), t statistic, 
+#'
+#' @return A \code{vector} reporting the effect size (estimate of the coefficient
+#'   of drug concentration), standard error (se), sample size (n), t statistic,
 #'   and F statistics and its corresponding p-value.
 #'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var
-geneDrugSensitivity <- function(x, type, batch, drugpheno, 
-                                interaction.typexgene=FALSE, 
+geneDrugSensitivity <- function(x, type, batch, drugpheno,
+                                interaction.typexgene=FALSE,
                                 model=FALSE,  standardize=c("SD", "rescale", "none"), verbose=FALSE) {
 
+  ## NOTE:: The use of T/F warning from BiocCheck is a false positive on the string 'Pr(>F)'
   standardize <- match.arg(standardize)
 
-  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")  
-  
+  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
+
   drugpheno <- data.frame(vapply(drugpheno, function(x) {
     if (!is.factor(x)) {
       x[is.infinite(x)] <- NA
@@ -65,16 +68,16 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
     } else {
       rest <- c("estimate" = NA, "se" = NA , "n" = nn, "tstat" = NA , "fstat" = NA , "pvalue" = NA , "df" = NA )
     }
-  }  
-  
+  }
+
   if(nn < 3 || isTRUE(all.equal(var(x[ccix], na.rm=TRUE), 0))) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
 
-  ## standardized coefficient in linear model 
+  ## standardized coefficient in linear model
   if(length(table(drugpheno)) > 2 & standardize!= "none") {
-    switch(standardize, 
+    switch(standardize,
       "SD" = drugpheno <- apply(drugpheno, 2, function(x){
       return(x[ccix]/sd(as.numeric(x[ccix])))}) ,
       "rescale" = drugpheno <- apply(drugpheno, 2, function(x){
@@ -85,7 +88,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
     drugpheno <- drugpheno[ccix,,drop=FALSE]
   }
   if(length(table(x)) > 2  & standardize!= "none"){
-    switch(standardize, 
+    switch(standardize,
       "SD" = xx <- x[ccix]/sd(as.numeric(x[ccix])) ,
       "rescale" = xx <- .rescale(as.numeric(x[ccix]), q=0.05, na.rm=TRUE)
       )
@@ -102,9 +105,9 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
 
   dd <- data.frame(drugpheno, "x"=xx)
   # , "x"=xx, "type"=type[ccix], "batch"=batch[ccix])
-  
+
   ## control for tissue type
-  if(length(sort(unique(type[ccix]))) > 1) { 
+  if(length(sort(unique(type[ccix]))) > 1) {
     dd <- cbind(dd, type=type[ccix])
   }
   ## control for batch
@@ -116,7 +119,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
   #   ff0 <- sprintf("%s + duration", ff0)
   #   ff <- sprintf("%s + duration", ff)
   # }
-  
+
   # if(is.factor(drugpheno[,1])){
 
   #   drugpheno <- drugpheno[,1]
@@ -128,10 +131,10 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno,
   # }
 if(any(unlist(lapply(drugpheno,is.factor)))){
 
-## Added default '' value to ww to fix function if it is passed verbose = FALSE  
+## Added default '' value to ww to fix function if it is passed verbose = FALSE
 ww = ''
 
-rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")),
     warning=function(w) {
       if(verbose) {
         ww <- "Null model did not convrge"
@@ -143,7 +146,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FA
         return(ww)
       }
     })
-  rr1 <- tryCatch(try(glm(formula(drugpheno.1 ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")), 
+  rr1 <- tryCatch(try(glm(formula(drugpheno.1 ~ .), data=dd, model=FALSE, x=FALSE, y=FALSE, family="binomial")),
     warning=function(w) {
       if(verbose) {
         ww <- "Model did not converge"
@@ -157,7 +160,7 @@ rr0 <- tryCatch(try(glm(formula(drugpheno.1 ~ . - x), data=dd, model=FALSE, x=FA
 
 } else{
 
-rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)), 
+rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
     warning=function(w) {
       if(verbose) {
         ww <- "Null model did not converge"
@@ -166,10 +169,10 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
           tt <- table(dd[,"type"])
           print(tt)
         }
-      return(ww)  
+      return(ww)
       }
     })
-  rr1 <- tryCatch(try(lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)), 
+  rr1 <- tryCatch(try(lm(formula(paste(ff0, "~ . ", sep=" ")), data=dd)),
     warning=function(w) {
       if(verbose) {
         ww <- "Model did not converge"
@@ -182,8 +185,8 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
 
 
 }
-  
-  
+
+
   if (!is(rr0, "try-error") && !is(rr1, "try-error") & !is(rr0, "character") && !is(rr1, "character")) {
     rr <- summary(rr1)
 
@@ -206,7 +209,7 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         rest <- do.call(c, rest)
         rest <- c(rest,"n"=nn, "fstat"=rrc$stats[grep("^x", rownames(rrc$stats)), "approx F"], "pvalue"=rrc$stats[grep("^x", rownames(rrc$stats)), "Pr(>F)"])
       } else {
-        rrc <- stats::anova(rr0, rr1, test = "F") 
+        rrc <- stats::anova(rr0, rr1, test = "F")
         if(!length(rr$coefficients[grep("^x", rownames(rr$coefficients)), "Estimate"])){
           stop("A model failed to converge even with sufficient data. Please investigate further")
         }
@@ -214,10 +217,10 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
         names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df")
       }
     }
-    
-    
+
+
 #    rest <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
-    
+
 #   names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
 
 ## add tissue type/cell line statistics
@@ -236,7 +239,7 @@ rr0 <- tryCatch(try(lm(formula(paste(ff0, "~ . -x", sep=" ")), data=dd)),
 ## Helper Functions
 ##TODO:: Add  function documentation
 #' @importFrom stats quantile
-.rescale <- function(x, na.rm=FALSE, q=0) 
+.rescale <- function(x, na.rm=FALSE, q=0)
 {
   if(q == 0) {
     ma <- max(x, na.rm=na.rm)

@@ -39,3 +39,7 @@ computeLoewe(
 Predict the response of a treatment combination under
 the Loewe additive null assumption.
 }
+\examples{
+print("TODO::")
+
+}

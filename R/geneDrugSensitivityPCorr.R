@@ -39,6 +39,9 @@ cor.boot <- function(data, w){
 #'   of drug concentration), standard error (se), sample size (n), t statistic,
 #'   and F statistics and its corresponding p-value.
 #'
+#' @examples
+#' print("TODO::")
+#'
 #' @importFrom stats sd complete.cases lm glm anova pf formula var pt qnorm cor residuals runif
 #' @importFrom boot boot boot.ci
 #' @importFrom coop pcor

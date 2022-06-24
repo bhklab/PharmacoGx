@@ -1,7 +1,7 @@
 #################################################
 ## Rank genes based on drug effect in the Connectivity Map
 ##
-## inputs:	
+## inputs:
 ##      - data: gene expression data matrix
 ##			- drug: single or vector of drug(s) of interest; if a vector of drugs is provided, they will be considered as being the same drug and will be jointly analyszed
 ##			- drug.id: drug used in each experiment
@@ -41,7 +41,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 	}
 ## is the drug in the dataset?
 	drugix <- drug.id %in% drug
-		  
+
 	if (sum(drugix) == 0) {
 		warning(sprintf("Drug(s) %s not in the dataset", paste(drug, collapse=", ")))
 		return(list("all.type"=NULL, "single.type"=NULL))
@@ -55,20 +55,20 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 	xp <- xp[iix]
 	batch <- batch[iix]
 	duration <- duration[iix]
-	
+
 	res.type <- NULL
-	
+
 ## build input matrix
 	inpumat <- NULL
 ## for each batch/vehicle of perturbations+controls (test within each batch/vehicle to avoid batch effect)
 	ubatch <- sort(unique(batch[!is.na(xp) & xp == "perturbation"]))
 	names(ubatch) <- paste("batch", ubatch, sep="")
-	
+
 	for (bb in seq_len(length(ubatch))) {
 ## identify the perturbations and corresponding control experiments
 		xpix <- rownames(data)[complete.cases(batch, xp) & batch == ubatch[bb] & xp == "perturbation"]
 		ctrlix <- rownames(data)[complete.cases(batch, xp) & batch == ubatch[bb] & xp == "control"]
-		
+
 		if (all(!is.na(c(xpix, ctrlix))) && length(xpix) > 0 && length(ctrlix) > 0) {
 			if (!all(is.element(ctrlix, rownames(data)))) {
 				stop("data for some control experiments are missing!")
@@ -90,7 +90,7 @@ function (data, drug, drug.id, drug.concentration, type, xp, batch, duration, si
 		warning(sprintf("Not enough data for drug(s) %s", paste(drug, collapse=", ")))
 		return(list("all.type"=NULL, "single.type"=NULL))
 	}
-	
+
 	res <- NULL
 	utype <- sort(unique(as.character(inpumat[ , "type"])))
 	ltype <- list("all"=utype)

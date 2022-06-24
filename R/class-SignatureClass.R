@@ -22,6 +22,9 @@ setOldClass('sessionInfo', sessionInfo)
 #'
 #' @return A `PharmacoSig` object build from the provided signature data
 #'
+#' @examples
+#' PharmacoSig()
+#'
 #' @export
 PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity',
                         SessionInfo=sessionInfo(), Call='No Call Recorded', Arguments = list()){
@@ -30,16 +33,16 @@ PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=d
 }
 
 
-#' Show PharmacoGx Signatures  
-#' 
+#' Show PharmacoGx Signatures
+#'
 #' @examples
 #' data(GDSCsmall)
-#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
 #'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' drug.sensitivity
-#' 
+#'
 #' @param object \code{PharmacoSig}
-#' @return Prints the PharmacoGx Signatures object to the output stream, and returns invisible NULL. 
+#' @return Prints the PharmacoGx Signatures object to the output stream, and returns invisible NULL.
 #' @export
 setMethod("show", signature=signature(object='PharmacoSig'),
         function(object) {
@@ -52,20 +55,20 @@ setMethod("show", signature=signature(object='PharmacoSig'),
 
 
 #' Show the Annotations of a signature object
-#' 
-#' This funtion prints out the information about the call used to compute the drug signatures, and the session info 
-#' for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures. 
-#' 
+#'
+#' This funtion prints out the information about the call used to compute the drug signatures, and the session info
+#' for the session in which the computation was done. Useful for determining the exact conditions used to generate signatures.
+#'
 #' @examples
 #' data(GDSCsmall)
-#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+#' drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
 #'              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 #' showSigAnnot(drug.sensitivity)
-#' 
+#'
 #' @param object An object of the \code{PharmacoSig} Class, as
 #' returned by \code{drugPerturbationSig} or \code{drugSensitivitySig}
 #'
-#' @return Prints the PharmacoGx Signatures annotations to the output stream, and returns invisible NULL. 
+#' @return Prints the PharmacoGx Signatures annotations to the output stream, and returns invisible NULL.
 #'
 #' @importMethodsFrom CoreGx showSigAnnot
 #' @export
@@ -79,4 +82,4 @@ setMethod("showSigAnnot", signature(object="PharmacoSig"), function(object){
   print(object@Call)
   print(object@SessionInfo)
   return(invisible(NULL))
-} 
+}

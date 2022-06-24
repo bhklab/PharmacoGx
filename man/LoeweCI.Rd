@@ -18,7 +18,7 @@ LoeweCI(
 }
 \arguments{
 \item{viability}{\code{numeric} is a vector whose entries are the viability values
-in the range \code{c(0, 1)}.}
+in the range [0, 1].}
 
 \item{treatment1dose}{\code{numeric} a vector of concentrations for treatment 1}
 
@@ -41,8 +41,12 @@ CI under Loewe additive definition
 }
 \description{
 Computes the Loewe additive combination index (CI) from its definition
-\deqn{
+\eqn{
     CI = \frac{x_1}{f_1^{-1}(E)} +
          \frac{x_2}{f_2^{-1}(E)}
 }
+}
+\examples{
+print("TODO::")
+
 }

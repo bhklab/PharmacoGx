@@ -15,6 +15,7 @@ Psets/*
 check/*
 PSets/**
 .*
+*.html
 
 # exceptions
 !.gitignore
