@@ -217,7 +217,7 @@ labelled exactly as the experiment ids used in the metadata data.frame `info`
 above. The second dimension is the doses, with each "column" labelled as
 `doses`, where the number is the column number. This is as long as there are
 different number of doses for each experiment. The third dimension is always
-fixed at 2, with names `Dose`, and `Viability`. `Dose} contains the actual dose
+fixed at 2, with names `Dose`, and `Viability`. `Dose` contains the actual dose
 used (usually in micro-molar), while viability contains the cell viability
 measurement at that dose. Therefore, for each experiment there are two vectors,
 one of doses and one of viabilities at each dose.
