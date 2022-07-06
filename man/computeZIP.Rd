@@ -4,20 +4,35 @@
 \alias{computeZIP}
 \title{Computes ZIP Null References}
 \usage{
-computeZIP(treatment1dose, treatment2dose, HS_1, HS_2, EC50_1, EC50_2)
+computeZIP(
+  treatment1dose,
+  HS_1,
+  EC50_1,
+  E_inf_1 = 0,
+  treatment2dose,
+  HS_2,
+  EC50_2,
+  E_inf_2 = 0
+)
 }
 \arguments{
 \item{treatment1dose}{\code{numeric} a vector of concentrations for treatment 1}
 
-\item{treatment2dose}{\code{numeric} a vector of concentrations for treatment 2}
-
 \item{HS_1}{\code{numeric} Hill coefficient of treatment 1}
-
-\item{HS_2}{\code{numeric} Hill coefficient of treatment 2}
 
 \item{EC50_1}{\code{numeric} relative EC50 of treatment 1.}
 
+\item{E_inf_1}{\code{numeric} viability produced by the maximum attainable effect of treatment 1.
+Default 0 by the original paper.}
+
+\item{treatment2dose}{\code{numeric} a vector of concentrations for treatment 2}
+
+\item{HS_2}{\code{numeric} Hill coefficient of treatment 2}
+
 \item{EC50_2}{\code{numeric} relative EC50 of treatment 2.}
+
+\item{E_inf_2}{\code{numeric} viability produced by maximum effect of treatment 2.
+Default 0 by the original paper.}
 }
 \value{
 \code{numeric} expected viability under ZIP null assumption.

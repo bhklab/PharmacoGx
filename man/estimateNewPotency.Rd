@@ -4,9 +4,18 @@
 \alias{estimateNewPotency}
 \title{Estimate projected potency and shape parameter}
 \usage{
-estimateNewPotency(viability, dose_add, EC50_add, HS_add, dose_to)
+estimateNewPotency(
+  dose_to,
+  viability,
+  dose_add,
+  EC50_add,
+  HS_add,
+  use_L2 = FALSE
+)
 }
 \arguments{
+\item{dose_to}{\code{numeric} a vector of concentrations of the drug being added to}
+
 \item{viability}{\code{numeric} Observed viability of two treatments; target for fitting curve.}
 
 \item{dose_add}{\code{numeric} a vector of concentrations of the drug added.}
@@ -15,12 +24,15 @@ estimateNewPotency(viability, dose_add, EC50_add, HS_add, dose_to)
 
 \item{HS_add}{\code{numeric} Hill coefficient of the drug added.}
 
-\item{dose_to}{\code{numeric} a vector of concentrations of the drug being added to}
+\item{use_L2}{\code{logical} Whether to use L2 loss for fitting curves.
+This method produces cruder estimates for projected Hill parameters of
+drug combinations difficult to optimise, but also faster to compute results.
+Use it only if the default method is not progressing. Default \code{FALSE}.}
 }
 \value{
 \code{list} \itemize{
-\item{"EC50"}{Projected potency after adding a drug}
-\item{"HS"}{Projected Hill coefficient after adding a drug}
+\item{"EC50_proj"}{Projected potency after adding a drug}
+\item{"HS_proj"}{Projected Hill coefficient after adding a drug}
 }
 }
 \description{

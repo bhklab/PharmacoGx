@@ -7,7 +7,7 @@
 projectedResponse(dose_add, EC50_add, HS_add, dose_to, EC50_proj, HS_proj)
 }
 \arguments{
-\item{dose_add}{\code{numeric} a vector of concentrations of the drug added.}
+\item{dose_add}{\code{numeric} a fixed concentration of the drug added.}
 
 \item{EC50_add}{\code{numeric} relative EC50 of the drug added.}
 

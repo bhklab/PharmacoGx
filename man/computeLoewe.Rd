@@ -12,7 +12,10 @@ computeLoewe(
   treatment2dose,
   HS_2,
   E_inf_2,
-  EC50_2
+  EC50_2,
+  tol = 0.5,
+  lower_bound = 0,
+  upper_bound = 1
 )
 }
 \arguments{
@@ -20,7 +23,7 @@ computeLoewe(
 
 \item{HS_1}{\code{numeric} Hill coefficient of treatment 1}
 
-\item{E_inf_1}{\code{numeric} the maximum attainable effect of treatment 1.}
+\item{E_inf_1}{\code{numeric} viability produced by the maximum attainable effect of treatment 1.}
 
 \item{EC50_1}{\code{numeric} relative EC50 of treatment 1.}
 
@@ -28,9 +31,15 @@ computeLoewe(
 
 \item{HS_2}{\code{numeric} Hill coefficient of treatment 2}
 
-\item{E_inf_2}{\code{numeric} the maximum attainable effect of treatment 2.}
+\item{E_inf_2}{\code{numeric} viability produced by the maximum attainable effect of treatment 2.}
 
 \item{EC50_2}{\code{numeric} relative EC50 of treatment 2.}
+
+\item{tol}{\code{numeric} Error tolerance for deviations from Loewe assumption. Loewe predictions with error higher than \code{tol} will be returned as \code{NA}. Deafult 0.5.}
+
+\item{lower_bound}{\code{numeric} Lowest possible value for Loewe expected viability. Default 0.}
+
+\item{upper_bound}{\code{numeric} Highest possible value for Loewe expected viability. Default 1.}
 }
 \value{
 \code{numeric} expected viability under Loewe additive null assumption.
