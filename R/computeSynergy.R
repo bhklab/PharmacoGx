@@ -360,7 +360,6 @@ setGeneric(name = "computeZIPdelta",
 #' @import data.table
 #' @export
 #' @docType methods
-
 setMethod(f = "computeZIPdelta",
           signature = signature(object = "TreatmentResponseExperiment"),
           definition = function(object, use_L2 = FALSE, nthread = 1L) {
@@ -420,7 +419,7 @@ setMethod(f = "computeZIPdelta",
         )
     ]
     
-    combo_profiles <- merge(
+    combo_profiles <- merge.data.table(
         combo_profiles,
         fit_2_to_1,
         by.x = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
@@ -456,6 +455,93 @@ setMethod(f = "computeZIPdelta",
     ## Can we do call by reference?
     return(object)
 })
+
+deltaZIP <- function(treatment1id, treatment2id, treatment1dose, treatment2dose,
+        HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2) {
+    combo_prof <- data.table(
+        treatment1id=treatment1id,
+        treatment2id=treatment2id,
+        treatment1dose=treatment1dose,
+        treatment2dose=treatment2dose,
+        HS_1=HS_1,
+        HS_2=HS_2,
+        EC50_1=EC50_1,
+        EC50_2=EC50_2,
+        E_inf_1=E_inf_1,
+        E_inf_2=E_inf_2
+    )
+
+    combo_keys <- c("treatment1id", "treatment2id",
+                    "treatment1dose", "treatment2dose", "sampleid")
+    setkeyv(combo_profiles, combo_keys)
+
+    combo_profiles |>
+        aggregate(
+            estimateNewPotency(
+                dose_to = treatment1dose,
+                viability = viability,
+                dose_add = unique(treatment2dose),
+                EC50_add = unique(EC50_2),
+                HS_add = unique(HS_2),
+                use_L2 = use_L2
+            ),
+            by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+            nthread = nthread,
+            enlist = FALSE
+        ) -> fit_2_to_1
+    combo_profiles |>
+        aggregate(
+            estimateNewPotency(
+                dose_to = treatment2dose,
+                viability = viability,
+                dose_add = unique(treatment1dose),
+                EC50_add = unique(EC50_1),
+                HS_add = unique(HS_1),
+                use_L2 = use_L2
+            ),
+            by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
+            nthread = nthread,
+            enlist = FALSE
+        ) -> fit_1_to_2
+
+    combo_profiles <- combo_profiles[
+        fit_1_to_2, ,
+        on = c(
+            treatment1id = "treatment1id",
+            treatment2id = "treatment2id",
+            treatment1dose = "treatment1dose",
+            sampleid = "sampleid"
+        )
+    ]
+    
+    combo_profiles <- merge.data.table(
+        combo_profiles,
+        fit_2_to_1,
+        by.x = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+        by.y = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+        suffixes = c("_1_to_2", "_2_to_1")
+    )
+
+    combo_profiles |>
+        aggregate(
+            delta_score = .computeZIPDelta(
+                EC50_1_to_2 = EC50_proj_1_to_2,
+                EC50_2_to_1 = EC50_proj_2_to_1,
+                EC50_1 = EC50_1, EC50_2 = EC50_2,
+                HS_1_to_2 = HS_proj_1_to_2,
+                HS_2_to_1 = HS_proj_2_to_1,
+                HS_1 = HS_1, HS_2 = HS_2,
+                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                treatment1dose = treatment1dose,
+                treatment2dose = treatment2dose
+            ),
+            by = combo_keys,
+            nthread = nthread
+        ) -> delta_scores
+
+    return(delta_scores$delta_score)
+}
+
 
 #' @title Calculate ZIP delta score for each drug combination
 #'
