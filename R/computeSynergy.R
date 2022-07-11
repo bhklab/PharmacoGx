@@ -24,7 +24,7 @@
 #'
 #' @return `numeric` concentrations in micromoles required to produce
 #'     `viability` in the corresponding entries.
-#' 
+#'
 #' @examples
 #' print("TODO::")
 #'
@@ -87,9 +87,9 @@ LoeweCI <- function(viability,
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
-#' 
+#'
 #' @return the distance between computed Loewe CI and 1
-#' 
+#'
 #' @noRd
 .LoeweLoss <- function(viability,
                        treatment1dose, HS_1, E_inf_1, EC50_1,
@@ -158,7 +158,7 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #' @description
 #' Predict the additive response of a treatment combination under
 #' the ZIP null assumption.
-#' 
+#'
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param EC50_1 `numeric` relative EC50 of treatment 1.
@@ -169,9 +169,9 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
 #' @param E_inf_2 `numeric` viability produced by maximum effect of treatment 2.
 #'     Default 0 by the original paper.
-#' 
+#'
 #' @return `numeric` expected viability under ZIP null assumption.
-#' 
+#'
 #' @export
 computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
                        treatment2dose, HS_2, EC50_2, E_inf_2 = 0) {
@@ -195,7 +195,7 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
 #'     the viability of the added treatment at a fixed dose.
 #' 
 #' @return `numeric` viability after adding one drug to the other.
-#' 
+#'
 #' @export
 projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
     E_min_proj / (1 + (dose_to/EC50_proj)^(HS_proj))
@@ -211,7 +211,7 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #'     the viability of the added treatment at a fixed dose.
 #' 
 #' @return `numeric` L2 loss for fitting a 2-parameter curve. See below.
-#' 
+#'
 #' @noRd
 .fitProjParamsLoss_L2 <- function(par, dose_to, viability, E_min_proj) {
     norm(
@@ -233,7 +233,7 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #' by fitting a 2-parameter dose-response curve.
 #' It assumes \eqn{E_min = 1} for the drug being added and
 #' \eqn{E_inf = 0} for both drugs.
-#' 
+#'
 #' @param dose_to `numeric` a vector of concentrations of the drug being added to
 #' @param viability `numeric` Observed viability of two treatments; target for fitting curve.
 #' @param dose_add `numeric` a vector of concentrations of the drug added.
@@ -265,7 +265,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
                  upper_bounds[1]),
             pmin(pmax(1, lower_bounds[2]), upper_bounds[2])
     )
-    
+
     if (use_L2) {
         proj_params <- optim(
             fn = .fitProjParamsLoss_L2,
@@ -418,7 +418,7 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
 
 
 #' Generic to compute ZIP delta scores from an S4 object
-#' 
+#'
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
@@ -436,7 +436,7 @@ setGeneric(name = "computeZIPdelta",
 #' @description
 #' Following the calculation of ZIP delta score as in Appendix A3.
 #' See reference for details.
-#' 
+#'
 #' @description Compute ZIP delta score as described in the original paper.
 #'
 #' @param object [TreatmentResponseExperiment]
@@ -449,12 +449,12 @@ setGeneric(name = "computeZIPdelta",
 #'     Use it only if the default method is not progressing. Default `FALSE`.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
-#' 
+#'
 #' @return [TreatmentResponseExperiment] with assay `combo_scores` containing `delta_scores`
-#' 
+#'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
-#' 
+#'
 #' @importFrom CoreGx buildComboProfiles aggregate
 #' @import data.table
 #' @export
@@ -670,13 +670,13 @@ setMethod(f = "computeZIPdelta",
 #' Given two `numeric` containing viability of two monotherapy respectively,
 #' Compute Bliss null reference values for the expected response
 #' of the two treatments combined.
-#' 
+#'
 #' @param viability_1 `numeric` monotherapeutic response of treatment 1.
 #' @param viability_2 `numeric` monotherapeutic response of treatment 2.
-#' 
+#'
 #' @return `numeric` expected response of the two treatments combined
 #'     under Bliss null assumption.
-#' 
+#'
 #' @export
 computeBliss <- function(viability_1, viability_2) {
     bliss_ref <- (viability_1 * viability_2)
@@ -691,16 +691,15 @@ computeBliss <- function(viability_1, viability_2) {
 #' Given two `numeric` containing viability of two monotherapy respectively,
 #' Compute highest single-agent (HSA) values as the expected response
 #' of the two treatments combined.
-#' 
+#'
 #' @param viability_1 `numeric` monotherapeutic response of treatment 1.
 #' @param viability_2 `numeric` monotherapeutic response of treatment 2.
-#' 
+#'
 #' @return `numeric` expected response of the two treatments combined
 #'     using the highest response of the two (lower viability).
-#' 
+#'
 #' @export
 computeHSA <- function(viability_1, viability_2) {
     HSA_ref <- min(viability_1, viability_2)
     return(HSA_ref)
 }
-
