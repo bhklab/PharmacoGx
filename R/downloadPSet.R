@@ -103,6 +103,7 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL,
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
   pSet <- updateObject(pSet)
+  saveRDS(pSet, file=file.path(saveDir, pSetFileName))
   return(pSet)
 }
 
