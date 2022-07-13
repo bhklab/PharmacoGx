@@ -88,14 +88,14 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL,
     stop('Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.')
   }
 
-  if(!file.exists(saveDir)) {
+  if (!file.exists(saveDir)) {
     dir.create(saveDir, recursive=TRUE)
   }
 
-  if(is.null(pSetFileName)){
+  if (is.null(pSetFileName)){
     pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
   }
-  if(!file.exists(file.path(saveDir, pSetFileName))) {
+  if (!file.exists(file.path(saveDir, pSetFileName))) {
     downloader::download(url = as.character(pSetTable[whichx,"Download"]),
                          destfile=file.path(saveDir, pSetFileName),
                          quiet=!verbose,
