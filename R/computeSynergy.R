@@ -172,6 +172,15 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #'
 #' @return `numeric` expected viability under ZIP null assumption.
 #'
+#' @examples
+#' (zip <- computeZIP(
+#'   treatment1dose=c(0.1, 0.01, 0.001), treatment2dose=c(1, 0.1, 0.01),
+#'   HS_1=1, HS_2=1.2,
+#'   EC50_1=0.01, EC50_2=0.1,
+#'   E_inf_1=0,
+#'   E_inf_2=0.1
+#' ))
+#'
 #' @export
 computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
                        treatment2dose, HS_2, EC50_2, E_inf_2 = 0) {
@@ -187,18 +196,26 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
 #' Viability of adding one drug to the other,
 #' with the assumption that E_inf_add = 0, and
 #' E_min of the drug being added to is dictated by the response of the drug added.
-#' 
+#'
 #' @param dose_to `numeric` a vector of concentrations of the drug being added to
 #' @param HS_proj `numeric` changed Hill coefficient of the drug being added to; the projected shape parameter.
 #' @param EC50_proj `numeric` changed relative EC50 of the drug being added to; the projected potency.
 #' @param E_min_proj `numeric` Projected `E_min` given by
 #'     the viability of the added treatment at a fixed dose.
-#' 
+#'
 #' @return `numeric` viability after adding one drug to the other.
+#'
+#' @examples
+#' (viability <- projViability(
+#'   dose_to=c(0.1, 0.01, 0.001),
+#'   HS_proj=1.1,
+#'   EC50_proj=0.01,
+#'   E_min_proj=1
+#' ))
 #'
 #' @export
 projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
-    E_min_proj / (1 + (dose_to/EC50_proj)^(HS_proj))
+    E_min_proj / (1 + (dose_to / EC50_proj)^(HS_proj))
 }
 
 #' L2-loss to optimise for EC50_proj and HS_proj
@@ -209,7 +226,7 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #' @param viability `numeric` Observed viability of two treatments; target for fitting curve.
 #' @param E_min_proj `numeric` Projected `E_min` given by
 #'     the viability of the added treatment at a fixed dose.
-#' 
+#'
 #' @return `numeric` L2 loss for fitting a 2-parameter curve. See below.
 #'
 #' @noRd
@@ -245,15 +262,24 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #'     drug combinations difficult to optimise, but also faster to compute results.
 #'     Use it only if the default method is not progressing. Default `FALSE`.
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
-#' 
+#'
 #' @return `list`
 #'      * `EC50_proj`: Projected potency after adding a drug
 #'      * `HS_proj`: Projected Hill coefficient after adding a drug
-#' 
-#' @export
+#'
+#' @examples
+#' (EC50_and_HS <- estimateProjParams(
+#'   viability=c(0.9, 0.8, 0.7),
+#'   dose_to=c(0.1, 0.01, 0.001),
+#'   dose_add=c(1, 0.1, 0.01),
+#'   EC50_add=0.1,
+#'   HS_add=1.1,
+#'   E_inf_add=0.1
+#' ))
 #'
 #' @importFrom CoreGx .fitCurve
 #' @importFrom stats optimise
+#' @export
 estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
                                E_inf_add = 0, use_L2 = FALSE, show_Rsqr = FALSE) {
     E_min_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
@@ -285,7 +311,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
             )
             Rsqr <- 1 - (var(viability - proj_viability)/var(viability))
         }
-        
+
     } else {
         ## Default method
         proj_params <- CoreGx::.fitCurve(
@@ -332,7 +358,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' @description
 #' Fit projected dose-response curves with `E_min` as the viability
 #' of the treatment being added to the other treament at a fixed dose.
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
@@ -342,7 +368,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' @param combo_profiles [data.table] contains three parameters of dose-response curves
 #'     for each single agent in a drug comnbination,
 #'     and the observed viability of two treatments combined.
-#'    
+#'
 #' @param use_L2 `logical`
 #'     whether to use L2-loss rather than the default optimisation method.
 #'     This method produces cruder estimates for projected Hill parameters of
@@ -351,14 +377,14 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
-#' 
+#'
 #' @return [data.table] contains parameters of projected dose-response curves
 #'    for adding one treatment to the other.
-#'    
-#' 
+#'
+#'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
-#' 
+#'
 #' @importFrom CoreGx aggregate
 #' @import data.table
 #' @export
@@ -404,7 +430,7 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
             sampleid = "sampleid"
         )
     ]
-    
+
     combo_twowayFit <- merge.data.table(
         combo_twowayFit,
         fit_2_to_1,
@@ -515,7 +541,7 @@ setMethod(f = "computeZIPdelta",
 #' @description
 #' Following the calculation of ZIP delta score as in Appendix A3.
 #' See reference for details.
-#' 
+#'
 #' @param treatment1id `character` a vector of identifiers for treatment 1
 #' @param treatment2id `character` a vector of identifiers for treatment 2
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
@@ -534,9 +560,9 @@ setMethod(f = "computeZIPdelta",
 #'     Use it only if the default method is not progressing. Default `FALSE`.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
-#' 
+#'
 #' @return `numeric` delta scores of every dose combinations for any given treatment combinations.
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
@@ -556,12 +582,13 @@ setMethod(f = "computeZIPdelta",
 #'         by = c("treatment1id", "treatment2id", "sampleid")
 #'     )
 #' }
-#' 
+#'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
-#' 
+#'
 #' @importFrom CoreGx aggregate
 #' @import data.table
+#' @keywords internal
 #' @export
 .computeZIPdelta <- function(
     treatment1id, treatment2id, treatment1dose, treatment2dose,
@@ -626,13 +653,13 @@ setMethod(f = "computeZIPdelta",
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param treatment2dose `numeric` a vector of concentrations for treatment 2
-#' 
+#'
 #' @return `numeric` a ZIP delta score to quantify synergy for the drug combination.
+#'
 #' @noRd
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #' @export
-
 .deltaScore <- function(EC50_1_to_2, EC50_2_to_1, EC50_1, EC50_2,
                         HS_1_to_2, HS_2_to_1, HS_1, HS_2,
                         E_inf_1, E_inf_2, treatment1dose, treatment2dose) {
@@ -677,6 +704,9 @@ setMethod(f = "computeZIPdelta",
 #' @return `numeric` expected response of the two treatments combined
 #'     under Bliss null assumption.
 #'
+#' @examples
+#' (bliss <- computeBliss(0.75, 0.65))
+#'
 #' @export
 computeBliss <- function(viability_1, viability_2) {
     bliss_ref <- (viability_1 * viability_2)
@@ -697,6 +727,9 @@ computeBliss <- function(viability_1, viability_2) {
 #'
 #' @return `numeric` expected response of the two treatments combined
 #'     using the highest response of the two (lower viability).
+#'
+#' @examples
+#' (hsa <- computeHSA(0.75, 0.65))
 #'
 #' @export
 computeHSA <- function(viability_1, viability_2) {

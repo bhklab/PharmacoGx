@@ -47,3 +47,14 @@ by fitting a 2-parameter dose-response curve.
 It assumes \eqn{E_min = 1} for the drug being added and
 \eqn{E_inf = 0} for both drugs.
 }
+\examples{
+(EC50_and_HS <- estimateProjParams(
+  viability=c(0.9, 0.8, 0.7),
+  dose_to=c(0.1, 0.01, 0.001),
+  dose_add=c(1, 0.1, 0.01),
+  EC50_add=0.1,
+  HS_add=1.1,
+  E_inf_add=0.1
+))
+
+}

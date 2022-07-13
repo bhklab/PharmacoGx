@@ -20,3 +20,7 @@ Given two \code{numeric} containing viability of two monotherapy respectively,
 Compute Bliss null reference values for the expected response
 of the two treatments combined.
 }
+\examples{
+(bliss <- computeBliss(0.75, 0.65))
+
+}

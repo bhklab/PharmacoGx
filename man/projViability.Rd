@@ -24,3 +24,12 @@ Viability of adding one drug to the other,
 with the assumption that E_inf_add = 0, and
 E_min of the drug being added to is dictated by the response of the drug added.
 }
+\examples{
+(viability <- projViability(
+  dose_to=c(0.1, 0.01, 0.001),
+  HS_proj=1.1,
+  EC50_proj=0.01,
+  E_min_proj=1
+))
+
+}

@@ -20,3 +20,7 @@ Given two \code{numeric} containing viability of two monotherapy respectively,
 Compute highest single-agent (HSA) values as the expected response
 of the two treatments combined.
 }
+\examples{
+(hsa <- computeHSA(0.75, 0.65))
+
+}
