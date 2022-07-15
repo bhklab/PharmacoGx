@@ -173,14 +173,43 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #' @return `numeric` expected viability under ZIP null assumption.
 #'
 #' @export
-computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
-                       treatment2dose, HS_2, EC50_2, E_inf_2 = 0) {
+computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
+                       treatment2dose, HS_2, EC50_2, E_inf_2) {
     y_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
     y_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
     y_zip <- y_1 * y_2
     return(y_zip)
 }
 
+## If it works well for ZIP delta, move it to CoreGx
+
+#' @title Predict viability from a 4-paramter Hill curve
+#'
+#' @description
+#' Viability predicted by 4-parameter logistic regression.
+#' 
+#' @param dose `numeric` a vector of concentrations of the treatment in micromole.
+#' @param HS `numeric` Hill coefficient characterised by cooperativity and molecularity of
+#'     ligand-receptor binding of the treatment.
+#' @param EC50 `numeric` potency of the treatment;
+#'     the concentration necessary to cause half of the treatment efficacy.
+#' @param E_inf `numeric` efficacy of the treatment;
+#'     viability produced by the maximum effect of the treatment.
+#' @param E_nnf `numeric` cellular viability under
+#'     the effect of the treatment at the minimum dose level.
+#'     In predicting monotherapeutic viability,
+#'     a sensible `E_nnf` should be the negative control value of 1.
+#'
+#' @return `numeric` predicted cellular viability values of the treatment
+#'     given `dose` administered respectively.
+#'
+#' @export
+Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
+    (E_nnf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
+    #E_inf + (( E_nnf - E_inf ) / ( 1 + ( 10^dose / 10^EC50)^(HS) ))
+}
+
+# == Will be deprecated ===============================================
 #' @title Compute the projected viability after adding one treatment to the other
 #'
 #' @description
@@ -201,6 +230,17 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
     E_min_proj / (1 + (dose_to/EC50_proj)^(HS_proj))
 }
 
+.logcosh <- function(x) {
+    ## Borrow from Limma package, numerical stable log(cosh)
+	y <- abs(x) - log(2)
+	i <- abs(x) < 1e-4
+	y[i] <- 0.5*x[i]^2
+	i <- !i & (abs(x) < 17)
+	y[i] <- log(cosh(x[i]))
+	y
+}
+
+
 #' L2-loss to optimise for EC50_proj and HS_proj
 #'
 #' @param par `numeric` EC50_proj and HS_proj;
@@ -214,15 +254,26 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #'
 #' @noRd
 .fitProjParamsLoss_L2 <- function(par, dose_to, viability, E_min_proj) {
-    norm(
-         projViability(
-            dose_to = dose_to,
-            E_min_proj = E_min_proj,
-            EC50_proj = par[1],
-            HS_proj = par[2]
-        ) - viability, "2"
+    #norm(
+    #     Hill_4par(
+    #        dose = dose_to,
+    #        E_nnf = E_min_proj,
+    #        HS = par[1],
+    #        EC50 = par[2],
+    #        E_inf = par[3]
+    #    ) - viability, "2"
+    #)
+    sum(
+        .logcosh(
+             Hill_4par(
+                dose = dose_to,
+                E_nnf = E_min_proj,
+                HS = par[1],
+                E_inf = par[2],
+                EC50 = par[3]
+            ) - viability
+        )
     )
-
 }
 
 #' @title Estimate projected potency and shape parameter
@@ -252,56 +303,110 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #' 
 #' @export
 #'
-#' @importFrom CoreGx .fitCurve
-#' @importFrom stats optimise
+#' @importFrom CoreGx .fitCurve .reformatData
+#' @importFrom drc drm LL.4
+#' @importFrom stats optimise fitted
 estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
-                               E_inf_add = 0, use_L2 = FALSE, show_Rsqr = FALSE) {
-    E_min_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
-    lower_bounds <- c(1e-6, 0)
-    upper_bounds <- c(1e+6, 4)
-    gritty_guess <- c(
-            pmin(pmax(dose_to[which.min(abs(viability - 1/2))],
-                      lower_bounds[1]),
-                 upper_bounds[1]),
-            pmin(pmax(1, lower_bounds[2]), upper_bounds[2])
+                               E_inf_add = 0,
+                               use_L2 = FALSE,
+                               use_drc = F,
+                               show_Rsqr = TRUE,
+                               conc_as_log = FALSE) {
+    E_nnf_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+    formatted_data <- .reformatData(
+        x = dose_to,
+        y = viability,
+        x_to_log = !conc_as_log,
+        y_to_frac = FALSE, ## subject to change
+        y_to_log = FALSE,
+        trunc = FALSE
     )
+    log_conc <- formatted_data[["x"]]
 
+    lower_bounds <- c(0, 0, -6)
+    upper_bounds <- c(4, 1, 6)
+
+    gritty_guess <- c(
+        pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
+        pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
+        pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]),
+             upper_bounds[3])
+    )
+  
     if (use_L2) {
+        # will be deprecated
         proj_params <- optim(
             fn = .fitProjParamsLoss_L2,
             par = gritty_guess,
             lower = lower_bounds, upper = upper_bounds,
             method = "L-BFGS-B",
-            dose_to = dose_to,
+            dose_to = log_conc,
             viability = viability,
-            E_min_proj = E_min_proj
+            E_min_proj = E_nnf_proj
         )$par
         if (show_Rsqr) {
-            proj_viability <- projViability(
-                dose_to = dose_to,
-                EC50_proj = proj_params[1],
-                HS_proj = proj_params[2],
-                E_min_proj = E_min_proj
+            viability_hat <- Hill_4par(
+                dose = log_conc,
+                HS = proj_params[1],
+                E_inf = proj_params[2],
+                EC50 = proj_params[3],
+                E_nnf = E_nnf_proj
             )
-            Rsqr <- 1 - (var(viability - proj_viability)/var(viability))
+            Rsqr <- 1 - (var(viability - viability_hat)/var(viability))
         }
-        
+        proj_params[3] <- 10^proj_params[3]
+    } else if (use_drc) {
+        fit <- drm(
+            viability ~ dose,
+            data = data.frame(viability = viability, dose = dose_to),
+            fct = LL.4(
+                fixed = c(NA, NA, E_nnf_proj, NA),
+                names = c("HS_proj", "E_inf_proj", "E_nnf_proj", "EC50_proj")
+            ),
+            #logDose = 10,
+            lowerl = c(0, 0, 1e-6),
+            upperl = c(4, 1, 1e+6)
+            #robust = "tukey"
+        )
+        proj_params <- coef(fit)
+        proj_params <- c(
+            proj_params[grepl("HS_proj", names(proj_params))],
+            proj_params[grepl("E_inf_proj", names(proj_params))],
+            proj_params[grepl("EC50_proj", names(proj_params))]
+        )
+        if (show_Rsqr) {
+            viability_hat <- tryCatch({
+                fitted(fit)
+            }, warning = function(w) {
+                message("More parameters than data points.")
+                suppressWarnings(fitted(fit))
+            })
+            Rsqr <- 1 - (var(viability - viability_hat)/var(viability))
+        }
     } else {
         ## Default method
         proj_params <- CoreGx::.fitCurve(
-            x = dose_to, y = viability, f = function(dose_to, par) {
-                # par[1] = EC50_proj
-                # par[2] = HS_proj
-                E_min_proj / (1 + (dose_to/par[1])^(par[2]))
+            x = log_conc, y = viability, f = function(x, par) {
+                # par[1] = HS_proj
+                # par[2] = E_inf_proj
+                # par[3] = EC50_proj
+                Hill_4par(
+                    dose = x,
+                    E_nnf = E_nnf_proj,
+                    HS = par[1],
+                    E_inf = par[2],
+                    EC50 = par[3]
+                )
             },
             lower_bounds = lower_bounds,
             upper_bounds = upper_bounds,
-            density = c(2, 5),
-            step = .5 / c(2, 5),
+            density = c(2, 10, 5),
+            step = .5 / c(2, 10, 5),
             precision = 1e-4,
             scale = 0.07,
             family = c(
-                #"normal",
+                "normal"
+                ,
                 "Cauchy"
             ),
             median_n = 1,
@@ -310,19 +415,23 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
             gritty_guess = gritty_guess,
             span = 1
         )
+        proj_params[3] <- 10^proj_params[3]
         if (show_Rsqr)
             Rsqr <- attr(proj_params, "Rsquare")
     }
     if (show_Rsqr) {
         return(list(
-            EC50_proj = proj_params[1],
-            HS_proj = proj_params[2],
+            HS_proj = proj_params[1],
+            E_inf_proj = proj_params[2],
+            EC50_proj = proj_params[3],
+            E_nnf_proj = E_nnf_proj,
             Rsqr = Rsqr
         ))
     } else {
         return(list(
-            EC50_proj = proj_params[1],
-            HS_proj = proj_params[2]
+            HS_proj = proj_params[1],
+            EC50_proj = proj_params[2],
+            E_inf_proj = proj_params[3]
         ))
     }
 }
@@ -372,9 +481,11 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
                 dose_add = unique(treatment2dose),
                 EC50_add = unique(EC50_2),
                 HS_add = unique(HS_2),
-                E_inf_add = unique(E_inf_2)
+                E_inf_add = unique(E_inf_2),
+                use_L2 = use_L2,
+                show_Rsqr = show_Rsqr
             ),
-            moreArgs = list("use_L2" = use_L2, "show_Rsqr" = show_Rsqr),
+            moreArgs = list(use_L2 = use_L2, show_Rsqr = show_Rsqr),
             by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE
@@ -387,9 +498,11 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
                 dose_add = unique(treatment1dose),
                 EC50_add = unique(EC50_1),
                 HS_add = unique(HS_1),
-                E_inf_add = unique(E_inf_1)
+                E_inf_add = unique(E_inf_1),
+                use_L2 = use_L2,
+                show_Rsqr = show_Rsqr
             ),
-            moreArgs = list("use_L2" = use_L2, "show_Rsqr" = show_Rsqr),
+            moreArgs = list(use_L2 = use_L2, show_Rsqr = show_Rsqr),
             by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE

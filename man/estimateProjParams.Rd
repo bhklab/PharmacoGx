@@ -12,7 +12,9 @@ estimateProjParams(
   HS_add,
   E_inf_add = 0,
   use_L2 = FALSE,
-  show_Rsqr = FALSE
+  use_drc = F,
+  show_Rsqr = TRUE,
+  conc_as_log = FALSE
 )
 }
 \arguments{
