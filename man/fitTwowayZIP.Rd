@@ -4,23 +4,32 @@
 \alias{fitTwowayZIP}
 \title{Two-way fitting for projected dose-response curve.}
 \usage{
-fitTwowayZIP(combo_profiles, use_L2 = FALSE, show_Rsqr = FALSE, nthread = 1L)
+fitTwowayZIP(
+  combo_profiles,
+  residual = c("logcosh", "Cauchy", "normal"),
+  show_Rsqr = TRUE,
+  nthread = 1L
+)
 }
 \arguments{
 \item{combo_profiles}{\link{data.table} contains three parameters of dose-response curves
 for each single agent in a drug comnbination,
 and the observed viability of two treatments combined.}
 
-\item{use_L2}{\code{logical}
-whether to use L2-loss rather than the default optimisation method.
-This method produces cruder estimates for projected Hill parameters of
-drug combinations difficult to optimise, but also faster to compute results.
-Use it only if the default method is not progressing. Default \code{FALSE}.}
+\item{residual}{\code{character} Method used to minimise residual in fitting curves.
+3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+The default method is \code{logcosh}.
+It minimises the logarithmic hyperbolic cosine loss of the residuals
+and provides the fastest estimation among the three methods,
+with fitting quality in between \code{normal} and \code{Cauchy};
+recommanded when fitting large-scale datasets.
+The other two methods minimise residuals by
+considering the truncated probability distribution (as in their names) for the residual.
+\code{Cauchy} provides the best fitting quality but also takes the longest to run.}
 
 \item{show_Rsqr}{\code{logical} whether to show goodness-of-fit value in the result.}
 
-\item{nthread}{\code{integer} Number of cores used to perform computation.
-Default 1.}
+\item{nthread}{\code{integer} Number of cores used to perform computation. Default 1.}
 }
 \value{
 \link{data.table} contains parameters of projected dose-response curves

@@ -16,7 +16,7 @@
   E_inf_1,
   E_inf_2,
   viability,
-  use_L2 = FALSE,
+  residual = c("logcosh", "Cauchy", "normal"),
   nthread = 1L
 )
 }
@@ -43,11 +43,15 @@
 
 \item{viability}{\code{numeric} Observed viability of the two treatments combined.}
 
-\item{use_L2}{\code{logical}
-whether to use L2-loss rather than the default optimisation method.
-This method produces cruder estimates for projected Hill parameters of
-drug combinations difficult to optimise, but also faster to compute results.
-Use it only if the default method is not progressing. Default \code{FALSE}.}
+\item{residual}{\code{character} Method used to minimise residual in fitting curves.
+3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+The default method is \code{logcosh}.
+It minimises the logarithmic hyperbolic cosine loss of the residuals
+and provides the fastest estimation among the three methods,
+with fitting quality in between \code{normal} and \code{Cauchy}.
+The other two methods minimise residuals by
+considering the truncated probability distribution (as in their names) for the residual.
+\code{Cauchy} provides the best fitting quality but also takes the longest to run.}
 
 \item{nthread}{\code{integer} Number of cores used to perform computation.
 Default 1.}

@@ -7,7 +7,7 @@
 Hill_4par(dose, HS, E_nnf, E_inf, EC50)
 }
 \arguments{
-\item{dose}{\code{numeric} a vector of concentrations of the treatment in micromole.}
+\item{dose}{\code{numeric} a vector of concentrations of the treatment in \code{log10} scale.}
 
 \item{HS}{\code{numeric} Hill coefficient characterised by cooperativity and molecularity of
 ligand-receptor binding of the treatment.}
@@ -20,7 +20,7 @@ a sensible \code{E_nnf} should be the negative control value of 1.}
 \item{E_inf}{\code{numeric} efficacy of the treatment;
 viability produced by the maximum effect of the treatment.}
 
-\item{EC50}{\code{numeric} potency of the treatment;
+\item{EC50}{\code{numeric} potency of the treatment in \code{log10} scale;
 the concentration necessary to cause half of the treatment efficacy.}
 }
 \value{

@@ -5,18 +5,26 @@
 \alias{computeZIPdelta,TreatmentResponseExperiment-method}
 \title{Compute ZIP delta score}
 \usage{
-\S4method{computeZIPdelta}{TreatmentResponseExperiment}(object, use_L2 = FALSE, nthread = 1L)
+\S4method{computeZIPdelta}{TreatmentResponseExperiment}(
+  object,
+  residual = c("logcosh", "Cauchy", "normal"),
+  nthread = 1L
+)
 }
 \arguments{
 \item{object}{\link{TreatmentResponseExperiment}
 The \code{TreatmentResponseExperiment} from which to extract assays
 \code{mono_profile} and \code{combo_viability} to compute ZIP delta scores.}
 
-\item{use_L2}{\code{logical}
-whether to use L2-loss rather than the default optimisation method.
-This method produces cruder estimates for projected Hill parameters of
-drug combinations difficult to optimise, but also faster to compute results.
-Use it only if the default method is not progressing. Default \code{FALSE}.}
+\item{residual}{\code{character} Method used to minimise residual in fitting curves.
+3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+The default method is \code{logcosh}.
+It minimises the logarithmic hyperbolic cosine loss of the residuals
+and provides the fastest estimation among the three methods,
+with fitting quality in between \code{normal} and \code{Cauchy}.
+The other two methods minimise residuals by
+considering the truncated probability distribution (as in their names) for the residual.
+\code{Cauchy} provides the best fitting quality but also takes the longest to run.}
 
 \item{nthread}{\code{integer} Number of cores used to perform computation.
 Default 1.}
