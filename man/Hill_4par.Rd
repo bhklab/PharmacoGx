@@ -30,3 +30,12 @@ given \code{dose} administered respectively.
 \description{
 Viability predicted by 4-parameter logistic regression.
 }
+\examples{
+(viability <- projViability(
+  dose_to=c(0.1, 0.01, 0.001),
+  HS_proj=1.1,
+  EC50_proj=0.01,
+  E_min_proj=1
+))
+
+}
