@@ -9,6 +9,7 @@
   treatment2id,
   treatment1dose,
   treatment2dose,
+  sampleid,
   HS_1,
   HS_2,
   EC50_1,
@@ -16,7 +17,8 @@
   E_inf_1,
   E_inf_2,
   viability,
-  residual = c("logcosh", "Cauchy", "normal"),
+  ZIP = NULL,
+  residual = "logcosh",
   nthread = 1L
 )
 }
@@ -28,6 +30,8 @@
 \item{treatment1dose}{\code{numeric} a vector of concentrations for treatment 1}
 
 \item{treatment2dose}{\code{numeric} a vector of concentrations for treatment 2}
+
+\item{sampleid}{\code{character} Cell-line ID of a drug combination screening experiment.}
 
 \item{HS_1}{\code{numeric} Hill coefficient of treatment 1}
 
@@ -43,12 +47,16 @@
 
 \item{viability}{\code{numeric} Observed viability of the two treatments combined.}
 
+\item{ZIP}{\code{numeric} pre-computed ZIP reference values.
+If not provided, it will be computed during delta score calculation.}
+
 \item{residual}{\code{character} Method used to minimise residual in fitting curves.
-3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+3 methods available: \code{c("logcosh", "normal", "Cauchy")}.
 The default method is \code{logcosh}.
 It minimises the logarithmic hyperbolic cosine loss of the residuals
 and provides the fastest estimation among the three methods,
-with fitting quality in between \code{normal} and \code{Cauchy}.
+with fitting quality in between \code{normal} and \code{Cauchy};
+recommanded when fitting large-scale datasets.
 The other two methods minimise residuals by
 considering the truncated probability distribution (as in their names) for the residual.
 \code{Cauchy} provides the best fitting quality but also takes the longest to run.}
@@ -65,7 +73,8 @@ See reference for details.
 }
 \examples{
 \dontrun{
-combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
+## ZIP is optional. Will be recomputed if not provided.
+combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "viability"))
 combo_twowayFit <- fitTwowayZIP(combo_profiles)
 combo_twowayFit |>
     aggregate(
@@ -74,11 +83,16 @@ combo_twowayFit |>
             treatment2id = treatment2id,
             treatment1dose = treatment1dose,
             treatment2dose = treatment2dose,
+            sampleid = sampleid,
             HS_1 = HS_1, HS_2 = HS_2,
             EC50_1 = EC50_1, EC50_2 = EC50_2,
             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-            viability = viability
+            viability = viability,
+            ZIP = ZIP
         ),
+        treatment1dose = treatment1dose,
+        treatment2dose = treatment2dose,
+        moreArgs = list(residual = "Cauchy"),
         by = c("treatment1id", "treatment2id", "sampleid")
     )
 }

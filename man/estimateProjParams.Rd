@@ -41,6 +41,8 @@ considering the truncated probability distribution (as in their names) for the r
 \code{Cauchy} provides the best fitting quality but also takes the longest to run.}
 
 \item{show_Rsqr}{\code{logical} whether to show goodness-of-fit value in the result.}
+
+\item{conc_as_log}{\code{logical} indicates whether input concentrations are in log10 scale.}
 }
 \value{
 \code{list}

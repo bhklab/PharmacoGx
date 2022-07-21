@@ -452,7 +452,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #'     and the observed viability of two treatments combined.
 #'    
 #' @param residual `character` Method used to minimise residual in fitting curves.
-#'     3 methods available: `logcosh`, `normal`, `Cauchy`.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
 #'     The default method is `logcosh`.
 #'     It minimises the logarithmic hyperbolic cosine loss of the residuals
 #'     and provides the fastest estimation among the three methods,
@@ -474,7 +474,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' @import data.table
 #' @export
 fitTwowayZIP <- function(combo_profiles,
-                         residual = c("logcosh", "Cauchy", "normal"),
+                         residual = "logcosh",
                          show_Rsqr = TRUE, nthread = 1L) {
     combo_profiles |>
         aggregate(
@@ -568,7 +568,8 @@ fitTwowayZIP <- function(combo_profiles,
 #' .plotProjHill(combo_twowayFit,
 #'               treatment1 = "Methotrexate",
 #'               treatment2 = "Zolendronic Acid",
-#'               cellline = "UO-31")
+#'               cellline = "UO-31",
+#'               add_treatment = 1)
 #' }
 
 .plotProjHill <- function(combo_twowayFit, treatment1, treatment2,
@@ -581,7 +582,8 @@ fitTwowayZIP <- function(combo_profiles,
                        "EC50_proj_2_to_1", "E_nnf_proj_2_to_1")
     has_cols <- (required_cols %in% colnames(combo_twowayFit))
     if (!all(has_cols))
-        stop(paste("Missing required columns:", required_cols[!has_cols], collapse = ","))
+        stop("Missing required columns for plotting: ",
+             paste(required_cols[!has_cols]))
 
     select_combo <- combo_twowayFit[treatment1id == treatment1 &
                                     treatment2id == treatment2 &
@@ -717,8 +719,6 @@ fitTwowayZIP <- function(combo_profiles,
 
 }
 
-
-
 #' Generic to compute ZIP delta scores from an S4 object
 #'
 #' @examples
@@ -745,11 +745,12 @@ setGeneric(name = "computeZIPdelta",
 #'     The `TreatmentResponseExperiment` from which to extract assays
 #'     `mono_profile` and `combo_viability` to compute ZIP delta scores.
 #' @param residual `character` Method used to minimise residual in fitting curves.
-#'     3 methods available: `logcosh`, `normal`, `Cauchy`.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
 #'     The default method is `logcosh`.
 #'     It minimises the logarithmic hyperbolic cosine loss of the residuals
 #'     and provides the fastest estimation among the three methods,
-#'     with fitting quality in between `normal` and `Cauchy`.
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
 #'     The other two methods minimise residuals by
 #'     considering the truncated probability distribution (as in their names) for the residual.
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
@@ -757,6 +758,11 @@ setGeneric(name = "computeZIPdelta",
 #'     Default 1.
 #'
 #' @return [TreatmentResponseExperiment] with assay `combo_scores` containing `delta_scores`
+#'
+#' @examples
+#' \dontrun{
+#' tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+#' }
 #'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
@@ -768,52 +774,95 @@ setGeneric(name = "computeZIPdelta",
 setMethod(f = "computeZIPdelta",
           signature = signature(object = "TreatmentResponseExperiment"),
           definition = function(object,
-                                residual = c("logcosh", "Cauchy", "normal"),
+                                residual = "logcosh",
                                 nthread = 1L) {
 
     ## TODO: Handle missing argument
-    if (!is.logical(use_L2)) {
-        stop(.errorMsg("argument `use_L2` must be type of logical"))
-    } else if (length(use_L2) != 1) {
-        stop(.errorMsg("argument `use_L2` must be of length 1"))
+    if (!is.character(residual)) {
+        stop("argument `residual` must be type of logical")
+    } else if (length(residual) != 1) {
+        stop("argument `residual` must be of length 1")
     }
 
     if (!is.integer(nthread)) {
-        stop(.errorMsg("argument `nthread` must be type of integer"))
+        stop("argument `nthread` must be type of integer")
     } else if (length(nthread) != 1) {
-        stop(.errorMsg("argument `nthread` must be of length 1"))
+        stop("argument `nthread` must be of length 1")
     }
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
-    combo_profiles <- buildComboProfiles(object, c("HS", "EC50", "E_inf", "viability"))
+    combo_profiles <- tryCatch({
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "ZIP", "viability"))
+    }, warning = function(w) {
+        message(paste("ZIP reference values have not been pre-computed.",
+                      "They will be computed in during delta score calculation."))
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "viability"))
+    })
+    required_params <- c("HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2")
+    missing_params <- !(required_params %in% colnames(combo_profiles))
+    if (any(missing_params))
+        stop("Missing required paramters for two-way Hill curve fitting: ",
+             paste(required_params[missing_params]))
+    has_ZIP <- "ZIP" %in% colnames(combo_profiles)
+    if (has_ZIP) {
+        combo_ZIP <- combo_profiles[, c(combo_keys, "ZIP"), with = FALSE]
+        combo_profiles[, ZIP := NULL]
+        setkeyv(combo_ZIP, combo_keys)
+    }
+
     combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
     setkeyv(combo_twowayFit, combo_keys)
-    combo_twowayFit |>
-        aggregate(
-            delta_score = .deltaScore(
-                EC50_1_to_2 = EC50_proj_1_to_2,
-                EC50_2_to_1 = EC50_proj_2_to_1,
-                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                HS_1_to_2 = HS_proj_1_to_2,
-                HS_2_to_1 = HS_proj_2_to_1,
-                HS_1 = HS_1, HS_2 = HS_2,
-                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                treatment1dose = treatment1dose,
-                treatment2dose = treatment2dose
-            ),
-            by = combo_keys,
-            nthread = nthread
-        ) -> delta_scores
+    if (has_ZIP) {
+        combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose,
+                    ZIP = ZIP
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    } else {
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    }
+    setkeyv(delta_scores, combo_keys)
     ## Add delta scores to combo_scores in input TRE
-    combo_scores <- object$combo_scores
-    object$combo_scores <- combo_scores[
-        delta_scores,,
-        on = c(treatment1id = "treatment1id",
-               treatment2id = "treatment2id",
-               treatment1dose = "treatment1dose",
-               treatment2dose = "treatment2dose",
-               sampleid = "sampleid")]
+    combo_scores <- tryCatch({
+        object$combo_scores
+    }, error = function(e) {
+        NULL
+    })
+    if (is.null(combo_scores)) {
+        ## create a new combo_score assay and save delta scores
+        object$combo_scores <- delta_scores
+    } else {
+        object$combo_scores <- combo_scores[delta_scores,, on = combo_keys]
+    }
 
     return(object)
 })
@@ -828,6 +877,7 @@ setMethod(f = "computeZIPdelta",
 #' @param treatment2id `character` a vector of identifiers for treatment 2
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param treatment2dose `numeric` a vector of concentrations for treatment 2
+#' @param sampleid `character` Cell-line ID of a drug combination screening experiment.
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param EC50_1 `numeric` relative EC50 of treatment 1.
@@ -835,12 +885,15 @@ setMethod(f = "computeZIPdelta",
 #' @param E_inf_1 `numeric` viability produced by the maximum attainable effect of treatment 1.
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param viability `numeric` Observed viability of the two treatments combined.
+#' @param ZIP `numeric` pre-computed ZIP reference values.
+#'     If not provided, it will be computed during delta score calculation.
 #' @param residual `character` Method used to minimise residual in fitting curves.
-#'     3 methods available: `logcosh`, `normal`, `Cauchy`.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
 #'     The default method is `logcosh`.
 #'     It minimises the logarithmic hyperbolic cosine loss of the residuals
 #'     and provides the fastest estimation among the three methods,
-#'     with fitting quality in between `normal` and `Cauchy`.
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
 #'     The other two methods minimise residuals by
 #'     considering the truncated probability distribution (as in their names) for the residual.
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
@@ -851,7 +904,8 @@ setMethod(f = "computeZIPdelta",
 #' 
 #' @examples
 #' \dontrun{
-#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
+#' ## ZIP is optional. Will be recomputed if not provided.
+#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "viability"))
 #' combo_twowayFit <- fitTwowayZIP(combo_profiles)
 #' combo_twowayFit |>
 #'     aggregate(
@@ -860,11 +914,16 @@ setMethod(f = "computeZIPdelta",
 #'             treatment2id = treatment2id,
 #'             treatment1dose = treatment1dose,
 #'             treatment2dose = treatment2dose,
+#'             sampleid = sampleid,
 #'             HS_1 = HS_1, HS_2 = HS_2,
 #'             EC50_1 = EC50_1, EC50_2 = EC50_2,
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-#'             viability = viability
+#'             viability = viability,
+#'             ZIP = ZIP
 #'         ),
+#'         treatment1dose = treatment1dose,
+#'         treatment2dose = treatment2dose,
+#'         moreArgs = list(residual = "Cauchy"),
 #'         by = c("treatment1id", "treatment2id", "sampleid")
 #'     )
 #' }
@@ -876,15 +935,20 @@ setMethod(f = "computeZIPdelta",
 #' @import data.table
 #' @export
 .computeZIPdelta <- function(
-    treatment1id, treatment2id, treatment1dose, treatment2dose,
-    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, viability,
-    residual = c("logcosh", "Cauchy", "normal"), nthread = 1L) {
+    treatment1id, treatment2id, treatment1dose, treatment2dose, sampleid,
+    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, viability, ZIP = NULL,
+    residual = "logcosh", nthread = 1L) {
+
+    combo_keys <- c("treatment1id", "treatment2id",
+                    "treatment1dose", "treatment2dose", "sampleid")
 
     combo_profiles <- data.table(
         treatment1id = treatment1id,
         treatment2id = treatment2id,
         treatment1dose = treatment1dose,
         treatment2dose = treatment2dose,
+        sampleid = sampleid,
+        viability = viability,
         HS_1 = HS_1,
         HS_2 = HS_2,
         EC50_1 = EC50_1,
@@ -893,26 +957,57 @@ setMethod(f = "computeZIPdelta",
         E_inf_2 = E_inf_2
     )
 
-    combo_keys <- c("treatment1id", "treatment2id",
-                    "treatment1dose", "treatment2dose", "sampleid")
+    if (!is.null(ZIP)) {
+        combo_ZIP <- data.table(
+            treatment1id = treatment1id,
+            treatment2id = treatment2id,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose,
+            sampleid = sampleid,
+            ZIP = ZIP
+        )
+        setkeyv(combo_ZIP, combo_keys)
+    }
+
     combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
     setkeyv(combo_twowayFit, combo_keys)
-    combo_twowayFit |>
-        aggregate(
-            delta_score = .deltaScore(
-                EC50_1_to_2 = EC50_proj_1_to_2,
-                EC50_2_to_1 = EC50_proj_2_to_1,
-                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                HS_1_to_2 = HS_proj_1_to_2,
-                HS_2_to_1 = HS_proj_2_to_1,
-                HS_1 = HS_1, HS_2 = HS_2,
-                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                treatment1dose = treatment1dose,
-                treatment2dose = treatment2dose
-            ),
-            by = combo_keys,
-            nthread = nthread
-        ) -> delta_scores
+    if (is.null(ZIP)) {
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    } else {
+        combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose,
+                    ZIP = ZIP
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    }
 
     return(delta_scores$delta_score)
 }
@@ -938,6 +1033,8 @@ setMethod(f = "computeZIPdelta",
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param treatment2dose `numeric` a vector of concentrations for treatment 2
+#' @param ZIP `numeric` pre-computed ZIP reference values.
+#'     If not provided, it will be computed during delta score calculation.
 #' 
 #' @return `numeric` a ZIP delta score to quantify synergy for the drug combination.
 #' @noRd
@@ -947,7 +1044,8 @@ setMethod(f = "computeZIPdelta",
 
 .deltaScore <- function(EC50_1_to_2, EC50_2_to_1, EC50_1, EC50_2,
                         HS_1_to_2, HS_2_to_1, HS_1, HS_2,
-                        E_inf_1, E_inf_2, treatment1dose, treatment2dose) {
+                        E_inf_1, E_inf_2, treatment1dose, treatment2dose,
+                        ZIP = NULL) {
     E_min <- 1 ## 3-parameter case; subject to change
     ## TODO: choose scale of E_inf based on default setting
     E_inf_1 <- E_inf_1 / 100
@@ -965,11 +1063,15 @@ setMethod(f = "computeZIPdelta",
         1 + (treatment2dose/EC50_1_to_2)^(HS_1_to_2)
     )
     ## FIXME: avoid re-calculating ZIP references
-    viability_ZIP <- computeZIP(treatment1dose = treatment1dose,
-                                treatment2dose = treatment2dose,
-                                HS_1 = HS_1, HS_2 = HS_2,
-                                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2)
+    if (is.null(ZIP)) {
+        viability_ZIP <- computeZIP(treatment1dose = treatment1dose,
+                                    treatment2dose = treatment2dose,
+                                    HS_1 = HS_1, HS_2 = HS_2,
+                                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2)
+    } else {
+        viability_ZIP <- ZIP
+    }
     delta <- (1/2) * (viability_2_to_1 + viability_1_to_2) - viability_ZIP
 
     return(delta)

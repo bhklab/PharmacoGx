@@ -6,7 +6,7 @@
 \usage{
 fitTwowayZIP(
   combo_profiles,
-  residual = c("logcosh", "Cauchy", "normal"),
+  residual = "logcosh",
   show_Rsqr = TRUE,
   nthread = 1L
 )
@@ -17,7 +17,7 @@ for each single agent in a drug comnbination,
 and the observed viability of two treatments combined.}
 
 \item{residual}{\code{character} Method used to minimise residual in fitting curves.
-3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+3 methods available: \code{c("logcosh", "normal", "Cauchy")}.
 The default method is \code{logcosh}.
 It minimises the logarithmic hyperbolic cosine loss of the residuals
 and provides the fastest estimation among the three methods,
