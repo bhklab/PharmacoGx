@@ -182,28 +182,33 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #' ))
 #'
 #' @export
-computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
-                       treatment2dose, HS_2, EC50_2, E_inf_2 = 0) {
+computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
+                       treatment2dose, HS_2, EC50_2, E_inf_2) {
     y_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
     y_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
     y_zip <- y_1 * y_2
     return(y_zip)
 }
 
-#' @title Compute the projected viability after adding one treatment to the other
+#' @title Predict viability from a 4-paramter Hill curve
 #'
 #' @description
-#' Viability of adding one drug to the other,
-#' with the assumption that E_inf_add = 0, and
-#' E_min of the drug being added to is dictated by the response of the drug added.
+#' Viability predicted by 4-parameter logistic regression.
 #'
-#' @param dose_to `numeric` a vector of concentrations of the drug being added to
-#' @param HS_proj `numeric` changed Hill coefficient of the drug being added to; the projected shape parameter.
-#' @param EC50_proj `numeric` changed relative EC50 of the drug being added to; the projected potency.
-#' @param E_min_proj `numeric` Projected `E_min` given by
-#'     the viability of the added treatment at a fixed dose.
+#' @param dose `numeric` a vector of concentrations of the treatment in `log10` scale.
+#' @param HS `numeric` Hill coefficient characterised by cooperativity and molecularity of
+#'     ligand-receptor binding of the treatment.
+#' @param EC50 `numeric` potency of the treatment in `log10` scale;
+#'     the concentration necessary to cause half of the treatment efficacy.
+#' @param E_inf `numeric` efficacy of the treatment;
+#'     viability produced by the maximum effect of the treatment.
+#' @param E_nnf `numeric` cellular viability under
+#'     the effect of the treatment at the minimum dose level.
+#'     In predicting monotherapeutic viability,
+#'     a sensible `E_nnf` should be the negative control value of 1.
 #'
-#' @return `numeric` viability after adding one drug to the other.
+#' @return `numeric` predicted cellular viability values of the treatment
+#'     given `dose` administered respectively.
 #'
 #' @examples
 #' (viability <- projViability(
@@ -214,42 +219,84 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1 = 0,
 #' ))
 #'
 #' @export
-projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
-    E_min_proj / (1 + (dose_to / EC50_proj)^(HS_proj))
+Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
+    #(E_nnf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
+    E_inf + (( E_nnf - E_inf ) / ( 1 + ( 10^dose / 10^EC50)^(HS) ))
 }
 
-#' L2-loss to optimise for EC50_proj and HS_proj
+## TODO:: If it works well for fitting 2-way Hill curves, move it to CoreGx
+
+#' @title Compute Logarithm of Hyperbolic Cosine function
 #'
-#' @param par `numeric` EC50_proj and HS_proj;
-#'     the projected/shifted potency and Hill coefficient.
+#' @description
+#' A numerical stable version of `log(cosh(x))`
+#' without floating overflow or underflow.
+#' Originally implemented in `limma` by Gordon K Smyth.
+#'
+#' @param x `numeric` vector or matrix.
+#'
+#' @return `numeric` a vector or matrix with the same dimension as `x`.
+#'
+#' @references
+#' Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W, Smyth GK (2015). “limma powers differential expression analyses for RNA-sequencing and microarray studies.” Nucleic Acids Research, 43(7), e47. doi: 10.1093/nar/gkv007.
+#' @noRd
+#' @export
+.logcosh <- function(x) {
+	y <- abs(x) - log(2)
+	i <- abs(x) < 1e-4
+	y[i] <- 0.5*x[i]^2
+	i <- !i & (abs(x) < 17)
+	y[i] <- log(cosh(x[i]))
+	y
+}
+
+
+#' @title Log-cosh loss for fitting projected Hill curves
+#'
+#' @description
+#' Compute the log hyperbolic cosine (log-cosh) loss,
+#' which behaves as L2 at small values and as L1 at large values.
+#'
+#' @param par `numeric` a vector of parameters to optimise in the following order:
+#'     `c(HS_proj, E_inf_proj, EC50_proj)`
 #' @param dose_to `numeric` a vector of concentrations of the drug being added to
 #' @param viability `numeric` Observed viability of two treatments; target for fitting curve.
 #' @param E_min_proj `numeric` Projected `E_min` given by
 #'     the viability of the added treatment at a fixed dose.
 #'
-#' @return `numeric` L2 loss for fitting a 2-parameter curve. See below.
+#' @return `numeric` Log-Cosh loss for fitting a 3-parameter Hill curve. See below.
 #'
 #' @noRd
-.fitProjParamsLoss_L2 <- function(par, dose_to, viability, E_min_proj) {
-    norm(
-         projViability(
-            dose_to = dose_to,
-            E_min_proj = E_min_proj,
-            EC50_proj = par[1],
-            HS_proj = par[2]
-        ) - viability, "2"
+.fitProjParamsLoss <- function(par, dose_to, viability, E_min_proj) {
+    ## Old L2 Loss, not robust
+    #norm(
+    #     Hill_4par(
+    #        dose = dose_to,
+    #        E_nnf = E_min_proj,
+    #        HS = par[1],
+    #        EC50 = par[2],
+    #        E_inf = par[3]
+    #    ) - viability, "2"
+    #)
+    sum(
+        .logcosh(
+             Hill_4par(
+                dose = dose_to,
+                E_nnf = E_min_proj,
+                HS = par[1],
+                E_inf = par[2],
+                EC50 = par[3]
+            ) - viability
+        )
     )
-
 }
 
-#' @title Estimate projected potency and shape parameter
+#' @title Estimate the projected Hill coefficient, efficacy, and potency
 #'
 #' @description
-#' Estimate the projected potency EC50 and the shape parameter HS
-#' in the dose-response curve of a drug after adding another drug to it
+#' Estimate the projected shape parameter HS, efficacy `E_inf` and potency `EC50`
+#' in the new dose-response curve of a drug after adding another drug to it
 #' by fitting a 2-parameter dose-response curve.
-#' It assumes \eqn{E_min = 1} for the drug being added and
-#' \eqn{E_inf = 0} for both drugs.
 #'
 #' @param dose_to `numeric` a vector of concentrations of the drug being added to
 #' @param viability `numeric` Observed viability of two treatments; target for fitting curve.
@@ -257,98 +304,150 @@ projViability <- function(dose_to, EC50_proj, HS_proj, E_min_proj) {
 #' @param EC50_add `numeric` relative EC50 of the drug added.
 #' @param HS_add `numeric` Hill coefficient of the drug added.
 #' @param E_inf_add `numeric` Efficacy of the drug added.
-#' @param use_L2 `logical` Whether to use L2 loss for fitting curves.
-#'     This method produces cruder estimates for projected Hill parameters of
-#'     drug combinations difficult to optimise, but also faster to compute results.
-#'     Use it only if the default method is not progressing. Default `FALSE`.
+#' @param residual `character` Method used to minimise residual in fitting curves.
+#'     3 methods available: `logcosh`, `normal`, `Cauchy`.
+#'     The default method is `logcosh`.
+#'     It minimises the logarithmic hyperbolic cosine loss of the residuals
+#'     and provides the fastest estimation among the three methods,
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
+#'     The other two methods minimise residuals by
+#'     considering the truncated probability distribution (as in their names) for the residual.
+#'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
+#' @param conc_as_log `logical` indicates whether input concentrations are in log10 scale.
 #'
 #' @return `list`
-#'      * `EC50_proj`: Projected potency after adding a drug
 #'      * `HS_proj`: Projected Hill coefficient after adding a drug
+#'      * `E_inf_proj`: Projected efficacy after adding a drug
+#'      * `EC50_proj`: Projected potency after adding a drug
+#'      * `E_nnf_proj`: Projected baseline viability by the added drug
+#'      * `Rsqr`: if `show_Rsqr` is `TRUE`, it will include the R squared value indicating the quality of the fit in the result.
 #'
-#' @examples
-#' (EC50_and_HS <- estimateProjParams(
-#'   viability=c(0.9, 0.8, 0.7),
-#'   dose_to=c(0.1, 0.01, 0.001),
-#'   dose_add=c(1, 0.1, 0.01),
-#'   EC50_add=0.1,
-#'   HS_add=1.1,
-#'   E_inf_add=0.1
-#' ))
+#' @importFrom CoreGx .fitCurve .reformatData
+#' @importFrom stats optimise var coef
+#' @import drc
 #'
-#' @importFrom CoreGx .fitCurve
-#' @importFrom stats optimise
 #' @export
 estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
-                               E_inf_add = 0, use_L2 = FALSE, show_Rsqr = FALSE) {
-    E_min_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
-    lower_bounds <- c(1e-6, 0)
-    upper_bounds <- c(1e+6, 4)
+                               E_inf_add = 0,
+                               residual = c("logcosh", "drc", "normal", "Cauchy"),
+                               show_Rsqr = TRUE,
+                               conc_as_log = FALSE) {
+
+    residual <- match.arg(residual)
+
+    ## viability of the drug being added as the minimum baseline response
+    if (conc_as_log) {
+        E_nnf_proj <- .Hill(dose_add, c(HS_add, E_inf_add, log10(EC50_add)))
+    } else {
+        E_nnf_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+    }
+    formatted_data <- .reformatData(
+        x = dose_to,
+        y = viability,
+        x_to_log = !conc_as_log,
+        y_to_frac = FALSE, ## subject to change
+        y_to_log = FALSE,
+        trunc = FALSE
+    )
+    log_conc <- formatted_data[["x"]]
+
+    lower_bounds <- c(0, 0, -6)
+    upper_bounds <- c(4, 1, 6)
+
     gritty_guess <- c(
-            pmin(pmax(dose_to[which.min(abs(viability - 1/2))],
-                      lower_bounds[1]),
-                 upper_bounds[1]),
-            pmin(pmax(1, lower_bounds[2]), upper_bounds[2])
+        pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
+        pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
+        pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]),
+             upper_bounds[3])
+    )
+    proj_params <- switch(
+        residual,
+        logcosh = {
+            proj_params <- optim(
+                fn = .fitProjParamsLoss,
+                par = gritty_guess,
+                lower = lower_bounds, upper = upper_bounds,
+                method = "L-BFGS-B",
+                dose_to = log_conc,
+                viability = viability,
+                E_min_proj = E_nnf_proj
+            )$par
+            proj_params[3] <- 10^proj_params[3]
+            proj_params
+        },
+        ## For benchmarking speed and quality of fit. Will be removed in formal release
+        drc = {
+            fit <- drm(
+                viability ~ dose,
+                data = data.frame(viability = viability, dose = dose_to),
+                fct = LL.4(
+                    fixed = c(NA, NA, E_nnf_proj, NA),
+                    names = c("HS_proj", "E_inf_proj", "E_nnf_proj", "EC50_proj")
+                ),
+                #logDose = 10, ## drc unstable with log concentration
+                lowerl = c(0, 0, 1e-6),
+                upperl = c(4, 1, 1e+6)
+            )
+            proj_params <- coef(fit)
+            c(
+                proj_params[grepl("HS_proj", names(proj_params))],
+                proj_params[grepl("E_inf_proj", names(proj_params))],
+                proj_params[grepl("EC50_proj", names(proj_params))]
+            )
+        },
+        {
+            proj_params <- CoreGx::.fitCurve(
+                x = log_conc, y = viability, f = function(x, par) {
+                    Hill_4par(
+                        dose = x,
+                        E_nnf = E_nnf_proj,
+                        HS = par[1],
+                        E_inf = par[2],
+                        EC50 = par[3]
+                    )
+                },
+                lower_bounds = lower_bounds,
+                upper_bounds = upper_bounds,
+                density = c(2, 10, 5),
+                step = .5 / c(2, 10, 5),
+                precision = 1e-4,
+                scale = 0.07,
+                family = residual,
+                median_n = 1,
+                trunc = TRUE,
+                verbose = TRUE,
+                gritty_guess = gritty_guess,
+                span = 1
+            )
+            proj_params[3] <- 10^proj_params[3]
+            proj_params
+        }
     )
 
-    if (use_L2) {
-        proj_params <- optim(
-            fn = .fitProjParamsLoss_L2,
-            par = gritty_guess,
-            lower = lower_bounds, upper = upper_bounds,
-            method = "L-BFGS-B",
-            dose_to = dose_to,
-            viability = viability,
-            E_min_proj = E_min_proj
-        )$par
-        if (show_Rsqr) {
-            proj_viability <- projViability(
-                dose_to = dose_to,
-                EC50_proj = proj_params[1],
-                HS_proj = proj_params[2],
-                E_min_proj = E_min_proj
-            )
-            Rsqr <- 1 - (var(viability - proj_viability)/var(viability))
-        }
-
-    } else {
-        ## Default method
-        proj_params <- CoreGx::.fitCurve(
-            x = dose_to, y = viability, f = function(dose_to, par) {
-                # par[1] = EC50_proj
-                # par[2] = HS_proj
-                E_min_proj / (1 + (dose_to/par[1])^(par[2]))
-            },
-            lower_bounds = lower_bounds,
-            upper_bounds = upper_bounds,
-            density = c(2, 5),
-            step = .5 / c(2, 5),
-            precision = 1e-4,
-            scale = 0.07,
-            family = c(
-                #"normal",
-                "Cauchy"
-            ),
-            median_n = 1,
-            trunc = TRUE,
-            verbose = TRUE,
-            gritty_guess = gritty_guess,
-            span = 1
-        )
-        if (show_Rsqr)
-            Rsqr <- attr(proj_params, "Rsquare")
-    }
     if (show_Rsqr) {
+        viability_hat <- Hill_4par(
+            dose = log_conc,
+            HS = proj_params[1],
+            E_inf = proj_params[2],
+            EC50 = log10(proj_params[3]),
+            E_nnf = E_nnf_proj
+        )
+        Rsqr <- 1 - (var(viability - viability_hat) / var(viability))
         return(list(
-            EC50_proj = proj_params[1],
-            HS_proj = proj_params[2],
+            HS_proj = proj_params[1],
+            E_inf_proj = proj_params[2],
+            EC50_proj = proj_params[3],
+            E_nnf_proj = E_nnf_proj,
             Rsqr = Rsqr
         ))
     } else {
         return(list(
-            EC50_proj = proj_params[1],
-            HS_proj = proj_params[2]
+            HS_proj = proj_params[1],
+            E_inf_proj = proj_params[2],
+            EC50_proj = proj_params[3],
+            E_nnf_proj = E_nnf_proj
         ))
     }
 }
@@ -369,18 +468,21 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #'     for each single agent in a drug comnbination,
 #'     and the observed viability of two treatments combined.
 #'
-#' @param use_L2 `logical`
-#'     whether to use L2-loss rather than the default optimisation method.
-#'     This method produces cruder estimates for projected Hill parameters of
-#'     drug combinations difficult to optimise, but also faster to compute results.
-#'     Use it only if the default method is not progressing. Default `FALSE`.
+#' @param residual `character` Method used to minimise residual in fitting curves.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
+#'     The default method is `logcosh`.
+#'     It minimises the logarithmic hyperbolic cosine loss of the residuals
+#'     and provides the fastest estimation among the three methods,
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
+#'     The other two methods minimise residuals by
+#'     considering the truncated probability distribution (as in their names) for the residual.
+#'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
-#' @param nthread `integer` Number of cores used to perform computation.
-#'     Default 1.
+#' @param nthread `integer` Number of cores used to perform computation. Default 1.
 #'
 #' @return [data.table] contains parameters of projected dose-response curves
 #'    for adding one treatment to the other.
-#'
 #'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
@@ -388,8 +490,9 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' @importFrom CoreGx aggregate
 #' @import data.table
 #' @export
-fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
-                         show_Rsqr = FALSE, nthread = 1L) {
+fitTwowayZIP <- function(combo_profiles,
+                         residual = "logcosh",
+                         show_Rsqr = TRUE, nthread = 1L) {
     combo_profiles |>
         aggregate(
             estimateProjParams(
@@ -398,9 +501,11 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
                 dose_add = unique(treatment2dose),
                 EC50_add = unique(EC50_2),
                 HS_add = unique(HS_2),
-                E_inf_add = unique(E_inf_2)
+                E_inf_add = unique(E_inf_2),
+                residual = residual,
+                show_Rsqr = show_Rsqr
             ),
-            moreArgs = list("use_L2" = use_L2, "show_Rsqr" = show_Rsqr),
+            moreArgs = list(residual = residual, show_Rsqr = show_Rsqr),
             by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE
@@ -413,9 +518,11 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
                 dose_add = unique(treatment1dose),
                 EC50_add = unique(EC50_1),
                 HS_add = unique(HS_1),
-                E_inf_add = unique(E_inf_1)
+                E_inf_add = unique(E_inf_1),
+                residual = residual,
+                show_Rsqr = show_Rsqr
             ),
-            moreArgs = list("use_L2" = use_L2, "show_Rsqr" = show_Rsqr),
+            moreArgs = list(residual = residual, show_Rsqr = show_Rsqr),
             by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE
@@ -442,6 +549,192 @@ fitTwowayZIP <- function(combo_profiles, use_L2 = FALSE,
     return(combo_twowayFit)
 }
 
+## == Plot the result of two-way fittings for a drug combination experiment ===
+
+#' @title Plot projected Hill curves
+#'
+#' @description
+#' Plot the two-way projected Hill curves of adding one drug to the other.
+#'
+#' @param combo_twowayFit `data.table`
+#'      containing two-way fitted parameters for multiple drug combination experiments.
+#'
+#' @param treatment1 `character`
+#'      the `treatment1id` to select in `combo_twowayFit` for a drug combination.
+#'
+#' @param treatment2
+#'      the `treatment2id` to select in `combo_twowayFit` for a drug combination.
+#'
+#' @param cellline
+#'      the `sampleid` to select in `combo_twowayFit` for a drug combination experiment.
+#'
+#' @param add_treatment
+#'      The added treatment in projected Hill curves, either integer 1 or 2.
+#'      1 means adding treatment 1 to treatment 2.
+#'
+#' @return produce a plot with projected Hill curves of adding treatment [add_treatment]
+#'
+#' @importFrom graphics plot curve points legend
+#' @importFrom grDevices palette rainbow
+#' @export
+#' @noRd
+#' @examples
+#' \dontrun{
+#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
+#' combo_twowayFit <- fitTwowayZIP(combo_profiles)
+#' .plotProjHill(combo_twowayFit,
+#'               treatment1 = "Methotrexate",
+#'               treatment2 = "Zolendronic Acid",
+#'               cellline = "UO-31",
+#'               add_treatment = 1)
+#' }
+
+.plotProjHill <- function(combo_twowayFit, treatment1, treatment2,
+                          cellline, add_treatment = 1, title = NULL) {
+
+    required_cols <- c("treatment1id", "treatment1dose", "treatment2id", "treatment2dose",
+                       "sampleid", "viability", "HS_1", "E_inf_1", "EC50_1", "HS_2", "E_inf_2",
+                       "EC50_2", "HS_proj_1_to_2", "E_inf_proj_1_to_2", "EC50_proj_1_to_2",
+                       "E_nnf_proj_1_to_2", "HS_proj_2_to_1", "E_inf_proj_2_to_1",
+                       "EC50_proj_2_to_1", "E_nnf_proj_2_to_1")
+    has_cols <- (required_cols %in% colnames(combo_twowayFit))
+    if (!all(has_cols))
+        stop("Missing required columns for plotting: ",
+             paste(required_cols[!has_cols]))
+
+    select_combo <- combo_twowayFit[treatment1id == treatment1 &
+                                    treatment2id == treatment2 &
+                                    sampleid == cellline]
+    if (dim(select_combo)[1] <= 0)
+        stop(paste("No such drug combination with treatment1id:", treatment1,
+                   "and treatment2id:", treatment2, "and sampleid:", cellline))
+
+    if (length(add_treatment) > 1)
+        stop("Argument `add_treatment` must be of length 1.")
+
+    if (!(add_treatment %in% c(1, 2)))
+        stop("Argument `add_treatment` must be either 1 or 2.")
+
+    ## Use variable name as title if not provided
+    if (is.null(title))
+        title <- deparse(substitute(combo_twowayFit))
+
+    ## Colours for each curve of a fixed concentration of the drug added
+
+    has_Rsqr <- c("Rsqr_1_to_2", "Rsqr_2_to_1") %in% colnames(combo_twowayFit)
+    if (add_treatment == 2) {
+        ## unique treatment 2 concentrations
+        unique_t2_dose <- unique(select_combo[, treatment2dose])
+        cols <- palette(rainbow(length(unique_t2_dose)))
+        if (has_Rsqr[2])
+            Rsqr_2_to_1 <- vector(mode = "numeric", length = length(unique_t2_dose))
+        ## Initialise an empty background canvas
+        plot(
+            NULL, xlim = c(-10, 10), ylim = c(0, 2),
+            ylab = paste("Response of adding", treatment2, "to", treatment1),
+            xlab = paste0("log10([", treatment1,"])"),
+            main = title
+        )
+        for (i in seq_along(unique_t2_dose)) {
+            dose_add <- unique_t2_dose[i]
+            EC50_proj <- unique(select_combo[treatment2dose == dose_add, EC50_proj_2_to_1])
+            HS_proj <- unique(select_combo[treatment2dose == dose_add, HS_proj_2_to_1])
+            EC50_add <- unique(select_combo[treatment2dose == dose_add, EC50_2])
+            E_inf_add <- unique(select_combo[treatment2dose == dose_add, E_inf_2])
+            E_inf_proj <- unique(select_combo[treatment2dose == dose_add, E_inf_proj_2_to_1])
+            HS_add <- unique(select_combo[treatment2dose == dose_add, HS_2])
+            dose_to <- select_combo[treatment2dose == dose_add, treatment1dose]
+            E_nnf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+            if (has_Rsqr[2])
+                Rsqr_2_to_1[i] <- unique(select_combo[treatment2dose == dose_add, Rsqr_2_to_1])
+            y <- select_combo[treatment2dose == dose_add, viability]
+            curve(
+                PharmacoGx::Hill_4par(
+                    E_nnf = E_nnf_proj,
+                    E_inf = E_inf_proj,
+                    HS = HS_proj,
+                    EC50 = log10(EC50_proj),
+                    dose = x
+                ),
+                from = -10, to = 10, add = TRUE, col = cols[i]
+            )
+            points(x = log10(dose_to), y = y, col = cols[i])
+        }
+        if (has_Rsqr[2]) {
+            legend(-10, 2,
+                legend = paste0("[", treatment2, "] = ", unique_t2_dose,
+                                ", R square = ", round(Rsqr_2_to_1, digits = 4)),
+                col = cols,
+                lty = 1,
+                box.lty = 0
+            )
+        } else {
+            legend(-10, 2,
+                legend = paste0("[", treatment2, "] = ", unique_t2_dose),
+                col = cols,
+                lty = 1,
+                box.lty = 0
+            )
+        }
+    } else {
+        ## unique treatment 1 concentrations
+        unique_t1_dose <- unique(select_combo[, treatment1dose])
+        cols <- palette(rainbow(length(unique_t1_dose)))
+        ## TODO: Find a nicer way to extract R squared value
+        if (has_Rsqr[1])
+            Rsqr_1_to_2 <- vector(mode = "numeric", length = length(unique_t1_dose))
+
+        ## Initialise an empty background canvas
+        plot(
+            NULL, xlim = c(-10, 10), ylim = c(0, 2),
+            ylab = paste("Response of adding", treatment1, "to", treatment2),
+            xlab = paste0("log10([", treatment2,"])"),
+            main = title
+        )
+        for (i in seq_along(unique_t1_dose)) {
+            dose_add <- unique_t1_dose[i]
+            EC50_proj <- unique(select_combo[treatment1dose == dose_add, EC50_proj_1_to_2])
+            HS_proj <- unique(select_combo[treatment1dose == dose_add, HS_proj_1_to_2])
+            EC50_add <- unique(select_combo[treatment1dose == dose_add, EC50_1])
+            HS_add <- unique(select_combo[treatment1dose == dose_add, HS_1])
+            E_inf_add <- unique(select_combo[treatment1dose == dose_add, E_inf_1])
+            E_nnf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+            E_inf_proj <- unique(select_combo[treatment1dose == dose_add, E_inf_proj_1_to_2])
+            dose_to <- select_combo[treatment1dose == dose_add, treatment2dose]
+            if (has_Rsqr[1])
+                Rsqr_1_to_2[i] <- unique(select_combo[treatment1dose == dose_add, Rsqr_1_to_2])
+            y <- select_combo[treatment1dose == dose_add, viability]
+            curve(
+                PharmacoGx::Hill_4par(
+                    E_nnf = E_nnf_proj,
+                    E_inf = E_inf_proj,
+                    HS = HS_proj,
+                    EC50 = log10(EC50_proj),
+                    dose = x
+                ),
+                from = -10, to = 10, add = TRUE, col = cols[i]
+            )
+            points(x = log10(dose_to), y = y, col = cols[i])
+        }
+        if (has_Rsqr[1]) {
+            legend(-10, 2,
+                legend = paste0("[", treatment1, "] = ", unique_t1_dose,
+                                ", R square = ", round(Rsqr_1_to_2, digits = 4)),
+                col = cols,
+                lty = 1,
+                box.lty = 0
+            )
+        } else {
+            legend(-10, 2,
+                legend = paste0("[", treatment1, "] = ", unique_t1_dose),
+                col = cols,
+                lty = 1,
+                box.lty = 0
+            )
+        }
+    }
+
+}
 
 #' Generic to compute ZIP delta scores from an S4 object
 #'
@@ -468,15 +761,25 @@ setGeneric(name = "computeZIPdelta",
 #' @param object [TreatmentResponseExperiment]
 #'     The `TreatmentResponseExperiment` from which to extract assays
 #'     `mono_profile` and `combo_viability` to compute ZIP delta scores.
-#' @param use_L2 `logical`
-#'     whether to use L2-loss rather than the default optimisation method.
-#'     This method produces cruder estimates for projected Hill parameters of
-#'     drug combinations difficult to optimise, but also faster to compute results.
-#'     Use it only if the default method is not progressing. Default `FALSE`.
+#' @param residual `character` Method used to minimise residual in fitting curves.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
+#'     The default method is `logcosh`.
+#'     It minimises the logarithmic hyperbolic cosine loss of the residuals
+#'     and provides the fastest estimation among the three methods,
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
+#'     The other two methods minimise residuals by
+#'     considering the truncated probability distribution (as in their names) for the residual.
+#'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
 #'
 #' @return [TreatmentResponseExperiment] with assay `combo_scores` containing `delta_scores`
+#'
+#' @examples
+#' \dontrun{
+#' tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+#' }
 #'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
@@ -487,51 +790,96 @@ setGeneric(name = "computeZIPdelta",
 #' @docType methods
 setMethod(f = "computeZIPdelta",
           signature = signature(object = "TreatmentResponseExperiment"),
-          definition = function(object, use_L2 = FALSE, nthread = 1L) {
+          definition = function(object,
+                                residual = "logcosh",
+                                nthread = 1L) {
 
     ## TODO: Handle missing argument
-    if (!is.logical(use_L2)) {
-        stop(.errorMsg("argument `use_L2` must be type of logical"))
-    } else if (length(use_L2) != 1) {
-        stop(.errorMsg("argument `use_L2` must be of length 1"))
+    if (!is.character(residual)) {
+        stop("argument `residual` must be type of logical")
+    } else if (length(residual) != 1) {
+        stop("argument `residual` must be of length 1")
     }
 
     if (!is.integer(nthread)) {
-        stop(.errorMsg("argument `nthread` must be type of integer"))
+        stop("argument `nthread` must be type of integer")
     } else if (length(nthread) != 1) {
-        stop(.errorMsg("argument `nthread` must be of length 1"))
+        stop("argument `nthread` must be of length 1")
     }
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
-    combo_profiles <- buildComboProfiles(object, c("HS", "EC50", "E_inf", "viability"))
-    combo_twowayFit <- fitTwowayZIP(combo_profiles, use_L2, nthread)
+    combo_profiles <- tryCatch({
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "ZIP", "viability"))
+    }, warning = function(w) {
+        message(paste("ZIP reference values have not been pre-computed.",
+                      "They will be computed in during delta score calculation."))
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "viability"))
+    })
+    required_params <- c("HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2")
+    missing_params <- !(required_params %in% colnames(combo_profiles))
+    if (any(missing_params))
+        stop("Missing required paramters for two-way Hill curve fitting: ",
+             paste(required_params[missing_params]))
+    has_ZIP <- "ZIP" %in% colnames(combo_profiles)
+    if (has_ZIP) {
+        combo_ZIP <- combo_profiles[, c(combo_keys, "ZIP"), with = FALSE]
+        combo_profiles[, ZIP := NULL]
+        setkeyv(combo_ZIP, combo_keys)
+    }
+
+    combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
     setkeyv(combo_twowayFit, combo_keys)
-    combo_twowayFit |>
-        aggregate(
-            delta_score = .deltaScore(
-                EC50_1_to_2 = EC50_proj_1_to_2,
-                EC50_2_to_1 = EC50_proj_2_to_1,
-                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                HS_1_to_2 = HS_proj_1_to_2,
-                HS_2_to_1 = HS_proj_2_to_1,
-                HS_1 = HS_1, HS_2 = HS_2,
-                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                treatment1dose = treatment1dose,
-                treatment2dose = treatment2dose
-            ),
-            by = combo_keys,
-            nthread = nthread
-        ) -> delta_scores
+    if (has_ZIP) {
+        combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose,
+                    ZIP = ZIP
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    } else {
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    }
+    setkeyv(delta_scores, combo_keys)
     ## Add delta scores to combo_scores in input TRE
-    combo_scores <- object$combo_scores
-    object$combo_scores <- combo_scores[
-        delta_scores,,
-        on = c(treatment1id = "treatment1id",
-               treatment2id = "treatment2id",
-               treatment1dose = "treatment1dose",
-               treatment2dose = "treatment2dose",
-               sampleid = "sampleid")]
+    combo_scores <- tryCatch({
+        object$combo_scores
+    }, error = function(e) {
+        NULL
+    })
+    if (is.null(combo_scores)) {
+        ## create a new combo_score assay and save delta scores
+        object$combo_scores <- delta_scores
+    } else {
+        object$combo_scores <- combo_scores[delta_scores,, on = combo_keys]
+    }
 
     return(object)
 })
@@ -546,6 +894,7 @@ setMethod(f = "computeZIPdelta",
 #' @param treatment2id `character` a vector of identifiers for treatment 2
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param treatment2dose `numeric` a vector of concentrations for treatment 2
+#' @param sampleid `character` Cell-line ID of a drug combination screening experiment.
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param EC50_1 `numeric` relative EC50 of treatment 1.
@@ -553,11 +902,18 @@ setMethod(f = "computeZIPdelta",
 #' @param E_inf_1 `numeric` viability produced by the maximum attainable effect of treatment 1.
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param viability `numeric` Observed viability of the two treatments combined.
-#' @param use_L2 `logical`
-#'     whether to use L2-loss rather than the default optimisation method.
-#'     This method produces cruder estimates for projected Hill parameters of
-#'     drug combinations difficult to optimise, but also faster to compute results.
-#'     Use it only if the default method is not progressing. Default `FALSE`.
+#' @param ZIP `numeric` pre-computed ZIP reference values.
+#'     If not provided, it will be computed during delta score calculation.
+#' @param residual `character` Method used to minimise residual in fitting curves.
+#'     3 methods available: `c("logcosh", "normal", "Cauchy")`.
+#'     The default method is `logcosh`.
+#'     It minimises the logarithmic hyperbolic cosine loss of the residuals
+#'     and provides the fastest estimation among the three methods,
+#'     with fitting quality in between `normal` and `Cauchy`;
+#'     recommanded when fitting large-scale datasets.
+#'     The other two methods minimise residuals by
+#'     considering the truncated probability distribution (as in their names) for the residual.
+#'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
 #'
@@ -565,7 +921,8 @@ setMethod(f = "computeZIPdelta",
 #'
 #' @examples
 #' \dontrun{
-#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
+#' ## ZIP is optional. Will be recomputed if not provided.
+#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "viability"))
 #' combo_twowayFit <- fitTwowayZIP(combo_profiles)
 #' combo_twowayFit |>
 #'     aggregate(
@@ -574,11 +931,16 @@ setMethod(f = "computeZIPdelta",
 #'             treatment2id = treatment2id,
 #'             treatment1dose = treatment1dose,
 #'             treatment2dose = treatment2dose,
+#'             sampleid = sampleid,
 #'             HS_1 = HS_1, HS_2 = HS_2,
 #'             EC50_1 = EC50_1, EC50_2 = EC50_2,
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-#'             viability = viability
+#'             viability = viability,
+#'             ZIP = ZIP
 #'         ),
+#'         treatment1dose = treatment1dose,
+#'         treatment2dose = treatment2dose,
+#'         moreArgs = list(residual = "Cauchy"),
 #'         by = c("treatment1id", "treatment2id", "sampleid")
 #'     )
 #' }
@@ -591,43 +953,79 @@ setMethod(f = "computeZIPdelta",
 #' @keywords internal
 #' @export
 .computeZIPdelta <- function(
-    treatment1id, treatment2id, treatment1dose, treatment2dose,
-    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, viability,
-    use_L2 = FALSE, nthread = 1L) {
-
-    combo_profiles <- data.table(
-        treatment1id=treatment1id,
-        treatment2id=treatment2id,
-        treatment1dose=treatment1dose,
-        treatment2dose=treatment2dose,
-        HS_1=HS_1,
-        HS_2=HS_2,
-        EC50_1=EC50_1,
-        EC50_2=EC50_2,
-        E_inf_1=E_inf_1,
-        E_inf_2=E_inf_2
-    )
+    treatment1id, treatment2id, treatment1dose, treatment2dose, sampleid,
+    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, viability, ZIP = NULL,
+    residual = "logcosh", nthread = 1L) {
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
-    combo_twowayFit <- fitTwowayZIP(combo_profiles, use_L2, nthread)
+
+    combo_profiles <- data.table(
+        treatment1id = treatment1id,
+        treatment2id = treatment2id,
+        treatment1dose = treatment1dose,
+        treatment2dose = treatment2dose,
+        sampleid = sampleid,
+        viability = viability,
+        HS_1 = HS_1,
+        HS_2 = HS_2,
+        EC50_1 = EC50_1,
+        EC50_2 = EC50_2,
+        E_inf_1 = E_inf_1,
+        E_inf_2 = E_inf_2
+    )
+
+    if (!is.null(ZIP)) {
+        combo_ZIP <- data.table(
+            treatment1id = treatment1id,
+            treatment2id = treatment2id,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose,
+            sampleid = sampleid,
+            ZIP = ZIP
+        )
+        setkeyv(combo_ZIP, combo_keys)
+    }
+
+    combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
     setkeyv(combo_twowayFit, combo_keys)
-    combo_twowayFit |>
-        aggregate(
-            delta_score = .deltaScore(
-                EC50_1_to_2 = EC50_proj_1_to_2,
-                EC50_2_to_1 = EC50_proj_2_to_1,
-                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                HS_1_to_2 = HS_proj_1_to_2,
-                HS_2_to_1 = HS_proj_2_to_1,
-                HS_1 = HS_1, HS_2 = HS_2,
-                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                treatment1dose = treatment1dose,
-                treatment2dose = treatment2dose
-            ),
-            by = combo_keys,
-            nthread = nthread
-        ) -> delta_scores
+    if (is.null(ZIP)) {
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    } else {
+        combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
+        combo_twowayFit |>
+            aggregate(
+                delta_score = .deltaScore(
+                    EC50_1_to_2 = EC50_proj_1_to_2,
+                    EC50_2_to_1 = EC50_proj_2_to_1,
+                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                    HS_1_to_2 = HS_proj_1_to_2,
+                    HS_2_to_1 = HS_proj_2_to_1,
+                    HS_1 = HS_1, HS_2 = HS_2,
+                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                    treatment1dose = treatment1dose,
+                    treatment2dose = treatment2dose,
+                    ZIP = ZIP
+                ),
+                by = combo_keys,
+                nthread = nthread
+            ) -> delta_scores
+    }
 
     return(delta_scores$delta_score)
 }
@@ -653,6 +1051,8 @@ setMethod(f = "computeZIPdelta",
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param treatment2dose `numeric` a vector of concentrations for treatment 2
+#' @param ZIP `numeric` pre-computed ZIP reference values.
+#'     If not provided, it will be computed during delta score calculation.
 #'
 #' @return `numeric` a ZIP delta score to quantify synergy for the drug combination.
 #'
@@ -662,7 +1062,8 @@ setMethod(f = "computeZIPdelta",
 #' @export
 .deltaScore <- function(EC50_1_to_2, EC50_2_to_1, EC50_1, EC50_2,
                         HS_1_to_2, HS_2_to_1, HS_1, HS_2,
-                        E_inf_1, E_inf_2, treatment1dose, treatment2dose) {
+                        E_inf_1, E_inf_2, treatment1dose, treatment2dose,
+                        ZIP = NULL) {
     E_min <- 1 ## 3-parameter case; subject to change
     ## TODO: choose scale of E_inf based on default setting
     E_inf_1 <- E_inf_1 / 100
@@ -679,11 +1080,16 @@ setMethod(f = "computeZIPdelta",
         ) / (
         1 + (treatment2dose/EC50_1_to_2)^(HS_1_to_2)
     )
-    viability_ZIP <- computeZIP(treatment1dose = treatment1dose,
-                                treatment2dose = treatment2dose,
-                                HS_1 = HS_1, HS_2 = HS_2,
-                                EC50_1 = EC50_1, EC50_2 = EC50_2,
-                                E_inf_1 = E_inf_1, E_inf_2 = E_inf_2)
+    ## FIXME: avoid re-calculating ZIP references
+    if (is.null(ZIP)) {
+        viability_ZIP <- computeZIP(treatment1dose = treatment1dose,
+                                    treatment2dose = treatment2dose,
+                                    HS_1 = HS_1, HS_2 = HS_2,
+                                    EC50_1 = EC50_1, EC50_2 = EC50_2,
+                                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2)
+    } else {
+        viability_ZIP <- ZIP
+    }
     delta <- (1/2) * (viability_2_to_1 + viability_1_to_2) - viability_ZIP
 
     return(delta)

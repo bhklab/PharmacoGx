@@ -2,7 +2,7 @@
 % Please edit documentation in R/computeSynergy.R
 \name{estimateProjParams}
 \alias{estimateProjParams}
-\title{Estimate projected potency and shape parameter}
+\title{Estimate the projected Hill coefficient, efficacy, and potency}
 \usage{
 estimateProjParams(
   dose_to,
@@ -11,8 +11,9 @@ estimateProjParams(
   EC50_add,
   HS_add,
   E_inf_add = 0,
-  use_L2 = FALSE,
-  show_Rsqr = FALSE
+  residual = c("logcosh", "drc", "normal", "Cauchy"),
+  show_Rsqr = TRUE,
+  conc_as_log = FALSE
 )
 }
 \arguments{
@@ -28,24 +29,33 @@ estimateProjParams(
 
 \item{E_inf_add}{\code{numeric} Efficacy of the drug added.}
 
-\item{use_L2}{\code{logical} Whether to use L2 loss for fitting curves.
-This method produces cruder estimates for projected Hill parameters of
-drug combinations difficult to optimise, but also faster to compute results.
-Use it only if the default method is not progressing. Default \code{FALSE}.}
+\item{residual}{\code{character} Method used to minimise residual in fitting curves.
+3 methods available: \code{logcosh}, \code{normal}, \code{Cauchy}.
+The default method is \code{logcosh}.
+It minimises the logarithmic hyperbolic cosine loss of the residuals
+and provides the fastest estimation among the three methods,
+with fitting quality in between \code{normal} and \code{Cauchy};
+recommanded when fitting large-scale datasets.
+The other two methods minimise residuals by
+considering the truncated probability distribution (as in their names) for the residual.
+\code{Cauchy} provides the best fitting quality but also takes the longest to run.}
 
 \item{show_Rsqr}{\code{logical} whether to show goodness-of-fit value in the result.}
+
+\item{conc_as_log}{\code{logical} indicates whether input concentrations are in log10 scale.}
 }
 \value{
 \code{list}
-* \code{EC50_proj}: Projected potency after adding a drug
 * \code{HS_proj}: Projected Hill coefficient after adding a drug
+* \code{E_inf_proj}: Projected efficacy after adding a drug
+* \code{EC50_proj}: Projected potency after adding a drug
+* \code{E_nnf_proj}: Projected baseline viability by the added drug
+* \code{Rsqr}: if \code{show_Rsqr} is \code{TRUE}, it will include the R squared value indicating the quality of the fit in the result.
 }
 \description{
-Estimate the projected potency EC50 and the shape parameter HS
-in the dose-response curve of a drug after adding another drug to it
+Estimate the projected shape parameter HS, efficacy \code{E_inf} and potency \code{EC50}
+in the new dose-response curve of a drug after adding another drug to it
 by fitting a 2-parameter dose-response curve.
-It assumes \eqn{E_min = 1} for the drug being added and
-\eqn{E_inf = 0} for both drugs.
 }
 \examples{
 (EC50_and_HS <- estimateProjParams(
