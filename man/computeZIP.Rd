@@ -41,3 +41,13 @@ Default 0 by the original paper.}
 Predict the additive response of a treatment combination under
 the ZIP null assumption.
 }
+\examples{
+(zip <- computeZIP(
+  treatment1dose=c(0.1, 0.01, 0.001), treatment2dose=c(1, 0.1, 0.01),
+  HS_1=1, HS_2=1.2,
+  EC50_1=0.01, EC50_2=0.1,
+  E_inf_1=0,
+  E_inf_2=0.1
+))
+
+}

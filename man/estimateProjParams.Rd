@@ -57,3 +57,14 @@ Estimate the projected shape parameter HS, efficacy \code{E_inf} and potency \co
 in the new dose-response curve of a drug after adding another drug to it
 by fitting a 2-parameter dose-response curve.
 }
+\examples{
+(EC50_and_HS <- estimateProjParams(
+  viability=c(0.9, 0.8, 0.7),
+  dose_to=c(0.1, 0.01, 0.001),
+  dose_add=c(1, 0.1, 0.01),
+  EC50_add=0.1,
+  HS_add=1.1,
+  E_inf_add=0.1
+))
+
+}
