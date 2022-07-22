@@ -8,11 +8,11 @@ computeZIP(
   treatment1dose,
   HS_1,
   EC50_1,
-  E_inf_1 = 0,
+  E_inf_1,
   treatment2dose,
   HS_2,
   EC50_2,
-  E_inf_2 = 0
+  E_inf_2
 )
 }
 \arguments{
