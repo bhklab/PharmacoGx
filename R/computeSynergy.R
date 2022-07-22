@@ -202,26 +202,27 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
 #'     the concentration necessary to cause half of the treatment efficacy.
 #' @param E_inf `numeric` efficacy of the treatment;
 #'     viability produced by the maximum effect of the treatment.
-#' @param E_nnf `numeric` cellular viability under
+#' @param E_ninf `numeric` cellular viability under
 #'     the effect of the treatment at the minimum dose level.
 #'     In predicting monotherapeutic viability,
-#'     a sensible `E_nnf` should be the negative control value of 1.
+#'     a sensible `E_ninf` should be the negative control value of 1.
 #'
 #' @return `numeric` predicted cellular viability values of the treatment
 #'     given `dose` administered respectively.
 #'
 #' @examples
-#' (viability <- projViability(
-#'   dose_to=c(0.1, 0.01, 0.001),
-#'   HS_proj=1.1,
-#'   EC50_proj=0.01,
-#'   E_min_proj=1
+#' (viability <- hill4Par(
+#'   dose=c(0.1, 0.01, 0.001),
+#'   HS=1.1,
+#'   EC50=0.01,
+#'   E_ninf=1,
+#'   E_inf=0
 #' ))
 #'
 #' @export
-Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
-    #(E_nnf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
-    E_inf + (( E_nnf - E_inf ) / ( 1 + ( 10^dose / 10^EC50)^(HS) ))
+hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
+    #(E_ninf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
+    E_inf + (( E_ninf - E_inf ) / ( 1 + ( 10^dose / 10^EC50)^(HS) ))
 }
 
 ## TODO:: If it works well for fitting 2-way Hill curves, move it to CoreGx
@@ -270,9 +271,9 @@ Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
 .fitProjParamsLoss <- function(par, dose_to, viability, E_min_proj) {
     ## Old L2 Loss, not robust
     #norm(
-    #     Hill_4par(
+    #     hill4Par(
     #        dose = dose_to,
-    #        E_nnf = E_min_proj,
+    #        E_ninf = E_min_proj,
     #        HS = par[1],
     #        EC50 = par[2],
     #        E_inf = par[3]
@@ -280,9 +281,9 @@ Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
     #)
     sum(
         .logcosh(
-             Hill_4par(
+             hill4Par(
                 dose = dose_to,
-                E_nnf = E_min_proj,
+                E_ninf = E_min_proj,
                 HS = par[1],
                 E_inf = par[2],
                 EC50 = par[3]
@@ -321,7 +322,7 @@ Hill_4par <- function(dose, HS, E_nnf, E_inf, EC50) {
 #'      * `HS_proj`: Projected Hill coefficient after adding a drug
 #'      * `E_inf_proj`: Projected efficacy after adding a drug
 #'      * `EC50_proj`: Projected potency after adding a drug
-#'      * `E_nnf_proj`: Projected baseline viability by the added drug
+#'      * `E_ninf_proj`: Projected baseline viability by the added drug
 #'      * `Rsqr`: if `show_Rsqr` is `TRUE`, it will include the R squared value indicating the quality of the fit in the result.
 #'
 #' @importFrom CoreGx .fitCurve .reformatData
@@ -339,9 +340,9 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 
     ## viability of the drug being added as the minimum baseline response
     if (conc_as_log) {
-        E_nnf_proj <- .Hill(dose_add, c(HS_add, E_inf_add, log10(EC50_add)))
+        E_ninf_proj <- .Hill(dose_add, c(HS_add, E_inf_add, log10(EC50_add)))
     } else {
-        E_nnf_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+        E_ninf_proj <- .Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
     }
     formatted_data <- .reformatData(
         x = dose_to,
@@ -372,7 +373,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
                 method = "L-BFGS-B",
                 dose_to = log_conc,
                 viability = viability,
-                E_min_proj = E_nnf_proj
+                E_min_proj = E_ninf_proj
             )$par
             proj_params[3] <- 10^proj_params[3]
             proj_params
@@ -383,8 +384,8 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
                 viability ~ dose,
                 data = data.frame(viability = viability, dose = dose_to),
                 fct = LL.4(
-                    fixed = c(NA, NA, E_nnf_proj, NA),
-                    names = c("HS_proj", "E_inf_proj", "E_nnf_proj", "EC50_proj")
+                    fixed = c(NA, NA, E_ninf_proj, NA),
+                    names = c("HS_proj", "E_inf_proj", "E_ninf_proj", "EC50_proj")
                 ),
                 #logDose = 10, ## drc unstable with log concentration
                 lowerl = c(0, 0, 1e-6),
@@ -400,9 +401,9 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
         {
             proj_params <- CoreGx::.fitCurve(
                 x = log_conc, y = viability, f = function(x, par) {
-                    Hill_4par(
+                    hill4Par(
                         dose = x,
-                        E_nnf = E_nnf_proj,
+                        E_ninf = E_ninf_proj,
                         HS = par[1],
                         E_inf = par[2],
                         EC50 = par[3]
@@ -427,19 +428,19 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
     )
 
     if (show_Rsqr) {
-        viability_hat <- Hill_4par(
+        viability_hat <- hill4Par(
             dose = log_conc,
             HS = proj_params[1],
             E_inf = proj_params[2],
             EC50 = log10(proj_params[3]),
-            E_nnf = E_nnf_proj
+            E_ninf = E_ninf_proj
         )
         Rsqr <- 1 - (var(viability - viability_hat) / var(viability))
         return(list(
             HS_proj = proj_params[1],
             E_inf_proj = proj_params[2],
             EC50_proj = proj_params[3],
-            E_nnf_proj = E_nnf_proj,
+            E_ninf_proj = E_ninf_proj,
             Rsqr = Rsqr
         ))
     } else {
@@ -447,7 +448,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
             HS_proj = proj_params[1],
             E_inf_proj = proj_params[2],
             EC50_proj = proj_params[3],
-            E_nnf_proj = E_nnf_proj
+            E_ninf_proj = E_ninf_proj
         ))
     }
 }
@@ -595,8 +596,8 @@ fitTwowayZIP <- function(combo_profiles,
     required_cols <- c("treatment1id", "treatment1dose", "treatment2id", "treatment2dose",
                        "sampleid", "viability", "HS_1", "E_inf_1", "EC50_1", "HS_2", "E_inf_2",
                        "EC50_2", "HS_proj_1_to_2", "E_inf_proj_1_to_2", "EC50_proj_1_to_2",
-                       "E_nnf_proj_1_to_2", "HS_proj_2_to_1", "E_inf_proj_2_to_1",
-                       "EC50_proj_2_to_1", "E_nnf_proj_2_to_1")
+                       "E_ninf_proj_1_to_2", "HS_proj_2_to_1", "E_inf_proj_2_to_1",
+                       "EC50_proj_2_to_1", "E_ninf_proj_2_to_1")
     has_cols <- (required_cols %in% colnames(combo_twowayFit))
     if (!all(has_cols))
         stop("Missing required columns for plotting: ",
@@ -644,13 +645,13 @@ fitTwowayZIP <- function(combo_profiles,
             E_inf_proj <- unique(select_combo[treatment2dose == dose_add, E_inf_proj_2_to_1])
             HS_add <- unique(select_combo[treatment2dose == dose_add, HS_2])
             dose_to <- select_combo[treatment2dose == dose_add, treatment1dose]
-            E_nnf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+            E_ninf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
             if (has_Rsqr[2])
                 Rsqr_2_to_1[i] <- unique(select_combo[treatment2dose == dose_add, Rsqr_2_to_1])
             y <- select_combo[treatment2dose == dose_add, viability]
             curve(
-                PharmacoGx::Hill_4par(
-                    E_nnf = E_nnf_proj,
+                PharmacoGx::hill4Par(
+                    E_ninf = E_ninf_proj,
                     E_inf = E_inf_proj,
                     HS = HS_proj,
                     EC50 = log10(EC50_proj),
@@ -698,15 +699,15 @@ fitTwowayZIP <- function(combo_profiles,
             EC50_add <- unique(select_combo[treatment1dose == dose_add, EC50_1])
             HS_add <- unique(select_combo[treatment1dose == dose_add, HS_1])
             E_inf_add <- unique(select_combo[treatment1dose == dose_add, E_inf_1])
-            E_nnf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
+            E_ninf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
             E_inf_proj <- unique(select_combo[treatment1dose == dose_add, E_inf_proj_1_to_2])
             dose_to <- select_combo[treatment1dose == dose_add, treatment2dose]
             if (has_Rsqr[1])
                 Rsqr_1_to_2[i] <- unique(select_combo[treatment1dose == dose_add, Rsqr_1_to_2])
             y <- select_combo[treatment1dose == dose_add, viability]
             curve(
-                PharmacoGx::Hill_4par(
-                    E_nnf = E_nnf_proj,
+                PharmacoGx::hill4Par(
+                    E_ninf = E_ninf_proj,
                     E_inf = E_inf_proj,
                     HS = HS_proj,
                     EC50 = log10(EC50_proj),

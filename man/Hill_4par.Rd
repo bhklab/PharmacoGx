@@ -12,16 +12,16 @@ Hill_4par(dose, HS, E_nnf, E_inf, EC50)
 \item{HS}{\code{numeric} Hill coefficient characterised by cooperativity and molecularity of
 ligand-receptor binding of the treatment.}
 
-\item{E_nnf}{\code{numeric} cellular viability under
-the effect of the treatment at the minimum dose level.
-In predicting monotherapeutic viability,
-a sensible \code{E_nnf} should be the negative control value of 1.}
-
 \item{E_inf}{\code{numeric} efficacy of the treatment;
 viability produced by the maximum effect of the treatment.}
 
 \item{EC50}{\code{numeric} potency of the treatment in \code{log10} scale;
 the concentration necessary to cause half of the treatment efficacy.}
+
+\item{E_ninf}{\code{numeric} cellular viability under
+the effect of the treatment at the minimum dose level.
+In predicting monotherapeutic viability,
+a sensible \code{E_nnf} should be the negative control value of 1.}
 }
 \value{
 \code{numeric} predicted cellular viability values of the treatment
@@ -31,11 +31,12 @@ given \code{dose} administered respectively.
 Viability predicted by 4-parameter logistic regression.
 }
 \examples{
-(viability <- projViability(
-  dose_to=c(0.1, 0.01, 0.001),
-  HS_proj=1.1,
-  EC50_proj=0.01,
-  E_min_proj=1
+(viability <- Hill_4par(
+  dose=c(0.1, 0.01, 0.001),
+  HS=1.1,
+  EC50=0.01,
+  E_ninf=1,
+  E_inf=0
 ))
 
 }
