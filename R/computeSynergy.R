@@ -62,7 +62,7 @@ effectToDose <- function(viability, EC50, HS, E_inf) {
 #' print("TODO::")
 #'
 #' @export
-LoeweCI <- function(viability,
+loeweCI <- function(viability,
                     treatment1dose, HS_1, E_inf_1, EC50_1,
                     treatment2dose, HS_2, E_inf_2, EC50_2) {
     (treatment1dose / effectToDose(
@@ -91,11 +91,11 @@ LoeweCI <- function(viability,
 #' @return the distance between computed Loewe CI and 1
 #'
 #' @noRd
-.LoeweLoss <- function(viability,
+.loeweLoss <- function(viability,
                        treatment1dose, HS_1, E_inf_1, EC50_1,
                        treatment2dose, HS_2, E_inf_2, EC50_2) {
     abs(
-        LoeweCI(viability = viability,
+        loeweCI(viability = viability,
                 treatment1dose, HS_1, E_inf_1, EC50_1,
                 treatment2dose, HS_2, E_inf_2, EC50_2) - 1
     )
@@ -132,7 +132,7 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
                          tol = 0.5, lower_bound = 0, upper_bound = 1) {
     ## Find viability that minimises the distance between Loewe CI and 1
     loewe_guess <- optimise(
-        f = .LoeweLoss,
+        f = .loeweLoss,
         lower = lower_bound,
         upper = upper_bound,
         treatment1dose = treatment1dose,
@@ -589,7 +589,6 @@ fitTwowayZIP <- function(combo_profiles,
 #'               cellline = "UO-31",
 #'               add_treatment = 1)
 #' }
-
 .plotProjHill <- function(combo_twowayFit, treatment1, treatment2,
                           cellline, add_treatment = 1, title = NULL) {
 

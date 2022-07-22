@@ -49,7 +49,7 @@ considering the truncated probability distribution (as in their names) for the r
 * \code{HS_proj}: Projected Hill coefficient after adding a drug
 * \code{E_inf_proj}: Projected efficacy after adding a drug
 * \code{EC50_proj}: Projected potency after adding a drug
-* \code{E_nnf_proj}: Projected baseline viability by the added drug
+* \code{E_ninf_proj}: Projected baseline viability by the added drug
 * \code{Rsqr}: if \code{show_Rsqr} is \code{TRUE}, it will include the R squared value indicating the quality of the fit in the result.
 }
 \description{
