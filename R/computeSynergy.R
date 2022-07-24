@@ -21,19 +21,25 @@
 #'     that represents the sigmoidity of the curve.
 #' @param E_inf `numeric` the maximum attanable effect of a drug
 #'     when it is administered with a infinitely high concentration.
+#' @param is_pct `logical` whether both the input viabiliy and [E_inf] are given
+#'     in percentage (\[0, 100\]) rather than decimal (\[0, 1\]). Default FALSE.
 #'
 #' @return `numeric` concentrations in micromoles required to produce
 #'     `viability` in the corresponding entries.
 #'
 #' @examples
-#' print("TODO::")
-#'
+#' \dontrun{
+#' dose <- effectToDose(80, EC50 = 42, HS = 1, E_inf = 10, is_pct = TRUE)
+#' }
+#' @importFrom checkmate assertLogical
 #' @export
-effectToDose <- function(viability, EC50, HS, E_inf) {
-    ## TODO:: Check input validity
-    EC50 * (
-        (1 - viability) / (viability - E_inf)
-    )^ (1 / HS)
+effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
+    assertLogical(is_pct, len = 1)
+    if (is_pct) {
+        viability <- viability / 100
+        E_inf <- E_inf / 100
+    }
+    EC50 * ((1 - viability) / (viability - E_inf))^(1 / HS)
 }
 
 #' @title Loewe Additive Combination Index (CI)
@@ -55,27 +61,49 @@ effectToDose <- function(viability, EC50, HS, E_inf) {
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
+#' @param is_pct `logical` whether both the input viabiliy and [E_inf] are given
+#'     in percentage (\[0, 100\]) rather than decimal (\[0, 1\]). Default FALSE.
 #'
 #' @return CI under Loewe additive definition
 #'
 #' @examples
-#' print("TODO::")
+#' \dontrun{
+#' tre |>
+#'     endoaggregate(
+#'         assay="combo_viability",
+#'         Loewe = PharmacoGx::computeLoewe(
+#'             treatment1dose=treatment1dose,
+#'             treatment2dose=treatment2dose,
+#'             HS_1=HS_1,
+#'             HS_2=HS_2,
+#'             E_inf_1=E_inf_1,
+#'             E_inf_2=E_inf_2,
+#'             EC50_1=EC50_1,
+#'             EC50_2=EC50_2
+#'         ),
+#'         by = assayKeys(tre, "combo_viability")
+#'     ) -> tre
+#' }
 #'
 #' @export
 loeweCI <- function(viability,
                     treatment1dose, HS_1, E_inf_1, EC50_1,
-                    treatment2dose, HS_2, E_inf_2, EC50_2) {
+                    treatment2dose, HS_2, E_inf_2, EC50_2,
+                    is_pct = FALSE) {
     (treatment1dose / effectToDose(
         viability = viability,
         EC50 = EC50_1,
         HS = HS_1,
-        E_inf = E_inf_1)) +
+        E_inf = E_inf_1,
+        is_pct = is_pct)) +
     (treatment2dose / effectToDose(
         viability = viability,
         EC50 = EC50_2,
         HS = HS_2,
-        E_inf = E_inf_2))
+        E_inf = E_inf_2,
+        is_pct = is_pct))
 }
+
 ## Objective function to mimimise for solving E_Loewe
 #' @param viability `numeric` is a vector whose entries are the viability values
 #'     in the range [0, 1].
@@ -115,36 +143,85 @@ loeweCI <- function(viability,
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
-#' @param tol `numeric` Error tolerance for deviations from Loewe assumption. Loewe predictions with error higher than `tol` will be returned as `NA`. Deafult 0.5.
+#' @param tol `numeric` Error tolerance for deviations from Loewe assumption. Loewe predictions with error higher than `tol` will be returned as `NA`. Deafult 0.1.
 #' @param lower_bound `numeric` Lowest possible value for Loewe expected viability. Default 0.
 #' @param upper_bound `numeric` Highest possible value for Loewe expected viability. Default 1.
+#' @param verbose `logical` whether to display warning messages. Default `FALSE`.
 #'
 #' @return `numeric` expected viability under Loewe additive null assumption.
 #'
 #' @export
 #'
 #' @examples
-#' print("TODO::")
+#' \dontrun{
+#' tre |>
+#'     endoaggregate(
+#'         assay="combo_viability",
+#'         Loewe = computeLoewe(
+#'             treatment1dose=treatment1dose,
+#'             treatment2dose=treatment2dose,
+#'             HS_1=HS_1,
+#'             HS_2=HS_2,
+#'             E_inf_1=E_inf_1,
+#'             E_inf_2=E_inf_2,
+#'             EC50_1=EC50_1,
+#'             EC50_2=EC50_2
+#'         ),
+#'         by = assayKeys(tre, "combo_viability")
+#'     ) -> tre
+#' }
 #'
 #' @importFrom stats optimise
+
+#' @importFrom checkmate assertNumeric assertLogical
 computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
                          treatment2dose, HS_2, E_inf_2, EC50_2,
-                         tol = 0.5, lower_bound = 0, upper_bound = 1) {
+                         tol = 0.1, lower_bound = 0, upper_bound = 1,
+                         verbose = FALSE) {
+    
+    len <- length(treatment1dose)
+    assertNumeric(treatment1dose, len = len)
+    assertNumeric(treatment2dose, len = len)
+    assertNumeric(HS_1, len = len)
+    assertNumeric(HS_2, len = len)
+    assertNumeric(E_inf_1, len = len)
+    assertNumeric(E_inf_2, len = len)
+    assertNumeric(EC50_1, len = len)
+    assertNumeric(EC50_2, len = len)
+    assertNumeric(tol, len = 1)
+    assertNumeric(lower_bound, len = 1)
+    assertNumeric(upper_bound, len = 1)
+    assertLogical(verbose, len = 1)
+
     ## Find viability that minimises the distance between Loewe CI and 1
-    loewe_guess <- optimise(
-        f = .loeweLoss,
-        lower = lower_bound,
-        upper = upper_bound,
-        treatment1dose = treatment1dose,
-        HS_1 = HS_1, E_inf_1 = E_inf_1, EC50_1 = EC50_1,
-        treatment2dose = treatment2dose,
-        HS_2 = HS_2, E_inf_2 = E_inf_2, EC50_2 = EC50_2
-    )
+    if (verbose) {
+        loewe_guess <- optimise(
+            f = .loeweLoss,
+            lower = lower_bound,
+            upper = upper_bound,
+            treatment1dose = treatment1dose,
+            HS_1 = HS_1, E_inf_1 = E_inf_1, EC50_1 = EC50_1,
+            treatment2dose = treatment2dose,
+            HS_2 = HS_2, E_inf_2 = E_inf_2, EC50_2 = EC50_2
+        )
+    } else {
+        suppressWarnings({
+            loewe_guess <- optimise(
+                f = .loeweLoss,
+                lower = lower_bound,
+                upper = upper_bound,
+                treatment1dose = treatment1dose,
+                HS_1 = HS_1, E_inf_1 = E_inf_1, EC50_1 = EC50_1,
+                treatment2dose = treatment2dose,
+                HS_2 = HS_2, E_inf_2 = E_inf_2, EC50_2 = EC50_2
+            )
+        })
+    }
 
     guess_err <- loewe_guess$objective
     loewe_estimate <- loewe_guess$minimum
 
-    if(guess_err > tol)
+    if(is.nan(guess_err) | guess_err > tol)
         loewe_estimate <- NA_real_
 
     return(loewe_estimate)
@@ -181,9 +258,21 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #'   E_inf_2=0.1
 #' ))
 #'
+#' @importFrom checkmate assertNumeric
+#'
 #' @export
 computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
                        treatment2dose, HS_2, EC50_2, E_inf_2) {
+    len <- length(treatment1dose)
+    assertNumeric(treatment1dose, len = len)
+    assertNumeric(treatment2dose, len = len)
+    assertNumeric(HS_1, len = len)
+    assertNumeric(HS_2, len = len)
+    assertNumeric(E_inf_1, len = len)
+    assertNumeric(E_inf_2, len = len)
+    assertNumeric(EC50_1, len = len)
+    assertNumeric(EC50_2, len = len)
+
     y_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
     y_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
     y_zip <- y_1 * y_2
@@ -222,7 +311,7 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
 #' @export
 hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
     #(E_ninf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
-    E_inf + (( E_ninf - E_inf ) / ( 1 + ( 10^dose / 10^EC50)^(HS) ))
+    E_inf + (( E_ninf - E_inf ) / ( 1 + ( 10^dose / 10^EC50 )^(HS) ))
 }
 
 ## TODO:: If it works well for fitting 2-way Hill curves, move it to CoreGx
@@ -300,7 +389,7 @@ hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
 #' by fitting a 2-parameter dose-response curve.
 #'
 #' @param dose_to `numeric` a vector of concentrations of the drug being added to
-#' @param viability `numeric` Observed viability of two treatments; target for fitting curve.
+#' @param combo_viability `numeric` observed viability of two treatments; target for fitting curve.
 #' @param dose_add `numeric` a vector of concentrations of the drug added.
 #' @param EC50_add `numeric` relative EC50 of the drug added.
 #' @param HS_add `numeric` Hill coefficient of the drug added.
@@ -327,15 +416,25 @@ hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
 #'
 #' @importFrom CoreGx .fitCurve .reformatData
 #' @importFrom stats optimise var coef
+#' @importFrom checkmate assertNumeric assertLogical
 #' @import drc
 #'
 #' @export
-estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
+estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_add,
                                E_inf_add = 0,
                                residual = c("logcosh", "drc", "normal", "Cauchy"),
                                show_Rsqr = TRUE,
                                conc_as_log = FALSE) {
 
+    len_to <- length(dose_to)
+    assertNumeric(dose_to, len = len_to)
+    assertNumeric(viability, len = len_to)
+    assertNumeric(dose_add, len = 1)
+    assertNumeric(EC50_add, len = 1)
+    assertNumeric(HS_add, len = 1)
+    assertNumeric(E_inf_add, len = 1)
+    assertLogical(show_Rsqr, len = 1)
+    assertLogical(conc_as_log, len = 1)
     residual <- match.arg(residual)
 
     ## viability of the drug being added as the minimum baseline response
@@ -346,7 +445,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
     }
     formatted_data <- .reformatData(
         x = dose_to,
-        y = viability,
+        y = combo_viability,
         x_to_log = !conc_as_log,
         y_to_frac = FALSE, ## subject to change
         y_to_log = FALSE,
@@ -372,7 +471,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
                 lower = lower_bounds, upper = upper_bounds,
                 method = "L-BFGS-B",
                 dose_to = log_conc,
-                viability = viability,
+                viability = combo_viability,
                 E_min_proj = E_ninf_proj
             )$par
             proj_params[3] <- 10^proj_params[3]
@@ -382,7 +481,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
         drc = {
             fit <- drm(
                 viability ~ dose,
-                data = data.frame(viability = viability, dose = dose_to),
+                data = data.frame(viability = combo_viability, dose = dose_to),
                 fct = LL.4(
                     fixed = c(NA, NA, E_ninf_proj, NA),
                     names = c("HS_proj", "E_inf_proj", "E_ninf_proj", "EC50_proj")
@@ -400,7 +499,7 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
         },
         {
             proj_params <- CoreGx::.fitCurve(
-                x = log_conc, y = viability, f = function(x, par) {
+                x = log_conc, y = combo_viability, f = function(x, par) {
                     hill4Par(
                         dose = x,
                         E_ninf = E_ninf_proj,
@@ -428,14 +527,14 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
     )
 
     if (show_Rsqr) {
-        viability_hat <- hill4Par(
+        combo_viability_hat <- hill4Par(
             dose = log_conc,
             HS = proj_params[1],
             E_inf = proj_params[2],
             EC50 = log10(proj_params[3]),
             E_ninf = E_ninf_proj
         )
-        Rsqr <- 1 - (var(viability - viability_hat) / var(viability))
+        Rsqr <- 1 - (var(combo_viability - combo_viability_hat) / var(combo_viability))
         return(list(
             HS_proj = proj_params[1],
             E_inf_proj = proj_params[2],
@@ -489,16 +588,32 @@ estimateProjParams <- function(dose_to, viability, dose_add, EC50_add, HS_add,
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #'
 #' @importFrom CoreGx aggregate
+#' @importFrom checkmate assertLogical assertInt assertDataTable
 #' @import data.table
 #' @export
 fitTwowayZIP <- function(combo_profiles,
                          residual = "logcosh",
                          show_Rsqr = TRUE, nthread = 1L) {
+
+    assertDataTable(combo_profiles, min.rows = 1)
+    assertLogical(show_Rsqr, len = 1)
+    assertInt(nthread, lower = 1L)
+    required_cols <- c("treatment1id", "treatment2id",
+                       "treatment1dose", "treatment2dose",
+                       "sampleid", "combo_viability",
+                       "HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2")
+
+    has_cols <- required_cols %in% colnames(combo_profiles)
+    if (!all(has_cols))
+        stop("Missing required columns of parameters: ",
+             paste(required_cols[!has_cols], sep = ", "),
+             call. = FALSE)
+
     combo_profiles |>
         aggregate(
             estimateProjParams(
                 dose_to = treatment1dose,
-                viability = viability,
+                combo_viability = combo_viability,
                 dose_add = unique(treatment2dose),
                 EC50_add = unique(EC50_2),
                 HS_add = unique(HS_2),
@@ -515,7 +630,7 @@ fitTwowayZIP <- function(combo_profiles,
         aggregate(
             estimateProjParams(
                 dose_to = treatment2dose,
-                viability = viability,
+                combo_viability = combo_viability,
                 dose_add = unique(treatment1dose),
                 EC50_add = unique(EC50_1),
                 HS_add = unique(HS_1),
@@ -593,7 +708,7 @@ fitTwowayZIP <- function(combo_profiles,
                           cellline, add_treatment = 1, title = NULL) {
 
     required_cols <- c("treatment1id", "treatment1dose", "treatment2id", "treatment2dose",
-                       "sampleid", "viability", "HS_1", "E_inf_1", "EC50_1", "HS_2", "E_inf_2",
+                       "sampleid", "combo_viability", "HS_1", "E_inf_1", "EC50_1", "HS_2", "E_inf_2",
                        "EC50_2", "HS_proj_1_to_2", "E_inf_proj_1_to_2", "EC50_proj_1_to_2",
                        "E_ninf_proj_1_to_2", "HS_proj_2_to_1", "E_inf_proj_2_to_1",
                        "EC50_proj_2_to_1", "E_ninf_proj_2_to_1")
@@ -647,7 +762,7 @@ fitTwowayZIP <- function(combo_profiles,
             E_ninf_proj <- PharmacoGx:::.Hill(log10(dose_add), c(HS_add, E_inf_add, log10(EC50_add)))
             if (has_Rsqr[2])
                 Rsqr_2_to_1[i] <- unique(select_combo[treatment2dose == dose_add, Rsqr_2_to_1])
-            y <- select_combo[treatment2dose == dose_add, viability]
+            y <- select_combo[treatment2dose == dose_add, combo_viability]
             curve(
                 PharmacoGx::hill4Par(
                     E_ninf = E_ninf_proj,
@@ -703,7 +818,7 @@ fitTwowayZIP <- function(combo_profiles,
             dose_to <- select_combo[treatment1dose == dose_add, treatment2dose]
             if (has_Rsqr[1])
                 Rsqr_1_to_2[i] <- unique(select_combo[treatment1dose == dose_add, Rsqr_1_to_2])
-            y <- select_combo[treatment1dose == dose_add, viability]
+            y <- select_combo[treatment1dose == dose_add, combo_viability]
             curve(
                 PharmacoGx::hill4Par(
                     E_ninf = E_ninf_proj,
@@ -785,6 +900,7 @@ setGeneric(name = "computeZIPdelta",
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #'
 #' @importFrom CoreGx buildComboProfiles aggregate
+#' @importFrom checkmate assertInt
 #' @import data.table
 #' @export
 #' @docType methods
@@ -794,27 +910,22 @@ setMethod(f = "computeZIPdelta",
                                 residual = "logcosh",
                                 nthread = 1L) {
 
-    ## TODO: Handle missing argument
     if (!is.character(residual)) {
         stop("argument `residual` must be type of logical")
     } else if (length(residual) != 1) {
         stop("argument `residual` must be of length 1")
     }
 
-    if (!is.integer(nthread)) {
-        stop("argument `nthread` must be type of integer")
-    } else if (length(nthread) != 1) {
-        stop("argument `nthread` must be of length 1")
-    }
+    assertInt(nthread, lower = 1L)
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
     combo_profiles <- tryCatch({
-        buildComboProfiles(object, c("HS", "EC50", "E_inf", "ZIP", "viability"))
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
     }, warning = function(w) {
         message(paste("ZIP reference values have not been pre-computed.",
                       "They will be computed in during delta score calculation."))
-        buildComboProfiles(object, c("HS", "EC50", "E_inf", "viability"))
+        buildComboProfiles(object, c("HS", "EC50", "E_inf", "combo_viability"))
     })
     required_params <- c("HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2")
     missing_params <- !(required_params %in% colnames(combo_profiles))
@@ -901,7 +1012,7 @@ setMethod(f = "computeZIPdelta",
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
 #' @param E_inf_1 `numeric` viability produced by the maximum attainable effect of treatment 1.
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
-#' @param viability `numeric` Observed viability of the two treatments combined.
+#' @param combo_viability `numeric` observed viability of the two treatments combined.
 #' @param ZIP `numeric` pre-computed ZIP reference values.
 #'     If not provided, it will be computed during delta score calculation.
 #' @param residual `character` Method used to minimise residual in fitting curves.
@@ -922,7 +1033,7 @@ setMethod(f = "computeZIPdelta",
 #' @examples
 #' \dontrun{
 #' ## ZIP is optional. Will be recomputed if not provided.
-#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "viability"))
+#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
 #' combo_twowayFit <- fitTwowayZIP(combo_profiles)
 #' combo_twowayFit |>
 #'     aggregate(
@@ -935,7 +1046,7 @@ setMethod(f = "computeZIPdelta",
 #'             HS_1 = HS_1, HS_2 = HS_2,
 #'             EC50_1 = EC50_1, EC50_2 = EC50_2,
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-#'             viability = viability,
+#'             combo_viability = combo_viability,
 #'             ZIP = ZIP
 #'         ),
 #'         treatment1dose = treatment1dose,
@@ -949,13 +1060,28 @@ setMethod(f = "computeZIPdelta",
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #'
 #' @importFrom CoreGx aggregate
+#' @importFrom checkmate assertNumeric assertInt
 #' @import data.table
 #' @keywords internal
 #' @export
 .computeZIPdelta <- function(
     treatment1id, treatment2id, treatment1dose, treatment2dose, sampleid,
-    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, viability, ZIP = NULL,
+    HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, combo_viability, ZIP = NULL,
     residual = "logcosh", nthread = 1L) {
+
+    assertInt(nthread, lower = 1L)
+    len <- length(treatment1dose)
+    assertNumeric(treatment1dose, len = len)
+    assertNumeric(treatment2dose, len = len)
+    assertNumeric(HS_1, len = len)
+    assertNumeric(HS_2, len = len)
+    assertNumeric(E_inf_1, len = len)
+    assertNumeric(E_inf_2, len = len)
+    assertNumeric(EC50_1, len = len)
+    assertNumeric(EC50_2, len = len)
+    assertNumeric(combo_viability, len = len)
+    if (!is.null(ZIP))
+        assertNumeric(ZIP, len = len)
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
@@ -966,7 +1092,7 @@ setMethod(f = "computeZIPdelta",
         treatment1dose = treatment1dose,
         treatment2dose = treatment2dose,
         sampleid = sampleid,
-        viability = viability,
+        combo_viability = combo_viability,
         HS_1 = HS_1,
         HS_2 = HS_2,
         EC50_1 = EC50_1,
