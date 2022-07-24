@@ -11,7 +11,7 @@ estimateProjParams(
   EC50_add,
   HS_add,
   E_inf_add = 0,
-  residual = c("logcosh", "drc", "normal", "Cauchy"),
+  residual = c("logcosh", "normal", "Cauchy"),
   show_Rsqr = TRUE,
   conc_as_log = FALSE
 )

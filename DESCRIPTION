@@ -51,8 +51,7 @@ Imports:
     data.table,
     checkmate,
     boot,
-    coop,
-    drc
+    coop
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
