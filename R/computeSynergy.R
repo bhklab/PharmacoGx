@@ -420,11 +420,12 @@ hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
 #' @importFrom CoreGx .fitCurve .reformatData
 #' @importFrom stats optimise var coef
 #' @importFrom checkmate assertNumeric assertLogical
+#' @import drc
 #'
 #' @export
 estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_add,
                                E_inf_add = 0,
-                               residual = c("logcosh", "normal", "Cauchy"),
+                               residual = c("logcosh", "drc", "normal", "Cauchy"),
                                show_Rsqr = TRUE,
                                conc_as_log = FALSE) {
 
@@ -478,6 +479,26 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
             )$par
             proj_params[3] <- 10^proj_params[3]
             proj_params
+        },
+        ## For benchmarking speed and quality of fit. Will be removed in formal release
+        drc = {
+            fit <- drm(
+                viability ~ dose,
+                data = data.frame(viability = combo_viability, dose = dose_to),
+                fct = LL.4(
+                    fixed = c(NA, NA, E_ninf_proj, NA),
+                    names = c("HS_proj", "E_inf_proj", "E_ninf_proj", "EC50_proj")
+                ),
+                #logDose = 10, ## drc unstable with log concentration
+                lowerl = c(0, 0, 1e-6),
+                upperl = c(4, 1, 1e+6)
+            )
+            proj_params <- coef(fit)
+            c(
+                proj_params[grepl("HS_proj", names(proj_params))],
+                proj_params[grepl("E_inf_proj", names(proj_params))],
+                proj_params[grepl("EC50_proj", names(proj_params))]
+            )
         },
         {
             proj_params <- CoreGx::.fitCurve(
