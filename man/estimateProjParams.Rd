@@ -6,7 +6,7 @@
 \usage{
 estimateProjParams(
   dose_to,
-  viability,
+  combo_viability,
   dose_add,
   EC50_add,
   HS_add,
@@ -19,7 +19,7 @@ estimateProjParams(
 \arguments{
 \item{dose_to}{\code{numeric} a vector of concentrations of the drug being added to}
 
-\item{viability}{\code{numeric} Observed viability of two treatments; target for fitting curve.}
+\item{combo_viability}{\code{numeric} observed viability of two treatments; target for fitting curve.}
 
 \item{dose_add}{\code{numeric} a vector of concentrations of the drug added.}
 

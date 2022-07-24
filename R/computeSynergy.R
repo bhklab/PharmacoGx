@@ -21,16 +21,19 @@
 #'     that represents the sigmoidity of the curve.
 #' @param E_inf `numeric` the maximum attanable effect of a drug
 #'     when it is administered with a infinitely high concentration.
-#' @param is_pct `logical` whether both the input viabiliy and [E_inf] are given
+#' @param is_pct `logical` whether both the input viabiliy and `E_inf` are given
 #'     in percentage (\[0, 100\]) rather than decimal (\[0, 1\]). Default FALSE.
 #'
 #' @return `numeric` concentrations in micromoles required to produce
 #'     `viability` in the corresponding entries.
 #'
 #' @examples
-#' \dontrun{
-#' dose <- effectToDose(80, EC50 = 42, HS = 1, E_inf = 10, is_pct = TRUE)
-#' }
+#' dose <- effectToDose(viability = 80,
+#'                      EC50 = 42,
+#'                      HS = 1,
+#'                      E_inf = 10,
+#'                      is_pct = TRUE)
+#'
 #' @importFrom checkmate assertLogical
 #' @export
 effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
@@ -61,7 +64,7 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
 #' @param E_inf_2 `numeric` the maximum attainable effect of treatment 2.
 #' @param EC50_2 `numeric` relative EC50 of treatment 2.
-#' @param is_pct `logical` whether both the input viabiliy and [E_inf] are given
+#' @param is_pct `logical` whether both the input viabiliy and E_inf are given
 #'     in percentage (\[0, 100\]) rather than decimal (\[0, 1\]). Default FALSE.
 #'
 #' @return CI under Loewe additive definition
@@ -72,14 +75,14 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
 #'     endoaggregate(
 #'         assay="combo_viability",
 #'         Loewe = PharmacoGx::computeLoewe(
-#'             treatment1dose=treatment1dose,
-#'             treatment2dose=treatment2dose,
-#'             HS_1=HS_1,
-#'             HS_2=HS_2,
-#'             E_inf_1=E_inf_1,
-#'             E_inf_2=E_inf_2,
-#'             EC50_1=EC50_1,
-#'             EC50_2=EC50_2
+#'             treatment1dose = treatment1dose,
+#'             treatment2dose = treatment2dose,
+#'             HS_1 = HS_1,
+#'             HS_2 = HS_2,
+#'             E_inf_1 = E_inf_1,
+#'             E_inf_2 = E_inf_2,
+#'             EC50_1 = EC50_1,
+#'             EC50_2 = EC50_2
 #'         ),
 #'         by = assayKeys(tre, "combo_viability")
 #'     ) -> tre
@@ -251,11 +254,11 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
 #'
 #' @examples
 #' (zip <- computeZIP(
-#'   treatment1dose=c(0.1, 0.01, 0.001), treatment2dose=c(1, 0.1, 0.01),
-#'   HS_1=1, HS_2=1.2,
-#'   EC50_1=0.01, EC50_2=0.1,
-#'   E_inf_1=0,
-#'   E_inf_2=0.1
+#'   treatment1dose = c(0.1, 0.01, 0.001),
+#'   treatment2dose = c(1, 0.1, 0.01),
+#'   HS_1 = rep(1, 3), HS_2 = rep(1.2, 3),
+#'   EC50_1 = rep(0.01, 3), EC50_2 = rep(0.1, 3),
+#'   E_inf_1 = rep(0, 3), E_inf_2 = rep(0.1, 3)
 #' ))
 #'
 #' @importFrom checkmate assertNumeric
@@ -428,7 +431,7 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
 
     len_to <- length(dose_to)
     assertNumeric(dose_to, len = len_to)
-    assertNumeric(viability, len = len_to)
+    assertNumeric(combo_viability, len = len_to)
     assertNumeric(dose_add, len = 1)
     assertNumeric(EC50_add, len = 1)
     assertNumeric(HS_add, len = 1)
@@ -458,8 +461,8 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
 
     gritty_guess <- c(
         pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
-        pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
-        pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]),
+        pmin(pmax(min(combo_viability), lower_bounds[2]), upper_bounds[2]),
+        pmin(pmax(log_conc[which.min(abs(combo_viability - 1/2))], lower_bounds[3]),
              upper_bounds[3])
     )
     proj_params <- switch(
@@ -888,6 +891,8 @@ setGeneric(name = "computeZIPdelta",
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
+#' @param show_Rsqr `logical` Whether to show the 2-way curve fitting quality in the result.
+#'     Default FALSE.
 #'
 #' @return [TreatmentResponseExperiment] with assay `combo_scores` containing `delta_scores`
 #'
@@ -900,7 +905,7 @@ setGeneric(name = "computeZIPdelta",
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #'
 #' @importFrom CoreGx buildComboProfiles aggregate
-#' @importFrom checkmate assertInt
+#' @importFrom checkmate assertInt assertLogical
 #' @import data.table
 #' @export
 #' @docType methods
@@ -908,7 +913,8 @@ setMethod(f = "computeZIPdelta",
           signature = signature(object = "TreatmentResponseExperiment"),
           definition = function(object,
                                 residual = "logcosh",
-                                nthread = 1L) {
+                                nthread = 1L,
+                                show_Rsqr = FALSE) {
 
     if (!is.character(residual)) {
         stop("argument `residual` must be type of logical")
@@ -917,6 +923,7 @@ setMethod(f = "computeZIPdelta",
     }
 
     assertInt(nthread, lower = 1L)
+    assertLogical(show_Rsqr, len = 1)
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
@@ -939,44 +946,90 @@ setMethod(f = "computeZIPdelta",
         setkeyv(combo_ZIP, combo_keys)
     }
 
-    combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
+    combo_twowayFit <- fitTwowayZIP(combo_profiles = combo_profiles,
+                                    residual = residual,
+                                    nthread = nthread,
+                                    show_Rsqr = show_Rsqr)
     setkeyv(combo_twowayFit, combo_keys)
     if (has_ZIP) {
         combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
-        combo_twowayFit |>
-            aggregate(
-                delta_score = .deltaScore(
-                    EC50_1_to_2 = EC50_proj_1_to_2,
-                    EC50_2_to_1 = EC50_proj_2_to_1,
-                    EC50_1 = EC50_1, EC50_2 = EC50_2,
-                    HS_1_to_2 = HS_proj_1_to_2,
-                    HS_2_to_1 = HS_proj_2_to_1,
-                    HS_1 = HS_1, HS_2 = HS_2,
-                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                    treatment1dose = treatment1dose,
-                    treatment2dose = treatment2dose,
-                    ZIP = ZIP
-                ),
-                by = combo_keys,
-                nthread = nthread
-            ) -> delta_scores
+        if (show_Rsqr) {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose,
+                        ZIP = ZIP
+                    ),
+                    delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+                    delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        } else {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose,
+                        ZIP = ZIP
+                    ),
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        }
     } else {
-        combo_twowayFit |>
-            aggregate(
-                delta_score = .deltaScore(
-                    EC50_1_to_2 = EC50_proj_1_to_2,
-                    EC50_2_to_1 = EC50_proj_2_to_1,
-                    EC50_1 = EC50_1, EC50_2 = EC50_2,
-                    HS_1_to_2 = HS_proj_1_to_2,
-                    HS_2_to_1 = HS_proj_2_to_1,
-                    HS_1 = HS_1, HS_2 = HS_2,
-                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                    treatment1dose = treatment1dose,
-                    treatment2dose = treatment2dose
-                ),
-                by = combo_keys,
-                nthread = nthread
-            ) -> delta_scores
+        if (show_Rsqr) {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose
+                    ),
+                    delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+                    delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        } else {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose
+                    ),
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        }
     }
     setkeyv(delta_scores, combo_keys)
     ## Add delta scores to combo_scores in input TRE
@@ -1027,6 +1080,8 @@ setMethod(f = "computeZIPdelta",
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param nthread `integer` Number of cores used to perform computation.
 #'     Default 1.
+#' @param show_Rsqr `logical` Whether to show the 2-way curve fitting quality in the result.
+#'     Default FALSE.
 #'
 #' @return `numeric` delta scores of every dose combinations for any given treatment combinations.
 #'
@@ -1034,8 +1089,7 @@ setMethod(f = "computeZIPdelta",
 #' \dontrun{
 #' ## ZIP is optional. Will be recomputed if not provided.
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
-#' combo_twowayFit <- fitTwowayZIP(combo_profiles)
-#' combo_twowayFit |>
+#' combo_profiles |>
 #'     aggregate(
 #'         delta_score = .computeZIPdelta(
 #'             treatment1id = treatment1id,
@@ -1047,29 +1101,32 @@ setMethod(f = "computeZIPdelta",
 #'             EC50_1 = EC50_1, EC50_2 = EC50_2,
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
 #'             combo_viability = combo_viability,
-#'             ZIP = ZIP
+#'             ZIP = ZIP,
+#'             nthread = nthread,
+#'             show_Rsqr = show_Rsqr
 #'         ),
 #'         treatment1dose = treatment1dose,
 #'         treatment2dose = treatment2dose,
-#'         moreArgs = list(residual = "Cauchy"),
+#'         moreArgs = list(nthread = 2, show_Rsqr = TRUE),
 #'         by = c("treatment1id", "treatment2id", "sampleid")
-#'     )
+#'     ) -> delta_scores
 #' }
 #'
 #' @references
 #' Yadav, B., Wennerberg, K., Aittokallio, T., & Tang, J. (2015). Searching for Drug Synergy in Complex Dose–Response Landscapes Using an Interaction Potency Model. Computational and Structural Biotechnology Journal, 13, 504–513. https://doi.org/10.1016/j.csbj.2015.09.001
 #'
 #' @importFrom CoreGx aggregate
-#' @importFrom checkmate assertNumeric assertInt
+#' @importFrom checkmate assertNumeric assertInt assertLogical
 #' @import data.table
 #' @keywords internal
 #' @export
 .computeZIPdelta <- function(
     treatment1id, treatment2id, treatment1dose, treatment2dose, sampleid,
     HS_1, HS_2, EC50_1, EC50_2, E_inf_1, E_inf_2, combo_viability, ZIP = NULL,
-    residual = "logcosh", nthread = 1L) {
+    residual = "logcosh", nthread = 1L, show_Rsqr = FALSE) {
 
     assertInt(nthread, lower = 1L)
+    assertLogical(show_Rsqr, len = 1)
     len <- length(treatment1dose)
     assertNumeric(treatment1dose, len = len)
     assertNumeric(treatment2dose, len = len)
@@ -1113,44 +1170,90 @@ setMethod(f = "computeZIPdelta",
         setkeyv(combo_ZIP, combo_keys)
     }
 
-    combo_twowayFit <- fitTwowayZIP(combo_profiles, residual, nthread)
+    combo_twowayFit <- fitTwowayZIP(combo_profiles = combo_profiles,
+                                    residual = residual,
+                                    nthread = nthread,
+                                    show_Rsqr = show_Rsqr)
     setkeyv(combo_twowayFit, combo_keys)
     if (is.null(ZIP)) {
-        combo_twowayFit |>
-            aggregate(
-                delta_score = .deltaScore(
-                    EC50_1_to_2 = EC50_proj_1_to_2,
-                    EC50_2_to_1 = EC50_proj_2_to_1,
-                    EC50_1 = EC50_1, EC50_2 = EC50_2,
-                    HS_1_to_2 = HS_proj_1_to_2,
-                    HS_2_to_1 = HS_proj_2_to_1,
-                    HS_1 = HS_1, HS_2 = HS_2,
-                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                    treatment1dose = treatment1dose,
-                    treatment2dose = treatment2dose
-                ),
-                by = combo_keys,
-                nthread = nthread
-            ) -> delta_scores
+        if (show_Rsqr) {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose
+                    ),
+                    delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+                    delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        } else {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose
+                    ),
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        }
     } else {
         combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
-        combo_twowayFit |>
-            aggregate(
-                delta_score = .deltaScore(
-                    EC50_1_to_2 = EC50_proj_1_to_2,
-                    EC50_2_to_1 = EC50_proj_2_to_1,
-                    EC50_1 = EC50_1, EC50_2 = EC50_2,
-                    HS_1_to_2 = HS_proj_1_to_2,
-                    HS_2_to_1 = HS_proj_2_to_1,
-                    HS_1 = HS_1, HS_2 = HS_2,
-                    E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-                    treatment1dose = treatment1dose,
-                    treatment2dose = treatment2dose,
-                    ZIP = ZIP
-                ),
-                by = combo_keys,
-                nthread = nthread
-            ) -> delta_scores
+        if (show_Rsqr) {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose,
+                        ZIP = ZIP
+                    ),
+                    delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+                    delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        } else {
+            combo_twowayFit |>
+                aggregate(
+                    delta_score = .deltaScore(
+                        EC50_1_to_2 = EC50_proj_1_to_2,
+                        EC50_2_to_1 = EC50_proj_2_to_1,
+                        EC50_1 = EC50_1, EC50_2 = EC50_2,
+                        HS_1_to_2 = HS_proj_1_to_2,
+                        HS_2_to_1 = HS_proj_2_to_1,
+                        HS_1 = HS_1, HS_2 = HS_2,
+                        E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        treatment1dose = treatment1dose,
+                        treatment2dose = treatment2dose,
+                        ZIP = ZIP
+                    ),
+                    by = combo_keys,
+                    nthread = nthread
+                ) -> delta_scores
+        }
     }
 
     return(delta_scores$delta_score)

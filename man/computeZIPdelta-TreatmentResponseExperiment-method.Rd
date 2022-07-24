@@ -5,7 +5,7 @@
 \alias{computeZIPdelta,TreatmentResponseExperiment-method}
 \title{Compute ZIP delta score}
 \usage{
-\S4method{computeZIPdelta}{TreatmentResponseExperiment}(object, residual = "logcosh", nthread = 1L)
+\S4method{computeZIPdelta}{TreatmentResponseExperiment}(object, residual = "logcosh", nthread = 1L, show_Rsqr = FALSE)
 }
 \arguments{
 \item{object}{\link{TreatmentResponseExperiment}
@@ -25,6 +25,9 @@ considering the truncated probability distribution (as in their names) for the r
 
 \item{nthread}{\code{integer} Number of cores used to perform computation.
 Default 1.}
+
+\item{show_Rsqr}{\code{logical} Whether to show the 2-way curve fitting quality in the result.
+Default FALSE.}
 }
 \value{
 \link{TreatmentResponseExperiment} with assay \code{combo_scores} containing \code{delta_scores}

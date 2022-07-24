@@ -13,9 +13,10 @@ computeLoewe(
   HS_2,
   E_inf_2,
   EC50_2,
-  tol = 0.5,
+  tol = 0.1,
   lower_bound = 0,
-  upper_bound = 1
+  upper_bound = 1,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -35,11 +36,13 @@ computeLoewe(
 
 \item{EC50_2}{\code{numeric} relative EC50 of treatment 2.}
 
-\item{tol}{\code{numeric} Error tolerance for deviations from Loewe assumption. Loewe predictions with error higher than \code{tol} will be returned as \code{NA}. Deafult 0.5.}
+\item{tol}{\code{numeric} Error tolerance for deviations from Loewe assumption. Loewe predictions with error higher than \code{tol} will be returned as \code{NA}. Deafult 0.1.}
 
 \item{lower_bound}{\code{numeric} Lowest possible value for Loewe expected viability. Default 0.}
 
 \item{upper_bound}{\code{numeric} Highest possible value for Loewe expected viability. Default 1.}
+
+\item{verbose}{\code{logical} whether to display warning messages. Default \code{FALSE}.}
 }
 \value{
 \code{numeric} expected viability under Loewe additive null assumption.
@@ -49,6 +52,22 @@ Predict the response of a treatment combination under
 the Loewe additive null assumption.
 }
 \examples{
-print("TODO::")
+\dontrun{
+tre |>
+    endoaggregate(
+        assay="combo_viability",
+        Loewe = computeLoewe(
+            treatment1dose=treatment1dose,
+            treatment2dose=treatment2dose,
+            HS_1=HS_1,
+            HS_2=HS_2,
+            E_inf_1=E_inf_1,
+            E_inf_2=E_inf_2,
+            EC50_1=EC50_1,
+            EC50_2=EC50_2
+        ),
+        by = assayKeys(tre, "combo_viability")
+    ) -> tre
+}
 
 }
