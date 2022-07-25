@@ -1068,9 +1068,8 @@ setMethod(f = "computeZIPdelta",
 #' \dontrun{
 #' ## ZIP is optional. Will be recomputed if not provided.
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
-#' combo_profiles |>
-#'     aggregate(
-#'         delta_score = .computeZIPdelta(
+#' combo_profiles[,
+#'         .computeZIPdelta(
 #'             treatment1id = treatment1id,
 #'             treatment2id = treatment2id,
 #'             treatment1dose = treatment1dose,
@@ -1081,14 +1080,10 @@ setMethod(f = "computeZIPdelta",
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
 #'             combo_viability = combo_viability,
 #'             ZIP = ZIP,
-#'             nthread = nthread,
-#'             show_Rsqr = show_Rsqr
-#'         ),
-#'         treatment1dose = treatment1dose,
-#'         treatment2dose = treatment2dose,
-#'         moreArgs = list(nthread = 2, show_Rsqr = TRUE),
-#'         by = c("treatment1id", "treatment2id", "sampleid")
-#'     ) -> delta_scores
+#'             nthread = 4,
+#'             show_Rsqr = TRUE
+#'         )
+#'     ] -> delta_scores
 #' }
 #'
 #' @references
@@ -1234,8 +1229,14 @@ setMethod(f = "computeZIPdelta",
                 ) -> delta_scores
         }
     }
-
-    return(delta_scores$delta_score)
+    if (show_Rsqr) {
+        return(as.list(delta_scores[,
+            c(combo_keys, "delta_score", "delta_Rsqr_1_to_2", "delta_Rsqr_2_to_1"),
+            with = FALSE
+        ]))
+    } else {
+        return(as.list(delta_scores[, c(combo_keys, "delta_score"), with = FALSE]))
+    }
 }
 
 

@@ -79,9 +79,8 @@ See reference for details.
 \dontrun{
 ## ZIP is optional. Will be recomputed if not provided.
 combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
-combo_profiles |>
-    aggregate(
-        delta_score = .computeZIPdelta(
+combo_profiles[,
+        .computeZIPdelta(
             treatment1id = treatment1id,
             treatment2id = treatment2id,
             treatment1dose = treatment1dose,
@@ -92,14 +91,10 @@ combo_profiles |>
             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
             combo_viability = combo_viability,
             ZIP = ZIP,
-            nthread = nthread,
-            show_Rsqr = show_Rsqr
-        ),
-        treatment1dose = treatment1dose,
-        treatment2dose = treatment2dose,
-        moreArgs = list(nthread = 2, show_Rsqr = TRUE),
-        by = c("treatment1id", "treatment2id", "sampleid")
-    ) -> delta_scores
+            nthread = 4,
+            show_Rsqr = TRUE
+        )
+    ] -> delta_scores
 }
 
 }
