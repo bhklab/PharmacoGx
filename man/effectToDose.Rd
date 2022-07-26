@@ -8,7 +8,8 @@ effectToDose(viability, EC50, HS, E_inf, is_pct = FALSE)
 }
 \arguments{
 \item{viability}{\code{numeric} is a vector whose entries are the viability values
-in the range [0, 1].}
+in the range [0, 1] if \code{is_pct} is \code{FALSE} or [0, 100] if it is
+\code{TRUE}.}
 
 \item{EC50}{\code{numeric} is a vector of relative EC50 for drug-response equation.}
 
@@ -28,7 +29,7 @@ in percentage ([0, 100]) rather than decimal ([0, 1]). Default FALSE.}
 \description{
 For the dose-response Hill equation of a drug defined by
 \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
-that computes the response in viability from a dose in micromole fir a drug,
+that computes the response in viability from a dose in micromole for a drug,
 this function is the inverse function of the Hill curve that
 computes the dose required to produce a given response:
 \eqn{
