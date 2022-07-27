@@ -5,7 +5,7 @@
 #' @description
 #' For the dose-response Hill equation of a drug defined by
 #' \eqn{E(x) = E_{inf}+\frac{1-E_{inf}}{1+(\frac{x}{EC50})^(\frac{1}{HS})}},
-#' that computes the response in viability from a dose in micromole fir a drug,
+#' that computes the response in viability from a dose in micromole for a drug,
 #' this function is the inverse function of the Hill curve that
 #' computes the dose required to produce a given response:
 #' \eqn{
@@ -15,7 +15,8 @@
 #' }
 #'
 #' @param viability `numeric` is a vector whose entries are the viability values
-#'     in the range \[0, 1\].
+#'     in the range \[0, 1\] if `is_pct` is `FALSE` or \[0, 100\] if it is
+#'     `TRUE`.
 #' @param EC50 `numeric` is a vector of relative EC50 for drug-response equation.
 #' @param HS `numeric` Hill coefficient of the drug-response equation
 #'     that represents the sigmoidity of the curve.
@@ -175,13 +176,12 @@ loeweCI <- function(viability,
 #' }
 #'
 #' @importFrom stats optimise
-
 #' @importFrom checkmate assertNumeric assertLogical
 computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
                          treatment2dose, HS_2, E_inf_2, EC50_2,
                          tol = 0.1, lower_bound = 0, upper_bound = 1,
                          verbose = FALSE) {
-    
+
     len <- length(treatment1dose)
     assertNumeric(treatment1dose, len = len)
     assertNumeric(treatment2dose, len = len)
@@ -282,28 +282,50 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
     return(y_zip)
 }
 
-#' @title Predict viability from a 4-paramter Hill curve
+#' @title 4-Parameter Hill Equation for Stimuli-Response Curves
 #'
 #' @description
-#' Viability predicted by 4-parameter logistic regression.
+#' Sigmoidal function which fits well to many stimuli-response associations
+#' observed in biology and pharmacology. In the context of PharmacoGx we
+#' are using it to model treatment-response assocations in cancer cell lines.
 #'
-#' @param dose `numeric` a vector of concentrations of the treatment in `log10` scale.
-#' @param HS `numeric` Hill coefficient characterised by cooperativity and molecularity of
-#'     ligand-receptor binding of the treatment.
-#' @param EC50 `numeric` potency of the treatment in `log10` scale;
-#'     the concentration necessary to cause half of the treatment efficacy.
-#' @param E_inf `numeric` efficacy of the treatment;
-#'     viability produced by the maximum effect of the treatment.
-#' @param E_ninf `numeric` cellular viability under
-#'     the effect of the treatment at the minimum dose level.
-#'     In predicting monotherapeutic viability,
-#'     a sensible `E_ninf` should be the negative control value of 1.
+#' @param dose `numeric()` A vector of `log10(dose)` values (or equivalent for
+#' the stimuli being modelleled).
+#' @param EC50 `numeric(1)` The dose required to produce 50% of the
+#' theoretically maximal response in the system, `E_inf`. Should be in the same
+#' units as `dose`!
+#' @param HS `numeric(1)` Hill coefficient (n) which defines the slope of the
+#' dose-response curve at the mid-point. This parameter describes the degree
+#' of sigmoidicity of the Hill curve. HS = 1 corresponds to the rectangular
+#' hyperbola in dose-response space.
+#' @param E_inf `numeric(1)` Theoretical maximal response (minimal viability)
+#' in the system as a proportion in the range \\[0, 1\\]. Note that since we are
+#' predicting viability (percent of cells alive after treatment) instead of
+#' response, this value should be low (i.e., more cell killing).
+#' @param E_ninf `numeric(1)` Theoretical minimum response (basal response).
+#' Defaults to 1, which should be the case for most viability experiments since
+#' we expect no cell killing to occur prior to applying a treatment.
 #'
-#' @return `numeric` predicted cellular viability values of the treatment
-#'     given `dose` administered respectively.
+#' @return `numeric()` Vector of predicted viabilities for the Hill curve defined
+#' by `EC50`, `E_inf`, `E_ninf` and `HS` for each supplied value of `dose`.
+#'
+#' @references
+#' Gesztelyi, R., Zsuga, J., Kemeny-Beke, A., Varga, B., Juhasz, B., &
+#' Tosaki, A. (2012). The Hill equation and the origin of quantitative
+#' pharmacology. Archive for History of Exact Sciences, 66(4), 427–438.
+#' https://doi.org/10.1007/s00407-012-0098-5
+#'
+#' Motulsky, H., & Christopoulos, A. (2004). Fitting models to biological data
+#' using linear and nonlinear regression: A practical guide to curve fitting.
+#' Oxford University Press. See Chapter 41.
+#'
+#' @author
+#' Feifei Li
+#' Petr Smirnov
+#' Christopher Eeles
 #'
 #' @examples
-#' (viability <- hill4Par(
+#' (viability <- hillCurve(
 #'   dose=c(0.1, 0.01, 0.001),
 #'   HS=1.1,
 #'   EC50=0.01,
@@ -312,8 +334,7 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
 #' ))
 #'
 #' @export
-hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
-    #(E_ninf + E_inf * ( ( 10^dose / 10^EC50 )^HS) ) / (1 + ( 10^dose / 10^EC50 )^(HS))
+hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
     E_inf + (( E_ninf - E_inf ) / ( 1 + ( 10^dose / 10^EC50 )^(HS) ))
 }
 
@@ -363,7 +384,7 @@ hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
 .fitProjParamsLoss <- function(par, dose_to, viability, E_min_proj) {
     ## Old L2 Loss, not robust
     #norm(
-    #     hill4Par(
+    #     hillCurve(
     #        dose = dose_to,
     #        E_ninf = E_min_proj,
     #        HS = par[1],
@@ -373,7 +394,7 @@ hill4Par <- function(dose, HS, E_ninf, E_inf, EC50) {
     #)
     sum(
         .logcosh(
-             hill4Par(
+             hillCurve(
                 dose = dose_to,
                 E_ninf = E_min_proj,
                 HS = par[1],
@@ -503,7 +524,7 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
         {
             proj_params <- CoreGx::.fitCurve(
                 x = log_conc, y = combo_viability, f = function(x, par) {
-                    hill4Par(
+                    hillCurve(
                         dose = x,
                         E_ninf = E_ninf_proj,
                         HS = par[1],
@@ -530,7 +551,7 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
     )
 
     if (show_Rsqr) {
-        combo_viability_hat <- hill4Par(
+        combo_viability_hat <- hillCurve(
             dose = log_conc,
             HS = proj_params[1],
             E_inf = proj_params[2],
@@ -767,7 +788,7 @@ fitTwowayZIP <- function(combo_profiles,
                 Rsqr_2_to_1[i] <- unique(select_combo[treatment2dose == dose_add, Rsqr_2_to_1])
             y <- select_combo[treatment2dose == dose_add, combo_viability]
             curve(
-                PharmacoGx::hill4Par(
+                PharmacoGx::hillCurve(
                     E_ninf = E_ninf_proj,
                     E_inf = E_inf_proj,
                     HS = HS_proj,
@@ -823,7 +844,7 @@ fitTwowayZIP <- function(combo_profiles,
                 Rsqr_1_to_2[i] <- unique(select_combo[treatment1dose == dose_add, Rsqr_1_to_2])
             y <- select_combo[treatment1dose == dose_add, combo_viability]
             curve(
-                PharmacoGx::hill4Par(
+                PharmacoGx::hillCurve(
                     E_ninf = E_ninf_proj,
                     E_inf = E_inf_proj,
                     HS = HS_proj,
@@ -1042,7 +1063,7 @@ setMethod(f = "computeZIPdelta",
         ## create a new combo_score assay and save delta scores
         object$combo_scores <- delta_scores
     } else {
-        object$combo_scores <- combo_scores[delta_scores,, on = combo_keys]
+        object$combo_scores <- combo_scores[delta_scores, , on = combo_keys]
     }
 
     return(object)
@@ -1089,9 +1110,8 @@ setMethod(f = "computeZIPdelta",
 #' \dontrun{
 #' ## ZIP is optional. Will be recomputed if not provided.
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
-#' combo_profiles |>
-#'     aggregate(
-#'         delta_score = .computeZIPdelta(
+#' combo_profiles[,
+#'         .computeZIPdelta(
 #'             treatment1id = treatment1id,
 #'             treatment2id = treatment2id,
 #'             treatment1dose = treatment1dose,
@@ -1102,14 +1122,10 @@ setMethod(f = "computeZIPdelta",
 #'             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
 #'             combo_viability = combo_viability,
 #'             ZIP = ZIP,
-#'             nthread = nthread,
-#'             show_Rsqr = show_Rsqr
-#'         ),
-#'         treatment1dose = treatment1dose,
-#'         treatment2dose = treatment2dose,
-#'         moreArgs = list(nthread = 2, show_Rsqr = TRUE),
-#'         by = c("treatment1id", "treatment2id", "sampleid")
-#'     ) -> delta_scores
+#'             nthread = 4,
+#'             show_Rsqr = TRUE
+#'         )
+#'     ] -> delta_scores
 #' }
 #'
 #' @references
@@ -1255,8 +1271,14 @@ setMethod(f = "computeZIPdelta",
                 ) -> delta_scores
         }
     }
-
-    return(delta_scores$delta_score)
+    if (show_Rsqr) {
+        return(as.list(delta_scores[,
+            c(combo_keys, "delta_score", "delta_Rsqr_1_to_2", "delta_Rsqr_2_to_1"),
+            with = FALSE
+        ]))
+    } else {
+        return(as.list(delta_scores[, c(combo_keys, "delta_score"), with = FALSE]))
+    }
 }
 
 

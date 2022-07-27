@@ -1,5 +1,15 @@
 # Package Release News
 
+# 3.1.4
+- Modified downloadPSet function to automatically update the PharmacoSet class structure and resave the updated object after download
+- This work around is necessary until we can rerun our data engineering pipelines to regenerate all of our PharmacoSet using the 3.1.0 package updates
+- Added a number of additional methods for computing drug synergy metrics
+
+# 3.1.1
+## 3.1.0
+- Update to slot names "cell" -> "sample" and "drug" -> "treatment"
+- Update standardized identifier column names to match the above slot nomenclature: "cellid" -> "sampleid", "drugid" -> "treatmentid"
+
 ## 2.5.3
 - Added PharmacoSet2 constructor to allow creation of PSets with updated class definition introducted in BioC 3.13
 - The sensitivity slot is now required to be a TreatmentResponseExperiment
