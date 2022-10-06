@@ -969,6 +969,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose,
                         ZIP = ZIP
@@ -989,6 +991,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose,
                         ZIP = ZIP
@@ -1009,6 +1013,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose
                     ),
@@ -1028,6 +1034,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose
                     ),
@@ -1187,6 +1195,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose
                     ),
@@ -1206,6 +1216,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose
                     ),
@@ -1226,6 +1238,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose,
                         ZIP = ZIP
@@ -1246,6 +1260,8 @@ setMethod(f = "computeZIPdelta",
                         HS_2_to_1 = HS_proj_2_to_1,
                         HS_1 = HS_1, HS_2 = HS_2,
                         E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
+                        E_inf_2_to_1 = E_inf_proj_2_to_1,
+                        E_inf_1_to_2 = E_inf_proj_1_to_2,
                         treatment1dose = treatment1dose,
                         treatment2dose = treatment2dose,
                         ZIP = ZIP
@@ -1282,6 +1298,10 @@ setMethod(f = "computeZIPdelta",
 #'     after adding treatment 2.
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param HS_2 `numeric` Hill coefficient of treatment 2
+#' @param E_inf_2_to_1 `numeric` projected maximum attainable effect of
+#'     adding treatment 2 to treatment 1.
+#' @param E_inf_1_to_2 `numeric` projected maximum attainable effect of
+#'     adding treatment 1 to treatment 2.
 #' @param E_inf_1 `numeric` viability produced by the maximum attainable effect of treatment 1.
 #' @param E_inf_2 `numeric` viability produced by the maximum attainable effect of treatment 2.
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
@@ -1297,25 +1317,26 @@ setMethod(f = "computeZIPdelta",
 #' @export
 .deltaScore <- function(EC50_1_to_2, EC50_2_to_1, EC50_1, EC50_2,
                         HS_1_to_2, HS_2_to_1, HS_1, HS_2,
-                        E_inf_1, E_inf_2, treatment1dose, treatment2dose,
-                        ZIP = NULL) {
-    E_min <- 1 ## 3-parameter case; subject to change
-    ## TODO: choose scale of E_inf based on default setting
-    E_inf_1 <- E_inf_1 / 100
-    E_inf_2 <- E_inf_2 / 100
+                        E_inf_2_to_1, E_inf_1_to_2, E_inf_1, E_inf_2,
+                        treatment1dose, treatment2dose, ZIP = NULL) {
+
     viability_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
     viability_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
-    viability_2_to_1 <- (
-        viability_2 + E_inf_1*(treatment1dose/EC50_2_to_1)^(HS_2_to_1)
-        ) / (
-        1 + (treatment1dose/EC50_2_to_1)^(HS_2_to_1)
+    viability_2_to_1 <- hillCurve(
+        dose = treatment1dose,
+        HS = HS_2_to_1,
+        EC50 = EC50_2_to_1,
+        E_ninf = viability_2,
+        E_inf = E_inf_2_to_1
     )
-    viability_1_to_2 <- (
-        viability_1 + E_inf_2*(treatment2dose/EC50_1_to_2)^(HS_1_to_2)
-        ) / (
-        1 + (treatment2dose/EC50_1_to_2)^(HS_1_to_2)
+    viability_1_to_2 <- hillCurve(
+        dose = treatment2dose,
+        HS = HS_1_to_2,
+        EC50 = EC50_1_to_2,
+        E_ninf = viability_1,
+        E_inf = E_inf_1_to_2
     )
-    ## FIXME: avoid re-calculating ZIP references
+    ## avoid re-calculating ZIP references
     if (is.null(ZIP)) {
         viability_ZIP <- computeZIP(treatment1dose = treatment1dose,
                                     treatment2dose = treatment2dose,
