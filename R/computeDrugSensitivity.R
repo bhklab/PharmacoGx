@@ -39,7 +39,7 @@
 
     for (study in names(pSets)) {
         auc_recomputed_star <- unlist(
-            bplapply(rownames(sensitivityRaw(pSets[[study]])), 
+            bplapply(rownames(sensitivityRaw(pSets[[study]])),
                 FUN=function(experiment, exps, study, dataset, area.type) {
                     if (!experiment %in% exps[,study]) return(NA_real_)
                     return(computeAUC(
@@ -94,7 +94,7 @@
                 if (any(is.na(pars[[exp]]))) {
                     NA
                 } else{
-                    computeAUC(concentration=raw.sensitivity[exp, , "Dose"], 
+                    computeAUC(concentration=raw.sensitivity[exp, , "Dose"],
                         Hill_fit=pars[[exp]], trunc=trunc, conc_as_log=FALSE,
                         viability_as_pct=TRUE)
                 }
@@ -117,8 +117,8 @@
                     NA
                 } else {
                     logLogisticRegression(
-                        raw.sensitivity[exp, , "Dose"], 
-                        raw.sensitivity[exp, , "Viability"], 
+                        raw.sensitivity[exp, , "Dose"],
+                        raw.sensitivity[exp, , "Viability"],
                         trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE,
                         family=family, scale=scale, median_n=n)
                 }
@@ -133,20 +133,20 @@
                     NA
                 } else{
                     computeAUC(
-                        concentration=raw.sensitivity[exp, , "Dose"], 
+                        concentration=raw.sensitivity[exp, , "Dose"],
                         Hill_fit=pars[[exp]],
                         trunc=trunc, conc_as_log=FALSE, viability_as_pct=TRUE)
                 }
             },
-            raw.sensitivity=raw.sensitivity, pars=pars, trunc=trunc, 
+            raw.sensitivity=raw.sensitivity, pars=pars, trunc=trunc,
             mc.cores=nthread
         ))
-        IC50 <- unlist(parallel::mclapply(names(pars), 
+        IC50 <- unlist(parallel::mclapply(names(pars),
             FUN=function(exp, pars, trunc) {
                 if(any(is.na(pars[[exp]]))) {
                     NA
                 } else{
-                    computeIC50(Hill_fit=pars[[exp]], trunc=trunc, 
+                    computeIC50(Hill_fit=pars[[exp]], trunc=trunc,
                         conc_as_log=FALSE, viability_as_pct=TRUE)
                 }
             }, pars=pars, trunc=trunc, mc.cores=nthread
@@ -159,15 +159,15 @@
 }
 
 
-## This function computes intersected concentration range between a list of 
+## This function computes intersected concentration range between a list of
 ## concentration ranges
 .getCommonConcentrationRange <- function(doses) {
     min.dose <- 0
     max.dose <- 10^100
     for (i in seq_len(length(doses))) {
-        min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm=TRUE), 
+        min.dose <- max(min.dose, min(as.numeric(doses[[i]]), na.rm=TRUE),
             na.rm=TRUE)
-        max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm=TRUE), 
+        max.dose <- min(max.dose, max(as.numeric(doses[[i]]), na.rm=TRUE),
             na.rm=TRUE)
     }
     common.ranges <- list()
@@ -191,7 +191,7 @@
 ## calculate residual of fit
 ## FIXME:: Why is this different from CoreGx?
 #' @importFrom CoreGx .dmedncauchys .dmednnormals .edmednnormals .edmedncauchys
-.residual<-function(x, y, n, pars, scale=0.07, family=c("normal", "Cauchy"), 
+.residual <- function(x, y, n, pars, scale=0.07, family=c("normal", "Cauchy"),
         trunc=FALSE) {
     family <- match.arg(family)
     Cauchy_flag=(family == "Cauchy")
@@ -206,8 +206,8 @@
 
             # For up truncated, integrate the cauchy dist up until -
             #>because anything less gets truncated to 0, and thus the residual
-            #>is -diff, and the prob function becomes discrete For 
-            #>down_truncated, 1-cdf(diffs)=cdf(-diffs) 
+            #>is -diff, and the prob function becomes discrete For
+            #>down_truncated, 1-cdf(diffs)=cdf(-diffs)
             return(
                 sum(-log(.dmednnormals(diffs[!(down_truncated | up_truncated)],
                     n, scale))) +
@@ -215,23 +215,23 @@
                     n, scale)))
             )
 
-        }       
+        }
     } else {
         diffs <- .Hill(x, pars) - y
         if (trunc == FALSE) {
             return(sum(-log(.dmedncauchys(diffs, n, scale))))
         } else {
             down_truncated <- abs(y) >= 1
-            up_truncated <- abs(y) <= 0   
-            # For up truncated, integrate the cauchy dist up until -diff because 
+            up_truncated <- abs(y) <= 0
+            # For up truncated, integrate the cauchy dist up until -diff because
             #> anything less gets truncated to 0, and thus the residual is -diff,
-            #>and the prob function becomes discrete For down_truncated, 
-            #>1 - cdf(diffs) = cdf(-diffs)   
+            #>and the prob function becomes discrete For down_truncated,
+            #>1 - cdf(diffs) = cdf(-diffs)
             return(
-                sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], 
-                    n, scale))) + 
-                sum(-log(.edmedncauchys(-diffs[up_truncated | down_truncated], 
-                    n, scale))))  
+                sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)],
+                    n, scale))) +
+                sum(-log(.edmedncauchys(-diffs[up_truncated | down_truncated],
+                    n, scale))))
         }
     }
 }
@@ -247,28 +247,28 @@
         upper_bounds[3]))
     guess_residual <- .residual(log_conc, viability, pars=guess, n=n,
         scale=scale, family=family, trunc=trunc)
-    for (i in seq(from=lower_bounds[1], to=upper_bounds[1], 
+    for (i in seq(from=lower_bounds[1], to=upper_bounds[1],
             by=1 / density[1])) {
-        for (j in seq(from=lower_bounds[2], to=upper_bounds[2], 
+        for (j in seq(from=lower_bounds[2], to=upper_bounds[2],
                 by=1 / density[2])) {
-            for (k in seq(from=lower_bounds[3], to=upper_bounds[3], 
+            for (k in seq(from=lower_bounds[3], to=upper_bounds[3],
                     by=1 / density[3])) {
-                test_guess_residual <- .residual(log_conc, viability, 
-                    pars=c(i, j, k), n=n, scale=scale, family=family, 
+                test_guess_residual <- .residual(log_conc, viability,
+                    pars=c(i, j, k), n=n, scale=scale, family=family,
                     trunc=trunc)
                 if (!is.finite(test_guess_residual)) {
-                    warning(paste0(" Test Guess Residual is: ", 
-                        test_guess_residual, "\n Other Pars: log_conc: ", 
-                        paste(log_conc, collapse=", "), "\n Viability: ", 
-                        paste(viability, collapse=", "), "\n Scale: ", scale, 
+                    warning(paste0(" Test Guess Residual is: ",
+                        test_guess_residual, "\n Other Pars: log_conc: ",
+                        paste(log_conc, collapse=", "), "\n Viability: ",
+                        paste(viability, collapse=", "), "\n Scale: ", scale,
                         "\n Family: ", family, "\n Trunc ", trunc, "\n HS: ",
                         i, ", Einf: ", j, ", logEC50: ", k, "\n n: ", n))
                 }
                 if (!length(test_guess_residual)) {
-                    warning(paste0(" Test Guess Residual is: ", 
-                        test_guess_residual,  "\n Other Pars: log_conc: ", 
-                        paste(log_conc, collapse=", "), "\n Viability: ", 
-                        paste(viability, collapse=", "), "\n Scale: ", scale, 
+                    warning(paste0(" Test Guess Residual is: ",
+                        test_guess_residual,  "\n Other Pars: log_conc: ",
+                        paste(log_conc, collapse=", "), "\n Viability: ",
+                        paste(viability, collapse=", "), "\n Scale: ", scale,
                         "\n Family: ", family, "\n Trunc ", trunc, "\n HS: ", i,
                         ", Einf: ", j, ", logEC50: ", k, "\n n: ", n))
                 }
@@ -284,7 +284,7 @@
 
 ## FIXME:: Documentation?
 #  Fits dose-response curves to data given by the user
-#  and returns the AUC of the fitted curve, normalized to the length of the concentration range. 
+#  and returns the AUC of the fitted curve, normalized to the length of the concentration range.
 #
 #  @param concentration `numeric` is a vector of drug concentrations.
 #

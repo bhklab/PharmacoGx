@@ -16,10 +16,11 @@
   EC50_2,
   E_inf_1,
   E_inf_2,
-  viability,
+  combo_viability,
   ZIP = NULL,
   residual = "logcosh",
-  nthread = 1L
+  nthread = 1L,
+  show_Rsqr = FALSE
 )
 }
 \arguments{
@@ -45,7 +46,7 @@
 
 \item{E_inf_2}{\code{numeric} viability produced by the maximum attainable effect of treatment 2.}
 
-\item{viability}{\code{numeric} Observed viability of the two treatments combined.}
+\item{combo_viability}{\code{numeric} observed viability of the two treatments combined.}
 
 \item{ZIP}{\code{numeric} pre-computed ZIP reference values.
 If not provided, it will be computed during delta score calculation.}
@@ -63,6 +64,9 @@ considering the truncated probability distribution (as in their names) for the r
 
 \item{nthread}{\code{integer} Number of cores used to perform computation.
 Default 1.}
+
+\item{show_Rsqr}{\code{logical} Whether to show the 2-way curve fitting quality in the result.
+Default FALSE.}
 }
 \value{
 \code{numeric} delta scores of every dose combinations for any given treatment combinations.
@@ -74,11 +78,9 @@ See reference for details.
 \examples{
 \dontrun{
 ## ZIP is optional. Will be recomputed if not provided.
-combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "viability"))
-combo_twowayFit <- fitTwowayZIP(combo_profiles)
-combo_twowayFit |>
-    aggregate(
-        delta_score = .computeZIPdelta(
+combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
+combo_profiles[,
+        .computeZIPdelta(
             treatment1id = treatment1id,
             treatment2id = treatment2id,
             treatment1dose = treatment1dose,
@@ -87,14 +89,12 @@ combo_twowayFit |>
             HS_1 = HS_1, HS_2 = HS_2,
             EC50_1 = EC50_1, EC50_2 = EC50_2,
             E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-            viability = viability,
-            ZIP = ZIP
-        ),
-        treatment1dose = treatment1dose,
-        treatment2dose = treatment2dose,
-        moreArgs = list(residual = "Cauchy"),
-        by = c("treatment1id", "treatment2id", "sampleid")
-    )
+            combo_viability = combo_viability,
+            ZIP = ZIP,
+            nthread = 4,
+            show_Rsqr = TRUE
+        )
+    ] -> delta_scores
 }
 
 }

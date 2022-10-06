@@ -13,7 +13,8 @@ loeweCI(
   treatment2dose,
   HS_2,
   E_inf_2,
-  EC50_2
+  EC50_2,
+  is_pct = FALSE
 )
 }
 \arguments{
@@ -35,6 +36,9 @@ in the range [0, 1].}
 \item{E_inf_2}{\code{numeric} the maximum attainable effect of treatment 2.}
 
 \item{EC50_2}{\code{numeric} relative EC50 of treatment 2.}
+
+\item{is_pct}{\code{logical} whether both the input viabiliy and E_inf are given
+in percentage ([0, 100]) rather than decimal ([0, 1]). Default FALSE.}
 }
 \value{
 CI under Loewe additive definition
@@ -47,6 +51,22 @@ Computes the Loewe additive combination index (CI) from its definition
 }
 }
 \examples{
-print("TODO::")
+\dontrun{
+tre |>
+    endoaggregate(
+        assay="combo_viability",
+        Loewe = PharmacoGx::computeLoewe(
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose,
+            HS_1 = HS_1,
+            HS_2 = HS_2,
+            E_inf_1 = E_inf_1,
+            E_inf_2 = E_inf_2,
+            EC50_1 = EC50_1,
+            EC50_2 = EC50_2
+        ),
+        by = assayKeys(tre, "combo_viability")
+    ) -> tre
+}
 
 }
