@@ -31,3 +31,4 @@ scripts/.*
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^LICENSE\.md$
