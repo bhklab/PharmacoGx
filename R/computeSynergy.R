@@ -224,11 +224,7 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
     guess_err <- loewe_guess$objective
     loewe_estimate <- loewe_guess$minimum
 
-<<<<<<< HEAD
-    if(is.nan(guess_err) | guess_err > tol)
-=======
-    if (guess_err > tol)
->>>>>>> master
+    if (is.nan(guess_err) | guess_err > tol)
         loewe_estimate <- NA_real_
 
     return(loewe_estimate)
