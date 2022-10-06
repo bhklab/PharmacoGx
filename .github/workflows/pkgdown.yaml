@@ -8,6 +8,8 @@ on:
   workflow_dispatch:
 
 name: pkgdown
+env:
+  R_BIOC_VERSION: 3.16
 
 jobs:
   pkgdown:
@@ -24,7 +26,6 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          use-public-rspm: true
           r-version: '4.2.1'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
