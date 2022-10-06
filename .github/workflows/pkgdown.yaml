@@ -3,8 +3,6 @@
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -30,6 +28,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          cache-version: 2
           extra-packages: any::pkgdown, local::.
           needs: website
 
