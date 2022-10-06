@@ -224,7 +224,11 @@ computeLoewe <- function(treatment1dose, HS_1, E_inf_1, EC50_1,
     guess_err <- loewe_guess$objective
     loewe_estimate <- loewe_guess$minimum
 
+<<<<<<< HEAD
     if(is.nan(guess_err) | guess_err > tol)
+=======
+    if (guess_err > tol)
+>>>>>>> master
         loewe_estimate <- NA_real_
 
     return(loewe_estimate)
@@ -353,15 +357,16 @@ hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
 #'
 #' @references
 #' Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W, Smyth GK (2015). “limma powers differential expression analyses for RNA-sequencing and microarray studies.” Nucleic Acids Research, 43(7), e47. doi: 10.1093/nar/gkv007.
+#'
 #' @noRd
 #' @export
 .logcosh <- function(x) {
-	y <- abs(x) - log(2)
-	i <- abs(x) < 1e-4
-	y[i] <- 0.5*x[i]^2
-	i <- !i & (abs(x) < 17)
-	y[i] <- log(cosh(x[i]))
-	y
+    y <- abs(x) - log(2)
+    i <- abs(x) < 1e-4
+    y[i] <- 0.5*x[i]^2
+    i <- !i & (abs(x) < 17)
+    y[i] <- log(cosh(x[i]))
+    y
 }
 
 

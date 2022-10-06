@@ -22,3 +22,4 @@ PSets/**
 local_data/**
 .VSCodeCounter/**
 *.o
+docs

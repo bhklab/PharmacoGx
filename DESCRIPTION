@@ -18,7 +18,7 @@ Description: Contains a set of functions to perform large-scale analysis of
     the results of pharmacogenomic experiments, as well as a number of functions
     for computing common summaries of drug-dose response and correlating them
     with the molecular features in a cancer cell-line.
-License: Artistic-2.0
+License: GPL (>= 3)
 Suggests: pander,
     rmarkdown,
     knitr,

@@ -28,3 +28,7 @@ scripts/.*
 .scripts
 .local_data
 .github
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^LICENSE\.md$
