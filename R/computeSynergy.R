@@ -291,13 +291,13 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
 #'
 #' @param dose `numeric()` A vector of `log10(dose)` values (or equivalent for
 #' the stimuli being modelleled).
-#' @param EC50 `numeric(1)` The dose required to produce 50% of the
-#' theoretically maximal response in the system, `E_inf`. Should be in the same
-#' units as `dose`!
 #' @param HS `numeric(1)` Hill coefficient (n) which defines the slope of the
 #' dose-response curve at the mid-point. This parameter describes the degree
 #' of sigmoidicity of the Hill curve. HS = 1 corresponds to the rectangular
 #' hyperbola in dose-response space.
+#' @param EC50 `numeric(1)` The dose required to produce 50% of the
+#' theoretically maximal response in the system, `E_inf`. Should be in the same
+#' units as `dose`!
 #' @param E_inf `numeric(1)` Theoretical maximal response (minimal viability)
 #' in the system as a proportion in the range \\[0, 1\\]. Note that since we are
 #' predicting viability (percent of cells alive after treatment) instead of
@@ -334,7 +334,7 @@ computeZIP <- function(treatment1dose, HS_1, EC50_1, E_inf_1,
 #' ))
 #'
 #' @export
-hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
+hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
     E_inf + (( E_ninf - E_inf ) / ( 1 + ( 10^dose / 10^EC50 )^(HS) ))
 }
 
@@ -405,6 +405,26 @@ hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
     )
 }
 
+#' @title Log-cosh loss for fitting projected Hill curves
+#'
+#' @description
+#' Compute the log hyperbolic cosine (log-cosh) loss,
+#' which behaves as L2 at small values and as L1 at large values.
+#'
+#' @param par `numeric` a vector of parameters to optimise 
+#' @param x `numeric` a vector of input values to the model 
+#' @param y `numeric` a vector of target values
+#' @param fn `numeric` model to fit
+#' @param ... `pairlist` Fall through arguments to `fn`.
+#'
+#' @return `numeric` scalar Log-Cosh loss for fitting a curve.
+#'
+#' @keywords interal
+#' @noRd
+.logcoshLoss <- function(par, x, y, fn, ...) {
+    sum(.logcosh(fn(par = par, x) - y))
+}
+
 #' @title Estimate the projected Hill coefficient, efficacy, and potency
 #'
 #' @description
@@ -430,6 +450,9 @@ hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
 #' @param conc_as_log `logical` indicates whether input concentrations are in log10 scale.
+#' @param loss_args `list` Additional argument to the `loss` function.
+#'   These get passed to losss via `do.call` analagously to using `...`.
+#' @param optim_only `logical(1)` Should the fall back methods when optim fails
 #'
 #' @return `list`
 #'      * `HS_proj`: Projected Hill coefficient after adding a drug
@@ -441,14 +464,16 @@ hillCurve <- function(dose, EC50, HS, E_inf, E_ninf) {
 #' @importFrom CoreGx .fitCurve .reformatData
 #' @importFrom stats optimise var coef
 #' @importFrom checkmate assertNumeric assertLogical
-#' @import drc
 #'
 #' @export
 estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_add,
-                               E_inf_add = 0,
-                               residual = c("logcosh", "drc", "normal", "Cauchy"),
-                               show_Rsqr = TRUE,
-                               conc_as_log = FALSE) {
+    E_inf_add = 0,
+    residual = c("logcosh", "normal", "Cauchy"),
+    show_Rsqr = TRUE,
+    conc_as_log = FALSE,
+    optim_only = FALSE,
+    loss_args = list()
+) {
 
     len_to <- length(dose_to)
     assertNumeric(dose_to, len = len_to)
@@ -477,88 +502,152 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
     )
     log_conc <- formatted_data[["x"]]
 
-    lower_bounds <- c(0, 0, -6)
-    upper_bounds <- c(4, 1, 6)
-
+    residual_fns <- list(
+        "normal" = CoreGx:::.normal_loss,
+        "Cauchy" = CoreGx:::.cauchy_loss,
+        "logcosh" = .logcoshLoss
+    )
+    ## c(HS, EC50, E_inf, E_ninf)
+    lower_bounds <- c(0, -6, 0)
+    upper_bounds <- c(4, 6, 1)
+    density <- c(2, 5, 10)
+    step <- 0.5 / density
     gritty_guess <- c(
         pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
-        pmin(pmax(min(combo_viability), lower_bounds[2]), upper_bounds[2]),
-        pmin(pmax(log_conc[which.min(abs(combo_viability - 1/2))], lower_bounds[3]),
-             upper_bounds[3])
+        pmin(
+            pmax(
+                log_conc[which.min(abs(combo_viability - 1/2))],
+                lower_bounds[2]
+            ),
+            upper_bounds[2]
+        ),
+        pmin(pmax(min(combo_viability), lower_bounds[3]), upper_bounds[3])
     )
-    proj_params <- switch(
-        residual,
-        logcosh = {
-            proj_params <- optim(
-                fn = .fitProjParamsLoss,
-                par = gritty_guess,
-                lower = lower_bounds, upper = upper_bounds,
-                method = "L-BFGS-B",
-                dose_to = log_conc,
-                viability = combo_viability,
-                E_min_proj = E_ninf_proj
-            )$par
-            proj_params[3] <- 10^proj_params[3]
-            proj_params
-        },
-        ## For benchmarking speed and quality of fit. Will be removed in formal release
-        drc = {
-            fit <- drm(
-                viability ~ dose,
-                data = data.frame(viability = combo_viability, dose = dose_to),
-                fct = LL.4(
-                    fixed = c(NA, NA, E_ninf_proj, NA),
-                    names = c("HS_proj", "E_inf_proj", "E_ninf_proj", "EC50_proj")
-                ),
-                #logDose = 10, ## drc unstable with log concentration
-                lowerl = c(0, 0, 1e-6),
-                upperl = c(4, 1, 1e+6)
-            )
-            proj_params <- coef(fit)
-            c(
-                proj_params[grepl("HS_proj", names(proj_params))],
-                proj_params[grepl("E_inf_proj", names(proj_params))],
-                proj_params[grepl("EC50_proj", names(proj_params))]
-            )
-        },
-        {
-            proj_params <- CoreGx::.fitCurve(
-                x = log_conc, y = combo_viability, f = function(x, par) {
-                    hillCurve(
-                        dose = x,
-                        E_ninf = E_ninf_proj,
-                        HS = par[1],
-                        E_inf = par[2],
-                        EC50 = par[3]
-                    )
-                },
-                lower_bounds = lower_bounds,
-                upper_bounds = upper_bounds,
-                density = c(2, 10, 5),
-                step = .5 / c(2, 10, 5),
-                precision = 1e-4,
-                scale = 0.07,
-                family = residual,
-                median_n = 1,
-                trunc = TRUE,
-                verbose = TRUE,
-                gritty_guess = gritty_guess,
-                span = 1
-            )
-            proj_params[3] <- 10^proj_params[3]
-            proj_params
-        }
-    )
-
-    if (show_Rsqr) {
-        combo_viability_hat <- hillCurve(
-            dose = log_conc,
-            HS = proj_params[1],
-            E_inf = proj_params[2],
-            EC50 = log10(proj_params[3]),
+    ## When degree of freedom is non-positive
+    if (len_to <= 3) {
+        proj_params <- .fitCurve2(
+            par = gritty_guess[-1],
+            x = log_conc,
+            y = combo_viability,
+            fn = function(x, HS, EC50, E_inf, E_ninf) {
+                hillCurve(dose = x, HS, EC50, E_inf, E_ninf)
+            },
+            loss = residual_fns[[residual]],
+            lower = lower_bounds[-1],
+            upper = upper_bounds[-1],
+            iensity = density[-1],
+            step = step[-1],
+            optim_only = optim_only,
+            loss_args = loss_args,
+            E_ninf = E_ninf_proj,
+            HS = 1
+        )
+        proj_params <- c(1, proj_params)
+    } else {
+        proj_params <- .fitCurve2(
+            par = gritty_guess,
+            x = log_conc,
+            y = combo_viability,
+            fn = function(x, HS, EC50, E_inf, E_ninf) {
+                hillCurve(dose = x, HS, EC50, E_inf, E_ninf)
+            },
+            loss = residual_fns[[residual]],
+            lower = lower_bounds,
+            upper = upper_bounds,
+            density = density,
+            step = step,
+            optim_only = optim_only,
+            loss_args = loss_args,
             E_ninf = E_ninf_proj
         )
-        Rsqr <- 1 - (var(combo_viability - combo_viability_hat) / var(combo_viability))
+    }
+    proj_params[2] <- 10^proj_params[2]
+
+    #proj_params <- switch(
+    #    residual,
+    #    logcosh = {
+    #        proj_params <- optim(
+    #            fn = .logcoshLoss,
+    #            par = gritty_guess,
+    #            lower = lower_bounds,
+    #            upper = upper_bounds,
+    #            method = "L-BFGS-B",
+    #            x = log_conc,
+    #            y = combo_viability
+    #        )$par
+    #        if (fix_HS) proj_params <- c(1, proj_params)
+    #        proj_params[2] <- 10^proj_params[3]
+    #        #proj_params <- optim(
+    #        #    fn = .fitProjParamsLoss,
+    #        #    par = gritty_guess,
+    #        #    lower = lower_bounds, upper = upper_bounds,
+    #        #    method = "L-BFGS-B",
+    #        #    dose_to = log_conc,
+    #        #    viability = combo_viability,
+    #        #    E_min_proj = E_ninf_proj
+    #        #)$par
+    #        #proj_params[3] <- 10^proj_params[3]
+    #        #proj_params
+    #    },
+    #    ## For benchmarking speed and quality of fit. Will be removed in formal release
+    #    drc = {
+    #        fit <- drm(
+    #            viability ~ dose,
+    #            data = data.frame(viability = combo_viability, dose = dose_to),
+    #            fct = LL.4(
+    #                fixed = c(NA, NA, E_ninf_proj, NA),
+    #                names = c("HS_proj", "E_inf_proj", "E_ninf_proj", "EC50_proj")
+    #            ),
+    #            #logDose = 10, ## drc unstable with log concentration
+    #            lowerl = c(0, 0, 1e-6),
+    #            upperl = c(4, 1, 1e+6)
+    #        )
+    #        proj_params <- coef(fit)
+    #        c(
+    #            proj_params[grepl("HS_proj", names(proj_params))],
+    #            proj_params[grepl("E_inf_proj", names(proj_params))],
+    #            proj_params[grepl("EC50_proj", names(proj_params))]
+    #        )
+    #    },
+    #    {
+    #        proj_params <- CoreGx::.fitCurve(
+    #            x = log_conc, y = combo_viability, f = function(x, par) {
+    #                hillCurve(
+    #                    dose = x,
+    #                    E_ninf = E_ninf_proj,
+    #                    HS = par[1],
+    #                    E_inf = par[2],
+    #                    EC50 = par[3]
+    #                )
+    #            },
+    #            lower_bounds = lower_bounds,
+    #            upper_bounds = upper_bounds,
+    #            density = c(2, 10, 5),
+    #            step = .5 / c(2, 10, 5),
+    #            precision = 1e-4,
+    #            scale = 0.07,
+    #            family = residual,
+    #            median_n = 1,
+    #            trunc = TRUE,
+    #            verbose = TRUE,
+    #            gritty_guess = gritty_guess,
+    #            span = 1
+    #        )
+    #        proj_params[3] <- 10^proj_params[3]
+    #        proj_params
+    #    }
+    #)
+
+    if (show_Rsqr) {
+        Rsqr <- attr(proj_params, "Rsquare")
+        #combo_viability_hat <- hillCurve(
+        #    dose = log_conc,
+        #    HS = proj_params[1],
+        #    E_inf = proj_params[2],
+        #    EC50 = log10(proj_params[3]),
+        #    E_ninf = E_ninf_proj
+        #)
+        #Rsqr <- 1 - (var(combo_viability - combo_viability_hat) / var(combo_viability))
         return(list(
             HS_proj = proj_params[1],
             E_inf_proj = proj_params[2],
@@ -604,6 +693,9 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
 #'     `Cauchy` provides the best fitting quality but also takes the longest to run.
 #' @param show_Rsqr `logical` whether to show goodness-of-fit value in the result.
 #' @param nthread `integer` Number of cores used to perform computation. Default 1.
+#' @param loss_args `list` Additional argument to the `loss` function.
+#'   These get passed to losss via `do.call` analagously to using `...`.
+#' @param optim_only `logical(1)` Should the fall back methods when optim fails
 #'
 #' @return [data.table] contains parameters of projected dose-response curves
 #'    for adding one treatment to the other.
@@ -615,17 +707,23 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
 #' @importFrom checkmate assertLogical assertInt assertDataTable
 #' @import data.table
 #' @export
-fitTwowayZIP <- function(combo_profiles,
-                         residual = "logcosh",
-                         show_Rsqr = TRUE, nthread = 1L) {
+fitTwowayZIP <- function(
+    combo_profiles,
+    residual = "logcosh",
+    show_Rsqr = TRUE,
+    nthread = 1L,
+    optim_only = TRUE,
+    loss_args = list()
+) {
 
     assertDataTable(combo_profiles, min.rows = 1)
     assertLogical(show_Rsqr, len = 1)
     assertInt(nthread, lower = 1L)
-    required_cols <- c("treatment1id", "treatment2id",
-                       "treatment1dose", "treatment2dose",
-                       "sampleid", "combo_viability",
-                       "HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2")
+    required_cols <- c(
+        "treatment1id", "treatment2id", "treatment1dose", "treatment2dose",
+        "sampleid", "combo_viability",
+        "HS_1", "HS_2", "E_inf_1", "E_inf_2", "EC50_1", "EC50_2"
+    )
 
     has_cols <- required_cols %in% colnames(combo_profiles)
     if (!all(has_cols))
@@ -643,9 +741,16 @@ fitTwowayZIP <- function(combo_profiles,
                 HS_add = unique(HS_2),
                 E_inf_add = unique(E_inf_2),
                 residual = residual,
-                show_Rsqr = show_Rsqr
+                show_Rsqr = show_Rsqr,
+                optim_only = optim_only,
+                loss_args = loss_args
             ),
-            moreArgs = list(residual = residual, show_Rsqr = show_Rsqr),
+            moreArgs = list(
+                residual = residual,
+                show_Rsqr = show_Rsqr,
+                optim_only = optim_only,
+                loss_args = loss_args
+            ),
             by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE
@@ -660,9 +765,16 @@ fitTwowayZIP <- function(combo_profiles,
                 HS_add = unique(HS_1),
                 E_inf_add = unique(E_inf_1),
                 residual = residual,
-                show_Rsqr = show_Rsqr
+                show_Rsqr = show_Rsqr,
+                optim_only = optim_only,
+                loss_args = loss_args
             ),
-            moreArgs = list(residual = residual, show_Rsqr = show_Rsqr),
+            moreArgs = list(
+                residual = residual,
+                show_Rsqr = show_Rsqr,
+                optim_only = optim_only,
+                loss_args = loss_args
+            ),
             by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
             nthread = nthread,
             enlist = FALSE
@@ -1362,7 +1474,7 @@ setMethod(f = "computeZIPdelta",
     } else {
         viability_ZIP <- ZIP
     }
-    delta <- (1/2) * (viability_2_to_1 + viability_1_to_2) - viability_ZIP
+    delta <- viability_ZIP - (1/2) * (viability_2_to_1 + viability_1_to_2)
 
     return(delta)
 }
