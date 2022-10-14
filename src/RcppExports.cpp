@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// patialCorQUICKSTOP
-extern "C" SEXP patialCorQUICKSTOP(SEXP pin_x, SEXP pin_y, SEXP pobsCor, SEXP pGroupFactor, SEXP pGroupSize, SEXP pnumGroup, SEXP pMaxIter, SEXP pn, SEXP preq_alpha, SEXP ptolerance_par, SEXP plog_decision_boundary, SEXP pseed);
-RcppExport SEXP _PharmacoGx_patialCorQUICKSTOP(SEXP pin_xSEXP, SEXP pin_ySEXP, SEXP pobsCorSEXP, SEXP pGroupFactorSEXP, SEXP pGroupSizeSEXP, SEXP pnumGroupSEXP, SEXP pMaxIterSEXP, SEXP pnSEXP, SEXP preq_alphaSEXP, SEXP ptolerance_parSEXP, SEXP plog_decision_boundarySEXP, SEXP pseedSEXP) {
+// partialCorQUICKSTOP
+extern "C" SEXP partialCorQUICKSTOP(SEXP pin_x, SEXP pin_y, SEXP pobsCor, SEXP pGroupFactor, SEXP pGroupSize, SEXP pnumGroup, SEXP pMaxIter, SEXP pn, SEXP preq_alpha, SEXP ptolerance_par, SEXP plog_decision_boundary, SEXP pseed);
+RcppExport SEXP _PharmacoGx_partialCorQUICKSTOP(SEXP pin_xSEXP, SEXP pin_ySEXP, SEXP pobsCorSEXP, SEXP pGroupFactorSEXP, SEXP pGroupSizeSEXP, SEXP pnumGroupSEXP, SEXP pMaxIterSEXP, SEXP pnSEXP, SEXP preq_alphaSEXP, SEXP ptolerance_parSEXP, SEXP plog_decision_boundarySEXP, SEXP pseedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,13 +28,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type ptolerance_par(ptolerance_parSEXP);
     Rcpp::traits::input_parameter< SEXP >::type plog_decision_boundary(plog_decision_boundarySEXP);
     Rcpp::traits::input_parameter< SEXP >::type pseed(pseedSEXP);
-    rcpp_result_gen = Rcpp::wrap(patialCorQUICKSTOP(pin_x, pin_y, pobsCor, pGroupFactor, pGroupSize, pnumGroup, pMaxIter, pn, preq_alpha, ptolerance_par, plog_decision_boundary, pseed));
+    rcpp_result_gen = Rcpp::wrap(partialCorQUICKSTOP(pin_x, pin_y, pobsCor, pGroupFactor, pGroupSize, pnumGroup, pMaxIter, pn, preq_alpha, ptolerance_par, plog_decision_boundary, pseed));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PharmacoGx_patialCorQUICKSTOP", (DL_FUNC) &_PharmacoGx_patialCorQUICKSTOP, 12},
+    {"_PharmacoGx_partialCorQUICKSTOP", (DL_FUNC) &_PharmacoGx_partialCorQUICKSTOP, 12},
     {NULL, NULL, 0}
 };
 
