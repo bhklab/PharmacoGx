@@ -382,16 +382,6 @@ hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
 #'
 #' @noRd
 .fitProjParamsLoss <- function(par, dose_to, viability, E_min_proj) {
-    ## Old L2 Loss, not robust
-    #norm(
-    #     hillCurve(
-    #        dose = dose_to,
-    #        E_ninf = E_min_proj,
-    #        HS = par[1],
-    #        EC50 = par[2],
-    #        E_inf = par[3]
-    #    ) - viability, "2"
-    #)
     sum(
         .logcosh(
              hillCurve(
