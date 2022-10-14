@@ -9,6 +9,9 @@ on:
 
 name: pkgdown
 
+env:
+  R_BIOC_VERSION: 3.16
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
