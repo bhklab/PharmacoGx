@@ -356,12 +356,12 @@ hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
 #' @noRd
 #' @export
 .logcosh <- function(x) {
-	y <- abs(x) - log(2)
-	i <- abs(x) < 1e-4
-	y[i] <- 0.5*x[i]^2
-	i <- !i & (abs(x) < 17)
-	y[i] <- log(cosh(x[i]))
-	y
+    y <- abs(x) - log(2)
+    i <- abs(x) < 1e-4
+    y[i] <- 0.5*x[i]^2
+    i <- !i & (abs(x) < 17)
+    y[i] <- log(cosh(x[i]))
+    y
 }
 
 
@@ -411,8 +411,8 @@ hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
 #' Compute the log hyperbolic cosine (log-cosh) loss,
 #' which behaves as L2 at small values and as L1 at large values.
 #'
-#' @param par `numeric` a vector of parameters to optimise 
-#' @param x `numeric` a vector of input values to the model 
+#' @param par `numeric` a vector of parameters to optimise
+#' @param x `numeric` a vector of input values to the model
 #' @param y `numeric` a vector of target values
 #' @param fn `numeric` model to fit
 #' @param ... `pairlist` Fall through arguments to `fn`.
