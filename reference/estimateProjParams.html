@@ -75,7 +75,9 @@ by fitting a 2-parameter dose-response curve.</p>
 <span>  E_inf_add <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  residual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"logcosh"</span>, <span class="st">"normal"</span>, <span class="st">"Cauchy"</span><span class="op">)</span>,</span>
 <span>  show_Rsqr <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  conc_as_log <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  conc_as_log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  optim_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  loss_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -124,6 +126,15 @@ considering the truncated probability distribution (as in their names) for the r
 
 <dt>conc_as_log</dt>
 <dd><p><code>logical</code> indicates whether input concentrations are in log10 scale.</p></dd>
+
+
+<dt>optim_only</dt>
+<dd><p><code>logical(1)</code> Should the fall back methods when optim fails</p></dd>
+
+
+<dt>loss_args</dt>
+<dd><p><code>list</code> Additional argument to the <code>loss</code> function.
+These get passed to losss via <code>do.call</code> analagously to using <code>...</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -66,7 +66,7 @@ are using it to model treatment-response assocations in cancer cell lines.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">hillCurve</span><span class="op">(</span><span class="va">dose</span>, <span class="va">EC50</span>, <span class="va">HS</span>, <span class="va">E_inf</span>, <span class="va">E_ninf</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">hillCurve</span><span class="op">(</span><span class="va">dose</span>, <span class="va">HS</span>, <span class="va">EC50</span>, <span class="va">E_inf</span>, <span class="va">E_ninf</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,17 +76,17 @@ are using it to model treatment-response assocations in cancer cell lines.</p>
 the stimuli being modelleled).</p></dd>
 
 
-<dt>EC50</dt>
-<dd><p><code>numeric(1)</code> The dose required to produce 50% of the
-theoretically maximal response in the system, <code>E_inf</code>. Should be in the same
-units as <code>dose</code>!</p></dd>
-
-
 <dt>HS</dt>
 <dd><p><code>numeric(1)</code> Hill coefficient (n) which defines the slope of the
 dose-response curve at the mid-point. This parameter describes the degree
 of sigmoidicity of the Hill curve. HS = 1 corresponds to the rectangular
 hyperbola in dose-response space.</p></dd>
+
+
+<dt>EC50</dt>
+<dd><p><code>numeric(1)</code> The dose required to produce 50% of the
+theoretically maximal response in the system, <code>E_inf</code>. Should be in the same
+units as <code>dose</code>!</p></dd>
 
 
 <dt>E_inf</dt>

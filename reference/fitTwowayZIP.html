@@ -67,7 +67,9 @@ of the treatment being added to the other treament at a fixed dose.</p>
 <span>  <span class="va">combo_profiles</span>,</span>
 <span>  residual <span class="op">=</span> <span class="st">"logcosh"</span>,</span>
 <span>  show_Rsqr <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  nthread <span class="op">=</span> <span class="fl">1L</span></span>
+<span>  nthread <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  optim_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  loss_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,6 +100,15 @@ considering the truncated probability distribution (as in their names) for the r
 
 <dt>nthread</dt>
 <dd><p><code>integer</code> Number of cores used to perform computation. Default 1.</p></dd>
+
+
+<dt>optim_only</dt>
+<dd><p><code>logical(1)</code> Should the fall back methods when optim fails</p></dd>
+
+
+<dt>loss_args</dt>
+<dd><p><code>list</code> Additional argument to the <code>loss</code> function.
+These get passed to losss via <code>do.call</code> analagously to using <code>...</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
