@@ -29,7 +29,7 @@
 
    The state must be seeded so that it is not everywhere zero. If you have
    a 64-bit seed, we suggest to seed a splitmix64 generator and use its
-   output to fill s. 
+   output to fill s.
 
    NOTE: the parameters (a=24, b=16, b=37) of this version give slightly
    better results in our test than the 2016 version (a=55, b=14, c=36).
@@ -58,7 +58,7 @@ uint64_t next(uint64_t *s) {
 // maxindex here is exclusive of the right edge
 uint64_t generate_random_index(uint64_t *state, uint64_t maxindex){
    // uint64_t maxindex = llround(maxindexd);
-   
+
    if ((maxindex-1) == UINT64_MAX){
       return next(state);
    } else {
@@ -104,7 +104,7 @@ void sampleIdx(uint64_t N, uint64_t *permPointer, uint64_t *state){
   }
 
 }
-  
+
 
 // This code is adapted from the quickstop reference implementation here: https://github.com/julianhecker/QUICK-STOP
 
@@ -124,15 +124,15 @@ double log_denom(uint64_t suc,uint64_t n, double p)
 
 
 
-void runPerm(double *out, 
-               double *xvec, 
-               double *yvec, 
-               double obsCor, 
-               int *GroupFactor, 
-               uint64_t N, 
-               int *GroupSize, 
-               int numGroup, 
-               double req_alpha, 
+void runPerm(double *out,
+               double *xvec,
+               double *yvec,
+               double obsCor,
+               int *GroupFactor,
+               uint64_t N,
+               int *GroupSize,
+               int numGroup,
+               double req_alpha,
                double tolerance_par,
                int log_decision_boundary,
                uint64_t max_iter,
@@ -268,7 +268,7 @@ void runPerm(double *out,
     // printf("%f\n", pr_min_1);
 
 
-    // TODO: make a list to return everything to R 
+    // TODO: make a list to return everything to R
     if(log_cur_PiN - log_cur_suph2 > log_decision_boundary){
       significant = (double) 1;
       break;
@@ -303,7 +303,7 @@ void runPerm(double *out,
 
 // Tested the computation of correlations by comparing against R code, perm distributions look
 // very similar
-SEXP patialCorQUICKSTOP(SEXP pin_x,
+SEXP partialCorQUICKSTOP(SEXP pin_x,
                SEXP pin_y,
                SEXP pobsCor,
                SEXP pGroupFactor,
@@ -311,14 +311,14 @@ SEXP patialCorQUICKSTOP(SEXP pin_x,
                SEXP pnumGroup,
                SEXP pMaxIter,
                SEXP pn,
-               SEXP preq_alpha, 
+               SEXP preq_alpha,
                SEXP ptolerance_par,
                SEXP plog_decision_boundary,
                SEXP pseed){
-  
+
   double Ndouble = *REAL(pn);
 
-  double MaxIterdouble = *REAL(pMaxIter);  
+  double MaxIterdouble = *REAL(pMaxIter);
   double obsCor = *REAL(pobsCor);
   double req_alpha = *REAL(preq_alpha);
   double tolerance_par = *REAL(ptolerance_par);
@@ -331,30 +331,28 @@ SEXP patialCorQUICKSTOP(SEXP pin_x,
   uint64_t max_iter = (uint64_t) MaxIterdouble;
 
   SEXP pout = PROTECT(allocVector(REALSXP,4));
-  
+
   double *out = REAL(pout);
-  
+
   double *seed = REAL(pseed);
   uint64_t *state = (uint64_t*) seed;
 
   int numGroup = *INTEGER(pnumGroup);
 
-  runPerm(out, REAL(pin_x), REAL(pin_y), 
-                  obsCor, 
-                  INTEGER(pGroupFactor), 
-                  N, 
-                  INTEGER(pGroupSize), 
+  runPerm(out, REAL(pin_x), REAL(pin_y),
+                  obsCor,
+                  INTEGER(pGroupFactor),
+                  N,
+                  INTEGER(pGroupSize),
                   numGroup,
-                  req_alpha, 
+                  req_alpha,
                   tolerance_par,
                   log_decision_boundary,
-                  max_iter, 
+                  max_iter,
                   state);
 
   UNPROTECT(1);
-  
+
   return pout;
-  
+
 }
-
-

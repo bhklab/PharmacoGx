@@ -8,7 +8,9 @@ fitTwowayZIP(
   combo_profiles,
   residual = "logcosh",
   show_Rsqr = TRUE,
-  nthread = 1L
+  nthread = 1L,
+  optim_only = TRUE,
+  loss_args = list()
 )
 }
 \arguments{
@@ -30,6 +32,11 @@ considering the truncated probability distribution (as in their names) for the r
 \item{show_Rsqr}{\code{logical} whether to show goodness-of-fit value in the result.}
 
 \item{nthread}{\code{integer} Number of cores used to perform computation. Default 1.}
+
+\item{optim_only}{\code{logical(1)} Should the fall back methods when optim fails}
+
+\item{loss_args}{\code{list} Additional argument to the \code{loss} function.
+These get passed to losss via \code{do.call} analagously to using \code{...}.}
 }
 \value{
 \link{data.table} contains parameters of projected dose-response curves
