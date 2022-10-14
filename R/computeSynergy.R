@@ -444,6 +444,9 @@ hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
 #'   These get passed to losss via `do.call` analagously to using `...`.
 #' @param optim_only `logical(1)` Should the fall back methods when optim fails
 #'
+#' @references
+#' Motulsky, H., & Christopoulos, A. (2004). Fitting dose-response curves. In Fitting models to biological data using linear and nonlinear regression: A practical guide to curve fitting. Oxford University Press.
+#'
 #' @return `list`
 #'      * `HS_proj`: Projected Hill coefficient after adding a drug
 #'      * `E_inf_proj`: Projected efficacy after adding a drug
@@ -514,28 +517,30 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
     )
 
     ## TODO: do.call
+    ## If we have zero or less degrees of freedom, fix the HS parameter to 1
+    ## This is as per recommendations in Motulsky & Christopoulos (2004)
+    insuff_df <- len_to <= 3
     fit_curve_args <- list(
-            par = if (len_to > 3) gritty_guess else gritty_guess[-1],
+            par = if (insuff_df) gritty_guess[-1] else gritty_guess,
             x = log_conc,
             y = combo_viability,
             fn = function(x, HS, EC50, E_inf, E_ninf) {
                 hillCurve(dose = x, HS, EC50, E_inf, E_ninf)
             },
             loss = residual_fns[[residual]],
-            lower = if (len_to > 3) lower_bounds else lower_bounds[-1],
-            upper = if (len_to > 3) upper_bounds else lower_bounds[-1],
-            density = if(len_to > 3) density else density[-1],
-            step = if (len_to > 3) step else step[-1],
+            lower = if (insuff_df) lower_bounds[-1] else lower_bounds,
+            upper = if (insuff_df) upper_bounds[-1] else lower_bounds,
+            density = if(insuff_df) density[-1] else density,
+            step = if (insuff_df) step[-1] else step,
             optim_only = optim_only,
             loss_args = loss_args,
             E_ninf = E_ninf_proj
     )
-    ## When degree of freedom is non-positive
-    if (len_to <= 3)
+    if (insuff_df)
         fit_curve_args <- c(fit_curve_args, HS = 1)
 
     proj_params <- do.call(.fitCurve2, fit_curve_args)
-    if (len_to <= 3)
+    if (insuff_df)
         proj_params <- c(1, proj_params)
 
     proj_params[2] <- 10^proj_params[2]
