@@ -302,7 +302,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
       #   NG <- length(table(factor(dd[,3])))
       #   N <- as.numeric(length(x))
 
-      #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
+      #   p.value <-PharmacoGx:::partialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
       #   significant <- p.value[[1]]
       #   p.value <- p.value[[2]]
       # }
@@ -376,7 +376,7 @@ geneDrugSensitivityPBCorr <- function(x, type, batch, drugpheno,
     #   NG <- 1
     #   N <- as.numeric(length(x))
 
-    #   p.value <-PharmacoGx:::patialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
+    #   p.value <-PharmacoGx:::partialCorQUICKSTOP(x, y, obs.cor, GR, GS, NG, 1e7,N, req_alpha, req_alpha/100, 10L, runif(2))
     #   significant <- p.value[[1]]
     #   p.value <- p.value[[2]]
     # }

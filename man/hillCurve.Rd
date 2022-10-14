@@ -4,20 +4,20 @@
 \alias{hillCurve}
 \title{4-Parameter Hill Equation for Stimuli-Response Curves}
 \usage{
-hillCurve(dose, EC50, HS, E_inf, E_ninf)
+hillCurve(dose, HS, EC50, E_inf, E_ninf)
 }
 \arguments{
 \item{dose}{\code{numeric()} A vector of \code{log10(dose)} values (or equivalent for
 the stimuli being modelleled).}
 
-\item{EC50}{\code{numeric(1)} The dose required to produce 50\% of the
-theoretically maximal response in the system, \code{E_inf}. Should be in the same
-units as \code{dose}!}
-
 \item{HS}{\code{numeric(1)} Hill coefficient (n) which defines the slope of the
 dose-response curve at the mid-point. This parameter describes the degree
 of sigmoidicity of the Hill curve. HS = 1 corresponds to the rectangular
 hyperbola in dose-response space.}
+
+\item{EC50}{\code{numeric(1)} The dose required to produce 50\% of the
+theoretically maximal response in the system, \code{E_inf}. Should be in the same
+units as \code{dose}!}
 
 \item{E_inf}{\code{numeric(1)} Theoretical maximal response (minimal viability)
 in the system as a proportion in the range \[0, 1\]. Note that since we are

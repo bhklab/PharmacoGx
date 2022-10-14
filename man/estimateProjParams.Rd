@@ -13,7 +13,9 @@ estimateProjParams(
   E_inf_add = 0,
   residual = c("logcosh", "normal", "Cauchy"),
   show_Rsqr = TRUE,
-  conc_as_log = FALSE
+  conc_as_log = FALSE,
+  optim_only = FALSE,
+  loss_args = list()
 )
 }
 \arguments{
@@ -43,6 +45,11 @@ considering the truncated probability distribution (as in their names) for the r
 \item{show_Rsqr}{\code{logical} whether to show goodness-of-fit value in the result.}
 
 \item{conc_as_log}{\code{logical} indicates whether input concentrations are in log10 scale.}
+
+\item{optim_only}{\code{logical(1)} Should the fall back methods when optim fails}
+
+\item{loss_args}{\code{list} Additional argument to the \code{loss} function.
+These get passed to losss via \code{do.call} analagously to using \code{...}.}
 }
 \value{
 \code{list}
