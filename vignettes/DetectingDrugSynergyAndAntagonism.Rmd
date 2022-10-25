@@ -127,14 +127,119 @@ raw[,
     viability := Value / .SD[treatment1dose == 0 & treatment2dose == 0, Value],
     by=c("treatment1id", "treatment2id", "sampleid", "tech_rep")
 ]
+raw[, viability := pmax(0, viability)]
 tre[["raw"]] <- raw
+```
+
+```{r}
+tre[["raw"]][, range(viability)]
+```
+
+```{r}
+bad_treatments <- tre[["raw"]][viability > 2, unique(treatment1id)]
+```
+
+```{r}
+## TODO:: Debug warning message!
+tre <- subset(tre, !(treatment1id %in% bad_treatments))
+```
+
+```{r}
+tre[["raw"]][, range(viability)]
 ```
 
 ## Fitting Monotherapy Curves
 
 ```{r}
-
+tre |>
+    endoaggregate(
+        subset=treatment2dose == 0,
+        assay="raw",
+        target="mono_viability",
+        mean(viability),
+        by=c("treatment1id", "treatment1dose", "sampleid")
+    ) -> tre2
 ```
+
+```{r}
+tre2 |>
+    endoaggregate(
+        {
+            fit <- logLogisticRegression(treatment1dose, mean_viability,
+                viability_as_pct=FALSE)
+            ic50 <- computeIC50(treatment1dose, Hill_fit=fit)
+            aac <- computeAUC(treatment1dose, Hill_fit=fit)
+            list(
+                HS=fit[["HS"]],
+                E_inf = fit[["E_inf"]] / 100,
+                EC50 = fit[["EC50"]],
+                aac_recomputed=aac,
+                ic50_recomputed=ic50
+            )
+        },
+        assay="mono_viability",
+        target="mono_profiles",
+        enlist=FALSE,
+        by=c("treatment1id", "sampleid"),
+        nthread=4
+    ) -> tre3
+```
+
+## Joining Monotherapy Curve Fits to Combinations
+
+```{r}
+tre3 |>
+    endoaggregate(
+        subset=treatment2dose != 0,
+        assay="raw",
+        target="combo_viability",
+        mean(viability),
+        by=c("treatment1id", "treatment2id", "treatment1dose", "treatment2dose", "sampleid")
+    ) -> tre4
+```
+
+```{r}
+tre4 |>
+    mergeAssays(
+        x="combo_viability",
+        y="mono_profiles",
+        by=c("treatment1id", "sampleid")
+    ) |>
+    mergeAssays(
+        x="combo_viability",
+        y="mono_profiles",
+        by.x=c("treatment2id", "sampleid"),
+        by.y=c("treatment1id", "sampleid"),
+        suffixes=c("_1", "_2")
+    ) -> tre5
+```
+
+```{r}
+tre5 |>
+    endoaggregate(
+        {
+            viability_1 <- PharmacoGx:::.Hill(
+                x=log10(treatment1dose),
+                pars=c(HS_1, E_inf_1, log10(EC50_1))
+            )
+            viability_2 <- PharmacoGx:::.Hill(
+                x=log10(treatment2dose),
+                pars=c(HS_2, E_inf_2, log10(EC50_2))
+            )
+            list(
+                viability_1=viability_1,
+                viability_2=viability_2
+            )
+        },
+        assay="combo_viability",
+        by=assayKeys(tre5, "combo_viability"),
+        enlist=FALSE
+    ) -> tre6
+```
+
+## Compute Synergy Scores
+
+
 
 # References
 
