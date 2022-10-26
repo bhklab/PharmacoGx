@@ -190,7 +190,6 @@ tre2 |>
 ```{r}
 tre3 |>
     endoaggregate(
-        subset=treatment2dose != 0,
         assay="raw",
         target="combo_viability",
         mean(viability),
@@ -239,6 +238,20 @@ tre5 |>
 
 ## Compute Synergy Scores
 
+```{r}
+tre6 |>
+    endoaggregate(
+        assay="combo_viability",
+        HSA=computeHSA(viability_1, viability_2),
+        Bliss=computeBliss(viability_1, viability_2),
+        ZIP=computeZIP(
+            treatment1dose, HS_1, EC50_1, E_inf_1,
+            treatment2dose, HS_2, EC50_2, E_inf_2
+        ),
+        by=assayKeys(tre6, "combo_viability"),
+        nthread=4
+    ) -> tre7
+```
 
 
 # References

@@ -7,7 +7,10 @@
 amcc(x, y, step.prct = 0, min.cat = 3, nperm = 1000, nthread = 1)
 }
 \arguments{
-\item{x, y}{Two paired vectors of values. Could be replicates of observations
+\item{x}{Two paired vectors of values. Could be replicates of observations
+for the same experiments for example.}
+
+\item{y}{Two paired vectors of values. Could be replicates of observations
 for the same experiments for example.}
 
 \item{step.prct}{Instead of testing all possible splits of the data, it is

@@ -48,10 +48,21 @@ dose response data for the sensitivity experiments}
 \item{sensitivityProfiles}{\code{data.frame} containing drug sensitivity profile
 statistics such as IC50 and AUC}
 
-\item{sensitivityN, perturbationN}{A \code{data.frame} summarizing the
+\item{sensitivityN}{A \code{data.frame} summarizing the
 available sensitivity/perturbation data}
 
-\item{curationSample, curationTissue, curationTreatment}{A \code{data.frame} mapping
+\item{perturbationN}{A \code{data.frame} summarizing the
+available sensitivity/perturbation data}
+
+\item{curationTreatment}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
+
+\item{curationSample}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
+
+\item{curationTissue}{A \code{data.frame} mapping
 the names for samples, tissues and treatments used in the data set to
 universal identifiers used between different CoreSet objects}
 
