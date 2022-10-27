@@ -64,3 +64,6 @@ Estimate the projected shape parameter HS, efficacy \code{E_inf} and potency \co
 in the new dose-response curve of a drug after adding another drug to it
 by fitting a 2-parameter dose-response curve.
 }
+\references{
+Motulsky, H., & Christopoulos, A. (2004). Fitting dose-response curves. In Fitting models to biological data using linear and nonlinear regression: A practical guide to curve fitting. Oxford University Press.
+}

@@ -518,7 +518,6 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
         pmin(pmax(min(combo_viability), lower_bounds[3]), upper_bounds[3])
     )
 
-    ## TODO: do.call
     ## If we have zero or less degrees of freedom, fix the HS parameter to 1
     ## This is as per recommendations in Motulsky & Christopoulos (2004)
     insuff_df <- len_to <= 3
@@ -527,11 +526,11 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
             x = log_conc,
             y = combo_viability,
             fn = function(x, HS, EC50, E_inf, E_ninf) {
-                hillCurve(dose = x, HS, EC50, E_inf, E_ninf)
+                hillCurve(dose=x, HS, EC50, E_inf, E_ninf)
             },
             loss = residual_fns[[residual]],
             lower = if (insuff_df) lower_bounds[-1] else lower_bounds,
-            upper = if (insuff_df) upper_bounds[-1] else lower_bounds,
+            upper = if (insuff_df) upper_bounds[-1] else upper_bounds,
             density = if(insuff_df) density[-1] else density,
             step = if (insuff_df) step[-1] else step,
             optim_only = optim_only,

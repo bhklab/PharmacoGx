@@ -285,6 +285,28 @@ tre_synergy <- tre_synergy |>
     )
 ```
 
+
+```{r}
+tre_synergy |>
+    endoaggregate(
+        assay="combo_viability",
+        subset=treatment2id != 0 & treatment1id != 0,
+        {
+            estimateProjParams(
+                dose_to=treatment1dose,
+                combo_viability=mean_viability,
+                dose_add=unique(treatment2dose),
+                EC50_add=unique(EC50_2),
+                HS_add=unique(HS_2),
+                E_inf_add=unique(E_inf_2)
+            )
+            setNames(zip_fit, paste0(names(zip_fit), "_zip12"))
+        },
+        enlist=FALSE,
+        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid")
+    ) -> tre_test
+```
+
 ## Visualizing Drug Synergy
 
 ```{r}
@@ -307,24 +329,6 @@ top_15_bliss_df |>
     scale_fill_brewer(palette="RdBu")
 ```
 
-```{r}
-tre_synergy |>
-    endoaggregate(
-        assay="combo_viability",
-        {
-            zip_fit <- estimateProjParams(
-                dose_to=treatment1dose,
-                combo_viability=mean_viability,
-                dose_add=unique(treatment2dose),
-                EC50_add=unique(EC50_2),
-                HS_add=unique(HS_2),
-                E_inf_add=unique(E_inf_2)
-            )
-        },
-        enlist=FALSE,
-        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid")
-    )
-```
 
 ```{r}
 library(ggplot2)

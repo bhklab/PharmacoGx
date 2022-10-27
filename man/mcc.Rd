@@ -7,9 +7,7 @@
 mcc(x, y, nperm = 1000, nthread = 1)
 }
 \arguments{
-\item{x}{\code{factor} of the same length with the same number of levels}
-
-\item{y}{\code{factor} of the same length with the same number of levels}
+\item{x, y}{\code{factor} of the same length with the same number of levels}
 
 \item{nperm}{\code{numeric} number of permutations for significance
 estimation. If 0, no permutation testing is done}
