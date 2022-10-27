@@ -290,9 +290,8 @@ tre_synergy <- tre_synergy |>
 tre_synergy |>
     endoaggregate(
         assay="combo_viability",
-        subset=treatment2id != 0 & treatment1id != 0,
         {
-            estimateProjParams(
+            zip_fit <- estimateProjParams(
                 dose_to=treatment1dose,
                 combo_viability=mean_viability,
                 dose_add=unique(treatment2dose),
@@ -303,7 +302,8 @@ tre_synergy |>
             setNames(zip_fit, paste0(names(zip_fit), "_zip12"))
         },
         enlist=FALSE,
-        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid")
+        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+        nthread=10
     ) -> tre_test
 ```
 
