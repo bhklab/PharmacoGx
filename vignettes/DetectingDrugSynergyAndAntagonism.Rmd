@@ -287,9 +287,10 @@ tre_synergy <- tre_synergy |>
 
 
 ```{r}
-tre_synergy |>
+tre_zip <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
+        subset=treatment2dose != 0,
         {
             zip_fit <- estimateProjParams(
                 dose_to=treatment1dose,
@@ -297,16 +298,19 @@ tre_synergy |>
                 dose_add=unique(treatment2dose),
                 EC50_add=unique(EC50_2),
                 HS_add=unique(HS_2),
-                E_inf_add=unique(E_inf_2)
+                E_inf_add=unique(E_inf_2),
+                residual="normal"
             )
-            setNames(zip_fit, paste0(names(zip_fit), "_zip_1_to_2"))
+            setNames(zip_fit, paste0(names(zip_fit), "_2_to_1"))
         },
         enlist=FALSE,
         by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
         nthread=10
-    ) |>
+    )
+tre_zip <- tre_zip |>
     endoaggregate(
         assay="combo_viability",
+        subset=treatment1dose != 0,
         {
             zip_fit <- estimateProjParams(
                 dose_to=treatment2dose,
@@ -314,34 +318,53 @@ tre_synergy |>
                 dose_add=unique(treatment1dose),
                 EC50_add=unique(EC50_1),
                 HS_add=unique(HS_1),
-                E_inf_add=unique(E_inf_1)
+                E_inf_add=unique(E_inf_1),
+                residual="normal"
             )
-            setNames(zip_fit, paste0(names(zip_fit), "_zip_2_to_1"))
+            setNames(zip_fit, paste0(names(zip_fit), "_1_to_2"))
         },
         enlist=FALSE,
         by=c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
         nthread=10
-    ) -> tre_zip
+    )
+```
+
+```{r}
+tre_zip1 <- tre_zip |>
+    endoaggregate(
+        assay="combo_viability",
+        zip_delta=.deltaScore(
+            EC50_1_to_2=EC50_proj_1_to_2, EC50_2_to_1=EC50_proj_2_to_1,
+            EC50_1=EC50_1, EC50_2=EC50_2,
+            HS_1_to_2=HS_proj_1_to_2, HS_2_to_1=HS_proj_2_to_1,
+            HS_1=HS_1, HS_2=HS_2,
+            E_inf_2_to_1=E_inf_proj_2_to_1, E_inf_1_to_2=E_inf_proj_1_to_2,
+            E_inf_1=E_inf_1, E_inf_2=E_inf_2,
+            treatment1dose=treatment1dose, treatment2dose=treatment2dose,
+            ZIP=ZIP
+        ),
+        by=assayKeys(tre_zip, "combo_viability")
+    )
 ```
 
 ## Visualizing Drug Synergy
 
 ```{r}
-combo_viab <- tre_synergy[["combo_viability"]]
-top_15_bliss <- combo_viab[
-    order(-Bliss_score),
+combo_viab <- tre_zip1[["combo_viability"]]
+top_15_combo <- combo_viab[
+    order(-zip_delta),
     unique(.SD),
     .SDcols=c("treatment1id", "treatment2id")
 ] |> head(15)
-top_15_bliss_df <- combo_viab[top_15_bliss, ]
+top_15_combo_df <- combo_viab[top_15_combo, ]
 ```
 
 ```{r}
 library(ggplot2)
 libary(RColorBrewer)
-top_15_bliss_df |>
+top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose)) +
-    geom_contour_filled(aes(z=Bliss_score), bins=11) +
+    geom_contour_filled(aes(z=zip_delta), bins=11) +
     facet_wrap(~treatment1id, nrow=3, ncol=5) +
     scale_fill_brewer(palette="RdBu")
 ```
@@ -362,9 +385,9 @@ top_15_bliss_df |>
 ```
 
 ```{r}
-top_15_bliss_df |>
+top_15_combo_df |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
-    geom_tile(aes(fill=Bliss_score)) +
+    geom_tile(aes(fill=zip_delta)) +
     facet_wrap(~treatment1id, nrow=3, ncol=5) +
     scale_fill_gradient2(low="blue", mid="white", high="red")
 ```
@@ -372,7 +395,7 @@ top_15_bliss_df |>
 ```{r}
 combo_viab[treatment1id %ilike% "Isp|Cane", ] |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
-    geom_tile(aes(fill=HSA_score)) +
+    geom_tile(aes(fill=zip_delta)) +
     facet_wrap(~treatment1id) +
     scale_fill_gradient2(low="blue", mid="white", high="red")
 ```
