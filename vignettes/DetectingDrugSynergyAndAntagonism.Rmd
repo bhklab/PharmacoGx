@@ -299,12 +299,29 @@ tre_synergy |>
                 HS_add=unique(HS_2),
                 E_inf_add=unique(E_inf_2)
             )
-            setNames(zip_fit, paste0(names(zip_fit), "_zip12"))
+            setNames(zip_fit, paste0(names(zip_fit), "_zip_1_to_2"))
         },
         enlist=FALSE,
         by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
         nthread=10
-    ) -> tre_test
+    ) |>
+    endoaggregate(
+        assay="combo_viability",
+        {
+            zip_fit <- estimateProjParams(
+                dose_to=treatment2dose,
+                combo_viability=mean_viability,
+                dose_add=unique(treatment1dose),
+                EC50_add=unique(EC50_1),
+                HS_add=unique(HS_1),
+                E_inf_add=unique(E_inf_1)
+            )
+            setNames(zip_fit, paste0(names(zip_fit), "_zip_2_to_1"))
+        },
+        enlist=FALSE,
+        by=c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
+        nthread=10
+    ) -> tre_zip
 ```
 
 ## Visualizing Drug Synergy

@@ -544,14 +544,14 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
     if (insuff_df)
         proj_params <- c(1, proj_params)
 
-    proj_params[3] <- 10^proj_params[3]
+    proj_params[2] <- 10^proj_params[2]
 
     if (show_Rsqr) {
         Rsqr <- attr(proj_params, "Rsquare")
         return(list(
             HS_proj = proj_params[1],
-            E_inf_proj = proj_params[2],
-            EC50_proj = proj_params[3],
+            EC50_proj = proj_params[2],
+            E_inf_proj = proj_params[3],
             E_ninf_proj = E_ninf_proj,
             Rsqr = Rsqr
         ))
