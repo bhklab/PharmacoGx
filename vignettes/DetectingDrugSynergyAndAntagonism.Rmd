@@ -151,18 +151,18 @@ tre[["raw"]][, range(viability)]
 ## Fitting Monotherapy Curves
 
 ```{r}
-tre |>
+tre_qc <- tre |>
     endoaggregate(
         subset=treatment2dose == 0,
         assay="raw",
         target="mono_viability",
-        mean(viability),
+        mean_viability=pmin(1, mean(viability)),
         by=c("treatment1id", "treatment1dose", "sampleid")
-    ) -> tre2
+    )
 ```
 
 ```{r}
-tre2 |>
+tre_fit <- tre_qc |>
     endoaggregate(
         {
             fit <- logLogisticRegression(treatment1dose, mean_viability,
@@ -173,6 +173,7 @@ tre2 |>
                 HS=fit[["HS"]],
                 E_inf = fit[["E_inf"]] / 100,
                 EC50 = fit[["EC50"]],
+                Rsq=as.numeric(unlist(attributes(fit))),
                 aac_recomputed=aac,
                 ic50_recomputed=ic50
             )
@@ -182,23 +183,23 @@ tre2 |>
         enlist=FALSE,
         by=c("treatment1id", "sampleid"),
         nthread=4
-    ) -> tre3
+    )
 ```
 
 ## Joining Monotherapy Curve Fits to Combinations
 
 ```{r}
-tre3 |>
+tre_combo <- tre_fit |>
     endoaggregate(
         assay="raw",
         target="combo_viability",
         mean(viability),
         by=c("treatment1id", "treatment2id", "treatment1dose", "treatment2dose", "sampleid")
-    ) -> tre4
+    )
 ```
 
 ```{r}
-tre4 |>
+tre_combo <- tre_combo |>
     mergeAssays(
         x="combo_viability",
         y="mono_profiles",
@@ -210,49 +211,150 @@ tre4 |>
         by.x=c("treatment2id", "sampleid"),
         by.y=c("treatment1id", "sampleid"),
         suffixes=c("_1", "_2")
-    ) -> tre5
+    )
+```
+
+
+```{r}
+tre_combo <- tre_combo |>
+    endoaggregate(
+        viability_1=.SD[treatment2dose == 0, mean_viability],
+        assay="combo_viability",
+        by=c("treatment1id", "treatment1dose", "sampleid")
+    ) |>
+    endoaggregate(
+        viability_2=.SD[treatment1dose == 0, mean_viability],
+        assay="combo_viability",
+        by=c("treatment1id", "treatment2dose", "sampleid")
+    )
 ```
 
 ```{r}
-tre5 |>
-    endoaggregate(
-        {
-            viability_1 <- PharmacoGx:::.Hill(
-                x=log10(treatment1dose),
-                pars=c(HS_1, E_inf_1, log10(EC50_1))
-            )
-            viability_2 <- PharmacoGx:::.Hill(
-                x=log10(treatment2dose),
-                pars=c(HS_2, E_inf_2, log10(EC50_2))
-            )
-            list(
-                viability_1=viability_1,
-                viability_2=viability_2
-            )
-        },
-        assay="combo_viability",
-        by=assayKeys(tre5, "combo_viability"),
-        enlist=FALSE
-    ) -> tre6
+# tre_combo <- tre_combo |>
+#     endoaggregate(
+#         {
+#             viability_1_impute <- PharmacoGx:::.Hill(
+#                 x=log10(treatment1dose),
+#                 pars=c(HS_1, E_inf_1, log10(EC50_1))
+#             )
+#             viability_2_impute <- PharmacoGx:::.Hill(
+#                 x=log10(treatment2dose),
+#                 pars=c(HS_2, E_inf_2, log10(EC50_2))
+#             )
+#             list(
+#                 viability_1_impute=viability_1_impute,
+#                 viability_2_impute=viability_2_impute
+#             )
+#         },
+#         assay="combo_viability",
+#         by=assayKeys(tre_combo, "combo_viability"),
+#         enlist=FALSE
+#     )
 ```
 
 ## Compute Synergy Scores
 
 ```{r}
-tre6 |>
+tre_synergy <- tre_combo |>
     endoaggregate(
         assay="combo_viability",
         HSA=computeHSA(viability_1, viability_2),
         Bliss=computeBliss(viability_1, viability_2),
-        ZIP=computeZIP(
-            treatment1dose, HS_1, EC50_1, E_inf_1,
-            treatment2dose, HS_2, EC50_2, E_inf_2
+        Loewe=computeLoewe(
+            treatment1dose, HS_1=HS_1, EC50_1=EC50_1, E_inf_1=E_inf_1,
+            treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
         ),
-        by=assayKeys(tre6, "combo_viability"),
+        ZIP=computeZIP(
+            treatment1dose, HS_1=HS_1, EC50_1=EC50_1, E_inf_1=E_inf_1,
+            treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
+        ),
+        by=assayKeys(tre_combo, "combo_viability"),
         nthread=4
-    ) -> tre7
+    )
 ```
 
+```{r}
+tre_synergy <- tre_synergy |>
+    endoaggregate(
+        assay="combo_viability",
+        HSA_score=HSA - mean_viability,
+        Bliss_score=Bliss - mean_viability,
+        Loewe_score=Loewe - mean_viability,
+        ZIP_score=ZIP - mean_viability,
+        by=assayKeys(tre_synergy, "combo_viability")
+    )
+```
+
+## Visualizing Drug Synergy
+
+```{r}
+combo_viab <- tre_synergy[["combo_viability"]]
+top_15_bliss <- combo_viab[
+    order(-Bliss_score),
+    unique(.SD),
+    .SDcols=c("treatment1id", "treatment2id")
+] |> head(15)
+top_15_bliss_df <- combo_viab[top_15_bliss, ]
+```
+
+```{r}
+library(ggplot2)
+libary(RColorBrewer)
+top_15_bliss_df |>
+    ggplot(aes(x=treatment1dose, y=treatment2dose)) +
+    geom_contour_filled(aes(z=Bliss_score), bins=11) +
+    facet_wrap(~treatment1id, nrow=3, ncol=5) +
+    scale_fill_brewer(palette="RdBu")
+```
+
+```{r}
+tre_synergy |>
+    endoaggregate(
+        assay="combo_viability",
+        {
+            zip_fit <- estimateProjParams(
+                dose_to=treatment1dose,
+                combo_viability=mean_viability,
+                dose_add=unique(treatment2dose),
+                EC50_add=unique(EC50_2),
+                HS_add=unique(HS_2),
+                E_inf_add=unique(E_inf_2)
+            )
+        },
+        enlist=FALSE,
+        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid")
+    )
+```
+
+```{r}
+library(ggplot2)
+libary(RColorBrewer)
+top_15_bliss_df |>
+    ggplot(aes(x=treatment1dose, y=treatment2dose, z=Bliss_score)) +
+    geom_contour_filled() +
+    geom_contour(colour="black") +
+    geom_point() +
+    facet_wrap(~treatment1id, nrow=3, ncol=5) +
+    scale_x_log10(oob=scales::squish_infinite) +
+    scale_y_log10(oob=scales::squish_infinite) +
+    scale_fill_brewer(palette="RdBu")
+```
+
+```{r}
+top_15_bliss_df |>
+    ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
+    geom_tile(aes(fill=Bliss_score)) +
+    facet_wrap(~treatment1id, nrow=3, ncol=5) +
+    scale_fill_gradient2(low="blue", mid="white", high="red")
+```
+
+```{r}
+combo_viab[treatment1id %ilike% "Isp|Cane", ] |>
+    ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
+    geom_tile(aes(fill=HSA_score)) +
+    facet_wrap(~treatment1id) +
+    scale_fill_gradient2(low="blue", mid="white", high="red")
+```
 
 # References
 

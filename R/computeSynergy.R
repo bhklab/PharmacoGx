@@ -494,6 +494,7 @@ estimateProjParams <- function(dose_to, combo_viability, dose_add, EC50_add, HS_
         trunc = FALSE
     )
     log_conc <- formatted_data[["x"]]
+    combo_viability <- formatted_data[["y"]]
 
     residual_fns <- list(
         "normal" = CoreGx:::.normal_loss,
@@ -942,12 +943,9 @@ setGeneric(name = "computeZIPdelta",
 #' @import data.table
 #' @export
 #' @docType methods
-setMethod(f = "computeZIPdelta",
-          signature = signature(object = "TreatmentResponseExperiment"),
-          definition = function(object,
-                                residual = "logcosh",
-                                nthread = 1L,
-                                show_Rsqr = FALSE) {
+setMethod("computeZIPdelta", signature(object = "TreatmentResponseExperiment"),
+        function(object, residual = "logcosh", nthread = 1L,
+        show_Rsqr = FALSE) {
 
     if (!is.character(residual)) {
         stop("argument `residual` must be type of logical")
