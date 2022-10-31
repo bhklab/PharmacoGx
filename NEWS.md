@@ -10,6 +10,8 @@
 - Update to slot names "cell" -> "sample" and "drug" -> "treatment"
 - Update standardized identifier column names to match the above slot nomenclature: "cellid" -> "sampleid", "drugid" -> "treatmentid"
 
+# 2.5
+
 ## 2.5.3
 - Added PharmacoSet2 constructor to allow creation of PSets with updated class definition introducted in BioC 3.13
 - The sensitivity slot is now required to be a TreatmentResponseExperiment
