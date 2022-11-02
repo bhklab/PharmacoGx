@@ -54,6 +54,7 @@ For a comprehensive introduction to drug combination modelling with `r cgx` and
 library(PharmacoGx)
 library(CoreGx)
 library(data.table)
+library(ggplot2)
 ```
 
 ## Reading in Raw Data
@@ -192,7 +193,7 @@ tre_fit <- tre_qc |>
             aac <- computeAUC(treatment1dose, Hill_fit=fit)
             list(
                 HS=fit[["HS"]],
-                E_inf = fit[["E_inf"]] / 100,
+                E_inf = fit[["E_inf"]],
                 EC50 = fit[["EC50"]],
                 Rsq=as.numeric(unlist(attributes(fit))),
                 aac_recomputed=aac,
@@ -206,6 +207,37 @@ tre_fit <- tre_qc |>
         nthread=4
     )
 ```
+
+```{r}
+mono_fits <- tre_fit$mono_profiles |>
+    merge(tre_fit$mono_viability, by=c("treatment1id", "sampleid"))
+mono_plots <- split(mono_fits, by=c("treatment1id", "sampleid"))
+```
+
+```{r}
+plots <- lapply(mono_plots, \(df) {
+    df[,
+        .SD |>
+        ggplot(aes(x=log10(ifelse(treatment1dose == 0, 1., treatment1dose)))) +
+        geom_function(
+            fun=\(x)
+                hillCurve(dose=x,
+                HS=unique(.SD$HS),
+                E_inf=unique(.SD$E_inf),
+                EC50=log10(unique(.SD$EC50)),
+                E_ninf=1)
+        ) +
+        geom_point(aes(y=mean_viability)) +
+        xlab("log10(treatment1dose)")
+    ]
+})
+```
+
+
+```{r}
+mono_fits[, plot(density(E_inf, na.rm=TRUE))]
+```
+
 
 ## Joining Monotherapy Curve Fits to Combinations
 
@@ -248,31 +280,6 @@ tre_combo <- tre_combo |>
         assay="combo_viability",
         by=c("treatment1id", "treatment2dose", "sampleid")
     )
-```
-
-```{r}
-## Computing viability from monotherapy fits was resulting in weird results
-## (e.g., predicitons of synergy for monotherapies!)
-# tre_combo <- tre_combo |>
-#     endoaggregate(
-#         {
-#             viability_1_impute <- PharmacoGx:::.Hill(
-#                 x=log10(treatment1dose),
-#                 pars=c(HS_1, E_inf_1, log10(EC50_1))
-#             )
-#             viability_2_impute <- PharmacoGx:::.Hill(
-#                 x=log10(treatment2dose),
-#                 pars=c(HS_2, E_inf_2, log10(EC50_2))
-#             )
-#             list(
-#                 viability_1_impute=viability_1_impute,
-#                 viability_2_impute=viability_2_impute
-#             )
-#         },
-#         assay="combo_viability",
-#         by=assayKeys(tre_combo, "combo_viability"),
-#         enlist=FALSE
-#     )
 ```
 
 ## Compute Synergy Scores
@@ -375,7 +382,7 @@ tre_zip1 <- tre_zip |>
 combo_viab <- tre_zip1[["combo_viability"]]
 top_15_combo <- combo_viab[
     Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
-    .(delta=max(Bliss_score, na.rm=TRUE)),
+    .(delta=max(zip_delta, na.rm=TRUE)),
     by=.(treatment1id, treatment2id, sampleid)
 ][
     order(-delta),
@@ -387,7 +394,7 @@ top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id',
 
 ```{r}
 library(ggplot2)
-libary(RColorBrewer)
+library(RColorBrewer)
 top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose)) +
     geom_contour_filled(aes(z=zip_delta), bins=11) +
@@ -395,6 +402,34 @@ top_15_combo_df |>
     scale_fill_brewer(palette="RdBu")
 ```
 
+```{r}
+Rsq_cut_off <- seq(0, 0.8, 0.1)
+spearman <- c()
+n_drugs <- c()
+for (cutoff in Rsq_cut_off) {
+    df_ <- combo_viab[
+        Rsq_1 >= cutoff &
+            Rsq_2 >= cutoff &
+            Rsqr_1_to_2 >= cutoff &
+            Rsqr_2_to_1 >= cutoff,
+    ]
+    spearman <- c(spearman,
+        df_[, cor(Bliss_score, zip_delta, use="complete", method="spearman")]
+    )
+    n_drugs <- c(n_drugs, df_[, uniqueN(.SD[, .(treatment1id, treatment2id)])])
+}
+spearman_df <- data.frame(Rsq_cut_off, spearman, n_drugs)
+```
+
+
+```{r}
+spearman_df |>
+    ggplot(aes(x=Rsq_cut_off, y=spearman, label=n_drugs)) +
+    geom_point() +
+    geom_text(angle=45, vjust=-0.5) +
+    geom_smooth() +
+    ggtitle("Spearman for Bliss score vs ZIP delta")
+```
 
 ```{r}
 library(ggplot2)
