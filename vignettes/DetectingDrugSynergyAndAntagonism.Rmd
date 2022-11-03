@@ -233,16 +233,6 @@ mono_fits[,
 ```
 
 ```{r}
-# Loess smoothing over predicted viabilities
-mono_fits |>
-    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
-    geom_smooth(
-        method="glm",
-        method.args=list(family="binomial")
-    )
-```
-
-```{r}
 # Test out clustering curves by parameters
 hill_df <- tre_fit[["mono_profiles"]][,
     .(HS, EC50, E_inf)
@@ -250,7 +240,8 @@ hill_df <- tre_fit[["mono_profiles"]][,
 rownames(hill_df) <- tre_fit[["mono_profiles"]]$treatment1id
 hill_euclidean <- dist(hill_df)
 hill_hc_ward <- hclust(hill_euclidean, method="ward.D2")
-# Test out clustering curves by actual
+# Test out clustering curves by actual viabilities
+viab_df <- mono_fits |>
     dcast(treatment1id ~ treatment1dose, value.var="mean_viability") |>
     as.data.frame()
 rownames(viab_df) <- viab_df$treatment1id
@@ -275,7 +266,6 @@ plot(pviab_hc_ward, cex=0.6)
 hill_hc_labs <- cutree(hill_hc_ward, k=4)
 viab_hc_labs <- cutree(viab_hc_ward, k=4)
 pviab_hc_labs <- cutree(pviab_hc_ward, k=4)
-mcc(factor(pviab_hc_labs), factor(viab_hc_labs))
 ```
 
 ```{r}
@@ -288,6 +278,7 @@ mono_fits[, pviab_clust := pviab_hc_labs[treatment1id]]
 mono_fits[,
     viab_clust_label :=
         paste(
+            viab_clust,
             "Rsqr:",
             paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
             "n:",
@@ -299,6 +290,7 @@ mono_fits[,
 mono_fits[,
     hill_clust_label :=
         paste(
+            hill_clust,
             "Rsqr:",
             paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
             "n:",
@@ -306,6 +298,18 @@ mono_fits[,
             sep=" "
         ),
     by=hill_clust
+]
+mono_fits[,
+    hill_clust_label :=
+        paste(
+            pviab_clust,
+            "Rsqr:",
+            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
+            "n:",
+            uniqueN(treatment1id),
+            sep=" "
+        ),
+    by=pviab_clust
 ]
 ```
 
@@ -329,6 +333,13 @@ mono_fits |>
         span=0.3
     ) +
     facet_wrap(~viab_clust_label)
+```
+
+```{r}
+mono_fits |>
+    ggplot(aes(x=viab_clust_label, y=Rsq)) +
+    geom_boxplot() +
+    scale_y_continuous(limits=c(-2, 1))
 ```
 
 ```{r}
