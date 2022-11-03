@@ -215,6 +215,123 @@ mono_plots <- split(mono_fits, by=c("treatment1id", "sampleid"))
 ```
 
 ```{r}
+# Add the hill curve viability predictions
+mono_fits[,
+    log10_treatment1dose := log10(
+        ifelse(treatment1dose == 0, 1, treatment1dose) # No Inf!
+    )
+]
+mono_fits[,
+    pred_viability := hillCurve(
+        dose=log10_treatment1dose,
+        HS=unique(HS),
+        E_inf=unique(E_inf),
+        EC50=log10(EC50),
+        E_ninf=1),
+    by=.(treatment1id, sampleid)
+]
+```
+
+```{r}
+# Loess smoothing over predicted viabilities
+mono_fits |>
+    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
+    geom_smooth(
+        method="glm",
+        method.args=list(family="binomial")
+    )
+```
+
+```{r}
+# Test out clustering curves by parameters
+hill_df <- tre_fit[["mono_profiles"]][,
+    .(HS, EC50, E_inf)
+] |> as.data.frame()
+rownames(hill_df) <- tre_fit[["mono_profiles"]]$treatment1id
+hill_euclidean <- dist(hill_df)
+hill_hc_ward <- hclust(hill_euclidean, method="ward.D2")
+# Test out clustering curves by actual
+    dcast(treatment1id ~ treatment1dose, value.var="mean_viability") |>
+    as.data.frame()
+rownames(viab_df) <- viab_df$treatment1id
+viab_euclidean <- dist(viab_df)
+viab_hc_ward <- hclust(viab_euclidean, method="ward.D2")
+# Test out clustering curves by predicted viabilities
+pviab_df <- mono_fits |>
+    dcast(treatment1id ~ treatment1dose, value.var="pred_viability") |>
+    as.data.frame()
+rownames(pviab_df) <- pviab_df$treatment1id
+pviab_euclidean <- dist(pviab_df)
+pviab_hc_ward <- hclust(pviab_euclidean, method="ward.D2")
+```
+
+```{r}
+plot(hill_hc_ward, cex=0.6)
+plot(viab_hc_ward, cex=0.6)
+plot(pviab_hc_ward, cex=0.6)
+```
+
+```{r}
+hill_hc_labs <- cutree(hill_hc_ward, k=4)
+viab_hc_labs <- cutree(viab_hc_ward, k=4)
+pviab_hc_labs <- cutree(pviab_hc_ward, k=4)
+mcc(factor(pviab_hc_labs), factor(viab_hc_labs))
+```
+
+```{r}
+mono_fits[, hill_clust := hill_hc_labs[treatment1id]]
+mono_fits[, viab_clust := viab_hc_labs[treatment1id]]
+mono_fits[, pviab_clust := pviab_hc_labs[treatment1id]]
+```
+
+```{r}
+mono_fits[,
+    viab_clust_label :=
+        paste(
+            "Rsqr:",
+            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
+            "n:",
+            uniqueN(treatment1id),
+            sep=" "
+        ),
+    by=viab_clust
+]
+mono_fits[,
+    hill_clust_label :=
+        paste(
+            "Rsqr:",
+            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
+            "n:",
+            uniqueN(treatment1id),
+            sep=" "
+        ),
+    by=hill_clust
+]
+```
+
+```{r}
+mono_fits |>
+    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
+    stat_smooth(
+        method="glm",
+        method.args=list(family="binomial"),
+        span=0.3
+    ) +
+    facet_wrap(~hill_clust_label)
+```
+
+```{r}
+mono_fits |>
+    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
+    stat_smooth(
+        method="glm",
+        method.args=list(family="binomial"),
+        span=0.3
+    ) +
+    facet_wrap(~viab_clust_label)
+```
+
+```{r}
 plots <- lapply(mono_plots, \(df) {
     df[,
         .SD |>
@@ -363,7 +480,7 @@ tre_zip <- tre_zip |>
 tre_zip1 <- tre_zip |>
     endoaggregate(
         assay="combo_viability",
-        zip_delta=.deltaScore(
+        ZIP_delta=.deltaScore(
             EC50_1_to_2=EC50_proj_1_to_2, EC50_2_to_1=EC50_proj_2_to_1,
             EC50_1=EC50_1, EC50_2=EC50_2,
             HS_1_to_2=HS_proj_1_to_2, HS_2_to_1=HS_proj_2_to_1,
@@ -382,7 +499,7 @@ tre_zip1 <- tre_zip |>
 combo_viab <- tre_zip1[["combo_viability"]]
 top_15_combo <- combo_viab[
     Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
-    .(delta=max(zip_delta, na.rm=TRUE)),
+    .(delta=max(ZIP_delta, na.rm=TRUE)),
     by=.(treatment1id, treatment2id, sampleid)
 ][
     order(-delta),
@@ -397,14 +514,14 @@ library(ggplot2)
 library(RColorBrewer)
 top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose)) +
-    geom_contour_filled(aes(z=zip_delta), bins=11) +
+    geom_contour_filled(aes(z=ZIP_delta), bins=11) +
     facet_wrap(~treatment1id, nrow=3, ncol=5) +
     scale_fill_brewer(palette="RdBu")
 ```
 
 ```{r}
 Rsq_cut_off <- seq(0, 0.8, 0.1)
-spearman <- c()
+spearman <- list()
 n_drugs <- c()
 for (cutoff in Rsq_cut_off) {
     df_ <- combo_viab[
@@ -413,22 +530,41 @@ for (cutoff in Rsq_cut_off) {
             Rsqr_1_to_2 >= cutoff &
             Rsqr_2_to_1 >= cutoff,
     ]
-    spearman <- c(spearman,
-        df_[, cor(Bliss_score, zip_delta, use="complete", method="spearman")]
-    )
-    n_drugs <- c(n_drugs, df_[, uniqueN(.SD[, .(treatment1id, treatment2id)])])
+    n_drugs <- df_[, uniqueN(.SD[, .(treatment1id, treatment2id)])]
+    tmp_df <- df_[,
+            cor(.SD[, .(Bliss_score, HSA_score, Loewe_score, ZIP_delta)],
+                use="complete", method="spearman")
+        ] |>
+        as.data.table(keep.rownames="score") |>
+        melt(id.vars="score", variable.factor=FALSE)
+    tmp_df$n_drugs <- n_drugs
+    tmp_df$prop_drugs <- n_drugs / combo_viab[, uniqueN(treatment1id, treatment2id)]
+    spearman <- c(spearman, list(tmp_df))
 }
-spearman_df <- data.frame(Rsq_cut_off, spearman, n_drugs)
+names(spearman) <- Rsq_cut_off
+spearman_df <- rbindlist(spearman, idcol="Rsquare")
+spearman_df[, Rsquare := as.numeric(Rsquare)]
+spearman_df[, label := paste(score, variable, sep=".")]
 ```
 
 
 ```{r}
-spearman_df |>
-    ggplot(aes(x=Rsq_cut_off, y=spearman, label=n_drugs)) +
+cutoffs <- spearman_df[, unique(Rsquare)]
+ndrugs <- spearman_df[, unique(n_drugs)]
+spearman_df[score != variable, ] |>
+    ggplot(aes(x=Rsquare, y=value, colour=score)) +
     geom_point() +
-    geom_text(angle=45, vjust=-0.5) +
     geom_smooth() +
-    ggtitle("Spearman for Bliss score vs ZIP delta")
+    scale_x_continuous(
+        sec.axis=dup_axis(
+            name="Number of compound pairs",
+            breaks=cutoffs,
+            labels=ndrugs
+        )
+    ) +
+    xlab("Rsquare cut-off") +
+    ylab("Spearman's rho") +
+    facet_wrap(~variable)
 ```
 
 ```{r}
