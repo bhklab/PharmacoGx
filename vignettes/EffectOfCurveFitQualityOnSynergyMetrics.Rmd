@@ -1,5 +1,5 @@
 ---
-title: "Detecting Drug Synergy and Antagnoism with PharmacoGx 3.0"
+title: "Effect of Curve Fit Quality on Synergy Metrics"
 author:
 - name: Christopher Eeles
   affiliation: &pm Princess Margaret Cancer Centre, University Health Network, Toronto Canada
@@ -19,23 +19,15 @@ author:
 output:
   BiocStyle::html_document
 abstract: |
-  Drug combinations are an effective strategy to over come incomplete response
-  or acquired resistance to monotherapies in clinical oncology and beyond. As
-  such, detecting molecular signatures of drug synergy or antagonism in
-  pre-clinical model systems is a major priority to accelerate the adoption of
-  novel treatment strategies in the clinic. The release of PharmacoGx 3.0
-  introduces support for storing, analyzing and visualizing the results of drug
-  combination experiments using the PharmacoSet class, and will enable
-  reseachers across a range of disciplines to more easily mine the published
-  drug combination literature for promising signatures of synergy or antagonism
-  which can be validated in retrospective patient data and prioritized
-  for prospective clinical trails.
+  Monotherapy fit quality has a significant impact on the variability of curve
+  based synergy metrics such as Loewe Additivty and ZIP Delta.
 bibliography: drugCombos.bib
 vignette: |
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Effect of Curve Fit Quality on Synergy Metrics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r eval=TRUE, include=FALSE}
 cgx <- BiocStyle::Biocpkg("CoreGx")
