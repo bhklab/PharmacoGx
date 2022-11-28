@@ -55,7 +55,7 @@ Imports:
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification

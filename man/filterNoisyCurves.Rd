@@ -2,8 +2,10 @@
 % Please edit documentation in R/filterNoisyCurves.R
 \name{filterNoisyCurves}
 \alias{filterNoisyCurves}
-\title{Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
-to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.}
+\title{Viability measurements in dose-reponse curves must remain stable or decrease
+monotonically reflecting response to the drug being tested.
+filterNoisyCurves flags dose-response curves that strongly violate these
+assumptions.}
 \usage{
 filterNoisyCurves(
   pSet,
@@ -29,12 +31,14 @@ may violate epsilon rule for how many points on drug-response curve}
 should the computation be parallelized over?}
 }
 \value{
-a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the
-rownames of the non-noisy curves
+a list with two elements 'noisy' containing the rownames of the
+noisy curves, and 'ok' containing the rownames of the non-noisy curves
 }
 \description{
-Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
-to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
+Viability measurements in dose-reponse curves must remain stable or decrease
+monotonically reflecting response to the drug being tested.
+filterNoisyCurves flags dose-response curves that strongly violate these
+assumptions.
 }
 \examples{
 data(GDSCsmall)

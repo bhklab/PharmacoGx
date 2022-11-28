@@ -11,8 +11,7 @@ PharmacoSet2(
   molecularProfiles = MultiAssayExperiment(),
   treatmentResponse = TreatmentResponseExperiment(),
   perturbation = list(),
-  curation = list(sample = data.frame(), treatment = data.frame(), tissue =
-    data.frame()),
+  curation = list(sample = data.frame(), treatment = data.frame(), tissue = data.frame()),
   datasetType = "sensitivity"
 )
 }

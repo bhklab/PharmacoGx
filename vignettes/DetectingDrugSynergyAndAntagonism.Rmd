@@ -24,7 +24,7 @@ abstract: |
   such, detecting molecular signatures of drug synergy or antagonism in
   pre-clinical model systems is a major priority to accelerate the adoption of
   novel treatment strategies in the clinic. The release of PharmacoGx 3.0
-  introduces support for storing, analyzying and visualizing the results of drug
+  introduces support for storing, analyzing and visualizing the results of drug
   combination experiments using the PharmacoSet class, and will enable
   reseachers across a range of disciplines to more easily mine the published
   drug combination literature for promising signatures of synergy or antagonism
@@ -42,25 +42,31 @@ cgx <- BiocStyle::Biocpkg("CoreGx")
 pgx <- BiocStyle::Biocpkg("PharmacoGx")
 ```
 
-# Drug Combinations Tutorial
+# Synergy/Antagonism Biomarker Discovery
 
-For a comprehensive introduction to drug combination modelling with `r cgx` and
+For a comprehensive introduction to drug combination modelling for
+detecting biomarkers of drug synergy and antagonism with `r cgx` and
 `r pgx`, please see our
 [workshop from BioC2022](http://bhklab.ca/bioc2022workshop/articles/PGxWorkshop.html).
 
 # Mathews Griner
 
-The Mathews Griner dataset is from a high-throughput drug combination screening
-study conducted to explore potential drug synergies, additivities or antagonisms
-in a panel of 459 compounds combined with the Tyrosine Kinase inhibitor ibrutinib
-in the activated B-cell like subtype of diffuse large B-cell lymphoma
-[@mathewsgrinerHighthroughputCombinatorialScreening2014]. The study uses a
-6x6 combination matrix design, where each respective drug in a combination
-undergoes a 4-fold dilution series over 5 steps, with the 6th step being
-untreated. The result is a total of 36 cell viability measurements via The
-CellTitreGlo assay 48 hrs after initial treatment. We selected this dataset
-for our vignette to simplify comparison with the `SynergyFinder` package,
-which was used to analyze the same dataset [@yadavSearchingDrugSynergy2015].
+The Mathews Griner dataset was generated in a high-throughput drug combination
+screening study conducted to explore potential drug synergies and antagonisms
+in a panel of 459 compounds combined with the Tyrosine Kinase inhibitor
+ibrutinib in cancer cell lines from the activated B-cell like subtype of diffuse
+large B-cell lymphoma [@mathewsgrinerHighthroughputCombinatorialScreening2014].
+The study uses a 6 x 6 combination matrix design, where each respective drug in
+a combination undergoes a 4-fold dilution series over 4 steps, with the last
+well left untreated. This can be conceptualized as drug combination matrix where
+the final row and column represent monotherapy responses for each compound in
+the pair. A total of 36 viability measurements were taken via the CellTitreGlo
+assay for each drug pair, being comprised of pair-wise combinations of each
+dose level in the respective dilution series.
+
+We selected this dataset for our vignette to simplify comparison with the
+`SynergyFinder` package, which was previously used to analyze this dataset
+[@yadavSearchingDrugSynergy2015].
 
 ```{r load_dependencies_eval, eval=TRUE, echo=FALSE}
 suppressPackageStartupMessages({
@@ -82,7 +88,8 @@ library(ggplot2)
 ## Reading in Raw Data
 
 We have included a compressed CSV version of the Mathews Griner dataset
-which we curated to have informative compound names.
+which we curated to have informative compound names. You can read the file
+in with your CSV reader of choice.
 
 ```{r}
 input_file <- file.path("mathews_griner.csv.tar.gz")
@@ -91,23 +98,27 @@ mathews_griner <- fread(input_file)
 
 ## Experimental Design Hypothesis
 
-Before modelling dose-response and treatment synergy with `r pgx` we must
-first build a `TreatmentResponseExperiment` from our raw high-throughput
-drug combination dataset. This S4 class is used to store high-dimensional
-treatment response experiments, such as the dose-response screens in cancer
+Before modelling dose-response and treatment synergy/antagonism with `r pgx` we
+must first build a `TreatmentResponseExperiment` from our high-throughput
+drug combination data. This S4 class was designed to store and analyze high
+dimensional treatment response data, such as the dose-response screens in cancer
 cell lines which are the subject of this analysis. For a detailed explanation
-of the class design, please refer to our
+of the class design, please refer to the
 [TreatmentResponseExperiment vignette in CoreGx](http://bhklab.ca/CoreGx/articles/TreatmentResponseExperiment.html).
 
 Due to the highly diverse set of experimental designs used in drug combination
 studies, the first step in any drug combination analysis is to generate a
 hypothesis about the study design. For the `TreatmentResponseExperiment`,
 we must identify which columns in our raw data are required to uniquely
-identify every treatment (our rows) and sample (our columns). As a starting
-point we recommend trying treatment identifiers and their respective doses
-for rows and sample identifiers for columns.
+identify every treatment (our rows), sample (our columns) and observation
+(our assay). As a starting point we recommend trying treatment identifiers and
+their respective doses for rows, sample identifiers for columns, and the union
+of these for observations.
 
-```{r}
+NOTE: Giving names to columns in your groups will automatically rename them
+when the `TreatmentResponseExperiment` gets created!
+
+```{r experiment_design_hypothesis}
 groups <- list(
     rowDataMap=c(
         treatment1id="RowName", treatment2id="ColName",
@@ -121,24 +132,24 @@ groups[["assayMap"]] <- c(groups$rowDataMap, groups$colDataMap)
 
 ## Handling Undocumented Replicates
 
-These initial guesses can be insufficient to uniquely identify our treatments or
-samples if there are technical or biological replicates in the dataset. While
-some publications are explicit about these measurements in their datasets, others
-are not and require us to explore the data to identify them. In general, We
-recommend undocumented replciates be treated as technical replicates and used
-to quantify the noisiness of our dataset unless explicitly documented as being
-biological replicates.
+These initial guesses can be insufficient to uniquely identify our
+treatments or samples if there are technical or biological replicates in the
+data. While some publications are explicit about the presence of such
+measurements, others are not and require us to explore the data to identify
+them. In general, We recommend undocumented replciates be treated as technical
+and used to quantify noise in our assay unless you have good reason to believe
+they are from distinct biological entities.
 
-We can identify undocumented replicates using a group by operation. This
-operation used the split-apply-combine paradigm to compute some aggregate
-over subsets of tabular data. A group has undocumented replicates if more
-than one row is assigned to groups which we hypothesize to uniquely identify
-every observation in our data. We check this below using the `.N` special
+We can identify undocumented replicates using a "group by" operation. This
+operation uses the split-apply-combine paradigm to compute some aggregate
+over subsets of a `data.frame`. A group has undocumented replicates if more
+than one row is assigned to any group which we hypothesized to uniquely identify
+the observations in our data. We check this below using the `.N` special
 variable from the `data.table` package, which counts the number of instances
 in a each group. Similar operations could be accomplished with `dplyr` or
-even base R.
+even base R, though they may be less concise.
 
-```{r}
+```{r handling_technicl_replicates}
 mathews_griner[, tech_rep := seq_len(.N), by=c(groups[["assayMap"]])]
 if (max(mathews_griner[["tech_rep"]]) > 1) {
     groups[["colDataMap"]] <- c(groups[["colDataMap"]], "tech_rep")
@@ -150,6 +161,8 @@ if (max(mathews_griner[["tech_rep"]]) > 1) {
 }
 ```
 
+For the Mathews Griner dataset, we do indeed have undocumented replicates!
+
 ## Using the `TREDataMapper`
 
 Once we are confident we know which columns are needed to uniquely
@@ -157,30 +170,31 @@ identify our treatments and samples, we can create a `TREDataMapper` using
 our raw data and our mapping hypothesis. The `guessMapping` method does
 the necessary internal work to map additional columns in your dataset to
 the appopriate category&mdash;treatment metadata, sample metadata or assay
-data&mdash;and returns the column names for each.
+data&mdash;and returns the column names for each group.
 
-```{r}
+```{r build_tredatamapper}
 (treMapper <- TREDataMapper(rawdata=mathews_griner))
 ```
 
-We know we have successfully mapped all of our data in the "unmapped" list
-item in our guess has no columns names in it. If this is not the case, your
+We will know we have successfully mapped all of our data if the "unmapped" list
+item in our guess has no columns names in it. If this is not the case, you
 may have to refine your hypothesis to include additional information needed
 to uniquely identify each observation in your dataset.
 
-```{r}
-guess <- guessMapping(treMapper, groups, subset=TRUE)
+```{r evaluate_tre_mapping_guess}
+(guess <- guessMapping(treMapper, groups, subset=TRUE))
 ```
 
 Once we have mapped all our columns, we can assign their names to the
 `TREDataMapper` object and use it to construct the `TreatmentResponseExperiment`
 we will use in downstream dose-response and synergy-antagonism modelling.
 
-```{r}
+```{r update_tredatamapper_with_guess}
 metadataMap(treMapper) <- list(experiment_metadata=guess$metadata$mapped_columns)
 rowDataMap(treMapper) <- guess$rowDataMap
 colDataMap(treMapper) <- guess$colDataMap
 assayMap(treMapper) <- list(raw=guess$assayMap)
+(treMapper)
 ```
 
 ## Creating a `TreatmentResponseExperiment`
@@ -189,42 +203,99 @@ assayMap(treMapper) <- list(raw=guess$assayMap)
 `TreatmentResponseExperiment` object. Simply call it on the `TREDataMapper` you
 created previously to instantiate your object.
 
-```{r}
+```{r metaconstruct_the_tre}
 (tre <- metaConstruct(treMapper))
 ```
 
 ## Normalizing Treatment Response
 
-```{r}
+The viability measurements in the Mathews Griner data have already been
+normalized relative to the time zero control. However, `r pgx` recommends
+further normalizing against the treatment control to limit the range
+of your viability measurements from 0 to 1.
+
+To accomplish this for our current dataset, we can use a sub-query where we
+select the viability at index (6, 6) of our drug combination matrix. This is
+well has not been treatment with either drug. Dividing by it normalizes the
+observed viability in our treatment wells relative to any growth that may
+have occured during treatment. We further truncate our viability values at
+zero, since any values below this are likely a result of technical noise in our
+assay.
+
+```{r normalize_to_dose_0_0_control}
 raw <- tre[["raw"]]
 raw[,
     viability := viability / .SD[treatment1dose == 0 & treatment2dose == 0, viability],
     by=c("treatment1id", "treatment2id", "sampleid", "tech_rep")
 ]
-raw[, viability := pmax(0, viability)]
+raw[, viability := pmax(0, viability)]  # truncate min viability at 0
 tre[["raw"]] <- raw
 ```
 
-```{r}
+As a sanity check that our normalization was effective, we have a look at the
+range of our viabiltiy values. In most cases, this should be very close to
+[0, 1], since we do not expect treatment with one or more compound to increase
+the growth of our cell lines.
+
+```{r sanity_check_viability}
 tre[["raw"]][, range(viability)]
 ```
 
-```{r}
-bad_treatments <- tre[["raw"]][viability > 2, unique(treatment1id)]
+Some of our treated viabilties are > 60x higher than our control! This is very
+unlikely to be a real signal and probably indicates there was an issue
+with the viability measurement for our dose 0 x 0 well. To quality control
+our results, we will find the treatment combination with this observation
+and remove it from downstream analysis. It is always essential to perform
+regular sanity checks to ensure your data is plausible given the experimental
+setup.
+
+```{r find_bad_viability_treatment}
+(bad_treatments <- tre[["raw"]][viability > 2, unique(treatment1id)])
 ```
 
-```{r}
-## TODO:: Debug warning message!
-tre <- subset(tre, !(treatment1id %in% bad_treatments))
+Only a single treatment has a viability measurement higher than twice our
+control. We will remove this and leave the remaining values in place, since
+we can simply truncate them at vaiblity of 1 to include as many combinations
+in our analyses as possible
+
+```{r remove_bad_viability_treatment}
+(tre <- subset(tre, !(treatment1id %in% bad_treatments)))
 ```
 
-```{r}
+We will inspect the viability range again to ensure the bad data has
+been removed.
+
+```{r sanity_check_viability2}
 tre[["raw"]][, range(viability)]
 ```
+
+The range for viabilities is now much more reasonable, and we can move on
+to fitting dose-response curves to our monotherapy measurements.
 
 ## Fitting Monotherapy Curves
 
-```{r}
+Since we currently only want to fit curves to the monotherapy experiments
+in our drug matrix we will use the `subset` feature of the `endoaggregate`
+method to remove the combination therapy rows. This method allows us to
+extract an assay from our `TreatmentResponseExperiment`, compute a group by
+(aggregation) over it, then assign it back to our
+`TreatmentResponseExperiment` via a join.
+
+We can use this feature to update existing assays, or to create
+new ones. The `assay` argument specifies the assay to aggregate over and the
+`target` argument specifies the name of the assay to assign to.
+If the `target` does not already exist, a new assay will be created otherwise
+the specified `target` will be updated. If you exclude this argument, the
+`assay` you select automatically becomes the `target`. The `endoaggregate`
+method is endomorphic, meaning it always returns a `TreatmentResponseExperiment`.
+
+While subsetting out our monotherapy viabilities, we can also summarize
+viabilities over our techinical replicates by excluding that column from our
+`by` argument. Any additional arguments to `endoaggregate` via `...` are
+assumed to be aggregation calls and will be computed for each group
+identified in `by` and assigned to `target`.
+
+```{r creating_monotherapy_assay}
 tre_qc <- tre |>
     endoaggregate(
         subset=treatment2dose == 0,
@@ -235,8 +306,15 @@ tre_qc <- tre |>
     )
 ```
 
+Once we have isolated our monotherapy viabilities, we can once again use
+`endoaggregate` to fit our dose-response curves. This time we will use the
+`enlist=FALSE` option which allows us to assign intermediate variables
+during our aggregate computation. Pass in an entire code block to `endoggregate`
+to use this feature and only the final returned list will become columns in
+your `target` assay. To prevent duplicating our curve parameters, we will
+create a new assay for them since we are now summarizing over dose.
 
-```{r}
+```{r monotherapy_curve_fits}
 tre_fit <- tre_qc |>
     endoaggregate(
         {
@@ -264,7 +342,7 @@ tre_fit <- tre_qc |>
 
 ## Joining Monotherapy Curve Fits to Combinations
 
-```{r}
+```{r create_combo_viability}
 tre_combo <- tre_fit |>
     endoaggregate(
         assay="raw",
@@ -274,7 +352,7 @@ tre_combo <- tre_fit |>
     )
 ```
 
-```{r}
+```{r add_monotherapy_fits_to_combo_viability}
 tre_combo <- tre_combo |>
     mergeAssays(
         x="combo_viability",
@@ -291,7 +369,7 @@ tre_combo <- tre_combo |>
 ```
 
 
-```{r}
+```{r }
 tre_combo <- tre_combo |>
     endoaggregate(
         viability_1=.SD[treatment2dose == 0, mean_viability],
@@ -307,7 +385,7 @@ tre_combo <- tre_combo |>
 
 ## Compute Synergy Scores
 
-```{r}
+```{r compute_synergy_null_hypotheses}
 tre_synergy <- tre_combo |>
     endoaggregate(
         assay="combo_viability",
@@ -326,7 +404,7 @@ tre_synergy <- tre_combo |>
     )
 ```
 
-```{r}
+```{r synergy_score_vs_reference}
 tre_synergy <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
@@ -339,7 +417,7 @@ tre_synergy <- tre_synergy |>
 ```
 
 
-```{r}
+```{r zip_two_way_fit}
 tre_zip <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
@@ -351,8 +429,7 @@ tre_zip <- tre_synergy |>
                 dose_add=unique(treatment2dose),
                 EC50_add=unique(EC50_2),
                 HS_add=unique(HS_2),
-                E_inf_add=unique(E_inf_2),
-                residual="normal"
+                E_inf_add=unique(E_inf_2)
             )
             setNames(zip_fit, paste0(names(zip_fit), "_2_to_1"))
         },
@@ -371,8 +448,7 @@ tre_zip <- tre_zip |>
                 dose_add=unique(treatment1dose),
                 EC50_add=unique(EC50_1),
                 HS_add=unique(HS_1),
-                E_inf_add=unique(E_inf_1),
-                residual="normal"
+                E_inf_add=unique(E_inf_1)
             )
             setNames(zip_fit, paste0(names(zip_fit), "_1_to_2"))
         },
@@ -382,8 +458,8 @@ tre_zip <- tre_zip |>
     )
 ```
 
-```{r}
-tre_zip1 <- tre_zip |>
+```{r compute_zip_delta}
+tre_zip <- tre_zip |>
     endoaggregate(
         assay="combo_viability",
         ZIP_delta=.deltaScore(
@@ -391,7 +467,7 @@ tre_zip1 <- tre_zip |>
             EC50_1=EC50_1, EC50_2=EC50_2,
             HS_1_to_2=HS_proj_1_to_2, HS_2_to_1=HS_proj_2_to_1,
             HS_1=HS_1, HS_2=HS_2,
-            E_inf_2_to_1=E_inf_proj_2_to_1, E_inf_1_to_2=E_inf_proj_1_to_2,
+            E_inf_1_to_2=E_inf_proj_1_to_2, E_inf_2_to_1=E_inf_proj_2_to_1,
             E_inf_1=E_inf_1, E_inf_2=E_inf_2,
             treatment1dose=treatment1dose, treatment2dose=treatment2dose,
             ZIP=ZIP_ref
@@ -402,36 +478,42 @@ tre_zip1 <- tre_zip |>
 
 ## Visualizing Drug Synergy
 
-```{r}
-combo_viab <- tre_zip1[["combo_viability"]]
-top_15_combo <- combo_viab[
+```{r compute_top_synergy}
+combo_viab <- tre_zip[["combo_viability"]]
+(top_15_combo <- combo_viab[
     Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
-    .(delta=max(ZIP_delta, na.rm=TRUE)),
+    .(
+        max_delta=max(ZIP_delta, na.rm=TRUE),
+        mean_delta=mean(ZIP_delta, na.rm=TRUE),
+        max_bliss=max(Bliss_score, na.rm=TRUE),
+        mean_bliss=mean(Bliss_score, na.rm=TRUE)
+    ),
     by=.(treatment1id, treatment2id, sampleid)
 ][
-    order(-delta),
-    unique(.SD),
-    .SDcols=c('treatment1id', 'treatment2id', 'sampleid', 'delta')
-][1:15]
-top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id', 'sampleid')]
+    order(-max_delta),
+    unique(.SD)
+][1:15])
 ```
 
-```{r}
+```{r handle_synergy_missing}
+top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id', 'sampleid')]
 # Last observation carried forward for NA/NaN delta scores, to make plot look nicer
 setnafill(top_15_combo_df, type="locf", cols="ZIP_delta")
 ```
 
-```{r, eval=FALSE, include=FALSE}
+```{r synergy_contour_plot}
 top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta * 100)) +
     scale_x_log10(oob=scales::squish_infinite) +
     scale_y_log10(oob=scales::squish_infinite) +
-    geom_contour_filled() +
+    geom_contour_filled(
+        breaks=c(-100, -80, -40, -20, -10, -1, 1, 10, 20, 40, 80, 100)
+    ) +
     facet_wrap(~ treatment1id, nrow=3, ncol=5) +
-    scale_fill_brewer(palette="RdBu", direction=-1)
+    scale_fill_brewer(palette="RdBu", direction=-1, drop=FALSE)
 ```
 
-```{r}
+```{r synergy_heatmap}
 top_15_combo_df |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
     geom_tile(aes(fill=ZIP_delta * 100)) +
@@ -439,7 +521,7 @@ top_15_combo_df |>
     scale_fill_gradient2(low="blue", mid="white", high="red", midpoint=0)
 ```
 
-# Session info {.unnumbered}
+# Session Info {.unnumbered}
 
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
