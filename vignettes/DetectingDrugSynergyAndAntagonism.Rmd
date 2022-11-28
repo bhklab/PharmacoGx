@@ -50,6 +50,20 @@ For a comprehensive introduction to drug combination modelling with `r cgx` and
 
 # Mathews Griner
 
+The Mathews Griner dataset is from a high-throughput drug combination screening
+study conducted to explore potential drug synergies, additivities or antagonisms
+in a panel of 463 compounds combined with the Tyrosine Kinase inhibitor ibrutinib
+in the activated B-cell like subtype of diffuse large B-cell lymphoma
+[@mathewsgrinerHighthroughputCombinatorialScreening2014]. The study uses a
+6x6 combination matrix design, where each respective drug in a combination
+undergoes a 4-fold dilution series over 5 steps, with the 6th step being
+untreated. The result is a total of 36 cell viability measurements via The
+CellTitreGlou assay 48 hrs after initial treatmnet. We selected this dataset
+for our vignette to simplify comparison with other R packages implementing
+dose-response modelling and/or drug synergy quantification such as `drc`,
+`drda` and `SynergyFinder`.
+
+
 ```{r}
 library(PharmacoGx)
 library(CoreGx)
@@ -531,58 +545,8 @@ top_15_combo_df |>
 ```
 
 ```{r}
-Rsq_cut_off <- seq(0, 0.8, 0.1)
-spearman <- list()
-n_drugs <- c()
-for (cutoff in Rsq_cut_off) {
-    df_ <- combo_viab[
-        Rsq_1 >= cutoff &
-            Rsq_2 >= cutoff &
-            Rsqr_1_to_2 >= cutoff &
-            Rsqr_2_to_1 >= cutoff,
-    ]
-    n_drugs <- df_[, uniqueN(.SD[, .(treatment1id, treatment2id)])]
-    tmp_df <- df_[,
-            cor(.SD[, .(Bliss_score, HSA_score, Loewe_score, ZIP_delta)],
-                use="complete", method="spearman")
-        ] |>
-        as.data.table(keep.rownames="score") |>
-        melt(id.vars="score", variable.factor=FALSE)
-    tmp_df$n_drugs <- n_drugs
-    tmp_df$prop_drugs <- n_drugs / combo_viab[, uniqueN(treatment1id, treatment2id)]
-    spearman <- c(spearman, list(tmp_df))
-}
-names(spearman) <- Rsq_cut_off
-spearman_df <- rbindlist(spearman, idcol="Rsquare")
-spearman_df[, Rsquare := as.numeric(Rsquare)]
-spearman_df[, label := paste(score, variable, sep=".")]
-```
-
-
-```{r}
-cutoffs <- spearman_df[, unique(Rsquare)]
-ndrugs <- spearman_df[, unique(n_drugs)]
-spearman_df[score != variable, ] |>
-    ggplot(aes(x=Rsquare, y=value, colour=score)) +
-    geom_point() +
-    geom_smooth() +
-    scale_x_continuous(
-        sec.axis=dup_axis(
-            name="Number of compound pairs",
-            breaks=cutoffs,
-            labels=ndrugs
-        )
-    ) +
-    xlab("Rsquare cut-off") +
-    ylab("Spearman's rho") +
-    facet_wrap(~variable)
-```
-
-```{r}
-library(ggplot2)
-libary(RColorBrewer)
 top_15_combo_df |>
-    ggplot(aes(x=treatment1dose, y=treatment2dose, z=zip_delta)) +
+    ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta)) +
     scale_x_log10(oob=scales::squish_infinite) +
     scale_y_log10(oob=scales::squish_infinite) +
     geom_contour_filled() +
@@ -608,7 +572,6 @@ combo_viab[treatment1id %ilike% "Isp|Cane", ] |>
 ```
 
 # References
-****
 
 # Session info {.unnumbered}
 
