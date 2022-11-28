@@ -59,21 +59,30 @@ in the activated B-cell like subtype of diffuse large B-cell lymphoma
 undergoes a 4-fold dilution series over 5 steps, with the 6th step being
 untreated. The result is a total of 36 cell viability measurements via The
 CellTitreGlo assay 48 hrs after initial treatment. We selected this dataset
-for our vignette to simplify comparison with other R packages implementing
-dose-response modelling and/or drug synergy quantification such as `drc`,
-`drda` and `SynergyFinder`.
+for our vignette to simplify comparison with the `SynergyFinder` package,
+which was used to analyze the same dataset [@yadavSearchingDrugSynergy2015].
 
+```{r load_dependencies_eval, eval=TRUE, echo=FALSE}
+suppressPackageStartupMessages({
+    library(PharmacoGx)
+    library(CoreGx)
+    library(data.table)
+    library(ggplot2)
+})
+```
 
-
-
-```{r}
+```{r load_dependencies_echo, eval=FALSE, echo=TRUE}
 library(PharmacoGx)
 library(CoreGx)
 library(data.table)
 library(ggplot2)
 ```
 
+
 ## Reading in Raw Data
+
+We have included a compressed CSV version of the Mathews Griner dataset
+which we curated to have informative compound names.
 
 ```{r}
 input_file <- file.path("mathews_griner.csv.tar.gz")
@@ -81,6 +90,22 @@ mathews_griner <- fread(input_file)
 ```
 
 ## Experimental Design Hypothesis
+
+Before modelling dose-response and treatment synergy with `r pgx` we must
+first build a `TreatmentResponseExperiment` from our raw high-throughput
+drug combination dataset. This S4 class is used to store high-dimensional
+treatment response experiments, such as the dose-response screens in cancer
+cell lines which are the subject of this analysis. For a detailed explanation
+of the class design, please refer to our
+[TreatmentResponseExperiment vignette in CoreGx](http://bhklab.ca/CoreGx/articles/TreatmentResponseExperiment.html).
+
+Due to the highly diverse set of experimental designs used in drug combination
+studies, the first step in any drug combination analysis is to generate a
+hypothesis about the study design. For the `TreatmentResponseExperiment`,
+we must identify which columns in our raw data are required to uniquely
+identify every treatment (our rows) and sample (our columns). As a starting
+point we recommend trying treatment identifiers and their respective doses
+for rows and sample identifiers for columns.
 
 ```{r}
 groups <- list(
@@ -96,6 +121,23 @@ groups[["assayMap"]] <- c(groups$rowDataMap, groups$colDataMap)
 
 ## Handling Undocumented Replicates
 
+These initial guesses can be insufficient to uniquely identify our treatments or
+samples if there are technical or biological replicates in the dataset. While
+some publications are explicit about these measurements in their datasets, others
+are not and require us to explore the data to identify them. In general, We
+recommend undocumented replciates be treated as technical replicates and used
+to quantify the noisiness of our dataset unless explicitly documented as being
+biological replicates.
+
+We can identify undocumented replicates using a group by operation. This
+operation used the split-apply-combine paradigm to compute some aggregate
+over subsets of tabular data. A group has undocumented replicates if more
+than one row is assigned to groups which we hypothesize to uniquely identify
+every observation in our data. We check this below using the `.N` special
+variable from the `data.table` package, which counts the number of instances
+in a each group. Similar operations could be accomplished with `dplyr` or
+even base R.
+
 ```{r}
 mathews_griner[, tech_rep := seq_len(.N), by=c(groups[["assayMap"]])]
 if (max(mathews_griner[["tech_rep"]]) > 1) {
@@ -103,19 +145,36 @@ if (max(mathews_griner[["tech_rep"]]) > 1) {
     groups[["assayMap"]] <- c(groups[["assayMap"]], "tech_rep")
 } else {
     # delete the additional column if not needed
+    message("No technical replicates in this dataset!")
     mathews_griner[["tech_reps"]] <- NULL
 }
 ```
 
 ## Using the `TREDataMapper`
 
+Once we are confident we know which columns are needed to uniquely
+identify our treatments and samples, we can create a `TREDataMapper` using
+our raw data and our mapping hypothesis. The `guessMapping` method does
+the necessary internal work to map additional columns in your dataset to
+the appopriate category&mdash;treatment metadata, sample metadata or assay
+data&mdash;and returns the column names for each.
+
 ```{r}
 (treMapper <- TREDataMapper(rawdata=mathews_griner))
 ```
 
+We know we have successfully mapped all of our data in the "unmapped" list
+item in our guess has no columns names in it. If this is not the case, your
+may have to refine your hypothesis to include additional information needed
+to uniquely identify each observation in your dataset.
+
 ```{r}
 guess <- guessMapping(treMapper, groups, subset=TRUE)
 ```
+
+Once we have mapped all our columns, we can assign their names to the
+`TREDataMapper` object and use it to construct the `TreatmentResponseExperiment`
+we will use in downstream dose-response and synergy-antagonism modelling.
 
 ```{r}
 metadataMap(treMapper) <- list(experiment_metadata=guess$metadata$mapped_columns)
@@ -125,6 +184,10 @@ assayMap(treMapper) <- list(raw=guess$assayMap)
 ```
 
 ## Creating a `TreatmentResponseExperiment`
+
+`r pgx` includes the `metaConstruct` method to simplify creation of a
+`TreatmentResponseExperiment` object. Simply call it on the `TREDataMapper` you
+created previously to instantiate your object.
 
 ```{r}
 (tre <- metaConstruct(treMapper))
@@ -194,7 +257,7 @@ tre_fit <- tre_qc |>
         target="mono_profiles",
         enlist=FALSE,
         by=c("treatment1id", "sampleid"),
-        nthread=4
+        nthread=2
     )
 ```
 
@@ -259,7 +322,7 @@ tre_synergy <- tre_combo |>
             treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
         ),
         by=assayKeys(tre_combo, "combo_viability"),
-        nthread=4
+        nthread=2
     )
 ```
 
@@ -295,7 +358,7 @@ tre_zip <- tre_synergy |>
         },
         enlist=FALSE,
         by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
-        nthread=10
+        nthread=2
     )
 tre_zip <- tre_zip |>
     endoaggregate(
@@ -315,7 +378,7 @@ tre_zip <- tre_zip |>
         },
         enlist=FALSE,
         by=c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
-        nthread=10
+        nthread=2
     )
 ```
 
@@ -382,4 +445,4 @@ top_15_combo_df |>
 sessionInfo()
 ```
 
-# References
+# References {.unnumbered}
