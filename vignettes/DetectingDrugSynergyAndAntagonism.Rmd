@@ -52,16 +52,18 @@ For a comprehensive introduction to drug combination modelling with `r cgx` and
 
 The Mathews Griner dataset is from a high-throughput drug combination screening
 study conducted to explore potential drug synergies, additivities or antagonisms
-in a panel of 463 compounds combined with the Tyrosine Kinase inhibitor ibrutinib
+in a panel of 459 compounds combined with the Tyrosine Kinase inhibitor ibrutinib
 in the activated B-cell like subtype of diffuse large B-cell lymphoma
 [@mathewsgrinerHighthroughputCombinatorialScreening2014]. The study uses a
 6x6 combination matrix design, where each respective drug in a combination
 undergoes a 4-fold dilution series over 5 steps, with the 6th step being
 untreated. The result is a total of 36 cell viability measurements via The
-CellTitreGlou assay 48 hrs after initial treatmnet. We selected this dataset
+CellTitreGlo assay 48 hrs after initial treatment. We selected this dataset
 for our vignette to simplify comparison with other R packages implementing
 dose-response modelling and/or drug synergy quantification such as `drc`,
 `drda` and `SynergyFinder`.
+
+
 
 
 ```{r}
@@ -170,32 +172,6 @@ tre_qc <- tre |>
     )
 ```
 
-```{r}
-## QC on the variablity of fits for biological replicates of Ibrutinib monotherapy
-# tre |>
-#     aggregate(
-#         subset=treatment1dose == 0,
-#         assay="raw",
-#         mean_viability=pmin(1.05, mean(viability)),
-#         by=c("treatment1id", "treatment2dose", "sampleid")
-#     ) -> control_df
-
-# control_df[,
-#     {
-#         fit <- logLogisticRegression(
-#             treatment2dose,
-#             mean_viability,
-#             viability_as_pct=FALSE
-#         )
-#         c(fit, Rsquare=attributes(fit)$Rsquare)
-#     },
-#     by=c("treatment1id", "sampleid")
-# ] -> control_fits
-
-# p <- ggplot(control_df, aes(x=mean_viability)) +
-#     geom_density() +
-#     facet_wrap(~treatment2dose)
-```
 
 ```{r}
 tre_fit <- tre_qc |>
@@ -220,164 +196,6 @@ tre_fit <- tre_qc |>
         by=c("treatment1id", "sampleid"),
         nthread=4
     )
-```
-
-```{r}
-mono_fits <- tre_fit$mono_profiles |>
-    merge(tre_fit$mono_viability, by=c("treatment1id", "sampleid"))
-mono_plots <- split(mono_fits, by=c("treatment1id", "sampleid"))
-```
-
-```{r}
-# Add the hill curve viability predictions
-mono_fits[,
-    log10_treatment1dose := log10(
-        ifelse(treatment1dose == 0, 1, treatment1dose) # No Inf!
-    )
-]
-mono_fits[,
-    pred_viability := hillCurve(
-        dose=log10_treatment1dose,
-        HS=unique(HS),
-        E_inf=unique(E_inf),
-        EC50=log10(EC50),
-        E_ninf=1),
-    by=.(treatment1id, sampleid)
-]
-```
-
-```{r}
-# Test out clustering curves by parameters
-hill_df <- tre_fit[["mono_profiles"]][,
-    .(HS, EC50, E_inf)
-] |> as.data.frame()
-rownames(hill_df) <- tre_fit[["mono_profiles"]]$treatment1id
-hill_euclidean <- dist(hill_df)
-hill_hc_ward <- hclust(hill_euclidean, method="ward.D2")
-# Test out clustering curves by actual viabilities
-viab_df <- mono_fits |>
-    dcast(treatment1id ~ treatment1dose, value.var="mean_viability") |>
-    as.data.frame()
-rownames(viab_df) <- viab_df$treatment1id
-viab_euclidean <- dist(viab_df)
-viab_hc_ward <- hclust(viab_euclidean, method="ward.D2")
-# Test out clustering curves by predicted viabilities
-pviab_df <- mono_fits |>
-    dcast(treatment1id ~ treatment1dose, value.var="pred_viability") |>
-    as.data.frame()
-rownames(pviab_df) <- pviab_df$treatment1id
-pviab_euclidean <- dist(pviab_df)
-pviab_hc_ward <- hclust(pviab_euclidean, method="ward.D2")
-```
-
-```{r}
-plot(hill_hc_ward, cex=0.6)
-plot(viab_hc_ward, cex=0.6)
-plot(pviab_hc_ward, cex=0.6)
-```
-
-```{r}
-hill_hc_labs <- cutree(hill_hc_ward, k=4)
-viab_hc_labs <- cutree(viab_hc_ward, k=4)
-pviab_hc_labs <- cutree(pviab_hc_ward, k=4)
-```
-
-```{r}
-mono_fits[, hill_clust := hill_hc_labs[treatment1id]]
-mono_fits[, viab_clust := viab_hc_labs[treatment1id]]
-mono_fits[, pviab_clust := pviab_hc_labs[treatment1id]]
-```
-
-```{r}
-mono_fits[,
-    viab_clust_label :=
-        paste(
-            viab_clust,
-            "Rsqr:",
-            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
-            "n:",
-            uniqueN(treatment1id),
-            sep=" "
-        ),
-    by=viab_clust
-]
-mono_fits[,
-    hill_clust_label :=
-        paste(
-            hill_clust,
-            "Rsqr:",
-            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
-            "n:",
-            uniqueN(treatment1id),
-            sep=" "
-        ),
-    by=hill_clust
-]
-mono_fits[,
-    hill_clust_label :=
-        paste(
-            pviab_clust,
-            "Rsqr:",
-            paste0(round(range(Rsq, na.rm=TRUE), 3), collapse=","),
-            "n:",
-            uniqueN(treatment1id),
-            sep=" "
-        ),
-    by=pviab_clust
-]
-```
-
-```{r}
-mono_fits |>
-    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
-    stat_smooth(
-        method="glm",
-        method.args=list(family="binomial"),
-        span=0.3
-    ) +
-    facet_wrap(~hill_clust_label)
-```
-
-```{r}
-mono_fits |>
-    ggplot(aes(x=log10_treatment1dose, y=pred_viability)) +
-    stat_smooth(
-        method="glm",
-        method.args=list(family="binomial"),
-        span=0.3
-    ) +
-    facet_wrap(~viab_clust_label)
-```
-
-```{r}
-mono_fits |>
-    ggplot(aes(x=viab_clust_label, y=Rsq)) +
-    geom_boxplot() +
-    scale_y_continuous(limits=c(-2, 1))
-```
-
-```{r}
-plots <- lapply(mono_plots, \(df) {
-    df[,
-        .SD |>
-        ggplot(aes(x=log10(ifelse(treatment1dose == 0, 1., treatment1dose)))) +
-        geom_function(
-            fun=\(x)
-                hillCurve(dose=x,
-                HS=unique(.SD$HS),
-                E_inf=unique(.SD$E_inf),
-                EC50=log10(unique(.SD$EC50)),
-                E_ninf=1)
-        ) +
-        geom_point(aes(y=mean_viability)) +
-        xlab("log10(treatment1dose)")
-    ]
-})
-```
-
-
-```{r}
-mono_fits[, plot(density(E_inf, na.rm=TRUE))]
 ```
 
 
@@ -512,7 +330,8 @@ tre_zip1 <- tre_zip |>
             HS_1=HS_1, HS_2=HS_2,
             E_inf_2_to_1=E_inf_proj_2_to_1, E_inf_1_to_2=E_inf_proj_1_to_2,
             E_inf_1=E_inf_1, E_inf_2=E_inf_2,
-            treatment1dose=treatment1dose, treatment2dose=treatment2dose
+            treatment1dose=treatment1dose, treatment2dose=treatment2dose,
+            ZIP=ZIP_ref
         ),
         by=assayKeys(tre_zip, "combo_viability")
     )
@@ -529,52 +348,38 @@ top_15_combo <- combo_viab[
 ][
     order(-delta),
     unique(.SD),
-    .SDcols=c('treatment1id', 'treatment2id', 'sampleid')
+    .SDcols=c('treatment1id', 'treatment2id', 'sampleid', 'delta')
 ][1:15]
 top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id', 'sampleid')]
 ```
 
 ```{r}
-library(ggplot2)
-library(RColorBrewer)
-top_15_combo_df |>
-    ggplot(aes(x=treatment1dose, y=treatment2dose)) +
-    geom_contour_filled(aes(z=ZIP_delta), bins=11) +
-    facet_wrap(~treatment1id, nrow=3, ncol=5) +
-    scale_fill_brewer(palette="RdBu")
+# Last observation carried forward for NA/NaN delta scores, to make plot look nicer
+setnafill(top_15_combo_df, type="locf", cols="ZIP_delta")
 ```
 
-```{r}
+```{r, eval=FALSE, include=FALSE}
 top_15_combo_df |>
-    ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta)) +
+    ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta * 100)) +
     scale_x_log10(oob=scales::squish_infinite) +
     scale_y_log10(oob=scales::squish_infinite) +
     geom_contour_filled() +
-    geom_contour(colour="black") +
-    facet_wrap(~treatment1id, nrow=3, ncol=5) +
-    scale_fill_brewer(palette="RdBu")
+    facet_wrap(~ treatment1id, nrow=3, ncol=5) +
+    scale_fill_brewer(palette="RdBu", direction=-1)
 ```
 
 ```{r}
 top_15_combo_df |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
-    geom_tile(aes(fill=zip_delta)) +
+    geom_tile(aes(fill=ZIP_delta * 100)) +
     facet_wrap(~treatment1id, nrow=3, ncol=5) +
-    scale_fill_gradient2(low="blue", mid="white", high="red")
+    scale_fill_gradient2(low="blue", mid="white", high="red", midpoint=0)
 ```
-
-```{r}
-combo_viab[treatment1id %ilike% "Isp|Cane", ] |>
-    ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
-    geom_tile(aes(fill=zip_delta)) +
-    facet_wrap(~treatment1id) +
-    scale_fill_gradient2(low="blue", mid="white", high="red")
-```
-
-# References
 
 # Session info {.unnumbered}
 
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
+
+# References
