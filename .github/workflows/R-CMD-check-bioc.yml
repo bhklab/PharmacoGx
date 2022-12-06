@@ -61,8 +61,8 @@ jobs:
         config:
           - {
             os: ubuntu-latest,
-            r: '4.2',
-            bioc: '3.16',
+            r: '4.3',
+            bioc: '3.17',
             cont: "bioconductor/bioconductor_docker:devel",
             rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest",
             github: "bhklab/CoreGx"
