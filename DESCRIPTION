@@ -26,7 +26,8 @@ Suggests: pander,
     crayon,
     testthat,
     markdown,
-    BiocStyle
+    BiocStyle,
+    R.utils
 Encoding: UTF-8
 Imports:
     BiocGenerics,
