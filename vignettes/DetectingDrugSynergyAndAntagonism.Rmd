@@ -1,5 +1,5 @@
 ---
-title: "Detecting Drug Synergy and Antagnoism with PharmacoGx 3.0"
+title: "Detecting Drug Synergy and Antagonism with PharmacoGx 3.0+"
 author:
 - name: Christopher Eeles
   affiliation: &pm Princess Margaret Cancer Centre, University Health Network, Toronto Canada
@@ -27,12 +27,12 @@ abstract: |
   introduces support for storing, analyzing and visualizing the results of drug
   combination experiments using the PharmacoSet class, and will enable
   reseachers across a range of disciplines to more easily mine the published
-  drug combination literature for promising signatures of synergy or antagonism
-  which can be validated in retrospective patient data and prioritized
+  drug combination literature for promising molecular signatures of synergy or
+  antagonism which can be validated in retrospective patient data and prioritized
   for prospective clinical trails.
 bibliography: drugCombos.bib
 vignette: |
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Detecting Drug Synergy and Antagonism with PharmacoGx 3.0+}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -44,9 +44,8 @@ pgx <- BiocStyle::Biocpkg("PharmacoGx")
 
 # Synergy/Antagonism Biomarker Discovery
 
-For a comprehensive introduction to drug combination modelling for
-detecting biomarkers of drug synergy and antagonism with `r cgx` and
-`r pgx`, please see our
+For a comprehensive introduction to detecting biomarkers of drug synergy or
+antagonism with `r cgx` and `r pgx`, please see our
 [workshop from BioC2022](http://bhklab.ca/bioc2022workshop/articles/PGxWorkshop.html).
 
 # Mathews Griner
@@ -59,10 +58,10 @@ large B-cell lymphoma [@mathewsgrinerHighthroughputCombinatorialScreening2014].
 The study uses a 6 x 6 combination matrix design, where each respective drug in
 a combination undergoes a 4-fold dilution series over 4 steps, with the last
 well left untreated. This can be conceptualized as drug combination matrix where
-the final row and column represent monotherapy responses for each compound in
+the final row and column represent monotherapy experiments for each compound in
 the pair. A total of 36 viability measurements were taken via the CellTitreGlo
 assay for each drug pair, being comprised of pair-wise combinations of each
-dose level in the respective dilution series.
+dose level in the respective dilution series matrix.
 
 We selected this dataset for our vignette to simplify comparison with the
 `SynergyFinder` package, which was previously used to analyze this dataset
@@ -98,7 +97,7 @@ mathews_griner <- fread(input_file)
 
 ## Experimental Design Hypothesis
 
-Before modelling dose-response and treatment synergy/antagonism with `r pgx` we
+Before modelling dose-response or treatment synergy/antagonism with `r pgx` we
 must first build a `TreatmentResponseExperiment` from our high-throughput
 drug combination data. This S4 class was designed to store and analyze high
 dimensional treatment response data, such as the dose-response screens in cancer
@@ -111,12 +110,10 @@ studies, the first step in any drug combination analysis is to generate a
 hypothesis about the study design. For the `TreatmentResponseExperiment`,
 we must identify which columns in our raw data are required to uniquely
 identify every treatment (our rows), sample (our columns) and observation
-(our assay). As a starting point we recommend trying treatment identifiers and
+(our assays). As a starting point we recommend trying treatment identifiers and
 their respective doses for rows, sample identifiers for columns, and the union
-of these for observations.
-
-NOTE: Giving names to columns in your groups will automatically rename them
-when the `TreatmentResponseExperiment` gets created!
+of these for observations.^[Giving names to columns in your group list will
+automatically rename them when the `TreatmentResponseExperiment` gets created!]
 
 ```{r experiment_design_hypothesis}
 groups <- list(
@@ -136,20 +133,22 @@ These initial guesses can be insufficient to uniquely identify our
 treatments or samples if there are technical or biological replicates in the
 data. While some publications are explicit about the presence of such
 measurements, others are not and require us to explore the data to identify
-them. In general, We recommend undocumented replciates be treated as technical
-and used to quantify noise in our assay unless you have good reason to believe
+them. In general, we recommend undocumented replicates be treated as technical
+and used to quantify noise in the assay unless there is a good reason to believe
 they are from distinct biological entities.
 
 We can identify undocumented replicates using a "group by" operation. This
-operation uses the split-apply-combine paradigm to compute some aggregate
-over subsets of a `data.frame`. A group has undocumented replicates if more
-than one row is assigned to any group which we hypothesized to uniquely identify
-the observations in our data. We check this below using the `.N` special
-variable from the `data.table` package, which counts the number of instances
-in a each group. Similar operations could be accomplished with `dplyr` or
-even base R, though they may be less concise.
+operation uses the split-apply-combine strategy (also called Map-Reduce) to
+compute some aggregation over subsets of a `data.frame`. A grouping has
+undocumented replicates if more than one row is assigned to any group which we
+hypothesized to uniquely identify the observations in our data. We check this
+below using the `.N` special variable from the `data.table` package, which
+counts the number of instances in each group defined by the column in `by`.
+Similar operations could be accomplished with `dplyr` or even base R, though
+they may be slower and have less concise syntax.
 
-```{r handling_technicl_replicates}
+```{r handling_technical_replicates}
+# The := operator modifies a data.table by reference (i.e., without making a copy)
 mathews_griner[, tech_rep := seq_len(.N), by=c(groups[["assayMap"]])]
 if (max(mathews_griner[["tech_rep"]]) > 1) {
     groups[["colDataMap"]] <- c(groups[["colDataMap"]], "tech_rep")
@@ -167,10 +166,14 @@ For the Mathews Griner dataset, we do indeed have undocumented replicates!
 
 Once we are confident we know which columns are needed to uniquely
 identify our treatments and samples, we can create a `TREDataMapper` using
-our raw data and our mapping hypothesis. The `guessMapping` method does
-the necessary internal work to map additional columns in your dataset to
-the appopriate category&mdash;treatment metadata, sample metadata or assay
-data&mdash;and returns the column names for each group.
+our raw data and mapping hypothesis. The `TREDataMapper` is a helper class
+designed to make creating a `TreatmentResponseExperiment` from diverse drug
+combination experimental designs easier for users.
+
+The `guessMapping` method does the necessary internal work to map additional
+columns in your dataset to the appopriate category&mdash;treatment metadata,
+sample metadata or assay data&mdash;and returns the column names for each group
+in the "mapped_columns" list item.
 
 ```{r build_tredatamapper}
 (treMapper <- TREDataMapper(rawdata=mathews_griner))
@@ -179,7 +182,10 @@ data&mdash;and returns the column names for each group.
 We will know we have successfully mapped all of our data if the "unmapped" list
 item in our guess has no columns names in it. If this is not the case, you
 may have to refine your hypothesis to include additional information needed
-to uniquely identify each observation in your dataset.
+to uniquely identify each observation in your dataset.^[The metadata item in
+the list returned from `guessMapping` captures all columns in our dataset which
+only have one unique value. These can be assigned to the `metadata` slot of
+the `TreatmentResponseExperiment` to make our object smaller in memory.]
 
 ```{r evaluate_tre_mapping_guess}
 (guess <- guessMapping(treMapper, groups, subset=TRUE))
@@ -187,21 +193,24 @@ to uniquely identify each observation in your dataset.
 
 Once we have mapped all our columns, we can assign their names to the
 `TREDataMapper` object and use it to construct the `TreatmentResponseExperiment`
-we will use in downstream dose-response and synergy-antagonism modelling.
+we will use in downstream dose-response and synergy-antagonism modelling.^[We
+need to give names to the metadataMap and assayMap for in the `TREDataMapper`,
+since there can be more than one item in each of these slots of a
+`TreatmentResponseExperiment`.]
 
 ```{r update_tredatamapper_with_guess}
 metadataMap(treMapper) <- list(experiment_metadata=guess$metadata$mapped_columns)
 rowDataMap(treMapper) <- guess$rowDataMap
 colDataMap(treMapper) <- guess$colDataMap
 assayMap(treMapper) <- list(raw=guess$assayMap)
-(treMapper)
+treMapper
 ```
 
 ## Creating a `TreatmentResponseExperiment`
 
 `r pgx` includes the `metaConstruct` method to simplify creation of a
 `TreatmentResponseExperiment` object. Simply call it on the `TREDataMapper` you
-created previously to instantiate your object.
+created previously to instantiate the object.
 
 ```{r metaconstruct_the_tre}
 (tre <- metaConstruct(treMapper))
@@ -211,8 +220,11 @@ created previously to instantiate your object.
 
 The viability measurements in the Mathews Griner data have already been
 normalized relative to the time zero control. However, `r pgx` recommends
-further normalizing against the treatment control to limit the range
-of your viability measurements from 0 to 1.
+further normalizing against the untreated control to limit the range
+of your viability measurements to be close to [0, 1]. The untreated control
+is the well which has only been treated with the drug delivery vehicle (usually
+the solvent DMSO) and has thus been allowed to grow over the treatment exposure
+time.
 
 To accomplish this for our current dataset, we can use a sub-query where we
 select the viability at index (6, 6) of our drug combination matrix. This is
@@ -220,7 +232,9 @@ well has not been treatment with either drug. Dividing by it normalizes the
 observed viability in our treatment wells relative to any growth that may
 have occured during treatment. We further truncate our viability values at
 zero, since any values below this are likely a result of technical noise in our
-assay.
+assay.^[The `.SD` special variable, short for "subset data", is a `data.table`
+feature that allows you to implement complex sub-queries. It contains a copy
+of the entire `data.table` object you are querying.]
 
 ```{r normalize_to_dose_0_0_control}
 raw <- tre[["raw"]]
@@ -241,7 +255,7 @@ the growth of our cell lines.
 tre[["raw"]][, range(viability)]
 ```
 
-Some of our treated viabilties are > 60x higher than our control! This is very
+Some of our treated viabilties are >60x higher than our control! This is very
 unlikely to be a real signal and probably indicates there was an issue
 with the viability measurement for our dose 0 x 0 well. To quality control
 our results, we will find the treatment combination with this observation
@@ -256,7 +270,7 @@ setup.
 Only a single treatment has a viability measurement higher than twice our
 control. We will remove this and leave the remaining values in place, since
 we can simply truncate them at vaiblity of 1 to include as many combinations
-in our analyses as possible
+in our analyses as possible.
 
 ```{r remove_bad_viability_treatment}
 (tre <- subset(tre, !(treatment1id %in% bad_treatments)))
@@ -274,33 +288,37 @@ to fitting dose-response curves to our monotherapy measurements.
 
 ## Fitting Monotherapy Curves
 
-Since we currently only want to fit curves to the monotherapy experiments
-in our drug matrix we will use the `subset` feature of the `endoaggregate`
-method to remove the combination therapy rows. This method allows us to
-extract an assay from our `TreatmentResponseExperiment`, compute a group by
-(aggregation) over it, then assign it back to our
-`TreatmentResponseExperiment` via a join.
+The `endoaggregate` method allows us to extract an assay from our
+`TreatmentResponseExperiment`, compute a group by (aggregation) over it,
+then assign it back to our `TreatmentResponseExperiment` via a join. Since we
+currently only want to fit curves to the monotherapy experiments
+in our drug matrix we will use the `subset` argument to filter the assay
+to only monotherapy rows before applying the aggregation.
 
-We can use this feature to update existing assays, or to create
+The `endoaggregate` method is useful to update existing assays, or to create
 new ones. The `assay` argument specifies the assay to aggregate over and the
-`target` argument specifies the name of the assay to assign to.
+`target` argument specifies the name of the assay to assign the results to.
 If the `target` does not already exist, a new assay will be created otherwise
 the specified `target` will be updated. If you exclude this argument, the
 `assay` you select automatically becomes the `target`. The `endoaggregate`
-method is endomorphic, meaning it always returns a `TreatmentResponseExperiment`.
+method is endomorphic, which are a class of methods that always return
+the same type they are called on. This means that `endoaggregate` always
+returns a new `TreatmentResponseExperiment`.
 
 While subsetting out our monotherapy viabilities, we can also summarize
 viabilities over our techinical replicates by excluding that column from our
 `by` argument. Any additional arguments to `endoaggregate` via `...` are
 assumed to be aggregation calls and will be computed for each group
-identified in `by` and assigned to `target`.
+identified in `by` and assigned to `target`. The name given to any argument
+in `...` will be the column name for that computation in the resulting
+`TreatmentResponseExperiment`.
 
 ```{r creating_monotherapy_assay}
 tre_qc <- tre |>
     endoaggregate(
-        subset=treatment2dose == 0,
+        subset=treatment2dose == 0,  # filter to only monotherapy rows
         assay="raw",
-        target="mono_viability",
+        target="mono_viability",  # create a new assay named mono_viability
         mean_viability=pmin(1, mean(viability)),
         by=c("treatment1id", "treatment1dose", "sampleid")
     )
@@ -309,10 +327,11 @@ tre_qc <- tre |>
 Once we have isolated our monotherapy viabilities, we can once again use
 `endoaggregate` to fit our dose-response curves. This time we will use the
 `enlist=FALSE` option which allows us to assign intermediate variables
-during our aggregate computation. Pass in an entire code block to `endoggregate`
-to use this feature and only the final returned list will become columns in
-your `target` assay. To prevent duplicating our curve parameters, we will
-create a new assay for them since we are now summarizing over dose.
+during our aggregation. Pass in an entire code block to `endoggregate`
+to use this feature and only the each named item of the returned list will
+become a column in your `target` assay. To prevent repeating our curve
+parameters, we will create a new assay for them since we are now summarizing
+over dose.
 
 ```{r monotherapy_curve_fits}
 tre_fit <- tre_qc |>
@@ -322,7 +341,7 @@ tre_fit <- tre_qc |>
                 viability_as_pct=FALSE)
             ic50 <- computeIC50(treatment1dose, Hill_fit=fit)
             aac <- computeAUC(treatment1dose, Hill_fit=fit)
-            list(
+            list(  # each list time will be a column in the target assay
                 HS=fit[["HS"]],
                 E_inf = fit[["E_inf"]],
                 EC50 = fit[["EC50"]],
@@ -339,8 +358,12 @@ tre_fit <- tre_qc |>
     )
 ```
 
-
 ## Joining Monotherapy Curve Fits to Combinations
+
+Since we require the monotherapy curve parameters to calculate dose-response
+dependent synergy metrics such as Loewe and ZIP, we will add these to a
+a new drug combination assay to make computing synergy metrics possible with
+`endoaggregate`.
 
 ```{r create_combo_viability}
 tre_combo <- tre_fit |>
@@ -348,9 +371,19 @@ tre_combo <- tre_fit |>
         assay="raw",
         target="combo_viability",
         mean(viability),
-        by=c("treatment1id", "treatment2id", "treatment1dose", "treatment2dose", "sampleid")
+        by=c("treatment1id", "treatment2id", "treatment1dose", "treatment2dose",
+            "sampleid")
     )
 ```
+
+The `mergeAssays` method is a convenient way to perform joins between the
+assays of a `TreatmentResponseExperiment` endomorphically. It is equivalent
+to extracting the assays from the object, performing a join using the `merge`
+command, and assigning back to the assay specified as the `x` argument. This
+method accepts all the same parameters as the `data.table::merge` method,
+but requires the assays in `x` and `y` be specified as assay name instead of
+actual assay tables.^[The endomorphic nature of this operation allows the
+result to be piped into additional calls, as demonstrated below.]
 
 ```{r add_monotherapy_fits_to_combo_viability}
 tre_combo <- tre_combo |>
@@ -368,6 +401,12 @@ tre_combo <- tre_combo |>
     )
 ```
 
+The `endoaggregate` method is compatible with all `data.table` syntax, since
+`assays` are implemented internally using this package. As such, we can use
+a sub-query (via `.SD`) to pull out the viability measurements for each
+individual drug in our combination. This value is needed to compute the
+Highest Single Agent and Bliss synergy metrics. We will add these values to
+our "combo_viability" assay so all the synergy metrics .
 
 ```{r }
 tre_combo <- tre_combo |>
@@ -383,7 +422,12 @@ tre_combo <- tre_combo |>
     )
 ```
 
+Now that we have assembled all the requisite information into the
+"combo_viability" assay, we are ready to compute our synergy scores!
+
 ## Compute Synergy Scores
+
+
 
 ```{r compute_synergy_null_hypotheses}
 tre_synergy <- tre_combo |>

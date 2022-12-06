@@ -45,7 +45,7 @@ computeABC <- function(conc1, conc2, viability1, viability2,
                         trunc = TRUE,
                         verbose=TRUE) {
 
-if(missing(conc1) | missing(conc2)){
+if (missing(conc1) | missing(conc2)){
 
     stop("Both Concentration vectors the drugs were tested on must always be provided.")
 
