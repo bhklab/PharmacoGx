@@ -19,7 +19,7 @@ author:
 output:
   BiocStyle::html_document
 abstract: |
-  Drug combinations are an effective strategy to over come incomplete response
+  Drug combinations are an effective strategy to overcome incomplete response
   or acquired resistance to monotherapies in clinical oncology and beyond. As
   such, detecting molecular signatures of drug synergy or antagonism in
   pre-clinical model systems is a major priority to accelerate the adoption of
@@ -40,6 +40,7 @@ vignette: |
 ```{r eval=TRUE, include=FALSE}
 cgx <- BiocStyle::Biocpkg("CoreGx")
 pgx <- BiocStyle::Biocpkg("PharmacoGx")
+dt <- BiocStyle::CRANpkg("data.table")
 ```
 
 # Synergy/Antagonism Biomarker Discovery
@@ -142,7 +143,7 @@ operation uses the split-apply-combine strategy (also called Map-Reduce) to
 compute some aggregation over subsets of a `data.frame`. A grouping has
 undocumented replicates if more than one row is assigned to any group which we
 hypothesized to uniquely identify the observations in our data. We check this
-below using the `.N` special variable from the `data.table` package, which
+below using the `.N` special variable from the `r dt` package, which
 counts the number of instances in each group defined by the columns in `by`.
 This operation could also be accomplished with `dplyr` or even base R, though
 they may be slower and have less concise syntax.
@@ -170,7 +171,7 @@ identify our treatments and samples, we can create a `TREDataMapper` using
 our raw data and mapping hypothesis. The `TREDataMapper` is a helper class
 designed to make creating a `TreatmentResponseExperiment` from diverse drug
 combination experimental designs easier for users.^[See the
-`TreatmentResponseExperiment` in vignette in `CoreGx` to learn more about the
+`TreatmentResponseExperiment` vignette in `r cgx` to learn more about the
 `TREDataMapper` class.]
 
 The `guessMapping` method does the necessary internal work to map additional
@@ -187,8 +188,8 @@ item in our guess has no columns names in it. If this is not the case, you
 may have to refine your hypothesis to include additional information needed
 to uniquely identify each observation in your dataset.^[The metadata item in
 the list returned from `guessMapping` captures all columns in our dataset which
-only have one unique value. These can be assigned to the `metadata` slot of
-the `TreatmentResponseExperiment` to make our object smaller in memory.]
+only have one unique value. These will be assigned to the `metadata` slot of
+the `TreatmentResponseExperiment` to save memory.]
 
 ```{r evaluate_tre_mapping_guess}
 (guess <- guessMapping(treMapper, groups, subset=TRUE))
@@ -231,13 +232,13 @@ time.
 
 To accomplish this for our current dataset, we can use a sub-query where we
 select the viability at index (6, 6) of our drug combination matrix. This
-well has not been treatment with either drug. Dividing by it normalizes the
+well has not been treated with either drug. Dividing by it normalizes the
 observed viability in our treatment wells relative to any growth that may
-have occured during treatment. We further truncate our viability values at
-zero, since any values below this are likely a result of technical noise in our
-assay.^[The `.SD` special variable, short for "subset data", is a `data.table`
-feature that allows you to implement complex sub-queries. It contains a copy
-of the entire `data.table` object you are querying.]
+have occured during treatment. We further truncate our viability values at zero,
+since any values below this are likely a result of technical
+noise in our assay.^[The `.SD` special variable, short for "subset data", is a
+`r dt` feature that allows you to implement complex sub-queries. It
+contains a reference to the table being queried.]
 
 ```{r normalize_to_dose_0_0_control}
 raw <- tre[["raw"]]
@@ -262,20 +263,20 @@ Some of our treated viabilties are >60x higher than our control! This is very
 unlikely to be a real signal and probably indicates there was an issue
 with the viability measurement for our dose 0 x 0 well. To quality control
 our results, we will find the treatment combination with this observation
-and remove it from downstream analysis. It is always essential to perform
+and remove it from downstream analysis. It is essential to perform
 regular sanity checks to ensure your data is plausible given the experimental
 setup.
 
-```{r find_bad_viability_treatment}
+```{r find_bad_viability_treatment, warning=FALSE}
 (bad_treatments <- tre[["raw"]][viability > 2, unique(treatment1id)])
 ```
 
 Only a single treatment has a viability measurement higher than twice our
 control. We will remove this and leave the remaining values in place, since
-we can simply truncate them at vaiblity of 1 to include as many combinations
+we can simply truncate them at viability of 1 to include as many combinations
 in our analyses as possible.
 
-```{r remove_bad_viability_treatment}
+```{r remove_bad_viability_treatment, warning=FALSE}
 (tre <- subset(tre, !(treatment1id %in% bad_treatments)))
 ```
 
@@ -331,13 +332,14 @@ Once we have isolated our monotherapy viabilities, we can once again use
 `endoaggregate` to fit our dose-response curves. This time we will use the
 `enlist=FALSE` option which allows us to assign intermediate variables
 during our aggregation. Pass in an entire code block to `endoggregate`
-to use this feature and only the named items of the returned list will
-become a column in your `target` assay. To prevent repeating our curve
-parameters, we will create a new assay for them since we are now summarizing
-over dose. This helps ensure we use only as much memory as is necessary
-to store the analysis results in our `TreatmentResponseExperiment`.
+to use this feature and only the returned list will be assigned to the `target`
+assay, with each list item as a column with the corresponding name. To prevent
+repeating our curve fit parameters, we will create a new assay for them since
+we are now summarizing over dose. This helps ensure we use only as much memory
+as is necessary to store the analysis results in our
+`TreatmentResponseExperiment`.
 
-```{r monotherapy_curve_fits}
+```{r monotherapy_curve_fits, messages=FALSE}
 tre_fit <- tre_qc |>
     endoaggregate(
         {  # the entire code block is evaluated for each group in our group by
@@ -369,11 +371,11 @@ tre_fit <- tre_qc |>
 ## Joining Monotherapy Curve Fits to Combinations
 
 Since we require the monotherapy curve parameters to calculate dose-response
-dependent synergy metrics such as Loewe and ZIP, we will add these to a
+curve dependent synergy metrics such as Loewe and ZIP, we will add these to a
 a new drug combination assay to make computing synergy metrics possible within
 a single `endoaggregate` call.
 
-```{r create_combo_viability}
+```{r create_combo_viability, message=FALSE}
 tre_combo <- tre_fit |>
     endoaggregate(
         assay="raw",
@@ -409,15 +411,16 @@ tre_combo <- tre_combo |>
     )
 ```
 
-The `endoaggregate` method is compatible with standard `data.table` syntax, since
-`assays` are implemented internally using this package. As such, we can use
-a sub-query (via `.SD`) to pull out the viability measurements for each
+The `endoaggregate` method is compatible with standard `data.table` syntax,
+since `assays` are implemented internally using this package. As such, we can
+use a sub-query (via `.SD`) to pull out the viability measurements for each
 individual drug in our combination. This value is needed to compute the
 Highest Single Agent and Bliss synergy metrics. We will add these values to
 our "combo_viability" assay so all the synergy metrics can be calculated in
 a single step.^[The `endoaggregate` method can also be
 used to apply arbitrary functions to the data in an assay. Just specify the
-entire assay key to the by argument to compute the function for every row.]
+entire assay key to the by argument to compute the function for every row
+(*i.e.*, to perform no aggregation or summary of the data).]
 
 ```{r }
 tre_combo <- tre_combo |>
@@ -452,15 +455,16 @@ instead have response values you can convert them to viabilities by subtracting
 the normalized responses from 1 (or 100 if using percentages).]
 
 These models are discussed in more detail in our workshop from the 2022
-Bioconductor conference. Addition resources include
-[@yadavSearchingDrugSynergy2015] for mathematical definitions of each reference
-model and [@vlotApplyingSynergyMetrics2019a] to explore the assumptions of each
+Bioconductor conference, linked at the top of this vignette. Addition resources
+to learn about drug synergy models include [@yadavSearchingDrugSynergy2015] for
+mathematical definitions of each reference model and
+[@vlotApplyingSynergyMetrics2019a] for exploring the assumptions of each
 model and how they can affect resulting drug synergy predicitons.
 
 Below we use PharmacoGx to compute the expected response under all four
 null reference models of drug synergy.
 
-```{r compute_synergy_null_hypotheses}
+```{r compute_synergy_null_hypotheses, message=FALSE}
 tre_synergy <- tre_combo |>
     endoaggregate(
         assay="combo_viability",
@@ -479,7 +483,7 @@ tre_synergy <- tre_combo |>
     )
 ```
 
-Once we have setup our Null Hypothesis for no drug synergy, computing A
+Once we have our null hypotheis for no drug synergy, computing A
 synergy score is as simple as taking the difference or the ratio between
 the observed drug combination viability and each of our reference models.
 We prefer taking the difference, since the resulting value can be interpreted
@@ -505,9 +509,12 @@ referred to as ZIP delta, and is computed from a two-way curve fit for
 the expected effect of adding drug 1 to drug 2 and drug 2 to drug 1 for
 a pair in combinaton. [@yadavSearchingDrugSynergy2015].
 
-Below we demonstrate how to compute ZIP delta using `r pgx`.
+Below we demonstrate how to compute ZIP delta using `r pgx`. We first use
+the `estimateProjParams` method to compute the dose-response curve parameters
+for the two-way curve fits.
 
-```{r zip_two_way_fit}
+
+```{r zip_two_way_fit, message=FALSE}
 tre_zip <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
@@ -548,7 +555,10 @@ tre_zip <- tre_zip |>
     )
 ```
 
-```{r compute_zip_delta}
+Then we use the `.deltaScore` function to compute the final delta score
+using the two-way fit curve parameters from the previous step.
+
+```{r compute_zip_delta, message=FALSE}
 tre_zip <- tre_zip |>
     endoaggregate(
         assay="combo_viability",
@@ -579,7 +589,7 @@ with downstream analysis. Below we require curves to obtain an R-squared greater
 than 0.5 (that is, >50% variance of the data explained by the fit) before
 ranking treatment pairs by their synergy score. If you are ranking using
 HSA or Bliss, such a filter is not required, as these two metrics use
-only the observed monotherapy viabities for calculating the expected viability.
+only the observed monotherapy viabilities to calculate the expected viability.
 
 The following code filters to only high quality curve fits and then finds
 the 15 most synergistic treatment pairs based on their ZIP delta score.
@@ -618,7 +628,7 @@ produce both a contour plot (synergy surface) as well as a heat map to gain
 a more inuitive understanding of how synergy or antagonism changes over the
 full dose range of each drug combination matrix.
 
-```{r synergy_contour_plot}
+```{r synergy_contour_plot, fig.wide=TRUE}
 top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta * 100)) +
     scale_x_log10(oob=scales::squish_infinite) +
@@ -630,7 +640,7 @@ top_15_combo_df |>
     scale_fill_brewer(palette="RdBu", direction=-1, drop=FALSE)
 ```
 
-```{r synergy_heatmap}
+```{r synergy_heatmap, fig.wide=TRUE}
 top_15_combo_df |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
     geom_tile(aes(fill=ZIP_delta * 100)) +
