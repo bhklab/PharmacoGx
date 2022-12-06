@@ -58,11 +58,11 @@ ibrutinib in cancer cell lines from the activated B-cell like subtype of diffuse
 large B-cell lymphoma [@mathewsgrinerHighthroughputCombinatorialScreening2014].
 The study uses a 6 x 6 combination matrix design, where each respective drug in
 a combination undergoes a 4-fold dilution series over 4 steps, with the last
-well left untreated. This can be conceptualized as drug combination matrix where
-the final row and column represent monotherapy experiments for each compound in
-the pair. A total of 36 viability measurements were taken via the CellTitreGlo
-assay for each drug pair, being comprised of pair-wise combinations of each
-dose level in the respective dilution series matrix.
+well left untreated. This can be conceptualized as a drug combination matrix
+where the last row and column represent monotherapy experiments for each
+compound in the pair. A total of 36 viability measurements were taken via the
+CellTitreGlo assay for each drug pair, being comprised of pair-wise
+combinations of each dose level in the respective dilution series matrix.
 
 We selected this dataset for our vignette to simplify comparison with the
 `SynergyFinder` package, which was previously used to analyze this dataset
@@ -184,7 +184,7 @@ in the "mapped_columns" list item.
 ```
 
 We will know we have successfully mapped all of our data if the "unmapped" list
-item in our guess has no columns names in it. If this is not the case, you
+item in our guess has no column names in it. If this is not the case, you
 may have to refine your hypothesis to include additional information needed
 to uniquely identify each observation in your dataset.^[The metadata item in
 the list returned from `guessMapping` captures all columns in our dataset which
@@ -372,8 +372,10 @@ tre_fit <- tre_qc |>
 
 Since we require the monotherapy curve parameters to calculate dose-response
 curve dependent synergy metrics such as Loewe and ZIP, we will add these to a
-a new drug combination assay to make computing synergy metrics possible within
-a single `endoaggregate` call.
+new drug combination assay to make computing synergy metrics possible within
+a single `endoaggregate` call.^[If we don't name an aggregation in
+`endoaggregate` a default name will be inferred from the function name and its
+first argument. In this case, the column will be called "mean_viability".]
 
 ```{r create_combo_viability, message=FALSE}
 tre_combo <- tre_fit |>
@@ -483,7 +485,7 @@ tre_synergy <- tre_combo |>
     )
 ```
 
-Once we have our null hypotheis for no drug synergy, computing A
+Once we have our null hypotheis for no drug synergy, computing a
 synergy score is as simple as taking the difference or the ratio between
 the observed drug combination viability and each of our reference models.
 We prefer taking the difference, since the resulting value can be interpreted
@@ -649,13 +651,13 @@ top_15_combo_df |>
 ```
 
 To learn how to use synergy scores for biomarker discovery please review
-the our workshop from Bioconductor 2022, linked in the first section of this
+our workshop from Bioconductor 2022, linked in the first section of this
 document.
+
+# References {.unnumbered}
 
 # Session Info {.unnumbered}
 
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
-
-# References {.unnumbered}
