@@ -1,6 +1,6 @@
 # Package Release News
 
-# 3.1.7
+# 3.3.1
 - Added new vignette documenting support for drug combination modelling new
 drug combination features added in PharmacoGx >=3.0
 
@@ -13,6 +13,8 @@ drug combination features added in PharmacoGx >=3.0
 ## 3.1.0
 - Update to slot names "cell" -> "sample" and "drug" -> "treatment"
 - Update standardized identifier column names to match the above slot nomenclature: "cellid" -> "sampleid", "drugid" -> "treatmentid"
+
+# 2.5
 
 ## 2.5.3
 - Added PharmacoSet2 constructor to allow creation of PSets with updated class definition introducted in BioC 3.13
