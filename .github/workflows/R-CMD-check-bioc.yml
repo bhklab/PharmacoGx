@@ -61,8 +61,8 @@ jobs:
         config:
           - {
             os: ubuntu-latest,
-            r: '4.2',
-            bioc: '3.16',
+            r: '4.3',
+            bioc: '3.17',
             cont: "bioconductor/bioconductor_docker:devel",
             rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest",
             github: "bhklab/CoreGx"
@@ -94,14 +94,14 @@ jobs:
       ## R is already included in the Bioconductor docker images
       - name: Setup R from r-lib
         if: runner.os != 'Linux'
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
 
       ## pandoc is already included in the Bioconductor docker images
       - name: Setup pandoc from r-lib
         if: runner.os != 'Linux'
-        uses: r-lib/actions/setup-pandoc@master
+        uses: r-lib/actions/setup-pandoc@v2
 
       ## added to correct failed vignette builds
       - name: Install tinytex
@@ -283,7 +283,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-biocversion-devel-r-4-results
           path: check

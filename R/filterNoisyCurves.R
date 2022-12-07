@@ -1,5 +1,7 @@
-#' Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response
-#' to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.
+#' Viability measurements in dose-reponse curves must remain stable or decrease
+#' monotonically reflecting response to the drug being tested.
+#' filterNoisyCurves flags dose-response curves that strongly violate these
+#' assumptions.
 #'
 #' @examples
 #' data(GDSCsmall)
@@ -15,11 +17,12 @@
 #' @param nthread `numeric` if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
 #'
-#' @return a list with two elements 'noisy' containing the rownames of the noisy curves, and 'ok' containing the
-#'   rownames of the non-noisy curves
+#' @return a list with two elements 'noisy' containing the rownames of the
+#'   noisy curves, and 'ok' containing the rownames of the non-noisy curves
 #'
 #' @export
-filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
+filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80,
+        mean.viablity=200, nthread=1) {
 
     acceptable <- mclapply(rownames(sensitivityInfo(pSet)), function(xp) {
         #for(xp in rownames(sensitivityInfo(pSet))){
@@ -27,16 +30,19 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
         drug.responses <- drug.responses[complete.cases(drug.responses), ]
         doses.no <- nrow(drug.responses)
 
-        drug.responses[,"delta"] <- .computeDelta(drug.responses$Viability)
+        drug.responses[, "delta"] <- .computeDelta(drug.responses$Viability)
 
         delta.sum <- sum(drug.responses$delta, na.rm = TRUE)
 
         max.cum.sum <- .computeCumSumDelta(drug.responses$Viability)
 
-        if ((table(drug.responses$delta < epsilon)["TRUE"] >= (doses.no * positive.cutoff.percent)) &
-        (delta.sum < epsilon) &
-        (max.cum.sum < (2 * epsilon)) &
-        (mean(drug.responses$Viability) < mean.viablity)) {
+        if (
+            (table(drug.responses$delta < epsilon)["TRUE"] >=
+                (doses.no * positive.cutoff.percent)) &
+            (delta.sum < epsilon) &
+            (max.cum.sum < (2 * epsilon)) &
+            (mean(drug.responses$Viability) < mean.viablity)
+        ) {
             return (xp)
         }
     }, mc.cores=nthread)
@@ -45,12 +51,11 @@ filterNoisyCurves <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, me
     return(list("noisy"=noisy, "ok"=acceptable))
 }
 
-.computeDelta <- function(xx ,trunc = TRUE) {
+.computeDelta <- function(xx, trunc = TRUE) {
     xx <- as.numeric(xx)
-    if(trunc)
-    {
+    if (trunc) {
         return(c(pmin(100, xx[seq(2,length(xx))]) - pmin(100, xx[seq_along(xx)-1]), 0))
-    }else{
+    } else {
         return(c(xx[seq(2, length(xx))] - xx[seq_along(xx) - 1]), 0)
     }
 }
