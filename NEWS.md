@@ -1,5 +1,9 @@
 # Package Release News
 
+# 3.1.7
+- Added new vignette documenting support for drug combination modelling new
+drug combination features added in PharmacoGx >=3.0
+
 # 3.1.4
 - Modified downloadPSet function to automatically update the PharmacoSet class structure and resave the updated object after download
 - This work around is necessary until we can rerun our data engineering pipelines to regenerate all of our PharmacoSet using the 3.1.0 package updates
