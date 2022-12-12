@@ -659,10 +659,10 @@ To learn how to use synergy scores for biomarker discovery please review
 our workshop from Bioconductor 2022, linked in the first section of this
 document.
 
-# References {.unnumbered}
-
 # Session Info {.unnumbered}
 
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
+
+# References {.unnumbered}
