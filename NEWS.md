@@ -10,6 +10,7 @@ drug combination features added in PharmacoGx >=3.0
 - Added a number of additional methods for computing drug synergy metrics
 
 # 3.1.1
+
 ## 3.1.0
 - Update to slot names "cell" -> "sample" and "drug" -> "treatment"
 - Update standardized identifier column names to match the above slot nomenclature: "cellid" -> "sampleid", "drugid" -> "treatmentid"

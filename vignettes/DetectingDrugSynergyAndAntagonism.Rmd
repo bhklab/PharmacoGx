@@ -38,9 +38,13 @@ vignette: |
 ---
 
 ```{r eval=TRUE, include=FALSE}
+# convenience variables
 cgx <- BiocStyle::Biocpkg("CoreGx")
 pgx <- BiocStyle::Biocpkg("PharmacoGx")
 dt <- BiocStyle::CRANpkg("data.table")
+
+# knitr options
+knitr::opts_chunk$set(warning=FALSE)
 ```
 
 # Synergy/Antagonism Biomarker Discovery
@@ -92,7 +96,8 @@ which we curated to have informative compound names. You can read the file
 in with your CSV reader of choice.
 
 ```{r}
-input_file <- file.path("mathews_griner.csv.tar.gz")
+input_file <- system.file("extdata/mathews_griner.csv.tar.gz",
+    package="PharmacoGx")
 mathews_griner <- fread(input_file)
 ```
 
