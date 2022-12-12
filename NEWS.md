@@ -1,5 +1,8 @@
 # Package Release News
 
+# 3.3.2
+- Debugging vignette issues on the Bioconductor build system
+
 # 3.3.1
 - Added new vignette documenting support for drug combination modelling new
 drug combination features added in PharmacoGx >=3.0
