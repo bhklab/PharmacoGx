@@ -5,7 +5,7 @@ author:
   affiliation: &pm Princess Margaret Cancer Centre, University Health Network, Toronto Canada
   email: christopher.eeles@uhnresearch.ca
 - name: Feifei Li
-  affiliation: &ccb Department of Cell & System Biology, University of Toronto, Toronto Canada
+  affiliation: &csb Department of Cell & System Biology, University of Toronto, Toronto Canada
 - name: Petr Smirnov
   affiliation:
     - *pm
@@ -96,7 +96,7 @@ which we curated to have informative compound names. You can read the file
 in with your CSV reader of choice.
 
 ```{r}
-input_file <- system.file("extdata/mathews_griner.csv.tar.gz",
+input_file <- system.file("extdata", "mathews_griner.csv.tar.gz",
     package="PharmacoGx")
 mathews_griner <- fread(input_file)
 ```
@@ -520,6 +520,18 @@ Below we demonstrate how to compute ZIP delta using `r pgx`. We first use
 the `estimateProjParams` method to compute the dose-response curve parameters
 for the two-way curve fits.
 
+Please comment this block if you would like to compute ZIP delta for the whole dataset:
+```{r subset_top_15, message=FALSE}
+# Select the top 15 synergistic drug combinations ranked by ZIP for quick ZIP delta demo
+top_15_treatment1ids <- c(
+    "Navitoclax (ABT-263)", "ISOX"           , "AZD-7762",
+    "Belinostat"          , "NCGC00188382-01", "IC-87114",
+    "CUDC-101"            , "Nintedanib"     , "Vorinostat (SAHA)",
+    "SPC-839"             , "Tipifarnib"     , "Doxorubicin",
+    "AZD-6482"            , "Pracinostat"    , "Bardoxolone methyl"
+)
+tre_synergy <- subset(tre_synergy, treatment1id %in% top_15_treatment1ids)
+```
 
 ```{r zip_two_way_fit, message=FALSE}
 tre_zip <- tre_synergy |>
