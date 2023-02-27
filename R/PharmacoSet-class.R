@@ -128,7 +128,7 @@ PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
         molecularProfiles=cSet@molecularProfiles,
         sample=cSet@sample,
         treatment=cSet@treatment,
-        datasetType=cSet@datasetTypes,
+        datasetType=cSet@datasetType,
         treatmentResponse=cSet@treatmentResponse,
         perturbation=cSet@perturbation,
         curation=cSet@curation
