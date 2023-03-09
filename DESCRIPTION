@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.3.2
-Date: 2022-12-12
+Version: 3.3.3
+Date: 2023-03-08
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
         role=c("aut")),
@@ -11,6 +11,7 @@ Authors@R: c(
     person(given="Zhaleh", family="Safikhani", role=c("aut")),
     person(given="Mark", family="Freeman", role=c("aut")),
     person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca", role=c("aut")),
+    person(given="Jermiah", family="Joseph", email="jermiah.joseph@uhn.ca", role=c("aut")),
     person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
     )
 Description: Contains a set of functions to perform large-scale analysis of
@@ -56,7 +57,7 @@ Imports:
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification

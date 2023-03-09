@@ -108,6 +108,7 @@ PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
 
     cSet <- CoreGx::CoreSet(
         name=name,
+        molecularProfiles = molecularProfiles,
         sample=sample,
         treatment=treatment,
         sensitivityInfo=sensitivityInfo,
@@ -125,10 +126,10 @@ PharmacoSet <-  function(name, molecularProfiles=list(), sample=data.frame(),
 
     pSet  <- .PharmacoSet(
         annotation=cSet@annotation,
-        molecularProfiles=cSet@olecularProfiles,
+        molecularProfiles=cSet@molecularProfiles,
         sample=cSet@sample,
         treatment=cSet@treatment,
-        datasetType=cSet@datasetTypes,
+        datasetType=cSet@datasetType,
         treatmentResponse=cSet@treatmentResponse,
         perturbation=cSet@perturbation,
         curation=cSet@curation
