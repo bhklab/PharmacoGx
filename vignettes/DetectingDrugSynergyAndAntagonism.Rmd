@@ -26,7 +26,7 @@ abstract: |
   novel treatment strategies in the clinic. The release of PharmacoGx 3.0
   introduces support for storing, analyzing and visualizing the results of drug
   combination experiments using the PharmacoSet class, and will enable
-  reseachers across a range of disciplines to more easily mine the published
+  reseachers across a range of disciplines to more easily mine t he published
   drug combination literature for promising molecular signatures of synergy or
   antagonism which can be validated in retrospective patient data and prioritized
   for prospective clinical trails.
@@ -349,7 +349,7 @@ tre_fit <- tre_qc |>
     endoaggregate(
         {  # the entire code block is evaluated for each group in our group by
             # 1. fit a log logistic curve over the dose range
-            fit <- logLogisticRegression(treatment1dose, mean_viability,
+            fit <- PharmacoGx::logLogisticRegression(treatment1dose, mean_viability,
                 viability_as_pct=FALSE)
             # 2. compute curve summary metrics
             ic50 <- computeIC50(treatment1dose, Hill_fit=fit)
