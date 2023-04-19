@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.3.3
-Date: 2023-03-08
+Version: 3.3.4
+Date: 2023-05-19
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
         role=c("aut")),
