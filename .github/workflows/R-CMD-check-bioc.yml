@@ -46,7 +46,7 @@ env:
   has_RUnit: 'false'
   cache-version: 'cache-v3'
   run_docker: 'false'
-  github_dependencies: 'true'
+  # github_dependencies: 'true'
 
 jobs:
   build-check:
