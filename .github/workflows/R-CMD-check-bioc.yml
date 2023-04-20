@@ -25,10 +25,12 @@ on:
     branches:
       - master
       - main
+      - devel
   pull_request:
     branches:
       - master
       - main
+      
 
 name: R-CMD-check-bioc-devel
 
