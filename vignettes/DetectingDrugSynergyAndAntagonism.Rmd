@@ -81,7 +81,7 @@ suppressPackageStartupMessages({
 })
 ```
 
-```{r load_dependencies_echo, eval=True, echo=TRUE}
+```{r load_dependencies_echo, eval=TRUE, echo=TRUE}
 library(PharmacoGx)
 library(CoreGx)
 library(data.table)
