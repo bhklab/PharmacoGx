@@ -127,7 +127,7 @@ Load `PharamacoGx` into your current workspace:
 
 \vspace{5pt}
 \footnotesize
-```{r, eval=FALSE, results='hide'}
+```{r, eval=FALSE}
 library(PharmacoGx)
 ```
 \normalsize

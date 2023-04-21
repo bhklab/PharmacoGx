@@ -25,10 +25,12 @@ on:
     branches:
       - master
       - main
+      - devel
   pull_request:
     branches:
       - master
       - main
+      
 
 name: R-CMD-check-bioc-devel
 
@@ -46,7 +48,7 @@ env:
   has_RUnit: 'false'
   cache-version: 'cache-v3'
   run_docker: 'false'
-  github_dependencies: 'true'
+  # github_dependencies: 'true'
 
 jobs:
   build-check:
