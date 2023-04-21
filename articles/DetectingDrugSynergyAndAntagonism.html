@@ -527,8 +527,8 @@ much memory as is necessary to store the analysis results in our
 <span>            <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/logLogisticRegression.html">logLogisticRegression</a></span><span class="op">(</span><span class="va">treatment1dose</span>, <span class="va">mean_viability</span>,</span>
 <span>                viability_as_pct<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span>            <span class="co"># 2. compute curve summary metrics</span></span>
-<span>            <span class="va">ic50</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeICn.html">computeIC50</a></span><span class="op">(</span><span class="va">treatment1dose</span>, Hill_fit<span class="op">=</span><span class="va">fit</span><span class="op">)</span></span>
-<span>            <span class="va">aac</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeAUC.html">computeAUC</a></span><span class="op">(</span><span class="va">treatment1dose</span>, Hill_fit<span class="op">=</span><span class="va">fit</span><span class="op">)</span></span>
+<span>            <span class="va">ic50</span> <span class="op">&lt;-</span> <span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/computeICn.html">computeIC50</a></span><span class="op">(</span><span class="va">treatment1dose</span>, Hill_fit<span class="op">=</span><span class="va">fit</span><span class="op">)</span></span>
+<span>            <span class="va">aac</span> <span class="op">&lt;-</span> <span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/computeAUC.html">computeAUC</a></span><span class="op">(</span><span class="va">treatment1dose</span>, Hill_fit<span class="op">=</span><span class="va">fit</span><span class="op">)</span></span>
 <span>            <span class="co"># 3. assemble the results into a list, each item will become a</span></span>
 <span>            <span class="co">#   column in the target assay.</span></span>
 <span>            <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -546,11 +546,6 @@ much memory as is necessary to store the analysis results in our
 <span>        by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment1id"</span>, <span class="st">"sampleid"</span><span class="op">)</span>,</span>
 <span>        nthread<span class="op">=</span><span class="fl">2</span>  <span class="co"># parallelize over multiple cores to speed up the computation</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<pre><code>## 
-  |                                                                            
-  |                                                                      |   0%
-  |                                                                            
-  |======================================================================| 100%</code></pre>
 </div>
 <div class="section level3">
 <h3 id="joining-monotherapy-curve-fits-to-combinations">Joining Monotherapy Curve Fits to Combinations<a class="anchor" aria-label="anchor" href="#joining-monotherapy-curve-fits-to-combinations"></a>
@@ -562,7 +557,7 @@ metrics possible within a single <code>endoaggregate</code> call.<a class="footn
 &lt;code&gt;endoaggregate&lt;/code&gt; a default name will be inferred from the
 function name and its first argument. In this case, the column will be
 called “mean_viability”.&lt;/p&gt;"><sup>6</sup></a></p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_combo</span> <span class="op">&lt;-</span> <span class="va">tre_fit</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"raw"</span>,</span>
@@ -581,7 +576,7 @@ This method accepts all the same parameters as the
 <code>x</code> and <code>y</code> be specified as assay names instead of
 actual assay tables.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The endomorphic nature of this operation allows the
 result to be piped into additional calls, as demonstrated below.&lt;/p&gt;"><sup>7</sup></a></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_combo</span> <span class="op">&lt;-</span> <span class="va">tre_combo</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/mergeAssays.html" class="external-link">mergeAssays</a></span><span class="op">(</span></span>
 <span>        x<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
@@ -606,7 +601,7 @@ can be calculated in a single step.<a class="footnote-ref" tabindex="0" data-bs-
 to apply arbitrary functions to the data in an assay. Just specify the
 entire assay key to the by argument to compute the function for every
 row (&lt;em&gt;i.e.&lt;/em&gt;, to perform no aggregation or summary of the data).&lt;/p&gt;"><sup>8</sup></a></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_combo</span> <span class="op">&lt;-</span> <span class="va">tre_combo</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        viability_1<span class="op">=</span><span class="va">.SD</span><span class="op">[</span><span class="va">treatment2dose</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">mean_viability</span><span class="op">]</span>,</span>
@@ -645,13 +640,13 @@ of each reference model and <span class="citation">(Vlot et al.
 can affect resulting drug synergy predicitons.</p>
 <p>Below we use PharmacoGx to compute the expected response under all
 four null reference models of drug synergy.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_synergy</span> <span class="op">&lt;-</span> <span class="va">tre_combo</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
-<span>        HSA_ref<span class="op">=</span><span class="fu"><a href="../reference/computeHSA.html">computeHSA</a></span><span class="op">(</span><span class="va">viability_1</span>, <span class="va">viability_2</span><span class="op">)</span>,</span>
-<span>        Bliss_ref<span class="op">=</span><span class="fu"><a href="../reference/computeBliss.html">computeBliss</a></span><span class="op">(</span><span class="va">viability_1</span>, <span class="va">viability_2</span><span class="op">)</span>,</span>
-<span>        Loewe_ref<span class="op">=</span><span class="fu"><a href="../reference/computeLoewe.html">computeLoewe</a></span><span class="op">(</span></span>
+<span>        HSA_ref<span class="op">=</span><span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/computeHSA.html">computeHSA</a></span><span class="op">(</span><span class="va">viability_1</span>, <span class="va">viability_2</span><span class="op">)</span>,</span>
+<span>        Bliss_ref<span class="op">=</span><span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/computeBliss.html">computeBliss</a></span><span class="op">(</span><span class="va">viability_1</span>, <span class="va">viability_2</span><span class="op">)</span>,</span>
+<span>        Loewe_ref<span class="op">=</span><span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/computeLoewe.html">computeLoewe</a></span><span class="op">(</span></span>
 <span>            <span class="va">treatment1dose</span>, HS_1<span class="op">=</span><span class="va">HS_1</span>, EC50_1<span class="op">=</span><span class="va">EC50_1</span>, E_inf_1<span class="op">=</span><span class="va">E_inf_1</span>,</span>
 <span>            <span class="va">treatment2dose</span>, HS_2<span class="op">=</span><span class="va">HS_2</span>, EC50_2<span class="op">=</span><span class="va">EC50_2</span>, E_inf_2<span class="op">=</span><span class="va">E_inf_2</span></span>
 <span>        <span class="op">)</span>,</span>
@@ -662,18 +657,13 @@ four null reference models of drug synergy.</p>
 <span>        by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/assayKeys.html" class="external-link">assayKeys</a></span><span class="op">(</span><span class="va">tre_combo</span>, <span class="st">"combo_viability"</span><span class="op">)</span>,</span>
 <span>        nthread<span class="op">=</span><span class="fl">2</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<pre><code>## 
-  |                                                                            
-  |                                                                      |   0%
-  |                                                                            
-  |======================================================================| 100%</code></pre>
 <p>Once we have our null hypotheis for no drug synergy, computing a
 synergy score is as simple as taking the difference or the ratio between
 the observed drug combination viability and each of our reference
 models. We prefer taking the difference, since the resulting value can
 be interpreted as the proportion of cell death above or below the
 expected value for each model.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_synergy</span> <span class="op">&lt;-</span> <span class="va">tre_synergy</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
@@ -693,7 +683,7 @@ to drug 1 for a pair in combinaton. <span class="citation">(Yadav et al.
 <p>Below we demonstrate how to compute ZIP delta using <em><a href="https://bioconductor.org/packages/3.16/PharmacoGx" class="external-link">PharmacoGx</a></em>.
 We first use the <code>estimateProjParams</code> method to compute the
 dose-response curve parameters for the two-way curve fits.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_zip</span> <span class="op">&lt;-</span> <span class="va">tre_synergy</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
@@ -712,14 +702,8 @@ dose-response curve parameters for the two-way curve fits.</p>
 <span>        enlist<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>        by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment1id"</span>, <span class="st">"treatment2id"</span>, <span class="st">"treatment2dose"</span>, <span class="st">"sampleid"</span><span class="op">)</span>,</span>
 <span>        nthread<span class="op">=</span><span class="fl">2</span></span>
-<span>    <span class="op">)</span></span></code></pre></div>
-<pre><code>## 
-  |                                                                            
-  |                                                                      |   0%
-  |                                                                            
-  |======================================================================| 100%</code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tre_zip</span> <span class="op">&lt;-</span> <span class="va">tre_zip</span> <span class="op">|&gt;</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="va">tre_zip</span> <span class="op">&lt;-</span> <span class="va">tre_zip</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
 <span>        subset<span class="op">=</span><span class="va">treatment1dose</span> <span class="op">!=</span> <span class="fl">0</span>,</span>
@@ -738,15 +722,10 @@ dose-response curve parameters for the two-way curve fits.</p>
 <span>        by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment1id"</span>, <span class="st">"treatment2id"</span>, <span class="st">"treatment1dose"</span>, <span class="st">"sampleid"</span><span class="op">)</span>,</span>
 <span>        nthread<span class="op">=</span><span class="fl">2</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<pre><code>## 
-  |                                                                            
-  |                                                                      |   0%
-  |                                                                            
-  |======================================================================| 100%</code></pre>
 <p>Then we use the <code>.deltaScore</code> function to compute the
 final delta score using the two-way fit curve parameters from the
 previous step.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre_zip</span> <span class="op">&lt;-</span> <span class="va">tre_zip</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/endoaggregate.html" class="external-link">endoaggregate</a></span><span class="op">(</span></span>
 <span>        assay<span class="op">=</span><span class="st">"combo_viability"</span>,</span>
@@ -782,7 +761,7 @@ viability.</p>
 <p>The following code filters to only high quality curve fits and then
 finds the 15 most synergistic treatment pairs based on their ZIP delta
 score.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">combo_viab</span> <span class="op">&lt;-</span> <span class="va">tre_zip</span><span class="op">[[</span><span class="st">"combo_viability"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="op">(</span><span class="va">top_15_combo</span> <span class="op">&lt;-</span> <span class="va">combo_viab</span><span class="op">[</span></span>
 <span>    <span class="va">Rsq_1</span> <span class="op">&gt;</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">Rsqr_1_to_2</span> <span class="op">&gt;</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">Rsqr_2_to_1</span> <span class="op">&gt;</span> <span class="fl">0.5</span>,</span>
@@ -797,43 +776,11 @@ score.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">max_delta</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">.SD</span><span class="op">)</span></span>
 <span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">15</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##             treatment1id          treatment2id sampleid max_delta   mean_delta</span></span>
-<span><span class="co">##  1: Navitoclax (ABT-263) Ibrutinib (PCI-32765)     TMD8 0.2341778  0.112386654</span></span>
-<span><span class="co">##  2:                 ISOX Ibrutinib (PCI-32765)     TMD8 0.2278912  0.014159996</span></span>
-<span><span class="co">##  3:             AZD-7762 Ibrutinib (PCI-32765)     TMD8 0.2212394  0.007813598</span></span>
-<span><span class="co">##  4:           Belinostat Ibrutinib (PCI-32765)     TMD8 0.2188149 -0.008452740</span></span>
-<span><span class="co">##  5:      NCGC00188382-01 Ibrutinib (PCI-32765)     TMD8 0.2085839 -0.014080538</span></span>
-<span><span class="co">##  6:             IC-87114 Ibrutinib (PCI-32765)     TMD8 0.1984475  0.070699488</span></span>
-<span><span class="co">##  7:             CUDC-101 Ibrutinib (PCI-32765)     TMD8 0.1870545 -0.016791858</span></span>
-<span><span class="co">##  8:           Nintedanib Ibrutinib (PCI-32765)     TMD8 0.1859679 -0.020959729</span></span>
-<span><span class="co">##  9:    Vorinostat (SAHA) Ibrutinib (PCI-32765)     TMD8 0.1705919 -0.036479293</span></span>
-<span><span class="co">## 10:              SPC-839 Ibrutinib (PCI-32765)     TMD8 0.1613377 -0.002307915</span></span>
-<span><span class="co">## 11:           Tipifarnib Ibrutinib (PCI-32765)     TMD8 0.1612967  0.086199071</span></span>
-<span><span class="co">## 12:          Doxorubicin Ibrutinib (PCI-32765)     TMD8 0.1607282  0.003769315</span></span>
-<span><span class="co">## 13:             AZD-6482 Ibrutinib (PCI-32765)     TMD8 0.1570266  0.066378033</span></span>
-<span><span class="co">## 14:          Pracinostat Ibrutinib (PCI-32765)     TMD8 0.1537974 -0.003738217</span></span>
-<span><span class="co">## 15:   Bardoxolone methyl Ibrutinib (PCI-32765)     TMD8 0.1480847 -0.044305670</span></span>
-<span><span class="co">##     max_bliss  mean_bliss</span></span>
-<span><span class="co">##  1: 0.4687381 0.250394037</span></span>
-<span><span class="co">##  2: 0.2540336 0.059582145</span></span>
-<span><span class="co">##  3: 0.2991230 0.102971866</span></span>
-<span><span class="co">##  4: 0.2087757 0.053398964</span></span>
-<span><span class="co">##  5: 0.5633581 0.195464821</span></span>
-<span><span class="co">##  6: 0.1715337 0.072465204</span></span>
-<span><span class="co">##  7: 0.2918370 0.105186966</span></span>
-<span><span class="co">##  8: 0.2388164 0.096883398</span></span>
-<span><span class="co">##  9: 0.1744036 0.063543258</span></span>
-<span><span class="co">## 10: 0.2386048 0.094266615</span></span>
-<span><span class="co">## 11: 0.1533454 0.077727227</span></span>
-<span><span class="co">## 12: 0.2486366 0.066457137</span></span>
-<span><span class="co">## 13: 0.0727412 0.003652561</span></span>
-<span><span class="co">## 14: 0.5565674 0.175939199</span></span>
-<span><span class="co">## 15: 0.1431914 0.046344598</span></span></code></pre>
 <p>Before visualizing drug synergy, we recommend filling in any NA
 synergy scores to avoid gaps in the produced plots. This can be easily
 accomplished using the <code><a href="https://Rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">data.table::setnafill</a></code> function with
 the last observation carried forward strategy.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_15_combo_df</span> <span class="op">&lt;-</span> <span class="va">combo_viab</span><span class="op">[</span><span class="va">top_15_combo</span>, on<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'treatment1id'</span>, <span class="st">'treatment2id'</span>, <span class="st">'sampleid'</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co"># Last observation carried forward for NA/NaN delta scores, to make plot look nicer</span></span>
 <span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">setnafill</a></span><span class="op">(</span><span class="va">top_15_combo_df</span>, type<span class="op">=</span><span class="st">"locf"</span>, cols<span class="op">=</span><span class="st">"ZIP_delta"</span><span class="op">)</span></span></code></pre></div>
@@ -843,7 +790,7 @@ example code to produce both a contour plot (synergy surface) as well as
 a heat map to gain a more inuitive understanding of how synergy or
 antagonism changes over the full dose range of each drug combination
 matrix.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_15_combo_df</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">treatment1dose</span>, y<span class="op">=</span><span class="va">treatment2dose</span>, z<span class="op">=</span><span class="va">ZIP_delta</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span>oob<span class="op">=</span><span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/oob.html" class="external-link">squish_infinite</a></span><span class="op">)</span> <span class="op">+</span></span>
@@ -853,14 +800,12 @@ matrix.</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">treatment1id</span>, nrow<span class="op">=</span><span class="fl">3</span>, ncol<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette<span class="op">=</span><span class="st">"RdBu"</span>, direction<span class="op">=</span><span class="op">-</span><span class="fl">1</span>, drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DetectingDrugSynergyAndAntagonism_files/figure-html/synergy_contour_plot-1.png" width="700"></p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_15_combo_df</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">treatment1dose</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">treatment2dose</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill<span class="op">=</span><span class="va">ZIP_delta</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">treatment1id</span>, nrow<span class="op">=</span><span class="fl">3</span>, ncol<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient2</a></span><span class="op">(</span>low<span class="op">=</span><span class="st">"blue"</span>, mid<span class="op">=</span><span class="st">"white"</span>, high<span class="op">=</span><span class="st">"red"</span>, midpoint<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DetectingDrugSynergyAndAntagonism_files/figure-html/synergy_heatmap-1.png" width="700"></p>
 <p>To learn how to use synergy scores for biomarker discovery please
 review our workshop from Bioconductor 2022, linked in the first section
 of this document.</p>
@@ -900,63 +845,61 @@ of this document.</p>
 <span><span class="co">##   [1] fgsea_1.24.0                colorspace_2.1-0           </span></span>
 <span><span class="co">##   [3] ellipsis_0.3.2              rprojroot_2.0.3            </span></span>
 <span><span class="co">##   [5] lsa_0.73.3                  XVector_0.38.0             </span></span>
-<span><span class="co">##   [7] fs_1.6.1                    farver_2.1.1               </span></span>
-<span><span class="co">##   [9] SnowballC_0.7.0             MultiAssayExperiment_1.24.0</span></span>
-<span><span class="co">##  [11] DT_0.27                     fansi_1.0.4                </span></span>
-<span><span class="co">##  [13] R.methodsS3_1.8.2           codetools_0.2-18           </span></span>
-<span><span class="co">##  [15] cachem_1.0.7                knitr_1.42                 </span></span>
-<span><span class="co">##  [17] jsonlite_1.8.4              magicaxis_2.2.14           </span></span>
-<span><span class="co">##  [19] cluster_2.1.3               R.oo_1.25.0                </span></span>
-<span><span class="co">##  [21] shinydashboard_0.7.2        shiny_1.7.4                </span></span>
-<span><span class="co">##  [23] mapproj_1.2.11              BiocManager_1.30.20        </span></span>
-<span><span class="co">##  [25] compiler_4.2.1              backports_1.4.1            </span></span>
-<span><span class="co">##  [27] Matrix_1.4-1                fastmap_1.1.1              </span></span>
-<span><span class="co">##  [29] bench_1.1.2                 limma_3.54.2               </span></span>
-<span><span class="co">##  [31] cli_3.6.1                   later_1.3.0                </span></span>
-<span><span class="co">##  [33] visNetwork_2.1.2            htmltools_0.5.5            </span></span>
-<span><span class="co">##  [35] tools_4.2.1                 igraph_1.4.2               </span></span>
-<span><span class="co">##  [37] gtable_0.3.3                glue_1.6.2                 </span></span>
-<span><span class="co">##  [39] GenomeInfoDbData_1.2.9      reshape2_1.4.4             </span></span>
-<span><span class="co">##  [41] RANN_2.6.1                  dplyr_1.1.2                </span></span>
-<span><span class="co">##  [43] maps_3.4.1                  fastmatch_1.1-3            </span></span>
-<span><span class="co">##  [45] Rcpp_1.0.10                 slam_0.1-50                </span></span>
-<span><span class="co">##  [47] jquerylib_0.1.4             pkgdown_2.0.7              </span></span>
-<span><span class="co">##  [49] vctrs_0.6.2                 BumpyMatrix_1.6.0          </span></span>
-<span><span class="co">##  [51] xfun_0.38                   stringr_1.5.0              </span></span>
-<span><span class="co">##  [53] mime_0.12                   lifecycle_1.0.3            </span></span>
-<span><span class="co">##  [55] gtools_3.9.4                MASS_7.3-57                </span></span>
-<span><span class="co">##  [57] zlibbioc_1.44.0             scales_1.2.1               </span></span>
-<span><span class="co">##  [59] ragg_1.2.5                  promises_1.2.0.1           </span></span>
-<span><span class="co">##  [61] relations_0.6-13            parallel_4.2.1             </span></span>
-<span><span class="co">##  [63] RColorBrewer_1.1-3          sets_1.0-24                </span></span>
-<span><span class="co">##  [65] yaml_2.3.7                  memoise_2.0.1              </span></span>
-<span><span class="co">##  [67] downloader_0.4              sass_0.4.5                 </span></span>
-<span><span class="co">##  [69] stringi_1.7.12              highr_0.10                 </span></span>
-<span><span class="co">##  [71] NISTunits_1.0.1             desc_1.4.2                 </span></span>
-<span><span class="co">##  [73] plotrix_3.8-2               checkmate_2.1.0            </span></span>
-<span><span class="co">##  [75] caTools_1.18.2              boot_1.3-28                </span></span>
-<span><span class="co">##  [77] BiocParallel_1.32.6         rlang_1.1.0                </span></span>
-<span><span class="co">##  [79] pkgconfig_2.0.3             systemfonts_1.0.4          </span></span>
-<span><span class="co">##  [81] bitops_1.0-7                pracma_2.4.2               </span></span>
-<span><span class="co">##  [83] evaluate_0.20               lattice_0.20-45            </span></span>
-<span><span class="co">##  [85] purrr_1.0.1                 labeling_0.4.2             </span></span>
-<span><span class="co">##  [87] htmlwidgets_1.6.2           cowplot_1.1.1              </span></span>
-<span><span class="co">##  [89] tidyselect_1.2.0            plyr_1.8.8                 </span></span>
-<span><span class="co">##  [91] magrittr_2.0.3              bookdown_0.33              </span></span>
-<span><span class="co">##  [93] R6_2.5.1                    gplots_3.1.3               </span></span>
-<span><span class="co">##  [95] generics_0.1.3              sm_2.2-5.7.1               </span></span>
-<span><span class="co">##  [97] DelayedArray_0.24.0         withr_2.5.0                </span></span>
-<span><span class="co">##  [99] pillar_1.9.0                RCurl_1.98-1.12            </span></span>
-<span><span class="co">## [101] tibble_3.2.1                crayon_1.5.2               </span></span>
-<span><span class="co">## [103] KernSmooth_2.23-20          utf8_1.2.3                 </span></span>
-<span><span class="co">## [105] rmarkdown_2.21              isoband_0.2.7              </span></span>
-<span><span class="co">## [107] grid_4.2.1                  marray_1.76.0              </span></span>
-<span><span class="co">## [109] piano_2.14.0                digest_0.6.31              </span></span>
-<span><span class="co">## [111] xtable_1.8-4                httpuv_1.6.9               </span></span>
-<span><span class="co">## [113] R.utils_2.12.2              textshaping_0.3.6          </span></span>
-<span><span class="co">## [115] celestial_1.4.6             coop_0.6-3                 </span></span>
-<span><span class="co">## [117] munsell_0.5.0               bslib_0.4.2                </span></span>
-<span><span class="co">## [119] shinyjs_2.1.0</span></span></code></pre>
+<span><span class="co">##   [7] fs_1.6.1                    SnowballC_0.7.0            </span></span>
+<span><span class="co">##   [9] MultiAssayExperiment_1.24.0 DT_0.27                    </span></span>
+<span><span class="co">##  [11] fansi_1.0.4                 R.methodsS3_1.8.2          </span></span>
+<span><span class="co">##  [13] codetools_0.2-18            cachem_1.0.7               </span></span>
+<span><span class="co">##  [15] knitr_1.42                  jsonlite_1.8.4             </span></span>
+<span><span class="co">##  [17] magicaxis_2.2.14            cluster_2.1.3              </span></span>
+<span><span class="co">##  [19] R.oo_1.25.0                 shinydashboard_0.7.2       </span></span>
+<span><span class="co">##  [21] shiny_1.7.4                 mapproj_1.2.11             </span></span>
+<span><span class="co">##  [23] BiocManager_1.30.20         compiler_4.2.1             </span></span>
+<span><span class="co">##  [25] backports_1.4.1             Matrix_1.4-1               </span></span>
+<span><span class="co">##  [27] fastmap_1.1.1               bench_1.1.2                </span></span>
+<span><span class="co">##  [29] limma_3.54.2                cli_3.6.1                  </span></span>
+<span><span class="co">##  [31] later_1.3.0                 visNetwork_2.1.2           </span></span>
+<span><span class="co">##  [33] htmltools_0.5.5             tools_4.2.1                </span></span>
+<span><span class="co">##  [35] igraph_1.4.2                gtable_0.3.3               </span></span>
+<span><span class="co">##  [37] glue_1.6.2                  GenomeInfoDbData_1.2.9     </span></span>
+<span><span class="co">##  [39] reshape2_1.4.4              RANN_2.6.1                 </span></span>
+<span><span class="co">##  [41] dplyr_1.1.2                 maps_3.4.1                 </span></span>
+<span><span class="co">##  [43] fastmatch_1.1-3             Rcpp_1.0.10                </span></span>
+<span><span class="co">##  [45] slam_0.1-50                 jquerylib_0.1.4            </span></span>
+<span><span class="co">##  [47] pkgdown_2.0.7               vctrs_0.6.2                </span></span>
+<span><span class="co">##  [49] BumpyMatrix_1.6.0           xfun_0.39                  </span></span>
+<span><span class="co">##  [51] stringr_1.5.0               mime_0.12                  </span></span>
+<span><span class="co">##  [53] lifecycle_1.0.3             gtools_3.9.4               </span></span>
+<span><span class="co">##  [55] MASS_7.3-57                 zlibbioc_1.44.0            </span></span>
+<span><span class="co">##  [57] scales_1.2.1                ragg_1.2.5                 </span></span>
+<span><span class="co">##  [59] promises_1.2.0.1            relations_0.6-13           </span></span>
+<span><span class="co">##  [61] parallel_4.2.1              RColorBrewer_1.1-3         </span></span>
+<span><span class="co">##  [63] sets_1.0-24                 yaml_2.3.7                 </span></span>
+<span><span class="co">##  [65] memoise_2.0.1               downloader_0.4             </span></span>
+<span><span class="co">##  [67] sass_0.4.5                  stringi_1.7.12             </span></span>
+<span><span class="co">##  [69] NISTunits_1.0.1             desc_1.4.2                 </span></span>
+<span><span class="co">##  [71] plotrix_3.8-2               checkmate_2.1.0            </span></span>
+<span><span class="co">##  [73] caTools_1.18.2              boot_1.3-28                </span></span>
+<span><span class="co">##  [75] BiocParallel_1.32.6         rlang_1.1.0                </span></span>
+<span><span class="co">##  [77] pkgconfig_2.0.3             systemfonts_1.0.4          </span></span>
+<span><span class="co">##  [79] bitops_1.0-7                pracma_2.4.2               </span></span>
+<span><span class="co">##  [81] evaluate_0.20               lattice_0.20-45            </span></span>
+<span><span class="co">##  [83] purrr_1.0.1                 htmlwidgets_1.6.2          </span></span>
+<span><span class="co">##  [85] cowplot_1.1.1               tidyselect_1.2.0           </span></span>
+<span><span class="co">##  [87] plyr_1.8.8                  magrittr_2.0.3             </span></span>
+<span><span class="co">##  [89] bookdown_0.33               R6_2.5.1                   </span></span>
+<span><span class="co">##  [91] gplots_3.1.3                generics_0.1.3             </span></span>
+<span><span class="co">##  [93] sm_2.2-5.7.1                DelayedArray_0.24.0        </span></span>
+<span><span class="co">##  [95] withr_2.5.0                 pillar_1.9.0               </span></span>
+<span><span class="co">##  [97] RCurl_1.98-1.12             tibble_3.2.1               </span></span>
+<span><span class="co">##  [99] crayon_1.5.2                KernSmooth_2.23-20         </span></span>
+<span><span class="co">## [101] utf8_1.2.3                  rmarkdown_2.21             </span></span>
+<span><span class="co">## [103] grid_4.2.1                  marray_1.76.0              </span></span>
+<span><span class="co">## [105] piano_2.14.0                digest_0.6.31              </span></span>
+<span><span class="co">## [107] xtable_1.8-4                httpuv_1.6.9               </span></span>
+<span><span class="co">## [109] R.utils_2.12.2              textshaping_0.3.6          </span></span>
+<span><span class="co">## [111] celestial_1.4.6             coop_0.6-3                 </span></span>
+<span><span class="co">## [113] munsell_0.5.0               bslib_0.4.2                </span></span>
+<span><span class="co">## [115] shinyjs_2.1.0</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
