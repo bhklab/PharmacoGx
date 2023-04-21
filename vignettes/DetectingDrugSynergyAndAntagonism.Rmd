@@ -81,7 +81,7 @@ suppressPackageStartupMessages({
 })
 ```
 
-```{r load_dependencies_echo, eval=TRUE, echo=TRUE}
+```{r load_dependencies_echo, eval=FALSE, echo=TRUE}
 library(PharmacoGx)
 library(CoreGx)
 library(data.table)
@@ -344,7 +344,7 @@ we are now summarizing over dose. This helps ensure we use only as much memory
 as is necessary to store the analysis results in our
 `TreatmentResponseExperiment`.
 
-```{r monotherapy_curve_fits, messages=TRUE}
+```{r monotherapy_curve_fits, messages=TRUE, eval=FALSE}
 tre_fit <- tre_qc |>
     endoaggregate(
         {  # the entire code block is evaluated for each group in our group by
@@ -382,7 +382,7 @@ a single `endoaggregate` call.^[If we don't name an aggregation in
 `endoaggregate` a default name will be inferred from the function name and its
 first argument. In this case, the column will be called "mean_viability".]
 
-```{r create_combo_viability, message=FALSE}
+```{r create_combo_viability, message=FALSE, eval=FALSE}
 tre_combo <- tre_fit |>
     endoaggregate(
         assay="raw",
@@ -402,7 +402,7 @@ but requires the assays in `x` and `y` be specified as assay names instead of
 actual assay tables.^[The endomorphic nature of this operation allows the
 result to be piped into additional calls, as demonstrated below.]
 
-```{r add_monotherapy_fits_to_combo_viability}
+```{r add_monotherapy_fits_to_combo_viability, eval=FALSE}
 tre_combo <- tre_combo |>
     mergeAssays(
         x="combo_viability",
@@ -429,7 +429,7 @@ used to apply arbitrary functions to the data in an assay. Just specify the
 entire assay key to the by argument to compute the function for every row
 (*i.e.*, to perform no aggregation or summary of the data).]
 
-```{r }
+```{r eval=FALSE}
 tre_combo <- tre_combo |>
     endoaggregate(
         viability_1=.SD[treatment2dose == 0, mean_viability],
@@ -471,7 +471,7 @@ model and how they can affect resulting drug synergy predicitons.
 Below we use PharmacoGx to compute the expected response under all four
 null reference models of drug synergy.
 
-```{r compute_synergy_null_hypotheses, message=FALSE}
+```{r compute_synergy_null_hypotheses, message=FALSE, eval=FALSE}
 tre_synergy <- tre_combo |>
     endoaggregate(
         assay="combo_viability",
@@ -497,7 +497,7 @@ We prefer taking the difference, since the resulting value can be interpreted
 as the proportion of cell death above or below the expected value for each
 model.
 
-```{r synergy_score_vs_reference}
+```{r synergy_score_vs_reference, eval=FALSE}
 tre_synergy <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
@@ -521,7 +521,7 @@ the `estimateProjParams` method to compute the dose-response curve parameters
 for the two-way curve fits.
 
 
-```{r zip_two_way_fit, message=FALSE}
+```{r zip_two_way_fit, message=FALSE, eval=FALSE}
 tre_zip <- tre_synergy |>
     endoaggregate(
         assay="combo_viability",
@@ -565,7 +565,7 @@ tre_zip <- tre_zip |>
 Then we use the `.deltaScore` function to compute the final delta score
 using the two-way fit curve parameters from the previous step.
 
-```{r compute_zip_delta, message=FALSE}
+```{r compute_zip_delta, message=FALSE, eval=FALSE}
 tre_zip <- tre_zip |>
     endoaggregate(
         assay="combo_viability",
@@ -601,7 +601,7 @@ only the observed monotherapy viabilities to calculate the expected viability.
 The following code filters to only high quality curve fits and then finds
 the 15 most synergistic treatment pairs based on their ZIP delta score.
 
-```{r compute_top_synergy}
+```{r compute_top_synergy, eval=FALSE}
 combo_viab <- tre_zip[["combo_viability"]]
 (top_15_combo <- combo_viab[
     Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
@@ -623,7 +623,7 @@ to avoid gaps in the produced plots. This can be easily accomplished using
 the `data.table::setnafill` function with the last observation carried forward
 strategy.
 
-```{r handle_synergy_missing}
+```{r handle_synergy_missing, eval=FALSE}
 top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id', 'sampleid')]
 # Last observation carried forward for NA/NaN delta scores, to make plot look nicer
 setnafill(top_15_combo_df, type="locf", cols="ZIP_delta")
@@ -635,7 +635,7 @@ produce both a contour plot (synergy surface) as well as a heat map to gain
 a more inuitive understanding of how synergy or antagonism changes over the
 full dose range of each drug combination matrix.
 
-```{r synergy_contour_plot, fig.wide=TRUE}
+```{r synergy_contour_plot, fig.wide=TRUE, eval=FALSE}
 top_15_combo_df |>
     ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta * 100)) +
     scale_x_log10(oob=scales::squish_infinite) +
@@ -647,7 +647,7 @@ top_15_combo_df |>
     scale_fill_brewer(palette="RdBu", direction=-1, drop=FALSE)
 ```
 
-```{r synergy_heatmap, fig.wide=TRUE}
+```{r synergy_heatmap, fig.wide=TRUE, eval=FALSE}
 top_15_combo_df |>
     ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
     geom_tile(aes(fill=ZIP_delta * 100)) +
