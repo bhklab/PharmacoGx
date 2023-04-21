@@ -81,7 +81,7 @@ suppressPackageStartupMessages({
 })
 ```
 
-```{r load_dependencies_echo, eval=FALSE, echo=TRUE}
+```{r load_dependencies_echo, eval=True, echo=TRUE}
 library(PharmacoGx)
 library(CoreGx)
 library(data.table)
@@ -344,7 +344,7 @@ we are now summarizing over dose. This helps ensure we use only as much memory
 as is necessary to store the analysis results in our
 `TreatmentResponseExperiment`.
 
-```{r monotherapy_curve_fits, messages=FALSE}
+```{r monotherapy_curve_fits, messages=TRUE}
 tre_fit <- tre_qc |>
     endoaggregate(
         {  # the entire code block is evaluated for each group in our group by
@@ -352,8 +352,8 @@ tre_fit <- tre_qc |>
             fit <- PharmacoGx::logLogisticRegression(treatment1dose, mean_viability,
                 viability_as_pct=FALSE)
             # 2. compute curve summary metrics
-            ic50 <- computeIC50(treatment1dose, Hill_fit=fit)
-            aac <- computeAUC(treatment1dose, Hill_fit=fit)
+            ic50 <- PharmacoGx::computeIC50(treatment1dose, Hill_fit=fit)
+            aac <- PharmacoGx::computeAUC(treatment1dose, Hill_fit=fit)
             # 3. assemble the results into a list, each item will become a
             #   column in the target assay.
             list(
@@ -475,9 +475,9 @@ null reference models of drug synergy.
 tre_synergy <- tre_combo |>
     endoaggregate(
         assay="combo_viability",
-        HSA_ref=computeHSA(viability_1, viability_2),
-        Bliss_ref=computeBliss(viability_1, viability_2),
-        Loewe_ref=computeLoewe(
+        HSA_ref=PharmacoGx::computeHSA(viability_1, viability_2),
+        Bliss_ref=PharmacoGx::computeBliss(viability_1, viability_2),
+        Loewe_ref=PharmacoGx::computeLoewe(
             treatment1dose, HS_1=HS_1, EC50_1=EC50_1, E_inf_1=E_inf_1,
             treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
         ),
