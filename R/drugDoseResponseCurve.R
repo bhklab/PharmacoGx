@@ -335,6 +335,8 @@ function(drug,
   return(invisible(NULL))
 }
 
+
+# TODO:: REMOVE FUNCTION WHEN MAGIC AXIS GETS RETURNED 
 #' @keywords internal
 .magaxis <- function(side=1:2, majorn=5, minorn='auto', tcl=0.5, ratio=0.5, labels=TRUE, unlog='auto', 
          mgp=c(2,0.5,0), mtline=2, xlab=NULL, ylab=NULL, crunch=TRUE, logpretty=TRUE, 
