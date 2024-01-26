@@ -8,8 +8,8 @@
 <meta name="description" content="PharmacoGx">
 <title>Detecting Drug Synergy and Antagonism with PharmacoGx 3.0+ • PharmacoGx</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Detecting Drug Synergy and Antagonism with PharmacoGx 3.0+">
 <meta property="og:description" content="PharmacoGx">
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">PharmacoGx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -169,7 +169,7 @@ read the file in with your CSV reader of choice.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">input_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mathews_griner.csv.tar.gz"</span>,</span>
 <span>    package<span class="op">=</span><span class="st">"PharmacoGx"</span><span class="op">)</span></span>
-<span><span class="va">mathews_griner</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="va">input_file</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mathews_griner</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="va">input_file</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="experimental-design-hypothesis">Experimental Design Hypothesis<a class="anchor" aria-label="anchor" href="#experimental-design-hypothesis"></a>
@@ -572,7 +572,7 @@ endomorphically. It is equivalent to extracting the assays from the
 object, performing a join using the <code>merge</code> command, and
 assigning back to the assay specified as the <code>x</code> argument.
 This method accepts all the same parameters as the
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/merge.html" class="external-link">data.table::merge</a></code> function, but requires the assays in
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/merge.html" class="external-link">data.table::merge</a></code> function, but requires the assays in
 <code>x</code> and <code>y</code> be specified as assay names instead of
 actual assay tables.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The endomorphic nature of this operation allows the
 result to be piped into additional calls, as demonstrated below.&lt;/p&gt;"><sup>7</sup></a></p>
@@ -778,12 +778,12 @@ score.</p>
 <span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">15</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>Before visualizing drug synergy, we recommend filling in any NA
 synergy scores to avoid gaps in the produced plots. This can be easily
-accomplished using the <code><a href="https://Rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">data.table::setnafill</a></code> function with
+accomplished using the <code><a href="https://rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">data.table::setnafill</a></code> function with
 the last observation carried forward strategy.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_15_combo_df</span> <span class="op">&lt;-</span> <span class="va">combo_viab</span><span class="op">[</span><span class="va">top_15_combo</span>, on<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'treatment1id'</span>, <span class="st">'treatment2id'</span>, <span class="st">'sampleid'</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co"># Last observation carried forward for NA/NaN delta scores, to make plot look nicer</span></span>
-<span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">setnafill</a></span><span class="op">(</span><span class="va">top_15_combo_df</span>, type<span class="op">=</span><span class="st">"locf"</span>, cols<span class="op">=</span><span class="st">"ZIP_delta"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/nafill.html" class="external-link">setnafill</a></span><span class="op">(</span><span class="va">top_15_combo_df</span>, type<span class="op">=</span><span class="st">"locf"</span>, cols<span class="op">=</span><span class="st">"ZIP_delta"</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>ggplot2</code> package can be used to visualize the synergy
 scores for our top 15 most synergistic treatment pairs. Below we provide
 example code to produce both a contour plot (synergy surface) as well as
@@ -816,7 +816,7 @@ of this document.</p>
 </h2>
 <pre><code><span><span class="co">## R version 4.2.1 (2022-06-23)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">## Running under: Ubuntu 22.04.2 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 22.04.3 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3</span></span>
@@ -833,73 +833,67 @@ of this document.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] ggplot2_3.4.2               data.table_1.14.8          </span></span>
-<span><span class="co">##  [3] PharmacoGx_3.3.4            CoreGx_2.2.0               </span></span>
+<span><span class="co">##  [1] ggplot2_3.4.4               data.table_1.14.10         </span></span>
+<span><span class="co">##  [3] PharmacoGx_3.7.1            CoreGx_2.2.0               </span></span>
 <span><span class="co">##  [5] SummarizedExperiment_1.28.0 Biobase_2.58.0             </span></span>
 <span><span class="co">##  [7] GenomicRanges_1.50.2        GenomeInfoDb_1.34.9        </span></span>
 <span><span class="co">##  [9] IRanges_2.32.0              S4Vectors_0.36.2           </span></span>
-<span><span class="co">## [11] MatrixGenerics_1.10.0       matrixStats_0.63.0         </span></span>
+<span><span class="co">## [11] MatrixGenerics_1.10.0       matrixStats_1.2.0          </span></span>
 <span><span class="co">## [13] BiocGenerics_0.44.0         BiocStyle_2.26.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] fgsea_1.24.0                colorspace_2.1-0           </span></span>
-<span><span class="co">##   [3] ellipsis_0.3.2              rprojroot_2.0.3            </span></span>
-<span><span class="co">##   [5] lsa_0.73.3                  XVector_0.38.0             </span></span>
-<span><span class="co">##   [7] fs_1.6.1                    SnowballC_0.7.0            </span></span>
-<span><span class="co">##   [9] MultiAssayExperiment_1.24.0 DT_0.27                    </span></span>
-<span><span class="co">##  [11] fansi_1.0.4                 R.methodsS3_1.8.2          </span></span>
-<span><span class="co">##  [13] codetools_0.2-18            cachem_1.0.7               </span></span>
-<span><span class="co">##  [15] knitr_1.42                  jsonlite_1.8.4             </span></span>
-<span><span class="co">##  [17] magicaxis_2.2.14            cluster_2.1.3              </span></span>
-<span><span class="co">##  [19] R.oo_1.25.0                 shinydashboard_0.7.2       </span></span>
-<span><span class="co">##  [21] shiny_1.7.4                 mapproj_1.2.11             </span></span>
-<span><span class="co">##  [23] BiocManager_1.30.20         compiler_4.2.1             </span></span>
-<span><span class="co">##  [25] backports_1.4.1             Matrix_1.4-1               </span></span>
-<span><span class="co">##  [27] fastmap_1.1.1               bench_1.1.2                </span></span>
-<span><span class="co">##  [29] limma_3.54.2                cli_3.6.1                  </span></span>
-<span><span class="co">##  [31] later_1.3.0                 visNetwork_2.1.2           </span></span>
-<span><span class="co">##  [33] htmltools_0.5.5             tools_4.2.1                </span></span>
-<span><span class="co">##  [35] igraph_1.4.2                gtable_0.3.3               </span></span>
-<span><span class="co">##  [37] glue_1.6.2                  GenomeInfoDbData_1.2.9     </span></span>
-<span><span class="co">##  [39] reshape2_1.4.4              RANN_2.6.1                 </span></span>
-<span><span class="co">##  [41] dplyr_1.1.2                 maps_3.4.1                 </span></span>
-<span><span class="co">##  [43] fastmatch_1.1-3             Rcpp_1.0.10                </span></span>
-<span><span class="co">##  [45] slam_0.1-50                 jquerylib_0.1.4            </span></span>
-<span><span class="co">##  [47] pkgdown_2.0.7               vctrs_0.6.2                </span></span>
-<span><span class="co">##  [49] BumpyMatrix_1.6.0           xfun_0.39                  </span></span>
-<span><span class="co">##  [51] stringr_1.5.0               mime_0.12                  </span></span>
-<span><span class="co">##  [53] lifecycle_1.0.3             gtools_3.9.4               </span></span>
-<span><span class="co">##  [55] MASS_7.3-57                 zlibbioc_1.44.0            </span></span>
-<span><span class="co">##  [57] scales_1.2.1                ragg_1.2.5                 </span></span>
-<span><span class="co">##  [59] promises_1.2.0.1            relations_0.6-13           </span></span>
-<span><span class="co">##  [61] parallel_4.2.1              RColorBrewer_1.1-3         </span></span>
-<span><span class="co">##  [63] sets_1.0-24                 yaml_2.3.7                 </span></span>
-<span><span class="co">##  [65] memoise_2.0.1               downloader_0.4             </span></span>
-<span><span class="co">##  [67] sass_0.4.5                  stringi_1.7.12             </span></span>
-<span><span class="co">##  [69] NISTunits_1.0.1             desc_1.4.2                 </span></span>
-<span><span class="co">##  [71] plotrix_3.8-2               checkmate_2.1.0            </span></span>
-<span><span class="co">##  [73] caTools_1.18.2              boot_1.3-28                </span></span>
-<span><span class="co">##  [75] BiocParallel_1.32.6         rlang_1.1.0                </span></span>
-<span><span class="co">##  [77] pkgconfig_2.0.3             systemfonts_1.0.4          </span></span>
-<span><span class="co">##  [79] bitops_1.0-7                pracma_2.4.2               </span></span>
-<span><span class="co">##  [81] evaluate_0.20               lattice_0.20-45            </span></span>
-<span><span class="co">##  [83] purrr_1.0.1                 htmlwidgets_1.6.2          </span></span>
-<span><span class="co">##  [85] cowplot_1.1.1               tidyselect_1.2.0           </span></span>
-<span><span class="co">##  [87] plyr_1.8.8                  magrittr_2.0.3             </span></span>
-<span><span class="co">##  [89] bookdown_0.33               R6_2.5.1                   </span></span>
-<span><span class="co">##  [91] gplots_3.1.3                generics_0.1.3             </span></span>
-<span><span class="co">##  [93] sm_2.2-5.7.1                DelayedArray_0.24.0        </span></span>
-<span><span class="co">##  [95] withr_2.5.0                 pillar_1.9.0               </span></span>
-<span><span class="co">##  [97] RCurl_1.98-1.12             tibble_3.2.1               </span></span>
-<span><span class="co">##  [99] crayon_1.5.2                KernSmooth_2.23-20         </span></span>
-<span><span class="co">## [101] utf8_1.2.3                  rmarkdown_2.21             </span></span>
-<span><span class="co">## [103] grid_4.2.1                  marray_1.76.0              </span></span>
-<span><span class="co">## [105] piano_2.14.0                digest_0.6.31              </span></span>
-<span><span class="co">## [107] xtable_1.8-4                httpuv_1.6.9               </span></span>
-<span><span class="co">## [109] R.utils_2.12.2              textshaping_0.3.6          </span></span>
-<span><span class="co">## [111] celestial_1.4.6             coop_0.6-3                 </span></span>
-<span><span class="co">## [113] munsell_0.5.0               bslib_0.4.2                </span></span>
-<span><span class="co">## [115] shinyjs_2.1.0</span></span></code></pre>
+<span><span class="co">##   [3] ellipsis_0.3.2              lsa_0.73.3                 </span></span>
+<span><span class="co">##   [5] XVector_0.38.0              fs_1.6.3                   </span></span>
+<span><span class="co">##   [7] SnowballC_0.7.1             MultiAssayExperiment_1.24.0</span></span>
+<span><span class="co">##   [9] DT_0.31                     fansi_1.0.6                </span></span>
+<span><span class="co">##  [11] R.methodsS3_1.8.2           codetools_0.2-18           </span></span>
+<span><span class="co">##  [13] cachem_1.0.8                knitr_1.45                 </span></span>
+<span><span class="co">##  [15] jsonlite_1.8.8              cluster_2.1.3              </span></span>
+<span><span class="co">##  [17] R.oo_1.26.0                 shinydashboard_0.7.2       </span></span>
+<span><span class="co">##  [19] shiny_1.8.0                 BiocManager_1.30.22        </span></span>
+<span><span class="co">##  [21] compiler_4.2.1              backports_1.4.1            </span></span>
+<span><span class="co">##  [23] Matrix_1.4-1                fastmap_1.1.1              </span></span>
+<span><span class="co">##  [25] bench_1.1.3                 limma_3.54.2               </span></span>
+<span><span class="co">##  [27] cli_3.6.2                   later_1.3.2                </span></span>
+<span><span class="co">##  [29] visNetwork_2.1.2            htmltools_0.5.7            </span></span>
+<span><span class="co">##  [31] tools_4.2.1                 igraph_1.6.0               </span></span>
+<span><span class="co">##  [33] gtable_0.3.4                glue_1.7.0                 </span></span>
+<span><span class="co">##  [35] GenomeInfoDbData_1.2.9      reshape2_1.4.4             </span></span>
+<span><span class="co">##  [37] dplyr_1.1.4                 fastmatch_1.1-4            </span></span>
+<span><span class="co">##  [39] Rcpp_1.0.12                 slam_0.1-50                </span></span>
+<span><span class="co">##  [41] jquerylib_0.1.4             pkgdown_2.0.7              </span></span>
+<span><span class="co">##  [43] vctrs_0.6.5                 BumpyMatrix_1.6.0          </span></span>
+<span><span class="co">##  [45] xfun_0.41                   stringr_1.5.1              </span></span>
+<span><span class="co">##  [47] mime_0.12                   lifecycle_1.0.4            </span></span>
+<span><span class="co">##  [49] gtools_3.9.5                zlibbioc_1.44.0            </span></span>
+<span><span class="co">##  [51] scales_1.3.0                ragg_1.2.7                 </span></span>
+<span><span class="co">##  [53] promises_1.2.1              relations_0.6-13           </span></span>
+<span><span class="co">##  [55] parallel_4.2.1              RColorBrewer_1.1-3         </span></span>
+<span><span class="co">##  [57] sets_1.0-25                 yaml_2.3.8                 </span></span>
+<span><span class="co">##  [59] memoise_2.0.1               downloader_0.4             </span></span>
+<span><span class="co">##  [61] sass_0.4.8                  stringi_1.8.3              </span></span>
+<span><span class="co">##  [63] desc_1.4.3                  checkmate_2.3.1            </span></span>
+<span><span class="co">##  [65] caTools_1.18.2              boot_1.3-28                </span></span>
+<span><span class="co">##  [67] BiocParallel_1.32.6         rlang_1.1.3                </span></span>
+<span><span class="co">##  [69] pkgconfig_2.0.3             systemfonts_1.0.5          </span></span>
+<span><span class="co">##  [71] bitops_1.0-7                evaluate_0.23              </span></span>
+<span><span class="co">##  [73] lattice_0.20-45             purrr_1.0.2                </span></span>
+<span><span class="co">##  [75] htmlwidgets_1.6.4           cowplot_1.1.3              </span></span>
+<span><span class="co">##  [77] tidyselect_1.2.0            plyr_1.8.9                 </span></span>
+<span><span class="co">##  [79] magrittr_2.0.3              bookdown_0.37              </span></span>
+<span><span class="co">##  [81] R6_2.5.1                    gplots_3.1.3               </span></span>
+<span><span class="co">##  [83] generics_0.1.3              DelayedArray_0.24.0        </span></span>
+<span><span class="co">##  [85] withr_3.0.0                 pillar_1.9.0               </span></span>
+<span><span class="co">##  [87] RCurl_1.98-1.14             tibble_3.2.1               </span></span>
+<span><span class="co">##  [89] crayon_1.5.2                KernSmooth_2.23-20         </span></span>
+<span><span class="co">##  [91] utf8_1.2.4                  rmarkdown_2.25             </span></span>
+<span><span class="co">##  [93] grid_4.2.1                  marray_1.76.0              </span></span>
+<span><span class="co">##  [95] piano_2.14.0                digest_0.6.34              </span></span>
+<span><span class="co">##  [97] xtable_1.8-4                httpuv_1.6.13              </span></span>
+<span><span class="co">##  [99] R.utils_2.12.3              textshaping_0.3.7          </span></span>
+<span><span class="co">## [101] coop_0.6-3                  munsell_0.5.0              </span></span>
+<span><span class="co">## [103] bslib_0.6.1                 shinyjs_2.1.0</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
