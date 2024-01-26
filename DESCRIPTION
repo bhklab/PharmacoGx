@@ -1,7 +1,7 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.7.0
+Version: 3.7.1
 Date: 2023-04-19
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
@@ -38,7 +38,6 @@ Imports:
     MultiAssayExperiment,
     BiocParallel,
     ggplot2,
-    magicaxis,
     RColorBrewer,
     parallel,
     caTools,
@@ -57,7 +56,7 @@ Imports:
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
