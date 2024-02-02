@@ -1,17 +1,18 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.7.1
-Date: 2023-04-19
+Version: 3.7.2
+Date: 2024-02-02
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
         role=c("aut")),
     person(given="Christopher", family="Eeles",
         email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+    person(given="Jermiah", family="Joseph", 
+        email="jermiah.joseph@uhn.ca", role=c("aut")),
     person(given="Zhaleh", family="Safikhani", role=c("aut")),
     person(given="Mark", family="Freeman", role=c("aut")),
     person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca", role=c("aut")),
-    person(given="Jermiah", family="Joseph", email="jermiah.joseph@uhn.ca", role=c("aut")),
     person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
     )
 Description: Contains a set of functions to perform large-scale analysis of
@@ -39,6 +40,7 @@ Imports:
     BiocParallel,
     ggplot2,
     RColorBrewer,
+    magicaxis,
     parallel,
     caTools,
     methods,
