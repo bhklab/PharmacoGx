@@ -32,12 +32,13 @@
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-        function(object, sensitivity.measure="auc_recomputed", cell.lines,
+        function(object, sensitivity.measure="auc_recomputed", cell.lines, profiles_assay = "profiles",
+        treatment_col = "treatmentid", sample_col = "sampleid",
         drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
         fill.missing=TRUE, verbose=TRUE) {
     if (is(treatmentResponse(object), 'LongTable'))
-        .summarizeSensProfiles(object, sensitivity.measure,
-            cell.lines, drugs, summary.stat, fill.missing)
+        .summarizeSensProfiles(object, sensitivity.measure, profiles_assay = profiles_assay,
+          treatment_col, sample_col, cell.lines, drugs, summary.stat, fill.missing)
     else
         .summarizeSensitivityProfilesPharmacoSet(object,
             sensitivity.measure, cell.lines, drugs, summary.stat,
@@ -52,19 +53,27 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #' @import data.table
 #' @keywords internal
 .summarizeSensProfiles <- function(object,
-        sensitivity.measure='auc_recomputed', cell.lines, drugs, summary.stat,
+        sensitivity.measure='auc_recomputed', profiles_assay = "profiles", 
+        treatment_col = "treatmentid", sample_col = "sampleid", cell.lines, drugs, summary.stat,
         fill.missing=TRUE) {
 
     # handle missing
     if (missing(cell.lines)) cell.lines <- sampleNames(object)
     if (missing(drugs)) drugs <- treatmentNames(object)
-    if (missing(summary.stat)) summary.stat <- 'mean'
+    if (missing(summary.stat) || length(summary.stat)>1) summary.stat <- 'mean'
 
+    checkmate::assert_class(treatmentResponse(object), 'LongTable')
+    checkmate::assert_string(sensitivity.measure)
+    checkmate::assert_string(profiles_assay)
     # get LongTable object
     longTable <- treatmentResponse(object)
 
+    checkmate::assert((profiles_assay %in% names(longTable)),
+      msg = paste0("[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ",
+        "The assay '", profiles_assay, "' is not in the LongTable object."))
+
     # extract the sensitivty profiles
-    sensProfiles <- assay(longTable, 'profiles', withDimnames=TRUE, key=FALSE)
+    sensProfiles <- assay(longTable, profiles_assay, withDimnames=TRUE, key=FALSE)
     profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
 
     # compute max concentration and add it to the profiles
@@ -101,22 +110,26 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
             "min" = { min(as.numeric(x), na.rm=TRUE)}
             )
     }
+    sensProfiles <- data.table::as.data.table(sensProfiles)
 
     # do the summary
     profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)),
-        by=.(treatmentid, sampleid)]
+        by=c(treatment_col, sample_col)]
 
+    print(profSummary)
+    
     # NA pad the missing cells and drugs
     if (fill.missing) {
         allCombos <- data.table(expand.grid(drugs, cell.lines))
-        colnames(allCombos) <- c("treatmentid", "sampleid")
-        profSummary <- profSummary[allCombos, on=c("treatmentid", "sampleid")]
+        colnames(allCombos) <- c(treatment_col, sample_col)
+        profSummary <- profSummary[allCombos, on=c(treatment_col, sample_col)]
+        print(profSummary)
     }
 
     # reshape and convert to matrix
-    setorderv(profSummary, c("sampleid", "treatmentid"))
-    profSummary <- dcast(profSummary, treatmentid ~ sampleid, value.var='V1')
-    summaryMatrix <- as.matrix(profSummary, rownames="treatmentid")
+    setorderv(profSummary, c(sample_col, treatment_col))
+    profSummary <- dcast(profSummary, get(treatment_col) ~ get(sample_col), value.var='V1')
+    summaryMatrix <- as.matrix(profSummary, rownames='treatment_col')
     return(summaryMatrix)
 
 }
