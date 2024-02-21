@@ -18,7 +18,7 @@
 #'
 #' # Generate a plot from one or more PSets
 #' data(GDSCsmall)
-#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
+#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV1", pSets=GDSCsmall)
 #' }
 #'
 #' @param drug `character(1)` A drug name for which the drug response curve should be
