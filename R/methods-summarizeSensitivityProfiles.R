@@ -11,38 +11,32 @@
 #'     sensitivity.measure='auc_published')
 #'
 #' @param object [PharmacoSet] The PharmacoSet from which to extract the data
-#' @param sensitivity.measure `character` which sensitivity sensitivity.measure
-#'   to use? Use the sensitivityMeasures function to find out what measures are
-#'   available for each object.
-#' @param cell.lines \code{character} The cell lines to be summarized.
-#'   If any cell lines has no data, it will be filled with
-#'   missing values
-#' @param drugs \code{character} The drugs to be summarized.
-#'   If any drugs has no data, it will be filled with
-#'   missing values
-#' @param summary.stat \code{character} which summary method to use if there are repeated
-#'   cell line-drug experiments? Choices are "mean", "median", "first", or "last"
-#' @param fill.missing \code{boolean} should the missing cell lines not in the
-#'   molecular data object be filled in with missing values?
-#' @param verbose Should the function print progress messages?
+#' @param sensitivity.measure [character] The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object.
+#' @param cell.lines [character] The cell lines to be summarized. If any cell lines have no data, they will be filled with missing values.
+#' @param profiles_assay [character] The name of the assay in the PharmacoSet object that contains the sensitivity profiles.
+#' @param treatment_col [character] The name of the column in the profiles assay that contains the treatment IDs.
+#' @param sample_col [character] The name of the column in the profiles assay that contains the sample IDs.
+#' @param drugs [character] The drugs to be summarized. If any drugs have no data, they will be filled with missing values.
+#' @param summary.stat [character] The summary method to use if there are repeated cell line-drug experiments. Choices are "mean", "median", "first", "last", "max", or "min".
+#' @param fill.missing [boolean] Should the missing cell lines not in the molecular data object be filled in with missing values?
+#' @param verbose [boolean] Should the function print progress messages?
 #'
-#' @return [matrix] A matrix with cell lines going down the rows, drugs across
-#'   the columns, with the selected sensitivity statistic for each pair.
+#' @return [matrix] A matrix with cell lines going down the rows, drugs across the columns, with the selected sensitivity statistic for each pair.
 #'
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-        function(object, sensitivity.measure="auc_recomputed", cell.lines, profiles_assay = "profiles",
-        treatment_col = "treatmentid", sample_col = "sampleid",
-        drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
-        fill.missing=TRUE, verbose=TRUE) {
-    if (is(treatmentResponse(object), 'LongTable'))
-        .summarizeSensProfiles(object, sensitivity.measure, profiles_assay = profiles_assay,
-          treatment_col, sample_col, cell.lines, drugs, summary.stat, fill.missing)
-    else
-        .summarizeSensitivityProfilesPharmacoSet(object,
-            sensitivity.measure, cell.lines, drugs, summary.stat,
-            fill.missing, verbose)
+    function(object, sensitivity.measure="auc_recomputed", cell.lines, profiles_assay = "profiles",
+    treatment_col = "treatmentid", sample_col = "sampleid",
+    drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
+    fill.missing=TRUE, verbose=TRUE) {
+  if (is(treatmentResponse(object), 'LongTable'))
+    .summarizeSensProfiles(object, sensitivity.measure, profiles_assay = profiles_assay,
+      treatment_col, sample_col, cell.lines, drugs, summary.stat, fill.missing)
+  else
+    .summarizeSensitivityProfilesPharmacoSet(object,
+      sensitivity.measure, cell.lines, drugs, summary.stat,
+      fill.missing, verbose)
 })
 
 #' Summarize the sensitivity profiles when the sensitivity slot is a LongTable
