@@ -61,6 +61,8 @@
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend.
 #' @param trunc `logical(1)` Should the viability values be truncated to lie in \[0-100\] before doing the fitting
 #' @param verbose `logical(1)` Should warning messages about the data passed in be printed?
+#' @param sample_col `character(1)` The name of the column in the profiles assay that contains the sample IDs.
+#' @param treatment_col `character(1)` The name of the column in the profiles assay that contains the treatment IDs.
 #'
 #' @return Plots to the active graphics device and returns an invisible NULL.
 #'
