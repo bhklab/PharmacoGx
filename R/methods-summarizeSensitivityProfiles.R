@@ -18,8 +18,8 @@
 #' @param sample_col [character] The name of the column in the profiles assay that contains the sample IDs.
 #' @param drugs [character] The drugs to be summarized. If any drugs have no data, they will be filled with missing values.
 #' @param summary.stat [character] The summary method to use if there are repeated cell line-drug experiments. Choices are "mean", "median", "first", "last", "max", or "min".
-#' @param fill.missing [boolean] Should the missing cell lines not in the molecular data object be filled in with missing values?
-#' @param verbose [boolean] Should the function print progress messages?
+#' @param fill.missing Should the missing cell lines not in the molecular data object be filled in with missing values?
+#' @param verbose Should the function print progress messages?
 #'
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across the columns, with the selected sensitivity statistic for each pair.
 #'
