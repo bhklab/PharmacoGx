@@ -1126,7 +1126,9 @@ setMethod("computeZIPdelta", signature(object = "TreatmentResponseExperiment"),
 #' @examples
 #' \dontrun{
 #' ## ZIP is optional. Will be recomputed if not provided.
-#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
+#' combo_profiles <- CoreGx::buildComboProfiles(
+#'      tre, 
+#'      c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
 #' combo_profiles[,
 #'         .computeZIPdelta(
 #'             treatment1id = treatment1id,
