@@ -30,10 +30,10 @@ vignette: |
 \vspace{5pt}
 \footnotesize
 ```{r setup, include=FALSE, cache=FALSE, message = FALSE}
-
+if (!requireNamespace("knitr", quietly = TRUE)) {
+  install.packages("knitr")
+}
 library("knitr")
-
-### Chunk options: see http://yihui.name/knitr/options/ ###
 
 ## Text results
 opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE, include = TRUE)
@@ -45,7 +45,11 @@ opts_chunk$set(tidy = FALSE, comment = NA, highlight = TRUE)
 
 
 ```{r knitcitation, include=FALSE}
+if (!requireNamespace("knitcitations", quietly = TRUE)) {
+  install.packages("knitcitations")
+}
 library(knitcitations)
+
 cleanbib()
 cite_options(citation_format = "pandoc")
 ```
