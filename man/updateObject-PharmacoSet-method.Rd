@@ -15,3 +15,8 @@
 \description{
 Update the PharmacoSet class after changes in it struture or API
 }
+\examples{
+data(GDSCsmall)
+updateObject(GDSCsmall)
+
+}

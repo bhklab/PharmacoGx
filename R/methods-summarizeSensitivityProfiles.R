@@ -26,10 +26,18 @@
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
 setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-    function(object, sensitivity.measure="auc_recomputed", cell.lines, profiles_assay = "profiles",
-    treatment_col = "treatmentid", sample_col = "sampleid",
-    drugs, summary.stat=c("mean", "median", "first", "last", "max", "min"),
-    fill.missing=TRUE, verbose=TRUE) {
+    function(
+      object, 
+      sensitivity.measure="auc_recomputed", 
+      cell.lines, 
+      profiles_assay = "profiles",
+      treatment_col = "treatmentid", 
+      sample_col = "sampleid",
+      drugs, 
+      summary.stat=c("mean", "median", "first", "last", "max", "min"),
+      fill.missing=TRUE, 
+      verbose=TRUE
+  ) {
   if (is(treatmentResponse(object), 'LongTable'))
     .summarizeSensProfiles(object, sensitivity.measure, profiles_assay = profiles_assay,
       treatment_col, sample_col, cell.lines, drugs, summary.stat, fill.missing)
@@ -177,16 +185,6 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
   rownames(result) <- drugs
   colnames(result) <- cell.lines
 
-  # if(verbose){
-
-  #   message(sprintf("Summarizing %s sensitivity data for:\t%s", sensitivity.measure, annotation(object)$name))
-  #   total <- length(drugs)*length(cell.lines)
-  #   # create progress bar
-  #   pb <- utils::txtProgressBar(min=0, max=total, style=3)
-  #   i <- 1
-
-
-  # }
   if(is.factor(dd[, sensitivity.measure]) | is.character(dd[, sensitivity.measure])){
     warning("Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
              Please correct this and/or file an issue. Fixing in the call of this function.")
@@ -213,9 +211,6 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
   pp_dd <- pp_dd[pp_dd[,"sampleid"] %in% cell.lines & pp_dd[,"treatmentid"]%in%drugs,]
 
   tt <- reshape2::acast(pp_dd, treatmentid ~ sampleid, fun.aggregate=summary.function, value.var="sensitivity.measure")
- # tt <- tt[drugs, cell.lines]
-
-
 
   result[rownames(tt), colnames(tt)] <- tt
 
