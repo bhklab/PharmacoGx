@@ -25,7 +25,9 @@ drugDoseResponseCurve(
   cex = 0.7,
   cex.main = 0.9,
   legend.loc = "topright",
-  verbose = TRUE
+  verbose = TRUE,
+  sample_col = "sampleid",
+  treatment_col = "treatmentid"
 )
 }
 \arguments{
@@ -87,6 +89,10 @@ are summarized and replicates are plotted individually otherwise}
 \item{legend.loc}{And argument passable to xy.coords for the position to place the legend.}
 
 \item{verbose}{\code{logical(1)} Should warning messages about the data passed in be printed?}
+
+\item{sample_col}{\code{character(1)} The name of the column in the profiles assay that contains the sample IDs.}
+
+\item{treatment_col}{\code{character(1)} The name of the column in the profiles assay that contains the treatment IDs.}
 }
 \value{
 Plots to the active graphics device and returns an invisible NULL.
@@ -109,7 +115,7 @@ drugDoseResponseCurve(concentrations=list("Experiment 1"=c(.008, .04, .2, 1)),
 
 # Generate a plot from one or more PSets
 data(GDSCsmall)
-drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
+drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV1", pSets=GDSCsmall)
 }
 
 }

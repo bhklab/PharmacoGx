@@ -9,6 +9,9 @@ drug vs cell line table}
   object,
   sensitivity.measure = "auc_recomputed",
   cell.lines,
+  profiles_assay = "profiles",
+  treatment_col = "treatmentid",
+  sample_col = "sampleid",
   drugs,
   summary.stat = c("mean", "median", "first", "last", "max", "min"),
   fill.missing = TRUE,
@@ -18,29 +21,26 @@ drug vs cell line table}
 \arguments{
 \item{object}{\link{PharmacoSet} The PharmacoSet from which to extract the data}
 
-\item{sensitivity.measure}{\code{character} which sensitivity sensitivity.measure
-to use? Use the sensitivityMeasures function to find out what measures are
-available for each object.}
+\item{sensitivity.measure}{\link{character} The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object.}
 
-\item{cell.lines}{\code{character} The cell lines to be summarized.
-If any cell lines has no data, it will be filled with
-missing values}
+\item{cell.lines}{\link{character} The cell lines to be summarized. If any cell lines have no data, they will be filled with missing values.}
 
-\item{drugs}{\code{character} The drugs to be summarized.
-If any drugs has no data, it will be filled with
-missing values}
+\item{profiles_assay}{\link{character} The name of the assay in the PharmacoSet object that contains the sensitivity profiles.}
 
-\item{summary.stat}{\code{character} which summary method to use if there are repeated
-cell line-drug experiments? Choices are "mean", "median", "first", or "last"}
+\item{treatment_col}{\link{character} The name of the column in the profiles assay that contains the treatment IDs.}
 
-\item{fill.missing}{\code{boolean} should the missing cell lines not in the
-molecular data object be filled in with missing values?}
+\item{sample_col}{\link{character} The name of the column in the profiles assay that contains the sample IDs.}
+
+\item{drugs}{\link{character} The drugs to be summarized. If any drugs have no data, they will be filled with missing values.}
+
+\item{summary.stat}{\link{character} The summary method to use if there are repeated cell line-drug experiments. Choices are "mean", "median", "first", "last", "max", or "min".}
+
+\item{fill.missing}{Should the missing cell lines not in the molecular data object be filled in with missing values?}
 
 \item{verbose}{Should the function print progress messages?}
 }
 \value{
-\link{matrix} A matrix with cell lines going down the rows, drugs across
-the columns, with the selected sensitivity statistic for each pair.
+\link{matrix} A matrix with cell lines going down the rows, drugs across the columns, with the selected sensitivity statistic for each pair.
 }
 \description{
 This function creates a table with cell lines as rows and drugs as columns,
