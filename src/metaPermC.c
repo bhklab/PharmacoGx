@@ -140,7 +140,7 @@ void runPerm(double *out,
 
 
 
-  uint64_t num_larger = 0;
+  // uint64_t num_larger = 0; // Unused
   uint64_t cur_success = 0;
   uint64_t cur_iter = 1;
 
@@ -325,7 +325,7 @@ SEXP partialCorQUICKSTOP(SEXP pin_x,
   int log_decision_boundary = *INTEGER(plog_decision_boundary);
 
 
-  double temp;
+  // double temp; // Unused
 
   uint64_t N = (uint64_t) Ndouble;
   uint64_t max_iter = (uint64_t) MaxIterdouble;

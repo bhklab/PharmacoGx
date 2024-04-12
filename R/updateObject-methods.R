@@ -3,7 +3,11 @@
 #' @param object A `PharmacoSet` object to update the class structure for.
 #'
 #' @return `PharmacoSet` with update class structure.
-#'
+#' 
+#' @examples
+#' data(GDSCsmall)
+#' updateObject(GDSCsmall)
+#' 
 #' @md
 #' @importMethodsFrom CoreGx updateObject
 #' @export
