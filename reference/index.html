@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">PharmacoGx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,8 +138,7 @@
           
           <code><a href="computeABC.html">computeABC()</a></code> 
         </dt>
-        <dd>Fits dose-response curves to data given by the user
-and returns the ABC of the fitted curves.</dd>
+        <dd>Fits dose-response curves to data given by the user and returns the ABC of the fitted curves.</dd>
       </dl><dl><dt>
           
           <code><a href="computeAUC.html">computeAUC()</a></code> 
@@ -149,9 +148,7 @@ and returns the ABC of the fitted curves.</dd>
           
           <code><a href="computeAmax.html">computeAmax()</a></code> 
         </dt>
-        <dd>Fits dose-response curves to data given by the user
-and returns the Amax of the fitted curve.
-Amax: 100 - viability at maximum concentarion (in fitted curve)</dd>
+        <dd>Fits dose-response curves to data given by the user and returns the Amax of the fitted curve. Amax: 100 - viability at maximum concentarion (in fitted curve)</dd>
       </dl><dl><dt>
           
           <code><a href="computeBliss.html">computeBliss()</a></code> 
@@ -176,8 +173,7 @@ Amax: 100 - viability at maximum concentarion (in fitted curve)</dd>
           
           <code><a href="computeSlope.html">computeSlope()</a></code> 
         </dt>
-        <dd>Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking
-its concentration and viability as input.</dd>
+        <dd>Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking its concentration and viability as input.</dd>
       </dl><dl><dt>
           
           <code><a href="computeZIP.html">computeZIP()</a></code> 
@@ -227,15 +223,12 @@ its concentration and viability as input.</dd>
           
           <code><a href="drugPerturbationSig.html">drugPerturbationSig()</a></code> 
         </dt>
-        <dd>Creates a signature representing gene expression (or other molecular profile)
-change induced by administrating a drug, for use in drug effect analysis.</dd>
+        <dd>Creates a signature representing gene expression (or other molecular profile) change induced by administrating a drug, for use in drug effect analysis.</dd>
       </dl><dl><dt>
           
           <code><a href="drugSensitivitySig-PharmacoSet-method.html">drugSensitivitySig(<i>&lt;PharmacoSet&gt;</i>)</a></code> 
         </dt>
-        <dd>Creates a signature representing the association between gene expression (or
-other molecular profile) and drug dose response, for use in drug sensitivity
-analysis.</dd>
+        <dd>Creates a signature representing the association between gene expression (or other molecular profile) and drug dose response, for use in drug sensitivity analysis.</dd>
       </dl><dl><dt>
           
           <code><a href="effectToDose.html">effectToDose()</a></code> 
@@ -250,10 +243,7 @@ analysis.</dd>
           
           <code><a href="filterNoisyCurves.html">filterNoisyCurves()</a></code> 
         </dt>
-        <dd>Viability measurements in dose-reponse curves must remain stable or decrease
-monotonically reflecting response to the drug being tested.
-filterNoisyCurves flags dose-response curves that strongly violate these
-assumptions.</dd>
+        <dd>Viability measurements in dose-reponse curves must remain stable or decrease monotonically reflecting response to the drug being tested. filterNoisyCurves flags dose-response curves that strongly violate these assumptions.</dd>
       </dl><dl><dt>
           
           <code><a href="fitTwowayZIP.html">fitTwowayZIP()</a></code> 
@@ -288,8 +278,7 @@ assumptions.</dd>
           
           <code><a href="intersectPSet.html">intersectPSet()</a></code> 
         </dt>
-        <dd>Intersects objects of the PharmacoSet class, subsetting them to the common
-drugs and/or cell lines as selected by the user.</dd>
+        <dd>Intersects objects of the PharmacoSet class, subsetting them to the common drugs and/or cell lines as selected by the user.</dd>
       </dl><dl><dt>
           
           <code><a href="loeweCI.html">loeweCI()</a></code> 
@@ -299,8 +288,7 @@ drugs and/or cell lines as selected by the user.</dd>
           
           <code><a href="logLogisticRegression.html">logLogisticRegression()</a></code> 
         </dt>
-        <dd>Fits curves of the form E = E_inf + (1 - E_inf)/(1 + (c/EC50)^HS) to dose-response data points (c, E) given by the user
-and returns a vector containing estimates for HS, E_inf, and EC50.</dd>
+        <dd>Fits curves of the form E = E_inf + (1 - E_inf)/(1 + (c/EC50)^HS) to dose-response data points (c, E) given by the user and returns a vector containing estimates for HS, E_inf, and EC50.</dd>
       </dl><dl><dt>
           
           <code><a href="mcc.html">mcc()</a></code> 
@@ -345,8 +333,7 @@ and returns a vector containing estimates for HS, E_inf, and EC50.</dd>
           
           <code><a href="summarizeSensitivityProfiles-PharmacoSet-method.html">summarizeSensitivityProfiles(<i>&lt;PharmacoSet&gt;</i>)</a></code> 
         </dt>
-        <dd>Takes the sensitivity data from a PharmacoSet, and summarises them into a
-drug vs cell line table</dd>
+        <dd>Takes the sensitivity data from a PharmacoSet, and summarises them into a drug vs cell line table</dd>
       </dl><dl><dt>
           
           <code><a href="updateObject-PharmacoSet-method.html">updateObject(<i>&lt;PharmacoSet&gt;</i>)</a></code> 
@@ -361,7 +348,7 @@ drug vs cell line table</dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>

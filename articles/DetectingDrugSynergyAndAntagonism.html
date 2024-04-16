@@ -22,11 +22,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">PharmacoGx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -268,25 +268,24 @@ category—treatment metadata, sample metadata or assay data—and returns
 the column names for each group in the “mapped_columns” list item.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">treMapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/TREDataMapper.html" class="external-link">TREDataMapper</a></span><span class="op">(</span>rawdata<span class="op">=</span><span class="va">mathews_griner</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code>##  [33m [1m [3m&lt;TREDataMapper&gt; 
-##  [23m [22m [39m [33m [1mrawdata: [22m [39m dim(16776, 21)
-##      BlockId   Col   Row viability AssayId  Size          RowSid      RowName
-##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;num&gt;   &lt;int&gt; &lt;int&gt;          &lt;char&gt;       &lt;char&gt;
-##   1:       1     1     1  14.47499     241     6 NCGC00181170-01 Bendamustine
-##   2:       1     2     1  28.67605     241     6 NCGC00181170-01 Bendamustine
-##   3:       1     3     1  48.73285     241     6 NCGC00181170-01 Bendamustine
-##   13 variable(s) not shown: [RowTarget &lt;char&gt;, ColSid &lt;char&gt;, ColName
-##     &lt;char&gt;, ColTarget &lt;char&gt;, RowIC50 &lt;int&gt;, ColIC50 &lt;int&gt;, RowConcs
-##     &lt;num&gt;, ColConcs &lt;num&gt;, RowConcUnit &lt;char&gt;, ColConcUnit &lt;char&gt;, ...] 
-## 
- [33m [1mrowDataMap: [22m [39m
-##    [32mrowIDs: [39m 
-##    [32mrowMeta: [39m 
-##  [33m [1mcolDataMap: [22m [39m
-##    [32mcolIDs: [39m 
-##    [32mcolMeta: [39m  [33m [1m
-## assayMap: [22m [39m [33m [1m
-## metadataMap: [22m [39m [32m NA [39m</code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00; font-weight: bold; font-style: italic;">&lt;TREDataMapper&gt; </span></span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold; font-style: italic;">## </span><span style="color: #BBBB00; font-weight: bold;">rawdata:</span> dim(16776, 21)</span></span>
+<span><span class="co">##      BlockId   Col   Row viability AssayId  Size          RowSid      RowName</span></span>
+<span><span class="co">##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;num&gt;   &lt;int&gt; &lt;int&gt;          &lt;char&gt;       &lt;char&gt;</span></span>
+<span><span class="co">##   1:       1     1     1  14.47499     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   2:       1     2     1  28.67605     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   3:       1     3     1  48.73285     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   13 variable(s) not shown: [RowTarget &lt;char&gt;, ColSid &lt;char&gt;, ColName</span></span>
+<span><span class="co">##     &lt;char&gt;, ColTarget &lt;char&gt;, RowIC50 &lt;int&gt;, ColIC50 &lt;int&gt;, RowConcs</span></span>
+<span><span class="co">##     &lt;num&gt;, ColConcs &lt;num&gt;, RowConcUnit &lt;char&gt;, ColConcUnit &lt;char&gt;, ...] </span></span>
+<span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">rowDataMap:</span></span></span>
+<span><span class="co">##   <span style="color: #00BB00;">rowIDs:</span> </span></span>
+<span><span class="co">##   <span style="color: #00BB00;">rowMeta:</span> </span></span>
+<span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colDataMap:</span></span></span>
+<span><span class="co">##   <span style="color: #00BB00;">colIDs:</span> </span></span>
+<span><span class="co">##   <span style="color: #00BB00;">colMeta:</span> </span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold;">## assayMap:</span></span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold;">## metadataMap:</span><span style="color: #00BB00;"> NA</span></span></span></code></pre>
 <p>We will know we have successfully mapped all of our data if the
 “unmapped” list item in our guess has no column names in it. If this is
 not the case, you may have to refine your hypothesis to include
@@ -356,29 +355,28 @@ can be more than one item in each of these slots of a
 <span><span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/TREDataMapper-accessors.html" class="external-link">colDataMap</a></span><span class="op">(</span><span class="va">treMapper</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">guess</span><span class="op">$</span><span class="va">colDataMap</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/TREDataMapper-accessors.html" class="external-link">assayMap</a></span><span class="op">(</span><span class="va">treMapper</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>raw<span class="op">=</span><span class="va">guess</span><span class="op">$</span><span class="va">assayMap</span><span class="op">)</span></span>
 <span><span class="va">treMapper</span></span></code></pre></div>
-<pre><code>##  [33m [1m [3m&lt;TREDataMapper&gt; 
-##  [23m [22m [39m [33m [1mrawdata: [22m [39m dim(16776, 21)
-##      BlockId   Col   Row viability AssayId  Size          RowSid      RowName
-##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;num&gt;   &lt;int&gt; &lt;int&gt;          &lt;char&gt;       &lt;char&gt;
-##   1:       1     1     1  14.47499     241     6 NCGC00181170-01 Bendamustine
-##   2:       1     2     1  28.67605     241     6 NCGC00181170-01 Bendamustine
-##   3:       1     3     1  48.73285     241     6 NCGC00181170-01 Bendamustine
-##   13 variable(s) not shown: [RowTarget &lt;char&gt;, ColSid &lt;char&gt;, ColName
-##     &lt;char&gt;, ColTarget &lt;char&gt;, RowIC50 &lt;int&gt;, ColIC50 &lt;int&gt;, RowConcs
-##     &lt;num&gt;, ColConcs &lt;num&gt;, RowConcUnit &lt;char&gt;, ColConcUnit &lt;char&gt;, ...] 
-## 
- [33m [1mrowDataMap: [22m [39m
-##    [32mrowIDs: [39m RowName, ColName, RowConcs, ColConcs
-##    [32mrowMeta: [39m Col, Row, RowTarget
-##  [33m [1mcolDataMap: [22m [39m
-##    [32mcolIDs: [39m sampleid, tech_rep
-##    [32mcolMeta: [39m  [33m [1m
-## assayMap: [22m [39m
-##    [31mraw: [39m
-##     keys: RowName, ColName, RowConcs, ColConcs, sampleid, tech_rep
-##     values: BlockId, viability, RowSid [33m [1m
-## metadataMap: [22m [39m
-##    [32mexperiment_metadata: [39m AssayId, Size, ColSid, ColTarget, RowIC50, ColIC50, RowConcUnit, ColConcUnit, tissueid</code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00; font-weight: bold; font-style: italic;">&lt;TREDataMapper&gt; </span></span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold; font-style: italic;">## </span><span style="color: #BBBB00; font-weight: bold;">rawdata:</span> dim(16776, 21)</span></span>
+<span><span class="co">##      BlockId   Col   Row viability AssayId  Size          RowSid      RowName</span></span>
+<span><span class="co">##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;num&gt;   &lt;int&gt; &lt;int&gt;          &lt;char&gt;       &lt;char&gt;</span></span>
+<span><span class="co">##   1:       1     1     1  14.47499     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   2:       1     2     1  28.67605     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   3:       1     3     1  48.73285     241     6 NCGC00181170-01 Bendamustine</span></span>
+<span><span class="co">##   13 variable(s) not shown: [RowTarget &lt;char&gt;, ColSid &lt;char&gt;, ColName</span></span>
+<span><span class="co">##     &lt;char&gt;, ColTarget &lt;char&gt;, RowIC50 &lt;int&gt;, ColIC50 &lt;int&gt;, RowConcs</span></span>
+<span><span class="co">##     &lt;num&gt;, ColConcs &lt;num&gt;, RowConcUnit &lt;char&gt;, ColConcUnit &lt;char&gt;, ...] </span></span>
+<span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">rowDataMap:</span></span></span>
+<span><span class="co">##   <span style="color: #00BB00;">rowIDs:</span> RowName, ColName, RowConcs, ColConcs</span></span>
+<span><span class="co">##   <span style="color: #00BB00;">rowMeta:</span> Col, Row, RowTarget</span></span>
+<span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colDataMap:</span></span></span>
+<span><span class="co">##   <span style="color: #00BB00;">colIDs:</span> sampleid, tech_rep</span></span>
+<span><span class="co">##   <span style="color: #00BB00;">colMeta:</span> </span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold;">## assayMap:</span></span></span>
+<span><span class="co">##   <span style="color: #BB0000;">raw:</span></span></span>
+<span><span class="co">##     keys: RowName, ColName, RowConcs, ColConcs, sampleid, tech_rep</span></span>
+<span><span class="co">##     values: BlockId, viability, RowSid</span></span>
+<span><span class="co"><span style="color: #BBBB00; font-weight: bold;">## metadataMap:</span></span></span>
+<span><span class="co">##   <span style="color: #00BB00;">experiment_metadata:</span> AssayId, Size, ColSid, ColTarget, RowIC50, ColIC50, RowConcUnit, ColConcUnit, tissueid</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="creating-a-treatmentresponseexperiment">Creating a <code>TreatmentResponseExperiment</code><a class="anchor" aria-label="anchor" href="#creating-a-treatmentresponseexperiment"></a>
@@ -816,7 +814,7 @@ of this document.</p>
 </h2>
 <pre><code><span><span class="co">## R version 4.2.1 (2022-06-23)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">## Running under: Ubuntu 22.04.3 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 22.04.4 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3</span></span>
@@ -833,72 +831,72 @@ of this document.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] ggplot2_3.4.4               data.table_1.15.0          </span></span>
-<span><span class="co">##  [3] PharmacoGx_3.7.2            CoreGx_2.2.0               </span></span>
+<span><span class="co">##  [1] ggplot2_3.5.0               data.table_1.15.4          </span></span>
+<span><span class="co">##  [3] PharmacoGx_3.7.5            CoreGx_2.2.0               </span></span>
 <span><span class="co">##  [5] SummarizedExperiment_1.28.0 Biobase_2.58.0             </span></span>
 <span><span class="co">##  [7] GenomicRanges_1.50.2        GenomeInfoDb_1.34.9        </span></span>
 <span><span class="co">##  [9] IRanges_2.32.0              S4Vectors_0.36.2           </span></span>
-<span><span class="co">## [11] MatrixGenerics_1.10.0       matrixStats_1.2.0          </span></span>
+<span><span class="co">## [11] MatrixGenerics_1.10.0       matrixStats_1.3.0          </span></span>
 <span><span class="co">## [13] BiocGenerics_0.44.0         BiocStyle_2.26.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] fgsea_1.24.0                colorspace_2.1-0           </span></span>
-<span><span class="co">##   [3] ellipsis_0.3.2              lsa_0.73.3                 </span></span>
-<span><span class="co">##   [5] XVector_0.38.0              fs_1.6.3                   </span></span>
-<span><span class="co">##   [7] SnowballC_0.7.1             MultiAssayExperiment_1.24.0</span></span>
-<span><span class="co">##   [9] DT_0.31                     fansi_1.0.6                </span></span>
-<span><span class="co">##  [11] R.methodsS3_1.8.2           codetools_0.2-18           </span></span>
-<span><span class="co">##  [13] cachem_1.0.8                knitr_1.45                 </span></span>
-<span><span class="co">##  [15] jsonlite_1.8.8              cluster_2.1.3              </span></span>
-<span><span class="co">##  [17] R.oo_1.26.0                 shinydashboard_0.7.2       </span></span>
-<span><span class="co">##  [19] shiny_1.8.0                 BiocManager_1.30.22        </span></span>
-<span><span class="co">##  [21] compiler_4.2.1              backports_1.4.1            </span></span>
-<span><span class="co">##  [23] Matrix_1.4-1                fastmap_1.1.1              </span></span>
-<span><span class="co">##  [25] bench_1.1.3                 limma_3.54.2               </span></span>
-<span><span class="co">##  [27] cli_3.6.2                   later_1.3.2                </span></span>
-<span><span class="co">##  [29] visNetwork_2.1.2            htmltools_0.5.7            </span></span>
-<span><span class="co">##  [31] tools_4.2.1                 igraph_2.0.1.1             </span></span>
-<span><span class="co">##  [33] gtable_0.3.4                glue_1.7.0                 </span></span>
-<span><span class="co">##  [35] GenomeInfoDbData_1.2.9      reshape2_1.4.4             </span></span>
-<span><span class="co">##  [37] dplyr_1.1.4                 fastmatch_1.1-4            </span></span>
-<span><span class="co">##  [39] Rcpp_1.0.12                 slam_0.1-50                </span></span>
-<span><span class="co">##  [41] jquerylib_0.1.4             pkgdown_2.0.7              </span></span>
-<span><span class="co">##  [43] vctrs_0.6.5                 BumpyMatrix_1.6.0          </span></span>
-<span><span class="co">##  [45] xfun_0.41                   stringr_1.5.1              </span></span>
-<span><span class="co">##  [47] mime_0.12                   lifecycle_1.0.4            </span></span>
-<span><span class="co">##  [49] gtools_3.9.5                zlibbioc_1.44.0            </span></span>
-<span><span class="co">##  [51] scales_1.3.0                ragg_1.2.7                 </span></span>
-<span><span class="co">##  [53] promises_1.2.1              relations_0.6-13           </span></span>
-<span><span class="co">##  [55] parallel_4.2.1              RColorBrewer_1.1-3         </span></span>
-<span><span class="co">##  [57] sets_1.0-25                 yaml_2.3.8                 </span></span>
-<span><span class="co">##  [59] memoise_2.0.1               downloader_0.4             </span></span>
-<span><span class="co">##  [61] sass_0.4.8                  stringi_1.8.3              </span></span>
-<span><span class="co">##  [63] desc_1.4.3                  checkmate_2.3.1            </span></span>
-<span><span class="co">##  [65] caTools_1.18.2              boot_1.3-28                </span></span>
-<span><span class="co">##  [67] BiocParallel_1.32.6         rlang_1.1.3                </span></span>
-<span><span class="co">##  [69] pkgconfig_2.0.3             systemfonts_1.0.5          </span></span>
-<span><span class="co">##  [71] bitops_1.0-7                evaluate_0.23              </span></span>
-<span><span class="co">##  [73] lattice_0.20-45             purrr_1.0.2                </span></span>
-<span><span class="co">##  [75] htmlwidgets_1.6.4           cowplot_1.1.3              </span></span>
-<span><span class="co">##  [77] tidyselect_1.2.0            plyr_1.8.9                 </span></span>
-<span><span class="co">##  [79] magrittr_2.0.3              bookdown_0.37              </span></span>
-<span><span class="co">##  [81] R6_2.5.1                    gplots_3.1.3               </span></span>
-<span><span class="co">##  [83] generics_0.1.3              DelayedArray_0.24.0        </span></span>
-<span><span class="co">##  [85] withr_3.0.0                 pillar_1.9.0               </span></span>
-<span><span class="co">##  [87] RCurl_1.98-1.14             tibble_3.2.1               </span></span>
-<span><span class="co">##  [89] crayon_1.5.2                KernSmooth_2.23-20         </span></span>
-<span><span class="co">##  [91] utf8_1.2.4                  rmarkdown_2.25             </span></span>
-<span><span class="co">##  [93] grid_4.2.1                  marray_1.76.0              </span></span>
-<span><span class="co">##  [95] piano_2.14.0                digest_0.6.34              </span></span>
-<span><span class="co">##  [97] xtable_1.8-4                httpuv_1.6.14              </span></span>
-<span><span class="co">##  [99] R.utils_2.12.3              textshaping_0.3.7          </span></span>
-<span><span class="co">## [101] coop_0.6-3                  munsell_0.5.0              </span></span>
-<span><span class="co">## [103] bslib_0.6.1                 shinyjs_2.1.0</span></span></code></pre>
+<span><span class="co">##   [3] lsa_0.73.3                  XVector_0.38.0             </span></span>
+<span><span class="co">##   [5] fs_1.6.3                    SnowballC_0.7.1            </span></span>
+<span><span class="co">##   [7] MultiAssayExperiment_1.24.0 DT_0.33                    </span></span>
+<span><span class="co">##   [9] fansi_1.0.6                 codetools_0.2-18           </span></span>
+<span><span class="co">##  [11] R.methodsS3_1.8.2           cachem_1.0.8               </span></span>
+<span><span class="co">##  [13] knitr_1.46                  jsonlite_1.8.8             </span></span>
+<span><span class="co">##  [15] cluster_2.1.3               R.oo_1.26.0                </span></span>
+<span><span class="co">##  [17] shinydashboard_0.7.2        shiny_1.8.1.1              </span></span>
+<span><span class="co">##  [19] BiocManager_1.30.22         compiler_4.2.1             </span></span>
+<span><span class="co">##  [21] backports_1.4.1             Matrix_1.4-1               </span></span>
+<span><span class="co">##  [23] fastmap_1.1.1               bench_1.1.3                </span></span>
+<span><span class="co">##  [25] limma_3.54.2                cli_3.6.2                  </span></span>
+<span><span class="co">##  [27] later_1.3.2                 visNetwork_2.1.2           </span></span>
+<span><span class="co">##  [29] htmltools_0.5.8.1           tools_4.2.1                </span></span>
+<span><span class="co">##  [31] igraph_2.0.3                gtable_0.3.4               </span></span>
+<span><span class="co">##  [33] glue_1.7.0                  GenomeInfoDbData_1.2.9     </span></span>
+<span><span class="co">##  [35] reshape2_1.4.4              dplyr_1.1.4                </span></span>
+<span><span class="co">##  [37] fastmatch_1.1-4             Rcpp_1.0.12                </span></span>
+<span><span class="co">##  [39] slam_0.1-50                 jquerylib_0.1.4            </span></span>
+<span><span class="co">##  [41] pkgdown_2.0.8               vctrs_0.6.5                </span></span>
+<span><span class="co">##  [43] BumpyMatrix_1.6.0           xfun_0.43                  </span></span>
+<span><span class="co">##  [45] stringr_1.5.1               mime_0.12                  </span></span>
+<span><span class="co">##  [47] lifecycle_1.0.4             gtools_3.9.5               </span></span>
+<span><span class="co">##  [49] zlibbioc_1.44.0             scales_1.3.0               </span></span>
+<span><span class="co">##  [51] ragg_1.3.0                  promises_1.3.0             </span></span>
+<span><span class="co">##  [53] relations_0.6-13            parallel_4.2.1             </span></span>
+<span><span class="co">##  [55] RColorBrewer_1.1-3          sets_1.0-25                </span></span>
+<span><span class="co">##  [57] yaml_2.3.8                  memoise_2.0.1              </span></span>
+<span><span class="co">##  [59] downloader_0.4              sass_0.4.9                 </span></span>
+<span><span class="co">##  [61] stringi_1.8.3               desc_1.4.3                 </span></span>
+<span><span class="co">##  [63] checkmate_2.3.1             caTools_1.18.2             </span></span>
+<span><span class="co">##  [65] boot_1.3-28                 BiocParallel_1.32.6        </span></span>
+<span><span class="co">##  [67] rlang_1.1.3                 pkgconfig_2.0.3            </span></span>
+<span><span class="co">##  [69] systemfonts_1.0.6           bitops_1.0-7               </span></span>
+<span><span class="co">##  [71] evaluate_0.23               lattice_0.20-45            </span></span>
+<span><span class="co">##  [73] purrr_1.0.2                 htmlwidgets_1.6.4          </span></span>
+<span><span class="co">##  [75] cowplot_1.1.3               tidyselect_1.2.1           </span></span>
+<span><span class="co">##  [77] plyr_1.8.9                  magrittr_2.0.3             </span></span>
+<span><span class="co">##  [79] bookdown_0.39               R6_2.5.1                   </span></span>
+<span><span class="co">##  [81] gplots_3.1.3.1              generics_0.1.3             </span></span>
+<span><span class="co">##  [83] DelayedArray_0.24.0         pillar_1.9.0               </span></span>
+<span><span class="co">##  [85] withr_3.0.0                 RCurl_1.98-1.14            </span></span>
+<span><span class="co">##  [87] tibble_3.2.1                crayon_1.5.2               </span></span>
+<span><span class="co">##  [89] KernSmooth_2.23-20          utf8_1.2.4                 </span></span>
+<span><span class="co">##  [91] rmarkdown_2.26              grid_4.2.1                 </span></span>
+<span><span class="co">##  [93] marray_1.76.0               piano_2.14.0               </span></span>
+<span><span class="co">##  [95] digest_0.6.35               xtable_1.8-4               </span></span>
+<span><span class="co">##  [97] httpuv_1.6.15               R.utils_2.12.3             </span></span>
+<span><span class="co">##  [99] textshaping_0.3.7           coop_0.6-3                 </span></span>
+<span><span class="co">## [101] munsell_0.5.1               bslib_0.7.0                </span></span>
+<span><span class="co">## [103] shinyjs_2.1.0</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-mathewsgrinerHighthroughputCombinatorialScreening2014" class="csl-entry">
 Mathews Griner, Lesley A., Rajarshi Guha, Paul Shinn, Ryan M. Young,
 Jonathan M. Keller, Dongbo Liu, Ian S. Goldlust, et al. 2014.
@@ -935,7 +933,7 @@ Dose</span> an <span>Interaction Potency Model</span>.”</span>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer>

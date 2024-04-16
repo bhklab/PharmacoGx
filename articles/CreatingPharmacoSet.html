@@ -22,11 +22,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">PharmacoGx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,12 +133,25 @@ documented below.</p>
 information about all the cells profiles across all the data types in
 the PharamcoSet, including both perturbation and sensitivity
 experiments. It is crucial for the rownames of each entry in the data
-frame to be the <strong>unique cell identifier</strong> used across all
-the datatypes for each cell type. The content of this data frame will
-vary based on what information each dataset provides. Mandatory columns
-in this data frame must be <code>sampleid</code>, which should be
-equivalent to the rownames and <code>tissueid</code>, which contains a
-curated annotation of the source tissue for each cell line.</p>
+frame to be the <strong>unique sample identifier</strong> used across
+all the datatypes for each cell type. The content of this data frame
+will vary based on what information each dataset provides. Mandatory
+columns in this data frame must be <code>sampleid</code>, which should
+be equivalent to the rownames and <code>tissueid</code>, which contains
+a curated annotation of the source tissue for each cell line.</p>
+<p>An example of a <code>sample</code> slot is shown below:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  sampleid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A549"</span>, <span class="st">"MCF7"</span>, <span class="st">"PC3"</span><span class="op">)</span>,</span>
+<span>  tissueid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lung"</span>, <span class="st">"breast"</span>, <span class="st">"prostate"</span><span class="op">)</span>,</span>
+<span>  cellosaurus.accession <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CVCL_0023"</span>, <span class="st">"CVCL_0031"</span>, <span class="st">"CVCL_0035"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A549"</span>, <span class="st">"MCF7"</span>, <span class="st">"PC3"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sample</span></span></code></pre></div>
+<pre><code>     sampleid tissueid cellosaurus.accession
+A549     A549     lung             CVCL_0023
+MCF7     MCF7   breast             CVCL_0031
+PC3       PC3 prostate             CVCL_0035</code></pre>
 </div>
 <div class="section level3">
 <h3 id="treatment">
@@ -150,27 +163,39 @@ information about all the drugs profiled across all the data types in
 the PharmacoSet, including both perturbation and sensitivity
 experiments. Similar to the <code>sample</code> slot, it is crucial for
 the rownames of each entry in the data frame to be the <strong>unique
-compound identifier</strong> used across all the datatypes for each
+treatment identifier</strong> used across all the datatypes for each
 compound. Once again, the content in this data frame will vary based on
 information provided by each dataset. Mandatory columns must be
 <code>treatmentid</code>, which should be equivalent to the object
 rownames.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">treatment</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  treatmentid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Doxorubicin"</span>, <span class="st">"Tamoxifen"</span>, <span class="st">"Docetaxel"</span><span class="op">)</span>,</span>
+<span>  chembl.MechanismOfAction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DNA topoisomerase II inhibitor"</span>, <span class="st">"Estrogen receptor antagonist"</span>, <span class="st">"Microtubule inhibitor"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Doxorubicin"</span>, <span class="st">"Tamoxifen"</span>, <span class="st">"Docetaxel"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">treatment</span></span></code></pre></div>
+<pre><code>            treatmentid       chembl.MechanismOfAction
+Doxorubicin Doxorubicin DNA topoisomerase II inhibitor
+Tamoxifen     Tamoxifen   Estrogen receptor antagonist
+Docetaxel     Docetaxel          Microtubule inhibitor</code></pre>
 </div>
 <div class="section level3">
 <h3 id="curation">
 <code>curation</code>:<a class="anchor" aria-label="anchor" href="#curation"></a>
 </h3>
-<p>This slot contains three data.frames, one for drugs, tissues, and
-cells. Each contains two columns, the first with the unique identifier
-that is used between all PharmacoSet objects for this drug, and the
-second with the identifier used within the dataset. At this time there
-is no set method to find the unique identifiers between all PharmacoSets
-for arbitrary drugs, as much labour intensive curation has gone into
-carefully matching identifiers between datasets. However, these tables
-are used only by the intersecting function, and all other functions will
-function without this data, therefore for PharmacoSet objects created by
-users, we recommend just filling both columns with the identifiers used
-in the datasets, to allow for at least some matching to be done.</p>
+<p>This slot contains three data.frames, one for <code>sample</code>,
+<code>treatment</code>, and <code>tissue</code>. Each contains two
+columns, the first with the unique identifier that is used between all
+PharmacoSet objects for this drug, and the second with the identifier
+used within the dataset. At this time there is no set method to find the
+unique identifiers between all PharmacoSets for arbitrary drugs, as much
+labour intensive curation has gone into carefully matching identifiers
+between datasets. However, these tables are used only by the
+intersecting function, and all other functions will function without
+this data, therefore for PharmacoSet objects created by users, we
+recommend just filling both columns with the identifiers used in the
+datasets, to allow for at least some matching to be done.</p>
 <ul>
 <li>
 <code>sample</code>: data frame annotating all cell-lines
@@ -187,11 +212,14 @@ in the study.</li>
 <h3 id="molecularprofiles">
 <code>molecularProfiles</code>:<a class="anchor" aria-label="anchor" href="#molecularprofiles"></a>
 </h3>
+<p>Either a:</p>
 <ul>
-<li>List of <code>SummarizedExperiment</code> objects containing the
-molecular profiles of the cell lines, such as mutations, gene
-expressions, or copy number variations.</li>
+<li>List of <code>SummarizedExperiment</code> objects</li>
+<li>
+<code>MultiAssayExperiment</code> object</li>
 </ul>
+<p>containing the molecular profiles of the samples, such as mutations,
+gene expressions, or copy number variations.</p>
 <p>The molecular profiles slot of a PharmacoSet object contains all the
 molecular expression data profiled in the dataset. Each type of data is
 kept in a separate SummarizedExperiment (SE) object, and they are all
@@ -206,7 +234,7 @@ the type of dataincluded within the object. Currently only
 molecular data types are recognized and handled differently by
 summarizing and signature generating functions. This labelling is done
 by calling, for example:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">SE</span><span class="op">@</span><span class="va">annotation</span> <span class="op">&lt;-</span> <span class="st">"rna"</span></span></code></pre></div>
 <p>The phenoData in each SummarizedExperiment object also needs to
 contain specific columns labelling each experiment. For sensitivity type
@@ -231,9 +259,14 @@ applied, the concentration. Should be 0 for controls.</p>
 <code>control</code> respectively.</p>
 <p>Otherwise each SummarizedExperiment object should be constructed as
 specified by the SummarizedExperiment package.</p>
-<p>Once these SummarizedExperiment objects are created, they should be
-added to a list, with the name of each object in the list being
-descriptive of the type of data contained.</p>
+<p>Once these SummarizedExperiment objects are created, they should
+be:</p>
+<ol style="list-style-type: decimal">
+<li>added to a list, with the name of each object in the list being
+descriptive of the type of data contained; OR</li>
+<li>added to a <code>MultiAssayExperiment</code> object, with the name
+of each assay being descriptive of the type of data contained.</li>
+</ol>
 </div>
 <div class="section level3">
 <h3 id="datasettype">
@@ -257,6 +290,29 @@ looking for.</p>
 <p>Previously called <code>@sensitivity</code> this slot contains
 viability measurements for cell-lines treated with different therapeutic
 compounds.</p>
+<div class="section level4">
+<h4 id="new-in-pharmacogx-2-0">New in <code>PharmacoGx 2.0</code><a class="anchor" aria-label="anchor" href="#new-in-pharmacogx-2-0"></a>
+</h4>
+<p>In <code>PharmacoGx 2.0</code> this slot now takes an object of the
+<a href="https://bioconductor.org/packages/release/bioc/vignettes/CoreGx/inst/doc/TreatmentResponseExperiment.html" class="external-link"><code>CoreGx::treatmentResponseExperiment</code></a>
+class. This class is a container for drug dose response data, and adds a
+layer of functionality to incorporate drug combination data while also
+being able to perform computations efficiently.</p>
+<p>The design takes the aspects of the <code>SummarizedExperiment</code>
+and <code>MultiAssayExperiment</code> classes and implements them using
+the <code>data.table</code> package, which provides an R API to a rich
+set of tools for scalable, high performance data processing implemented
+in C.</p>
+<p>To create a <code>TreatmentResponseExperiment</code> object, please
+refer to the <a href="https://bioconductor.org/packages/release/bioc/vignettes/CoreGx/inst/doc/TreatmentResponseExperiment.html" class="external-link">The
+TreatmentResponseExperiment Class Documentation</a>.</p>
+</div>
+<div class="section level4">
+<h4 id="old-in-pharmacogx-1-0">Old in <code>PharmacoGx 1.0</code><a class="anchor" aria-label="anchor" href="#old-in-pharmacogx-1-0"></a>
+</h4>
+<p>In <code>PharmacoGx 1.0</code>, this was a list of
+<code>data.frame</code> objects, each containing the following
+slots:</p>
 <ul>
 <li>
 <code>n</code>: Number of experiments for each cell line treated
@@ -270,15 +326,11 @@ concentration from the drug dose-response curves.</li>
 <li>
 <code>profiles</code>: Drug sensitivity values summarizing each
 dose-response curve (IC<span class="math inline">\(_{50}\)</span>, AUC,
-etc.)</li>
-</ul>
-<p>This slot is currently being redesigned to support drug combination
-experiments. See the <code>LongTable</code> vignette for information
-about the new data strucutre.</p>
-<p>This is a list containing all the data pertaining to drug dose
+etc.) This is a list containing all the data pertaining to drug dose
 response experiments, usually only present in <code>sensitivity</code>
 or <code>both</code> type datasets. This includes the names the
-following names slots in the list:</p>
+following names slots in the list:</li>
+</ul>
 <p><code>info</code>: Metadata for each pharmacological experiment
 stored in a <code>data.frame</code>. Each row of this data.frame should
 be labelled with a unique experiment identifier. This data.frame must
@@ -314,6 +366,7 @@ columns. This data.frame summaries how many experiments are in the data
 for each pair, allowing quick identification of what pairs were tested
 together. Note that this does not need to be generated before
 constructing the object, it is generated by the constructor.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="perturbation">
@@ -375,19 +428,41 @@ object.</li>
 </h2>
 <p>Once all the data is in the proper format, it can be passed to a the
 constructor function as below:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/PharmacoSet.html">PharmacoSet</a></span><span class="op">(</span><span class="va">name</span>,</span>
-<span>            molecularProfiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            sample<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            sensitivityInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            sensitivityRaw<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span>dim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>            sensitivityProfiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            curationTreatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            curationSample<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            curationTissue<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>            datasetType<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sensitivity"</span>, <span class="st">"perturbation"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
-<span>            verify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="pharmacogx-2-0">PharmacoGx 2.0<a class="anchor" aria-label="anchor" href="#pharmacogx-2-0"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/PharmacoSet2.html">PharmacoSet2</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"emptySet"</span>,</span>
+<span>  treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  molecularProfiles <span class="op">=</span> <span class="fu">MultiAssayExperiment</span><span class="fu">::</span><span class="fu"><a href="http://waldronlab.io/MultiAssayExperiment/reference/MultiAssayExperiment.html" class="external-link">MultiAssayExperiment</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  treatmentResponse <span class="op">=</span> <span class="fu">CoreGx</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CoreGx/man/TreatmentResponseExperiment.html" class="external-link">TreatmentResponseExperiment</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  perturbation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  curation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>    treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>    tissue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  datasetType <span class="op">=</span> <span class="st">"sensitivity"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="pharmacogx-1-0">PharmacoGx 1.0<a class="anchor" aria-label="anchor" href="#pharmacogx-1-0"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">PharmacoGx</span><span class="fu">::</span><span class="fu"><a href="../reference/PharmacoSet.html">PharmacoSet</a></span><span class="op">(</span></span>
+<span>  <span class="va">name</span>,</span>
+<span>  molecularProfiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  sample<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  sensitivityInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  sensitivityRaw<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span>dim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  sensitivityProfiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  curationTreatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  curationSample<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  curationTissue<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  datasetType<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sensitivity"</span>, <span class="st">"perturbation"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
+<span>  verify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Here, <code>name</code> is the name of the PharmacoSet as described
 in annotations above, <code>molecularProfiles</code> is the list of
 ExpressionSet objects described above, cell and drug are the data.frames
@@ -403,6 +478,7 @@ constructor, and the default empty values are as in the call above.
 Notice that none of the values should be set as NA, they should be
 omited if the data is not being provided.</p>
 </div>
+</div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>
@@ -416,7 +492,7 @@ omited if the data is not being provided.</p>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer>

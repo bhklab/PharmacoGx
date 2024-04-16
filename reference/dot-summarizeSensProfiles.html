@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">PharmacoGx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.7.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.summarizeSensProfiles</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  sensitivity.measure <span class="op">=</span> <span class="st">"auc_recomputed"</span>,</span>
+<span>  profiles_assay <span class="op">=</span> <span class="st">"profiles"</span>,</span>
+<span>  treatment_col <span class="op">=</span> <span class="st">"treatmentid"</span>,</span>
+<span>  sample_col <span class="op">=</span> <span class="st">"sampleid"</span>,</span>
 <span>  <span class="va">cell.lines</span>,</span>
 <span>  <span class="va">drugs</span>,</span>
 <span>  <span class="va">summary.stat</span>,</span>
@@ -88,7 +91,7 @@ the columns, with the selected sensitivity statistic for each pair.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>
