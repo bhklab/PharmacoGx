@@ -6,3 +6,4 @@ CONTRIBUTING.md
 ^docs$
 ^pkgdown$
 ^LICENSE\.md$
+.github

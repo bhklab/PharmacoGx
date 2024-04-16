@@ -7,6 +7,9 @@
 .summarizeSensProfiles(
   object,
   sensitivity.measure = "auc_recomputed",
+  profiles_assay = "profiles",
+  treatment_col = "treatmentid",
+  sample_col = "sampleid",
   cell.lines,
   drugs,
   summary.stat,

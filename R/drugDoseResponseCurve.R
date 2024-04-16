@@ -18,7 +18,7 @@
 #'
 #' # Generate a plot from one or more PSets
 #' data(GDSCsmall)
-#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV", pSets=GDSCsmall)
+#' drugDoseResponseCurve(drug="Doxorubicin", cellline="22RV1", pSets=GDSCsmall)
 #' }
 #'
 #' @param drug `character(1)` A drug name for which the drug response curve should be
@@ -61,6 +61,8 @@
 #' @param legend.loc And argument passable to xy.coords for the position to place the legend.
 #' @param trunc `logical(1)` Should the viability values be truncated to lie in \[0-100\] before doing the fitting
 #' @param verbose `logical(1)` Should warning messages about the data passed in be printed?
+#' @param sample_col `character(1)` The name of the column in the profiles assay that contains the sample IDs.
+#' @param treatment_col `character(1)` The name of the column in the profiles assay that contains the treatment IDs.
 #'
 #' @return Plots to the active graphics device and returns an invisible NULL.
 #'
@@ -91,7 +93,9 @@ function(drug,
          cex = 0.7,
          cex.main = 0.9,
          legend.loc = "topright",
-         verbose=TRUE) {
+         verbose=TRUE,
+         sample_col = "sampleid",
+         treatment_col = "treatmentid") {
   if(!missing(pSets)){
     if (!is(pSets, "list")) {
       if (is(pSets, "PharmacoSet")) {
@@ -167,28 +171,42 @@ function(drug,
     }
   }
 
-  common.range.star <- FALSE
-
   if (missing(plot.type)) {
     plot.type <- "Actual"
   }
 
+  if(is(treatmentResponse(pSets[[1]]), "LongTable")){
+    pSets[[1]] <- subsetByTreatment(pSets[[1]], treatments=drug)
+  }
+  pSets[[1]] <- subsetBySample(pSets[[1]], samples=cellline)
+
   doses <- list(); responses <- list(); legend.values <- list(); j <- 0; pSetNames <- list()
   if(!missing(pSets)){
     for(i in seq_len(length(pSets))) {
-      exp_i <- which(sensitivityInfo(pSets[[i]])[ ,"sampleid"] == cellline & sensitivityInfo(pSets[[i]])[ ,"treatmentid"] == drug)
+      exp_i <- which(sensitivityInfo(pSets[[i]])[ ,sample_col] == cellline & sensitivityInfo(pSets[[i]])[ ,treatment_col] == drug)
       if(length(exp_i) > 0) {
         if (summarize.replicates) {
           pSetNames[[i]] <- name(pSets[[i]])
-          if (length(exp_i) == 1) {
-            drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
+          drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
               "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
-            drug.responses <- drug.responses[complete.cases(drug.responses), ]
-          }else{
-            drug.responses <- as.data.frame(cbind("Dose"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"], 2, function(x){median(as.numeric(x), na.rm=TRUE)}),
-              "Viability"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
-            drug.responses <- drug.responses[complete.cases(drug.responses), ]
-          }
+          drug.responses <- drug.responses[complete.cases(drug.responses), ]
+          # tryCatch(
+          #   drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
+          #     "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
+          #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
+          # , error = function(e) {
+          #   if (length(exp_i) == 1) {
+          #   drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
+          #     "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
+          #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
+          # }else{
+          #   drug.responses <- as.data.frame(cbind("Dose"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"], 1, function(x){median(as.numeric(x), na.rm=TRUE)}),
+          #     "Viability"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
+          #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
+          # }
+          # })
+
+          
           doses[[i]] <- drug.responses$Dose
           responses[[i]] <- drug.responses$Viability
           names(doses[[i]]) <- names(responses[[i]]) <- seq_len(length(doses[[i]]))
@@ -201,7 +219,7 @@ function(drug,
               legend.values[[i]] <- sprintf("%s = %s", legends.label, round(as.numeric(sensitivityProfiles(pSets[[i]])[exp_i, legends.label]), digits=2))
             }
           } else {
-            legend.values[[i]] <- ""
+            legend.values[i] <- ""
           }
         }else {
           for (exp in exp_i) {
@@ -224,7 +242,7 @@ function(drug,
               }
             } else {
               tt <- unlist(strsplit(rownames(sensitivityInfo(pSets[[i]]))[exp], split="_"))
-              if (tt[1] == "treatmentid") {
+              if (tt[1] == treatment_col) {
                 legend.values[[j]] <- tt[2]
               }else{
                 legend.values[[j]] <- rownames(sensitivityInfo(pSets[[i]]))[exp]
@@ -323,13 +341,7 @@ function(drug,
     legends<- c(legends, sprintf("%s%s", pSetNames[[i]], legend.values[[i]]))
     legends.col <-  c(legends.col, mycol[i])
   }
-  if (common.range.star) {
-    if (length(doses) > 1) {
-      for (i in seq_len(length(doses))) {
-        points(common.ranges[[i]], responses[[i]][names(common.ranges[[i]])], pch=8, col=mycol[i])
-      }
-    }
-  }
+
   legend(legend.loc, legend=legends, col=legends.col, bty="n", cex=cex, pch=c(15,15))
   return(invisible(NULL))
 }

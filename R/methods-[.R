@@ -1,6 +1,4 @@
 # ==== PharmacoSet Class
-
-
 #'`[`
 #'
 #' @examples

@@ -30,10 +30,7 @@ vignette: |
 \vspace{5pt}
 \footnotesize
 ```{r setup, include=FALSE, cache=FALSE, message = FALSE}
-
 library("knitr")
-
-### Chunk options: see http://yihui.name/knitr/options/ ###
 
 ## Text results
 opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE, include = TRUE)
@@ -46,6 +43,7 @@ opts_chunk$set(tidy = FALSE, comment = NA, highlight = TRUE)
 
 ```{r knitcitation, include=FALSE}
 library(knitcitations)
+
 cleanbib()
 cite_options(citation_format = "pandoc")
 ```
@@ -80,11 +78,24 @@ Previously called `@cell`.
 This slot contains a `data.frame` which contains information about all the cells
 profiles across all the data types in the PharamcoSet, including both
 perturbation and sensitivity experiments. It is crucial for the rownames of each
-entry in the data frame to be the **unique cell identifier** used across all the
+entry in the data frame to be the **unique sample identifier** used across all the
 datatypes for each cell type. The content of this data frame will vary based on
 what information each dataset provides. Mandatory columns in this data frame
 must be `sampleid`, which should be equivalent to the rownames and `tissueid`,
 which contains a curated annotation of the source tissue for each cell line.
+
+An example of a `sample` slot is shown below:
+
+```{R}
+sample <- data.frame(
+  sampleid = c("A549", "MCF7", "PC3"),
+  tissueid = c("lung", "breast", "prostate"),
+  cellosaurus.accession = c("CVCL_0023", "CVCL_0031", "CVCL_0035"),
+  row.names = c("A549", "MCF7", "PC3"))
+
+sample
+```
+
 
 ## `treatment`
 
@@ -94,15 +105,25 @@ This slot contains a `data.frame` which contains information about all the drugs
 profiled across all the data types in the PharmacoSet, including both
 perturbation and sensitivity experiments. Similar to the `sample` slot, it is
 crucial for the rownames of each entry in the data frame to be the
-**unique compound identifier** used across all the datatypes for each compound.
+**unique treatment identifier** used across all the datatypes for each compound.
 Once again, the content in this data frame will vary based on information
 provided by each dataset. Mandatory columns must be `treatmentid`, which should
 be equivalent to the object rownames.
 
+```{R}
+treatment <- data.frame(
+  treatmentid = c("Doxorubicin", "Tamoxifen", "Docetaxel"),
+  chembl.MechanismOfAction = c("DNA topoisomerase II inhibitor", "Estrogen receptor antagonist", "Microtubule inhibitor"),
+  row.names = c("Doxorubicin", "Tamoxifen", "Docetaxel"))
+
+treatment
+```
+
+
 ## `curation`:
 
-This slot contains three data.frames, one for drugs, tissues, and cells. Each
-contains two columns, the first with the unique identifier that is used between
+This slot contains three data.frames, one for `sample`, `treatment`, and `tissue`. 
+Each contains two columns, the first with the unique identifier that is used between
 all PharmacoSet objects for this drug, and the second with the identifier used
 within the dataset. At this time there is no set method to find the unique
 identifiers between all PharmacoSets for arbitrary drugs, as much labour
@@ -117,9 +138,14 @@ used in the datasets, to allow for at least some matching to be done.
 * `tissue`: data.frame annotating all tissues investigated in the study.
 
 ## `molecularProfiles`:
-* List of `SummarizedExperiment` objects containing the
-molecular profiles of the cell lines, such as mutations, gene expressions, or
-copy number variations.
+
+Either a:
+
+* List of `SummarizedExperiment` objects 
+* `MultiAssayExperiment` object 
+
+containing the molecular profiles of the samples, such as mutations, 
+gene expressions, or copy number variations.
 
 The molecular profiles slot of a PharmacoSet object contains all the molecular
 expression data profiled in the dataset. Each type of data is kept in a separate
@@ -166,9 +192,13 @@ concentration. Should be 0 for controls.
 Otherwise each SummarizedExperiment object should be constructed as specified
 by the SummarizedExperiment package.
 
-Once these SummarizedExperiment objects are created, they should be added to a
-list, with the name of each object in the list being descriptive of the type of
-data contained.
+Once these SummarizedExperiment objects are created, they should be:
+
+1. added to a list, with the name of each object in the list being descriptive of the type of
+data contained; OR
+2. added to a `MultiAssayExperiment` object, with the name of each assay being
+descriptive of the type of data contained.
+
 
 ## `datasetType`
 
@@ -186,16 +216,34 @@ to be aware of what data types they should be looking for.
 Previously called `@sensitivity` this slot contains viability measurements for
 cell-lines treated with different therapeutic compounds.
 
+### New in `PharmacoGx 2.0`
+
+In `PharmacoGx 2.0` this slot now takes an object of the 
+[`CoreGx::treatmentResponseExperiment`](
+  https://bioconductor.org/packages/release/bioc/vignettes/CoreGx/inst/doc/TreatmentResponseExperiment.html)
+class. 
+This class is a container for drug dose response data, and adds a layer of
+functionality to incorporate drug combination data while also being able to 
+perform computations efficiently.
+
+The design takes the aspects of the `SummarizedExperiment` and `MultiAssayExperiment` 
+classes and implements them using the `data.table` package, which provides an R API 
+to a rich set of tools for scalable, high performance data processing implemented in C.
+
+To create a `TreatmentResponseExperiment` object, please refer to the 
+[The TreatmentResponseExperiment Class Documentation](https://bioconductor.org/packages/release/bioc/vignettes/CoreGx/inst/doc/TreatmentResponseExperiment.html).
+
+### Old in `PharmacoGx 1.0`
+
+In `PharmacoGx 1.0`, this was a list of `data.frame` objects, each containing
+the following slots:
+
 * `n`: Number of experiments for each cell line treated with a given drug.
 * `info`: Metadata for each pharmacological experiment.
 * `raw`: All cell viability measurements at each drug concentration from the
 drug dose-response curves.
 * `profiles`: Drug sensitivity values summarizing each dose-response curve
 (IC$_{50}$, AUC, etc.)
-
-This slot is currently being redesigned to support drug combination experiments.
-See the `LongTable` vignette for information about the new data strucutre.
-
 This is a list containing all the data pertaining to drug dose response
 experiments, usually only present in `sensitivity` or `both` type datasets. This
 includes the names the following names slots in the list:
@@ -279,19 +327,42 @@ the PharmacoSet, which is passed to the constructor.
 Once all the data is in the proper format, it can be passed to a the constructor
 function as below:
 
+## PharmacoGx 2.0
+
 ```{r eval=FALSE}
-PharmacoSet(name,
-            molecularProfiles=list(),
-            sample=data.frame(),
-            treatment=data.frame(),
-            sensitivityInfo=data.frame(),
-            sensitivityRaw=array(dim=c(0,0,0)),
-            sensitivityProfiles=matrix(),
-            curationTreatment=data.frame(),
-            curationSample=data.frame(),
-            curationTissue=data.frame(),
-            datasetType=c("sensitivity", "perturbation", "both"),
-            verify = TRUE)
+PharmacoGx::PharmacoSet2(
+  name = "emptySet",
+  treatment = data.frame(),
+  sample = data.frame(),
+  molecularProfiles = MultiAssayExperiment::MultiAssayExperiment(),
+  treatmentResponse = CoreGx::TreatmentResponseExperiment(),
+  perturbation = list(),
+  curation = list(
+    sample = data.frame(), 
+    treatment = data.frame(), 
+    tissue = data.frame()),
+  datasetType = "sensitivity"
+)
+
+
+```
+
+## PharmacoGx 1.0
+
+```{r eval=FALSE}
+PharmacoGx::PharmacoSet(
+  name,
+  molecularProfiles=list(),
+  sample=data.frame(),
+  treatment=data.frame(),
+  sensitivityInfo=data.frame(),
+  sensitivityRaw=array(dim=c(0,0,0)),
+  sensitivityProfiles=matrix(),
+  curationTreatment=data.frame(),
+  curationSample=data.frame(),
+  curationTissue=data.frame(),
+  datasetType=c("sensitivity", "perturbation", "both"),
+  verify = TRUE)
 ```
 
 Here, `name` is the name of the PharmacoSet as described in annotations above,
