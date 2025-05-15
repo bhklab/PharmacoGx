@@ -18,6 +18,7 @@ PSets/**
 *.html
 
 # exceptions
+!.github
 !.gitignore
 local_data/**
 .VSCodeCounter/**
