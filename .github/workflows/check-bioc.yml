@@ -307,8 +307,8 @@ jobs:
           - name: Login to Docker Hub
             uses: docker/login-action@v2
             with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
+                username: ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}
+                password: ${{ secrets.BHKLAB_DOCKERHUB_ACCESS_KEY }}
 
           - name: Build and Push Docker
             uses: docker/build-push-action@v4
@@ -319,5 +319,5 @@ jobs:
                 cache-to: type=gha,mode=max
                 push: true
                 tags: |
-                    ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
-                    ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:devel
+                    ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
+                    ${{ secrets.BHKLAB_DOCKERHUB_ACCESS_KEY }}/${{ env.CONT_IMG_NAME }}:devel
