@@ -344,19 +344,21 @@ jobs:
             - name: Set Docker tags
               id: docker_tags
               run: |
-                  TAGS="bhklab/${{ env.CONT_IMG_NAME }}:${{ matrix.bioc-version.tag }}"
+                  TAGS=""
 
                   if [[ "${{ matrix.bioc-version.tag }}" == "RELEASE_3_21" ]]; then
-                    TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:latest"
+                    TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:release"
+                    # if devel, add devel tag
+                  elif [[ "${{ matrix.bioc-version.tag }}" == "devel" ]]; then
+                    TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:devel"
                   fi
 
                   if [[ "${{ matrix.bioc-version.r-version }}" != "" ]]; then
-                    TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:${{ matrix.bioc-version.tag }}-R-${{ matrix.bioc-version.r-version }}"
+                    TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:BIOC-${{ matrix.bioc-version.tag }}_R-${{ matrix.bioc-version.r-version }}__${{ steps.pkg_version.outputs.version }}"
                   fi
 
-                  # Add version-specific tags
-                  TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:${{ steps.pkg_version.outputs.version }}"
-                  TAGS="$TAGS,bhklab/${{ env.CONT_IMG_NAME }}:${{ matrix.bioc-version.tag }}-${{ steps.pkg_version.outputs.version }}"
+
+                  echo "The following tags will be used for the Docker image: $TAGS"
 
                   echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
