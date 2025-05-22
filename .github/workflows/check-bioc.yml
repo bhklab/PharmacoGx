@@ -314,6 +314,9 @@ jobs:
             uses: docker/build-push-action@v4
             with:
                 context: .
+                platforms: linux/amd64,linux/arm64
+                cache-from: type=gha
+                cache-to: type=gha,mode=max
                 push: true
                 tags: |
                     ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
