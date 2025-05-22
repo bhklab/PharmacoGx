@@ -20,26 +20,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 # Install pak
-RUN Rscript -e 'if (!requireNamespace("pak", quietly = TRUE)) { \
-    install.packages("pak", repos = "https://cloud.r-project.org") }'
-
-# Copy only dependency information first to leverage Docker caching
-COPY DESCRIPTION /tmp/
+RUN Rscript -e 'if (!requireNamespace("pak", quietly = TRUE)) { install.packages("pak") }'
 
 # Install package dependencies using pak - extract them from DESCRIPTION
-RUN cd /tmp && \
-    Rscript -e 'deps <- pak::pkg_deps_tree(".", dependencies = TRUE)$package; \
-    pak::pkg_install(deps, ask = FALSE)'
+RUN Rscript -e 'pak::pkg_install("bhklab/PharmacoGx", ask = FALSE, dependencies = TRUE, upgrade = FALSE)'
 
 # Copy the local package files
 COPY . /app
 
 # Set working directory
 WORKDIR /app
-
-# Build and install the package
-RUN R CMD build . && \
-    R CMD INSTALL *.tar.gz
 
 # Default command when the container starts
 CMD ["R"]
