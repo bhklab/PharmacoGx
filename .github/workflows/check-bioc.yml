@@ -320,4 +320,4 @@ jobs:
                 push: true
                 tags: |
                     ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
-                    ${{ secrets.BHKLAB_DOCKERHUB_ACCESS_KEY }}/${{ env.CONT_IMG_NAME }}:devel
+                    ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:devel
