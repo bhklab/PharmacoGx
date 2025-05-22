@@ -291,8 +291,15 @@ jobs:
 
   docker-build-and-push:
         runs-on: ubuntu-latest
-        needs: build-check
+        # needs: build-check
         if: "!contains(github.event.head_commit.message, '/nodocker') && github.ref == 'refs/heads/devel'"
+        strategy:
+          fail-fast: false
+          matrix:
+            bioc-version:
+              - { tag: "devel", r-version: "4.5.0", is-latest: false }
+              - { tag: "RELEASE_3_21", r-version: "4.5.0", is-latest: true }
+              - { tag: "RELEASE_3_20", r-version: "4.4.2", is-latest: false }
         steps:
           - name: Checkout Repository
             uses: actions/checkout@v3
@@ -309,15 +316,30 @@ jobs:
             with:
                 username: ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}
                 password: ${{ secrets.BHKLAB_DOCKERHUB_ACCESS_KEY }}
+          
+          - name: Set Docker tags
+            id: docker_tags
+            run: |
+              TAGS="${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:${{ matrix.bioc-version.tag }}"
+              
+              if [[ "${{ matrix.bioc-version.tag }}" == "RELEASE_3_21" ]]; then
+                TAGS="$TAGS,${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest"
+              fi
+              
+              if [[ "${{ matrix.bioc-version.r-version }}" != "" ]]; then
+                TAGS="$TAGS,${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:${{ matrix.bioc-version.tag }}-R-${{ matrix.bioc-version.r-version }}"
+              fi
+              
+              echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
           - name: Build and Push Docker
             uses: docker/build-push-action@v4
             with:
                 context: .
                 platforms: linux/amd64,linux/arm64
+                build-args: |
+                  BASE_IMAGE=bioconductor/bioconductor_docker:${{ matrix.bioc-version.tag }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
                 push: true
-                tags: |
-                    ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
-                    ${{ secrets.BHKLAB_DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:devel
+                tags: ${{ steps.docker_tags.outputs.tags }}
