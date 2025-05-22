@@ -39,7 +39,7 @@ env:
   run_pkgdown: 'false'
   has_RUnit: 'false'
   cache-version: 'cache-v1'
-  run_docker: 'false'
+  run_docker: 'true'
 
 jobs:
   build-check:
@@ -292,50 +292,32 @@ jobs:
           path: check
 
 
-  ## Code adapted from
-  ## https://github.com/waldronlab/cBioPortalData/blob/e0440a4445f0cc731e426363a76faa22ee5e0f9d/.github/workflows/devel_check_dock.yml#L65-L92
-  docker-build-and-push:
+docker-build-and-push:
     runs-on: ubuntu-latest
     needs: build-check
+    if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
     steps:
       - name: Checkout Repository
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
         uses: actions/checkout@v3
 
-      - name: Register repo name
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
-        id: reg_repo_name
+      - name: Set repository name as environment variable
         run: |
-          echo CONT_IMG_NAME=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
-
-      - name: Set up QEMU
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
-        uses: docker/setup-qemu-action@v2
+            echo CONT_IMG_NAME=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
         uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      ## Note that DOCKERHUB_TOKEN is really a token for your dockerhub
-      ## account, not your actual dockerhub account password. You can get it
-      ## from https://hub.docker.com/settings/security.
-      ## Check https://github.com/docker/build-push-action/tree/v4.0.0
-      ## for more details.
-      ## Alternatively, try checking
-      ## https://seandavi.github.io/BuildABiocWorkshop/articles/HOWTO_BUILD_WORKSHOP.html.
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Docker
-        if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel' && success()"
         uses: docker/build-push-action@v4
         with:
-          context: .
-          push: true
-          tags: >
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest,
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:devel
+            context: .
+            push: true
+            tags: |
+                ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:latest
+                ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.CONT_IMG_NAME }}:devel
