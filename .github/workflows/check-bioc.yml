@@ -290,7 +290,7 @@ jobs:
           path: check
 
 
-    docker-build-and-push:
+  docker-build-and-push:
         runs-on: ubuntu-latest
         needs: build-check
         if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && github.ref == 'refs/heads/devel'"
