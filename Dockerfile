@@ -19,8 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-# Install pak for faster package installation
-RUN Rscript -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+# Install pak
+RUN Rscript -e 'if (!requireNamespace("pak", quietly = TRUE)) { \
+    install.packages("pak", repos = "https://cloud.r-project.org") }'
 
 # Copy only dependency information first to leverage Docker caching
 COPY DESCRIPTION /tmp/
