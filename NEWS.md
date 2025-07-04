@@ -1,6 +1,6 @@
 # Package Release News
 
-# 3.13.1
+# 3.12.1
 - Updated *only* the `sessionInfo` fields example data sets due to errors
 
 
