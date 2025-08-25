@@ -58,7 +58,7 @@ Imports:
 Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
@@ -102,8 +102,8 @@ Collate:
     'logLogisticRegression.R'
     'matthewCor.R'
     'mergePSets.R'
-    'methods-[.R'
     'methods-View.R'
+    'methods-[.R'
     'methods-drugSensitivitySig.R'
     'methods-intersect.R'
     'methods-subsetTo.R'

@@ -1,14 +1,23 @@
-##' Guarded delegate to utils::View with CoreSet compatibility notice
-##'
-##' - If called on an outdated CoreSet/PharmacoSet (missing required slots),
-##'   emit the same upgrade message as CoreGx::show() without stopping.
-##' - Always delegate to whatever `View` is installed in `package:utils`
-##'   (RStudio override when available; base otherwise).
-##'
-##' @param x Any R object, typically a data.frame-like or PharmacoSet/CoreSet
-##' @param title Optional title for the data viewer
-##'
-##' @export
+#' Guarded View for CoreSet/PharmacoSet
+#'
+#' Emits the same compatibility error as `CoreGx::show()` and stops for
+#' outdated CoreSet-derived objects. Otherwise delegates to whatever
+#' `utils::View` is installed in `package:utils` (RStudio/Positron override
+#' or base).
+#'
+#' @param x Any R object, typically a data.frame-like or `PharmacoSet`/`CoreSet`.
+#' @param title Optional title for the data viewer.
+#'
+#' @return Invisibly returns whatever the underlying viewer returns.
+#' @seealso [utils::View()]
+#'
+#' @examples
+#' \dontrun{
+#' # Assuming `prism_new` is an updated PharmacoSet/CoreSet
+#' # View(prism_new)
+#' }
+#'
+#' @export
 View <- function(x, title = NULL) {
   # Only intercept for CoreSet-derived objects; keep everything else untouched
   if (inherits(x, "CoreSet")) {
@@ -17,11 +26,16 @@ View <- function(x, title = NULL) {
     hasTreatment <- methods::.hasSlot(x, "treatment")
     if (!(hasSample && hasTreatment)) {
       # Hard stop with the same message as CoreGx::show()
-      stop(CoreGx::.errorMsg(
-        "This ", class(x)[1], " object appears to be out ",
-        "of date! Please run object <- updateObject(object) to update ",
-        "the object for compatibility with the current release."
-      ), call. = FALSE)
+      stop(
+        CoreGx::.errorMsg(
+          "This ",
+          class(x)[1],
+          " object appears to be out of date! ",
+          "Please run object <- updateObject(object) to update ",
+          "the object for compatibility with the current release."
+        ),
+        call. = FALSE
+      )
     }
   }
 
