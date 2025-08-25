@@ -103,6 +103,7 @@ Collate:
     'matthewCor.R'
     'mergePSets.R'
     'methods-[.R'
+    'methods-View.R'
     'methods-drugSensitivitySig.R'
     'methods-intersect.R'
     'methods-subsetTo.R'
