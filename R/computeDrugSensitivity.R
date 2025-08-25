@@ -315,7 +315,7 @@
 }
 
 updateMaxConc <- function(pSet) {
-    sensitivityInfo(pSeto)$max.conc <- apply(sensitivityRaw(pSet)[, , "Dose"],
+    sensitivityInfo(pSet)$max.conc <- apply(sensitivityRaw(pSet)[, , "Dose"],
         1, max, na.rm=TRUE)
     return(pSet)
 }

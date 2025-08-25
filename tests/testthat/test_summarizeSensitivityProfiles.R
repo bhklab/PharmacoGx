@@ -50,3 +50,10 @@ test_that("Summarize Sensitivity Profiles parameters work as expected", {
   expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = FALSE)), length(unique(sensitivityInfo(GDSCsmall)$sampleid)))
   expect_equal(ncol(summarizeSensitivityProfiles(GDSCsmall, fill.missing = TRUE)), length(sampleNames(GDSCsmall)))
 })
+
+test_that("summarizeSensitivityProfiles handles max.conc via updateMaxConc", {
+  res <- summarizeSensitivityProfiles(GDSCsmall, sensitivity.measure = "max.conc", verbose = FALSE)
+  expect_true(is.matrix(res))
+  expect_equal(ncol(res), length(sampleNames(GDSCsmall)))
+  expect_equal(nrow(res), length(treatmentNames(GDSCsmall)))
+})
