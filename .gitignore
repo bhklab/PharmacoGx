@@ -26,7 +26,6 @@ local_data/**
 docs
 
 # build artifacts
-man/
 *.tar.gz
 *.Rcheck/
 *.BiocCheck/
