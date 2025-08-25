@@ -5,16 +5,16 @@
 #' `utils::View` is installed in `package:utils` (RStudio/Positron override
 #' or base).
 #'
-#' @param x Any R object, typically a data.frame-like or `PharmacoSet`/`CoreSet`.
+#' @param x Any R object, typically a data.frame-like or `CoreSet`-derived.
 #' @param title Optional title for the data viewer.
 #'
 #' @return Invisibly returns whatever the underlying viewer returns.
 #' @seealso [utils::View()]
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming `prism_new` is an updated PharmacoSet/CoreSet
-#' # View(prism_new)
+#' if (interactive()) {
+#'   data("CCLEsmall", package = "PharmacoGx")
+#'   View(CCLEsmall)
 #' }
 #'
 #' @export
@@ -22,8 +22,9 @@ View <- function(x, title = NULL) {
   # Only intercept for CoreSet-derived objects; keep everything else untouched
   if (inherits(x, "CoreSet")) {
     # Replicate CoreGx::show() outdated check (CoreGx/R/CoreSet-class.R:424-428)
-    hasSample <- methods::.hasSlot(x, "sample")
-    hasTreatment <- methods::.hasSlot(x, "treatment")
+    sn <- methods::slotNames(x)
+    hasSample <- "sample" %in% sn
+    hasTreatment <- "treatment" %in% sn
     if (!(hasSample && hasTreatment)) {
       # Hard stop with the same message as CoreGx::show()
       stop(

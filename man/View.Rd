@@ -2,20 +2,31 @@
 % Please edit documentation in R/methods-View.R
 \name{View}
 \alias{View}
-\title{Guarded delegate to utils::View with CoreSet compatibility notice}
+\title{Guarded View for CoreSet/PharmacoSet}
 \usage{
 View(x, title = NULL)
 }
 \arguments{
-\item{x}{Any R object, typically a data.frame-like or PharmacoSet/CoreSet}
+\item{x}{Any R object, typically a data.frame-like or \code{CoreSet}-derived.}
 
-\item{title}{Optional title for the data viewer}
+\item{title}{Optional title for the data viewer.}
+}
+\value{
+Invisibly returns whatever the underlying viewer returns.
 }
 \description{
-\itemize{
-\item If called on an outdated CoreSet/PharmacoSet (missing required slots),
-emit the same upgrade message as CoreGx::show() without stopping.
-\item Always delegate to whatever \code{View} is installed in \code{package:utils}
-(RStudio override when available; base otherwise).
+Emits the same compatibility error as \code{CoreGx::show()} and stops for
+outdated CoreSet-derived objects. Otherwise delegates to whatever
+\code{utils::View} is installed in \code{package:utils} (RStudio/Positron override
+or base).
 }
+\examples{
+if (interactive()) {
+  data("CCLEsmall", package = "PharmacoGx")
+  View(CCLEsmall)
+}
+
+}
+\seealso{
+\code{\link[utils:View]{utils::View()}}
 }
