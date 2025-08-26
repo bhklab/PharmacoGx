@@ -24,3 +24,8 @@ local_data/**
 .VSCodeCounter/**
 *.o
 docs
+
+# build artifacts
+*.tar.gz
+*.Rcheck/
+*.BiocCheck/
