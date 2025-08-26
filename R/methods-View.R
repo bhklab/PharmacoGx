@@ -20,7 +20,7 @@
 #' @export
 View <- function(x, title = NULL) {
   # Only intercept for CoreSet-derived objects; keep everything else untouched
-  if (inherits(x, "CoreSet")) {
+  if (methods::is(x, "CoreSet")) {
     # Replicate CoreGx::show() outdated check (CoreGx/R/CoreSet-class.R:424-428)
     hasSample <- methods::.hasSlot(x, "sample")
     hasTreatment <- methods::.hasSlot(x, "treatment")
