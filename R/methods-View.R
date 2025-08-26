@@ -22,9 +22,8 @@ View <- function(x, title = NULL) {
   # Only intercept for CoreSet-derived objects; keep everything else untouched
   if (inherits(x, "CoreSet")) {
     # Replicate CoreGx::show() outdated check (CoreGx/R/CoreSet-class.R:424-428)
-    sn <- methods::slotNames(x)
-    hasSample <- "sample" %in% sn
-    hasTreatment <- "treatment" %in% sn
+    hasSample <- methods::.hasSlot(x, "sample")
+    hasTreatment <- methods::.hasSlot(x, "treatment")
     if (!(hasSample && hasTreatment)) {
       # Hard stop with the same message as CoreGx::show()
       stop(
