@@ -51,38 +51,38 @@
 #'
 #' @importFrom CoreGx .meshEval .residual
 #' @importFrom stats optim dcauchy dnorm pcauchy rcauchy rnorm pnorm integrate
-logLogisticRegression <- function(conc,
-                                  viability,
-                                  density = c(2, 10, 5),
-                                  step = .5 / density,
-                                  precision = 1e-4,
-                                  lower_bounds = c(0, 0, -6),
-                                  upper_bounds = c(4, 1, 6),
-                                  scale = 0.07,
-                                  family = c("normal", "Cauchy"),
-                                  median_n = 1,
-                                  conc_as_log = FALSE,
-                                  viability_as_pct = TRUE,
-                                  trunc = TRUE,
-                                  verbose = TRUE) {
+logLogisticRegression <- function(
+  conc,
+  viability,
+  density = c(2, 10, 5),
+  step = .5 / density,
+  precision = 1e-4,
+  lower_bounds = c(0, 0, -6),
+  upper_bounds = c(4, 1, 6),
+  scale = 0.07,
+  family = c("normal", "Cauchy"),
+  median_n = 1,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = TRUE
+) {
   # guess <- .logLogisticRegressionRaw(conc, viability, density , step, precision, lower_bounds, upper_bounds, scale, Cauchy_flag, conc_as_log, viability_as_pct, trunc, verbose)
 
-
-# .logLogisticRegressionRaw <- function(conc,
-#                                   viability,
-#                                   density = c(2, 10, 2),
-#                                   step = .5 / density,
-#                                   precision = 0.05,
-#                                   lower_bounds = c(0, 0, -6),
-#                                   upper_bounds = c(4, 1, 6),
-#                                   scale = 0.07,
-#                                   Cauchy_flag = FALSE,
-#                                   conc_as_log = FALSE,
-#                                   viability_as_pct = TRUE,
-#                                   trunc = TRUE,
-#                                   verbose = FALSE) {
+  # .logLogisticRegressionRaw <- function(conc,
+  #                                   viability,
+  #                                   density = c(2, 10, 2),
+  #                                   step = .5 / density,
+  #                                   precision = 0.05,
+  #                                   lower_bounds = c(0, 0, -6),
+  #                                   upper_bounds = c(4, 1, 6),
+  #                                   scale = 0.07,
+  #                                   Cauchy_flag = FALSE,
+  #                                   conc_as_log = FALSE,
+  #                                   viability_as_pct = TRUE,
+  #                                   trunc = TRUE,
+  #                                   verbose = FALSE) {
   family <- match.arg(family)
-
 
   if (prod(is.finite(step)) != 1) {
     print(step)
@@ -119,21 +119,20 @@ logLogisticRegression <- function(conc,
     stop("Cauchy flag is not a string.")
   }
 
-  if (length(density) != 3){
+  if (length(density) != 3) {
     stop("Density parameter needs to have length of 3, for HS, Einf, EC50")
   }
 
-  if (!median_n==as.integer(median_n)){
-    stop("There can only be a integral number of samples to take a median of. Check your setting of median_n parameter, it is not an integer")
+  if (!median_n == as.integer(median_n)) {
+    stop(
+      "There can only be a integral number of samples to take a median of. Check your setting of median_n parameter, it is not an integer"
+    )
   }
-
 
   if (min(upper_bounds - lower_bounds) < 0) {
     print(rbind(lower_bounds, upper_bounds))
     stop("Upper bounds on parameters do not exceed lower bounds.")
   }
-
-
 
   if (min(density) <= 0) {
     print(density)
@@ -155,24 +154,24 @@ logLogisticRegression <- function(conc,
     stop("Scale parameter is a nonpositive number.")
   }
 
+  CoreGx::.sanitizeInput(
+    x = conc,
+    y = viability,
+    x_as_log = conc_as_log,
+    y_as_log = FALSE,
+    y_as_pct = viability_as_pct,
+    trunc = trunc,
+    verbose = verbose
+  )
 
-
-
-
-  CoreGx::.sanitizeInput(x = conc,
-                         y = viability,
-                         x_as_log = conc_as_log,
-                         y_as_log = FALSE,
-                         y_as_pct = viability_as_pct,
-                         trunc = trunc,
-                         verbose = verbose)
-
-  cleanData <- CoreGx::.reformatData(x = conc,
-                               y = viability,
-                               x_to_log = !conc_as_log,
-                               y_to_log = FALSE,
-                               y_to_frac = viability_as_pct,
-                               trunc = trunc)
+  cleanData <- CoreGx::.reformatData(
+    x = conc,
+    y = viability,
+    x_to_log = !conc_as_log,
+    y_to_log = FALSE,
+    y_to_frac = viability_as_pct,
+    trunc = trunc
+  )
 
   if (!(all(lower_bounds < upper_bounds))) {
     if (verbose == 2) {
@@ -181,40 +180,46 @@ logLogisticRegression <- function(conc,
       message("upper_bounds:")
       message(upper_bounds)
     }
-    stop ("All lower bounds must be less than the corresponding upper_bounds.")
+    stop("All lower bounds must be less than the corresponding upper_bounds.")
   }
-
 
   log_conc <- cleanData[["x"]]
   viability <- cleanData[["y"]]
 
-
   #ATTEMPT TO REFINE GUESS WITH L-BFGS OPTIMIZATION
   # tryCatch(
-  gritty_guess <- c(pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
-                    pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
-                    pmin(pmax(log_conc[which.min(abs(viability - 1/2))], lower_bounds[3]), upper_bounds[3]))
+  gritty_guess <- c(
+    pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
+    pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
+    pmin(
+      pmax(log_conc[which.min(abs(viability - 1 / 2))], lower_bounds[3]),
+      upper_bounds[3]
+    )
+  )
 
+  guess <- CoreGx::.fitCurve(
+    x = log_conc,
+    y = viability,
+    f = PharmacoGx:::.Hill,
+    density = density,
+    step = step,
+    precision = precision,
+    lower_bounds = lower_bounds,
+    upper_bounds = upper_bounds,
+    scale = scale,
+    family = family,
+    median_n = median_n,
+    trunc = trunc,
+    verbose = verbose,
+    gritty_guess = gritty_guess,
+    span = 1
+  )
 
-  guess <- CoreGx::.fitCurve(x = log_conc,
-                              y = viability,
-                              f = PharmacoGx:::.Hill,
-                              density = density,
-                              step = step,
-                              precision = precision,
-                              lower_bounds = lower_bounds,
-                              upper_bounds = upper_bounds,
-                              scale = scale,
-                              family = family,
-                              median_n = median_n,
-                              trunc = trunc,
-                              verbose = verbose,
-                              gritty_guess = gritty_guess,
-                              span = 1)
-
-  returnval <- list("HS" = guess[1],
-              "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
-              "EC50" = ifelse(conc_as_log, guess[3], 10 ^ guess[3]))
+  returnval <- list(
+    "HS" = guess[1],
+    "E_inf" = ifelse(viability_as_pct, 100 * guess[2], guess[2]),
+    "EC50" = ifelse(conc_as_log, guess[3], 10^guess[3])
+  )
   attr(returnval, "Rsquare") <- attr(guess, "Rsquare")
 
   return(returnval)

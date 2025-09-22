@@ -21,21 +21,23 @@
 #' @return A `data.frame` with details about the available PharmacoSet objects
 #' @export
 #' @import jsonlite
-availablePSets <- function(canonical=TRUE){
-
+availablePSets <- function(canonical = TRUE) {
   if (canonical) {
     avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/canonical")
   } else {
     avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/available")
   }
 
-
-  pSetTable <- data.frame("Dataset Name" = avail.psets$dataset$name,
-                          "Date Created" = avail.psets$dateCreated,
-                          "PSet Name" = avail.psets$name,
-                          avail.psets$dataset$versionInfo,
-                          "DOI" = avail.psets$doi,
-                          "Download" = avail.psets$downloadLink, stringsAsFactors = FALSE, check.names = FALSE)
+  pSetTable <- data.frame(
+    "Dataset Name" = avail.psets$dataset$name,
+    "Date Created" = avail.psets$dateCreated,
+    "PSet Name" = avail.psets$name,
+    avail.psets$dataset$versionInfo,
+    "DOI" = avail.psets$doi,
+    "Download" = avail.psets$downloadLink,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
 
   return(pSetTable)
 }
@@ -73,54 +75,79 @@ availablePSets <- function(canonical=TRUE){
 #'
 #' @export
 #' @importFrom downloader download
-downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL,
-    verbose=TRUE, timeout=600) {
-
+downloadPSet <- function(
+  name,
+  saveDir = tempdir(),
+  pSetFileName = NULL,
+  verbose = TRUE,
+  timeout = 600
+) {
   # change the download timeout since the files are big
   opts <- options()
-  options(timeout=timeout)
+  options(timeout = timeout)
   on.exit(options(opts))
 
-  pSetTable <- availablePSets(canonical=FALSE)
+  pSetTable <- availablePSets(canonical = FALSE)
 
   whichx <- match(name, pSetTable[, "PSet Name"])
   if (is.na(whichx)) {
-    stop('Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.')
+    stop(
+      'Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.'
+    )
   }
 
   if (!file.exists(saveDir)) {
-    dir.create(saveDir, recursive=TRUE)
+    dir.create(saveDir, recursive = TRUE)
   }
 
-  if (is.null(pSetFileName)){
-    pSetFileName <- paste(pSetTable[whichx,"PSet Name"], ".rds", sep="")
+  if (is.null(pSetFileName)) {
+    pSetFileName <- paste(pSetTable[whichx, "PSet Name"], ".rds", sep = "")
   }
   if (!file.exists(file.path(saveDir, pSetFileName))) {
-    downloader::download(url = as.character(pSetTable[whichx,"Download"]),
-                         destfile=file.path(saveDir, pSetFileName),
-                         quiet=!verbose,
-                         mode='wb')
+    downloader::download(
+      url = as.character(pSetTable[whichx, "Download"]),
+      destfile = file.path(saveDir, pSetFileName),
+      quiet = !verbose,
+      mode = 'wb'
+    )
   }
   pSet <- readRDS(file.path(saveDir, pSetFileName))
   pSet <- updateObject(pSet)
-  saveRDS(pSet, file=file.path(saveDir, pSetFileName))
+  saveRDS(pSet, file = file.path(saveDir, pSetFileName))
   return(pSet)
 }
 
 #' @importFrom utils read.table write.table
 .createPSetEntry <- function(pSet, outfn) {
-
-  if(file.exists(outfn)){
-    pSetTable <- read.table(outfn, as.is=TRUE)
-    newrow <- c(name(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
+  if (file.exists(outfn)) {
+    pSetTable <- read.table(outfn, as.is = TRUE)
+    newrow <- c(
+      name(pSet),
+      pSet@datasetType,
+      paste(names(pSet@molecularProfiles), collapse = "/"),
+      pSet@annotation$dateCreated,
+      NA
+    )
     pSetTable <- rbind(pSetTable, newrow)
-    rownames(pSetTable) <- pSetTable[,1]
-    write.table(pSetTable, file=outfn)
+    rownames(pSetTable) <- pSetTable[, 1]
+    write.table(pSetTable, file = outfn)
   } else {
-    newrow <- c(name(pSet), pSet@datasetType, paste(names(pSet@molecularProfiles), collapse="/"), pSet@annotation$dateCreated, NA)
+    newrow <- c(
+      name(pSet),
+      pSet@datasetType,
+      paste(names(pSet@molecularProfiles), collapse = "/"),
+      pSet@annotation$dateCreated,
+      NA
+    )
     pSetTable <- t(matrix(newrow))
-    colnames(pSetTable) <- c("PSet.Name","Dataset.Type","Available.Molecular.Profiles","Date.Updated","URL")
-    rownames(pSetTable) <- pSetTable[,1]
-    write.table(pSetTable, file=outfn)
+    colnames(pSetTable) <- c(
+      "PSet.Name",
+      "Dataset.Type",
+      "Available.Molecular.Profiles",
+      "Date.Updated",
+      "URL"
+    )
+    rownames(pSetTable) <- pSetTable[, 1]
+    write.table(pSetTable, file = outfn)
   }
 }
