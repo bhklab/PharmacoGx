@@ -17,30 +17,37 @@
 #' @return Returns the normalized linear slope of the drug response curve
 #'
 #' @export
-computeSlope <- function(concentration, viability, trunc=TRUE, verbose=TRUE) {
+computeSlope <- function(
+  concentration,
+  viability,
+  trunc = TRUE,
+  verbose = TRUE
+) {
   concentration <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])
   ii <- which(concentration == 0)
-  if(length(ii) > 0) {
+  if (length(ii) > 0) {
     concentration <- concentration[-ii]
     viability <- viability[-ii]
   }
   ##convert to nanomolar with the assumption that always concentrations are in micro molar
   concentration <- concentration
   concentration <- log10(concentration) + 6
-  if(trunc) {
+  if (trunc) {
     viability <- pmin(viability, 100)
     viability <- pmax(viability, 0)
   }
 
   most.sensitive <- NULL
-  for(dose in concentration)
-  {
-    most.sensitive <- rbind(most.sensitive, cbind(dose,0))
+  for (dose in concentration) {
+    most.sensitive <- rbind(most.sensitive, cbind(dose, 0))
   }
 
-  slope.prime <- .optimizeRegression(x = most.sensitive[,1], y = most.sensitive[,2])
+  slope.prime <- .optimizeRegression(
+    x = most.sensitive[, 1],
+    y = most.sensitive[, 2]
+  )
   slope <- .optimizeRegression(x = concentration, y = viability)
-  slope <- round(slope/abs(slope.prime),digits=2)
+  slope <- round(slope / abs(slope.prime), digits = 2)
   return(-slope)
 }

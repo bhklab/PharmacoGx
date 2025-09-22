@@ -18,11 +18,16 @@
 #' @param verbose `logical` should warnings be printed
 #' @return The numerical Amax
 #' @export
-computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
+computeAmax <- function(
+  concentration,
+  viability,
+  trunc = TRUE,
+  verbose = FALSE
+) {
   concentration <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])
   ii <- which(concentration == 0)
-  if(length(ii) > 0) {
+  if (length(ii) > 0) {
     concentration <- concentration[-ii]
     viability <- viability[-ii]
   }
@@ -71,13 +76,14 @@ computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   }
 
   #FIT CURVE AND CALCULATE IC50
-  pars <- unlist(logLogisticRegression(log_conc,
-                                       viability,
-                                       conc_as_log = TRUE,
-                                       viability_as_pct = FALSE,
-                                       trunc = trunc))
+  pars <- unlist(logLogisticRegression(
+    log_conc,
+    viability,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE,
+    trunc = trunc
+  ))
   x <- 100 - .Hill(max(log_conc), pars) * 100
   names(x) <- "Amax"
   return(x)
-
 }

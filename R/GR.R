@@ -3,5 +3,5 @@
   #function, and a coefficient tau equal to the number of doubling times occuring between
   #the start of the experiment and the taking of the viability measurements. It then returns
   #the GR-value associated with those conditions.
-  return((.Hill(x, pars)) ^ (1 / tau))
+  return((.Hill(x, pars))^(1 / tau))
 }

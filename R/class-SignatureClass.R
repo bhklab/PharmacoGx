@@ -1,13 +1,18 @@
 setOldClass('sessionInfo', sessionInfo)
 
 #' @importFrom utils sessionInfo
-.PharmacoSig <- setClass('PharmacoSig', slots=list(
-            Arguments = "list",
-            PSetName='character',
-            DateCreated = 'character',
-            SigType = 'character',
-            SessionInfo = 'sessionInfo',
-            Call = 'character'), contains='array')
+.PharmacoSig <- setClass(
+  'PharmacoSig',
+  slots = list(
+    Arguments = "list",
+    PSetName = 'character',
+    DateCreated = 'character',
+    SigType = 'character',
+    SessionInfo = 'sessionInfo',
+    Call = 'character'
+  ),
+  contains = 'array'
+)
 
 
 #' Contructor for the PharmacoSig S4 class
@@ -26,10 +31,24 @@ setOldClass('sessionInfo', sessionInfo)
 #' PharmacoSig()
 #'
 #' @export
-PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=date(), SigType='sensitivity',
-                        SessionInfo=sessionInfo(), Call='No Call Recorded', Arguments = list()){
-    return(.PharmacoSig(Data, Arguments = Arguments, PSetName=PSetName, DateCreated=DateCreated, SigType=SigType,
-                        SessionInfo=SessionInfo, Call=Call))
+PharmacoSig <- function(
+  Data = array(NA, dim = c(0, 0, 0)),
+  PSetName = '',
+  DateCreated = date(),
+  SigType = 'sensitivity',
+  SessionInfo = sessionInfo(),
+  Call = 'No Call Recorded',
+  Arguments = list()
+) {
+  return(.PharmacoSig(
+    Data,
+    Arguments = Arguments,
+    PSetName = PSetName,
+    DateCreated = DateCreated,
+    SigType = SigType,
+    SessionInfo = SessionInfo,
+    Call = Call
+  ))
 }
 
 
@@ -44,14 +63,17 @@ PharmacoSig <- function(Data=array(NA, dim=c(0,0,0)), PSetName='', DateCreated=d
 #' @param object \code{PharmacoSig}
 #' @return Prints the PharmacoGx Signatures object to the output stream, and returns invisible NULL.
 #' @export
-setMethod("show", signature=signature(object='PharmacoSig'),
-        function(object) {
-        cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")
-        cat('Signature Type: ', attr(object, 'SigType'), "\n")
-        cat("Date Created: ", attr(object, 'DateCreated'), "\n")
-        cat("Number of Drugs: ", dim(object)[[2]], "\n")
-        cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
-           })
+setMethod(
+  "show",
+  signature = signature(object = 'PharmacoSig'),
+  function(object) {
+    cat('PharmacoSet Name: ', attr(object, 'PSetName'), "\n")
+    cat('Signature Type: ', attr(object, 'SigType'), "\n")
+    cat("Date Created: ", attr(object, 'DateCreated'), "\n")
+    cat("Number of Drugs: ", dim(object)[[2]], "\n")
+    cat("Number of Genes/Probes: ", dim(object)[[1]], "\n")
+  }
+)
 
 
 #' Show the Annotations of a signature object
@@ -72,13 +94,13 @@ setMethod("show", signature=signature(object='PharmacoSig'),
 #'
 #' @importMethodsFrom CoreGx showSigAnnot
 #' @export
-setMethod("showSigAnnot", signature(object="PharmacoSig"), function(object){
+setMethod("showSigAnnot", signature(object = "PharmacoSig"), function(object) {
   .showSigAnnotPharmacoSig(object)
 })
 
 
 #' @keywords internal
-.showSigAnnotPharmacoSig <- function(object){
+.showSigAnnotPharmacoSig <- function(object) {
   print(object@Call)
   print(object@SessionInfo)
   return(invisible(NULL))

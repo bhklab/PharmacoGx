@@ -25,27 +25,46 @@
 #'
 #' @importMethodsFrom CoreGx summarizeSensitivityProfiles
 #' @export
-setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
-    function(
-      object, 
-      sensitivity.measure="auc_recomputed", 
-      cell.lines, 
-      profiles_assay = "profiles",
-      treatment_col = "treatmentid", 
-      sample_col = "sampleid",
-      drugs, 
-      summary.stat=c("mean", "median", "first", "last", "max", "min"),
-      fill.missing=TRUE, 
-      verbose=TRUE
+setMethod(
+  "summarizeSensitivityProfiles",
+  signature(object = "PharmacoSet"),
+  function(
+    object,
+    sensitivity.measure = "auc_recomputed",
+    cell.lines,
+    profiles_assay = "profiles",
+    treatment_col = "treatmentid",
+    sample_col = "sampleid",
+    drugs,
+    summary.stat = c("mean", "median", "first", "last", "max", "min"),
+    fill.missing = TRUE,
+    verbose = TRUE
   ) {
-  if (is(treatmentResponse(object), 'LongTable'))
-    .summarizeSensProfiles(object, sensitivity.measure, profiles_assay = profiles_assay,
-      treatment_col, sample_col, cell.lines, drugs, summary.stat, fill.missing)
-  else
-    .summarizeSensitivityProfilesPharmacoSet(object,
-      sensitivity.measure, cell.lines, drugs, summary.stat,
-      fill.missing, verbose)
-})
+    if (is(treatmentResponse(object), 'LongTable')) {
+      .summarizeSensProfiles(
+        object,
+        sensitivity.measure,
+        profiles_assay = profiles_assay,
+        treatment_col,
+        sample_col,
+        cell.lines,
+        drugs,
+        summary.stat,
+        fill.missing
+      )
+    } else {
+      .summarizeSensitivityProfilesPharmacoSet(
+        object,
+        sensitivity.measure,
+        cell.lines,
+        drugs,
+        summary.stat,
+        fill.missing,
+        verbose
+      )
+    }
+  }
+)
 
 #' Summarize the sensitivity profiles when the sensitivity slot is a LongTable
 #'
@@ -54,171 +73,255 @@ setMethod("summarizeSensitivityProfiles", signature(object="PharmacoSet"),
 #'
 #' @import data.table
 #' @keywords internal
-.summarizeSensProfiles <- function(object,
-        sensitivity.measure='auc_recomputed', profiles_assay = "profiles", 
-        treatment_col = "treatmentid", sample_col = "sampleid", cell.lines, drugs, summary.stat,
-        fill.missing=TRUE) {
+.summarizeSensProfiles <- function(
+  object,
+  sensitivity.measure = 'auc_recomputed',
+  profiles_assay = "profiles",
+  treatment_col = "treatmentid",
+  sample_col = "sampleid",
+  cell.lines,
+  drugs,
+  summary.stat,
+  fill.missing = TRUE
+) {
+  # handle missing
+  if (missing(cell.lines)) {
+    cell.lines <- sampleNames(object)
+  }
+  if (missing(drugs)) {
+    drugs <- treatmentNames(object)
+  }
+  if (missing(summary.stat) || length(summary.stat) > 1) {
+    summary.stat <- 'mean'
+  }
 
-    # handle missing
-    if (missing(cell.lines)) cell.lines <- sampleNames(object)
-    if (missing(drugs)) drugs <- treatmentNames(object)
-    if (missing(summary.stat) || length(summary.stat)>1) summary.stat <- 'mean'
+  checkmate::assert_class(treatmentResponse(object), 'LongTable')
+  checkmate::assert_string(sensitivity.measure)
+  checkmate::assert_string(profiles_assay)
+  # get LongTable object
+  longTable <- treatmentResponse(object)
 
-    checkmate::assert_class(treatmentResponse(object), 'LongTable')
-    checkmate::assert_string(sensitivity.measure)
-    checkmate::assert_string(profiles_assay)
-    # get LongTable object
-    longTable <- treatmentResponse(object)
+  checkmate::assert(
+    (profiles_assay %in% names(longTable)),
+    msg = paste0(
+      "[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ",
+      "The assay '",
+      profiles_assay,
+      "' is not in the LongTable object."
+    )
+  )
 
-    checkmate::assert((profiles_assay %in% names(longTable)),
-      msg = paste0("[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ",
-        "The assay '", profiles_assay, "' is not in the LongTable object."))
+  # extract the sensitivty profiles
+  sensProfiles <- assay(
+    longTable,
+    profiles_assay,
+    withDimnames = TRUE,
+    key = FALSE
+  )
+  profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
 
-    # extract the sensitivty profiles
-    sensProfiles <- assay(longTable, profiles_assay, withDimnames=TRUE, key=FALSE)
-    profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
+  # compute max concentration and add it to the profiles
+  if (sensitivity.measure == 'max.conc') {
+    dose <- copy(assay(longTable, 'dose', withDimnames = TRUE, key = FALSE))
+    dose[,
+      max.conc := max(.SD, na.rm = TRUE),
+      .SDcols = grep('dose\\d+id', colnames(dose))
+    ]
+    dose <- dose[, .SD, .SDcols = !grepl('dose\\d+id', colnames(dose))]
+    sensProfiles <- dose[sensProfiles, on = idCols(longTable)]
+  }
 
-    # compute max concentration and add it to the profiles
-    if (sensitivity.measure == 'max.conc') {
-        dose <- copy(assay(longTable, 'dose', withDimnames=TRUE, key=FALSE))
-        dose[, max.conc := max(.SD, na.rm=TRUE),
-            .SDcols=grep('dose\\d+id', colnames(dose))]
-        dose <- dose[, .SD, .SDcols=!grepl('dose\\d+id', colnames(dose))]
-        sensProfiles <- dose[sensProfiles, on=idCols(longTable)]
+  # deal with drug combo methods
+  if (sensitivity.measure == 'Synergy_score') {
+    drugs <- grep('///', drugs, value = TRUE)
+  }
+
+  # ensure selected measure is an option
+  if (!(sensitivity.measure %in% profileOpts)) {
+    stop(.errorMsg(
+      '[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ',
+      'there is no measure ',
+      sensitivity.measure,
+      ' in this PharmacoSet.',
+      ' Please select one of: ',
+      .collapse(profileOpts)
+    ))
+  }
+
+  # match summary function
+  ## TODO:: extend this function to support passing in a custom summary function
+  summary.function <- function(x) {
+    if (all(is.na(x))) {
+      return(NA_real_)
     }
+    switch(
+      summary.stat,
+      "mean" = {
+        mean(as.numeric(x), na.rm = TRUE)
+      },
+      "median" = {
+        median(as.numeric(x), na.rm = TRUE)
+      },
+      "first" = {
+        as.numeric(x)[[1]]
+      },
+      "last" = {
+        as.numeric(x)[[length(x)]]
+      },
+      "max" = {
+        max(as.numeric(x), na.rm = TRUE)
+      },
+      "min" = {
+        min(as.numeric(x), na.rm = TRUE)
+      }
+    )
+  }
+  sensProfiles <- data.table::as.data.table(sensProfiles)
 
-    # deal with drug combo methods
-    if (sensitivity.measure == 'Synergy_score')
-        drugs <- grep('///', drugs, value=TRUE)
+  # do the summary
+  profSummary <- sensProfiles[,
+    summary.function(get(sensitivity.measure)),
+    by = c(treatment_col, sample_col)
+  ]
 
-    # ensure selected measure is an option
-    if (!(sensitivity.measure %in% profileOpts))
-        stop(.errorMsg('[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ',
-            'there is no measure ', sensitivity.measure, ' in this PharmacoSet.',
-            ' Please select one of: ', .collapse(profileOpts)))
+  print(profSummary)
 
-    # match summary function
-    ## TODO:: extend this function to support passing in a custom summary function
-    summary.function <- function(x) {
-        if (all(is.na(x))) {
-            return(NA_real_)
-        }
-        switch(summary.stat,
-            "mean" = { mean(as.numeric(x), na.rm=TRUE) },
-            "median" = { median(as.numeric(x), na.rm=TRUE) },
-            "first" = { as.numeric(x)[[1]] },
-            "last" = { as.numeric(x)[[length(x)]] },
-            "max"= { max(as.numeric(x), na.rm=TRUE) },
-            "min" = { min(as.numeric(x), na.rm=TRUE)}
-            )
-    }
-    sensProfiles <- data.table::as.data.table(sensProfiles)
-
-    # do the summary
-    profSummary <- sensProfiles[, summary.function(get(sensitivity.measure)),
-        by=c(treatment_col, sample_col)]
-
+  # NA pad the missing cells and drugs
+  if (fill.missing) {
+    allCombos <- data.table(expand.grid(drugs, cell.lines))
+    colnames(allCombos) <- c(treatment_col, sample_col)
+    profSummary <- profSummary[allCombos, on = c(treatment_col, sample_col)]
     print(profSummary)
-    
-    # NA pad the missing cells and drugs
-    if (fill.missing) {
-        allCombos <- data.table(expand.grid(drugs, cell.lines))
-        colnames(allCombos) <- c(treatment_col, sample_col)
-        profSummary <- profSummary[allCombos, on=c(treatment_col, sample_col)]
-        print(profSummary)
-    }
+  }
 
-    # reshape and convert to matrix
-    setorderv(profSummary, c(sample_col, treatment_col))
-    profSummary <- dcast(profSummary, get(treatment_col) ~ get(sample_col), value.var='V1')
-    summaryMatrix <- as.matrix(profSummary, rownames='treatment_col')
-    return(summaryMatrix)
-
+  # reshape and convert to matrix
+  setorderv(profSummary, c(sample_col, treatment_col))
+  profSummary <- dcast(
+    profSummary,
+    get(treatment_col) ~ get(sample_col),
+    value.var = 'V1'
+  )
+  summaryMatrix <- as.matrix(profSummary, rownames = 'treatment_col')
+  return(summaryMatrix)
 }
-
 
 
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom stats median
 #' @importFrom reshape2 acast
 #' @keywords internal
-.summarizeSensitivityProfilesPharmacoSet <- function(object,
-                                         sensitivity.measure="aac_recomputed",
-                                         cell.lines,
-                                         drugs,
-                                         summary.stat=c("mean", "median", "first", "last", "max", "min"),
-                                         fill.missing=TRUE, verbose=TRUE) {
-
-	summary.stat <- match.arg(summary.stat)
+.summarizeSensitivityProfilesPharmacoSet <- function(
+  object,
+  sensitivity.measure = "aac_recomputed",
+  cell.lines,
+  drugs,
+  summary.stat = c("mean", "median", "first", "last", "max", "min"),
+  fill.missing = TRUE,
+  verbose = TRUE
+) {
+  summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
-  if (!(sensitivity.measure %in% c(colnames(sensitivityProfiles(object)), "max.conc"))) {
-    stop (sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse=", ")))
+  if (
+    !(sensitivity.measure %in%
+      c(colnames(sensitivityProfiles(object)), "max.conc"))
+  ) {
+    stop(sprintf(
+      "Invalid sensitivity measure for %s, choose among: %s",
+      annotation(object)$name,
+      paste(colnames(sensitivityProfiles(object)), collapse = ", ")
+    ))
   }
   if (missing(cell.lines)) {
     cell.lines <- sampleNames(object)
   }
   if (missing(drugs)) {
-    if (sensitivity.measure != "Synergy_score")
-    {
+    if (sensitivity.measure != "Synergy_score") {
       drugs <- treatmentNames(object)
-    }else{
-      drugs <- sensitivityInfo(object)[grep("///", sensitivityInfo(object)$treatmentid), "treatmentid"]
+    } else {
+      drugs <- sensitivityInfo(object)[
+        grep("///", sensitivityInfo(object)$treatmentid),
+        "treatmentid"
+      ]
     }
   }
 
   pp <- sensitivityInfo(object)
   ppRows <- which(pp$sampleid %in% cell.lines & pp$treatmentid %in% drugs) ### NEEDED to deal with duplicated rownames!!!!!!!
-  if(sensitivity.measure != "max.conc") {
+  if (sensitivity.measure != "max.conc") {
     dd <- sensitivityProfiles(object)
   } else {
-
-    if(!"max.conc" %in% colnames(sensitivityInfo(object))) {
-
+    if (!"max.conc" %in% colnames(sensitivityInfo(object))) {
       object <- updateMaxConc(object)
-
     }
     dd <- sensitivityInfo(object)
-
   }
 
-  result <- matrix(NA_real_, nrow=length(drugs), ncol=length(cell.lines))
+  result <- matrix(NA_real_, nrow = length(drugs), ncol = length(cell.lines))
   rownames(result) <- drugs
   colnames(result) <- cell.lines
 
-  if(is.factor(dd[, sensitivity.measure]) | is.character(dd[, sensitivity.measure])){
-    warning("Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
-             Please correct this and/or file an issue. Fixing in the call of this function.")
-    dd[, sensitivity.measure] <- as.numeric(as.character(dd[, sensitivity.measure]))
+  if (
+    is.factor(dd[, sensitivity.measure]) |
+      is.character(dd[, sensitivity.measure])
+  ) {
+    warning(
+      "Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
+             Please correct this and/or file an issue. Fixing in the call of this function."
+    )
+    dd[, sensitivity.measure] <- as.numeric(as.character(dd[,
+      sensitivity.measure
+    ]))
   }
 
-  pp_dd <- cbind(pp[,c("sampleid", "treatmentid")], "sensitivity.measure"=dd[, sensitivity.measure])
-
+  pp_dd <- cbind(
+    pp[, c("sampleid", "treatmentid")],
+    "sensitivity.measure" = dd[, sensitivity.measure]
+  )
 
   summary.function <- function(x) {
-    if(all(is.na(x))){
+    if (all(is.na(x))) {
       return(NA_real_)
     }
-    switch(summary.stat,
-        "mean" = { mean(as.numeric(x), na.rm=TRUE) },
-        "median" = { median(as.numeric(x), na.rm=TRUE) },
-        "first" = { as.numeric(x)[[1]] },
-        "last" = { as.numeric(x)[[length(x)]] },
-        "max"= { max(as.numeric(x), na.rm=TRUE) },
-        "min" = { min(as.numeric(x), na.rm=TRUE)}
-        )
+    switch(
+      summary.stat,
+      "mean" = {
+        mean(as.numeric(x), na.rm = TRUE)
+      },
+      "median" = {
+        median(as.numeric(x), na.rm = TRUE)
+      },
+      "first" = {
+        as.numeric(x)[[1]]
+      },
+      "last" = {
+        as.numeric(x)[[length(x)]]
+      },
+      "max" = {
+        max(as.numeric(x), na.rm = TRUE)
+      },
+      "min" = {
+        min(as.numeric(x), na.rm = TRUE)
+      }
+    )
   }
 
-  pp_dd <- pp_dd[pp_dd[,"sampleid"] %in% cell.lines & pp_dd[,"treatmentid"]%in%drugs,]
+  pp_dd <- pp_dd[
+    pp_dd[, "sampleid"] %in% cell.lines & pp_dd[, "treatmentid"] %in% drugs,
+  ]
 
-  tt <- reshape2::acast(pp_dd, treatmentid ~ sampleid, fun.aggregate=summary.function, value.var="sensitivity.measure")
+  tt <- reshape2::acast(
+    pp_dd,
+    treatmentid ~ sampleid,
+    fun.aggregate = summary.function,
+    value.var = "sensitivity.measure"
+  )
 
   result[rownames(tt), colnames(tt)] <- tt
 
-	if (!fill.missing) {
-
+  if (!fill.missing) {
     myRows <- apply(result, 1, function(x) !all(is.na(x)))
     myCols <- apply(result, 2, function(x) !all(is.na(x)))
     result <- result[myRows, myCols]
-	}
+  }
   return(result)
 }
