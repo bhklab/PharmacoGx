@@ -81,7 +81,7 @@ setMethod(
   sample_col = "sampleid",
   cell.lines,
   drugs,
-  summary.stat,
+  summary.stat = c("mean", "median", "first", "last", "max", "min"),
   fill.missing = TRUE
 ) {
   # handle missing
@@ -91,9 +91,7 @@ setMethod(
   if (missing(drugs)) {
     drugs <- treatmentNames(object)
   }
-  if (missing(summary.stat) || length(summary.stat) > 1) {
-    summary.stat <- 'mean'
-  }
+  summary.stat <- match.arg(summary.stat)
 
   checkmate::assert_class(treatmentResponse(object), 'LongTable')
   checkmate::assert_string(sensitivity.measure)
