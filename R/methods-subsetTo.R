@@ -125,7 +125,7 @@ setMethod(
       if (length(cells) != 0) {
         if (!all(cells %in% sampleNames(object))) {
           stop(
-            'Some of the cell names passed to function did not match to names in the PharmacoSet. Please ensure you are using cell names as returned by the cellNames function'
+            'Some of the cell names passed did not match the PharmacoSet. Please use sampleNames(object).'
           )
         }
         cell_line_index <- which(
@@ -142,7 +142,7 @@ setMethod(
         if (length(drugs) != 0) {
           if (!all(drugs %in% treatmentNames(object))) {
             stop(
-              'Some of the drug names passed to function did not match to names in the PharmacoSet. Please ensure you are using drug names as returned by the drugNames function'
+              'Some of the drug names passed did not match the PharmacoSet. Please use treatmentNames(object).'
             )
           }
           drugs_index <- which(
