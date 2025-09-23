@@ -270,7 +270,7 @@ computeLoewe <- function(
   guess_err <- loewe_guess$objective
   loewe_estimate <- loewe_guess$minimum
 
-  if (is.nan(guess_err) | guess_err > tol) {
+  if (is.na(guess_err) || is.nan(guess_err) || guess_err > tol) {
     loewe_estimate <- NA_real_
   }
 
@@ -389,7 +389,7 @@ computeZIP <- function(
 #' ))
 #'
 #' @export
-hillCurve <- function(dose, HS, EC50, E_inf, E_ninf) {
+hillCurve <- function(dose, HS, EC50, E_inf, E_ninf = 1) {
   E_inf + ((E_ninf - E_inf) / (1 + (10^dose / 10^EC50)^(HS)))
 }
 
