@@ -1,5 +1,5 @@
-## Matthews correlatipon coefficient
-#' Compute a Mathews Correlation Coefficient
+## Matthews correlation coefficient
+#' Compute a Matthews Correlation Coefficient
 #'
 #' @inherit CoreGx::mcc
 #'
