@@ -18,7 +18,7 @@
 #' for example: rna, rnaseq, snp
 #' @param cell.lines \code{character} The cell lines to be summarized.
 #'   If any cell.line has no data, missing values will be created
-#' @param features \code{caracter} A vector of the feature names to include in the summary
+#' @param features \code{character} A vector of the feature names to include in the summary
 #' @param summary.stat \code{character} which summary method to use if there are repeated
 #'   cell.lines? Choices are "mean", "median", "first", or "last"
 #'   In case molecular data type is mutation or fusion "and" and "or" choices are available
@@ -67,7 +67,7 @@ setMethod(
       ))
     }
 
-    if (summarize == FALSE) {
+    if (!isTRUE(summarize)) {
       return(molecularProfilesSlot(object)[[mDataType]])
     }
 
@@ -114,9 +114,9 @@ setMethod(
     if (datasetType(object) %in% c("perturbation", "both") && removeTreated) {
       if (!"xptype" %in% colnames(phenoInfo(object, mDataType))) {
         warning(
-          "The passed in molecular data had no column: xptype.
-                 \rEither the mDataType does not include perturbations, or the PSet is malformed.
-                 \rAssuming the former and continuing."
+          "The passed in molecular data had no column: xptype.\n",
+          "Either the mDataType does not include perturbations, or the PSet is malformed.\n",
+          "Assuming the former and continuing."
         )
       } else {
         keepCols <- phenoInfo(object, mDataType)$xptype %in%
@@ -219,13 +219,17 @@ setMethod(
         i <- 1
       }
       ## replace factors by characters to allow for merging duplicated experiments
-      pp2 <- apply(pp2, 2, function(x) {
+      pp2_rownames <- rownames(pp2)
+      pp2_df <- as.data.frame(pp2, stringsAsFactors = FALSE)
+      pp2_df[] <- lapply(pp2_df, function(x) {
         if (is.factor(x)) {
-          return(as.character(x))
+          as.character(x)
         } else {
-          return(x)
+          x
         }
       })
+      rownames(pp2_df) <- pp2_rownames
+      pp2 <- pp2_df
       ## there are some replicates to collapse
       for (x in duplix) {
         myx <- which(!is.na(pp[, "sampleid"]) & is.element(pp[, "sampleid"], x))
