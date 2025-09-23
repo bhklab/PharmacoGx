@@ -68,7 +68,7 @@ setMethod(
   'subsetByFeature',
   signature(x = 'PharmacoSet'),
   function(x, features, mDataTypes) {
-    callNextMethod(x = x, features = features, mDataTypes)
+    callNextMethod(x = x, features = features, mDataTypes = mDataTypes)
   }
 )
 
@@ -81,7 +81,7 @@ setMethod(
 #'
 setMethod(
   'subset',
-  signature('PharmacoSet'),
+  signature(x = 'PharmacoSet'),
   function(x, samples, treatments, features, ..., mDataTypes) {
     callNextMethod(
       x = x,
