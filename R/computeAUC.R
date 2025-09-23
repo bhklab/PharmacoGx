@@ -51,6 +51,9 @@ computeAUC <- function(
     area.type <- match.arg(area.type)
   }
   if (area.type == "Fitted" && missing(Hill_fit)) {
+    if (missing(viability)) {
+      stop("To fit a curve (area.type='Fitted'), supply raw viability or provide Hill_fit.")
+    }
     Hill_fit <- logLogisticRegression(
       concentration,
       viability,
