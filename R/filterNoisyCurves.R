@@ -13,7 +13,7 @@
 #'   in the analysis, out of dna, rna, rnaseq, snp, cnv
 #' @param positive.cutoff.percent `numeric` This value indicates that function
 #'   may violate epsilon rule for how many points on drug-response curve
-#' @param mean.viablity `numeric` average expected viability value
+#' @param mean.viability `numeric` average expected viability value
 #' @param nthread `numeric` if multiple cores are available, how many cores
 #'   should the computation be parallelized over?
 #'
@@ -25,7 +25,7 @@ filterNoisyCurves <- function(
   pSet,
   epsilon = 25,
   positive.cutoff.percent = .80,
-  mean.viablity = 200,
+  mean.viability = 200,
   nthread = 1
 ) {
   acceptable <- mclapply(
@@ -50,7 +50,7 @@ filterNoisyCurves <- function(
           (doses.no * positive.cutoff.percent)) &
           (delta.sum < epsilon) &
           (max.cum.sum < (2 * epsilon)) &
-          (mean(drug.responses$Viability) < mean.viablity)
+          (mean(drug.responses$Viability) < mean.viability)
       ) {
         return(xp)
       }
