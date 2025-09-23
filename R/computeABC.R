@@ -49,12 +49,12 @@ computeABC <- function(
   trunc = TRUE,
   verbose = TRUE
 ) {
-  if (missing(conc1) | missing(conc2)) {
+  if (missing(conc1) || missing(conc2)) {
     stop(
       "Both Concentration vectors the drugs were tested on must always be provided."
     )
   }
-  if (missing(Hill_fit1) | missing(Hill_fit2)) {
+  if (missing(Hill_fit1) || missing(Hill_fit2)) {
     Hill_fit1 <- logLogisticRegression(
       conc1,
       viability1,
@@ -117,14 +117,15 @@ computeABC <- function(
   }
 
   #FIT CURVE AND CALCULATE IC50
-  if (max(log_conc1) < min(log_conc2) | max(log_conc2) < min(log_conc1)) {
+  if (max(log_conc1, na.rm = TRUE) < min(log_conc2, na.rm = TRUE) ||
+      max(log_conc2, na.rm = TRUE) < min(log_conc1, na.rm = TRUE)) {
     return(NA)
   } else {
     extrema <- sort(c(
-      min(log_conc1),
-      max(log_conc1),
-      min(log_conc2),
-      max(log_conc2)
+      min(log_conc1, na.rm = TRUE),
+      max(log_conc1, na.rm = TRUE),
+      min(log_conc2, na.rm = TRUE),
+      max(log_conc2, na.rm = TRUE)
     ))
     support <- .getSupportVec(c(extrema[2], extrema[3]))
     ABC <- as.numeric(
