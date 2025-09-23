@@ -12,5 +12,6 @@ cosinePerm <- function(
   include.perm = FALSE,
   nthread = 1
 ) {
+  alternative <- match.arg(alternative)
   CoreGx::cosinePerm(x, y, nperm, alternative, include.perm, nthread)
 }
