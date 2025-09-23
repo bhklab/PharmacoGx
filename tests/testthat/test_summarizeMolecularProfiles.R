@@ -7,7 +7,7 @@ context("Checking summarizeMolecularProfiles function.")
 data("GDSCsmall")
 
 test_that("Summarize Molecular Profiles fails gracefully.", {
-  ## FIXME:: No method defition for summarizeMolecularProfiles with class 'missing'
+  ## FIXME:: No method definition for summarizeMolecularProfiles with class 'missing'
   #expect_error(summarizeMolecularProfiles(), "argument \"pSet\" is missing")
   expect_error(
     summarizeMolecularProfiles(GDSCsmall),
