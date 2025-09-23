@@ -92,7 +92,7 @@ downloadPSet <- function(
   whichx <- match(name, pSetTable[, "PSet Name"])
   if (is.na(whichx)) {
     stop(
-      'Unknown Dataset. Please use the availablePSets() function for the table of available PharamcoSets.'
+      'Unknown Dataset. Please use the availablePSets() function for the table of available PharmacoSets.'
     )
   }
 
