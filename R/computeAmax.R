@@ -31,6 +31,12 @@ computeAmax <- function(
     concentration <- concentration[-ii]
     viability <- viability[-ii]
   }
+  if (length(concentration) < 2) {
+    if (verbose) warning("Insufficient non-zero concentrations for curve fitting")
+    x <- NA_real_
+    names(x) <- "Amax"
+    return(x)
+  }
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (!all(is.finite(concentration))) {
@@ -58,11 +64,11 @@ computeAmax <- function(
     stop("Concentration vector contains negative data.")
   }
 
-  if (min(viability) < 0 & verbose) {
+  if (min(viability) < 0 && verbose) {
     warning("Warning: Negative viability data.")
   }
 
-  if (max(viability) > 100 & verbose) {
+  if (max(viability) > 100 && verbose) {
     warning("Warning: Viability data exceeds negative control.")
   }
 
