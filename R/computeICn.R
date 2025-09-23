@@ -39,7 +39,7 @@ computeICn <- function(
   verbose = TRUE,
   trunc = TRUE
 ) {
-  if (missing(Hill_fit) & !missing(concentration) & !missing(viability)) {
+  if (missing(Hill_fit) && !missing(concentration) && !missing(viability)) {
     Hill_fit <- logLogisticRegression(
       conc = concentration,
       viability,
