@@ -28,9 +28,10 @@
 #' @param upper_bounds `numeric` is a vector of length 3 whose entries are the upper bounds on the HS, E_inf,
 #' and base-10 logarithm of the EC50 parameters, respectively.
 #' @param scale is a positive real number specifying the shape parameter of the Cauchy distribution.
-#' @param family `character`, if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
-#' instead of sum-of-squared-residuals as the objective function for assessing goodness-of-fit of
-#' dose-response curves to the data. Otherwise, if "normal", uses MLE with a gaussian assumption of errors
+#' @param family `character`, choose "normal" or "cauchy" (case insensitive). If "cauchy",
+#'   uses MLE under an assumption of Cauchy-distributed errors instead of sum-of-squared-residuals
+#'   as the objective function for assessing goodness-of-fit of dose-response curves to the data.
+#'   Otherwise, if "normal", uses MLE with a gaussian assumption of errors
 #' @param median_n If the viability points being fit were medians of measurements, they are expected to follow a median of \code{family}
 #' distribution, which is in general quite different from the case of one measurement. Median_n is the number of measurements
 #' the median was taken of. If the measurements are means of values, then both the Normal and the Cauchy distributions are stable, so means of
@@ -42,7 +43,7 @@
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
 #' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
-#' @return A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquared, which is the R^2 of the fit.
+#' @return A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquare, which is the R^2 of the fit.
 #' Note that this is calculated using the values actually used for the fit, after truncation and any transform applied. With truncation, this will be
 #' different from the R^2 compared to the variance of the raw data. This also means that if all points were truncated down or up, there is no variance
 #' in the data, and the R^2 may be NaN.
@@ -82,7 +83,8 @@ logLogisticRegression <- function(
   #                                   viability_as_pct = TRUE,
   #                                   trunc = TRUE,
   #                                   verbose = FALSE) {
-  family <- match.arg(family)
+  family <- match.arg(tolower(family), choices = c("normal", "cauchy"))
+  family <- if (identical(family, "cauchy")) "Cauchy" else "normal"
 
   if (prod(is.finite(step)) != 1) {
     print(step)
@@ -114,13 +116,12 @@ logLogisticRegression <- function(
     stop("Scale is not a real number.")
   }
 
-  if (is.character(family) == FALSE) {
-    print(family)
-    stop("Cauchy flag is not a string.")
-  }
-
   if (length(density) != 3) {
     stop("Density parameter needs to have length of 3, for HS, Einf, EC50")
+  }
+
+  if (length(lower_bounds) != 3 || length(upper_bounds) != 3) {
+    stop("lower_bounds and upper_bounds must each be length 3, for HS, Einf, EC50")
   }
 
   if (!median_n == as.integer(median_n)) {
@@ -154,6 +155,7 @@ logLogisticRegression <- function(
     stop("Scale parameter is a nonpositive number.")
   }
 
+  # Validate inputs without altering existing objects (throws on issues)
   CoreGx::.sanitizeInput(
     x = conc,
     y = viability,
