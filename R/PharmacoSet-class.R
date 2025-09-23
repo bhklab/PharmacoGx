@@ -333,15 +333,14 @@ checkPsetStructure <-
       }
 
       ## Test if sample and feature annotations dimensions match the assay
-      warning(ifelse(
-        nrow(rowData(profile)) != nrow(assays(profile)[[1]]),
-        sprintf(
-          '%s: number of features in fData is different from
-                             SummarizedExperiment slots',
+      if (nrow(rowData(profile)) != nrow(assays(profile)[[1]])) {
+        warning(sprintf(
+          "%s: number of features in fData differs from assay rows",
           nn
-        ),
-        sprintf('%s: rowData dimension is OK', nn)
-      ))
+        ))
+      } else {
+        message(sprintf('%s: rowData dimension is OK', nn))
+      }
       warning(ifelse(
         nrow(colData(profile)) != ncol(assays(profile)[[1]]),
         sprintf(
