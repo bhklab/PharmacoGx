@@ -1,38 +1,21 @@
 ##TODO:: Add function documentation
 getRawSensitivityMatrix <-
   function(pSet, cell.id, drug.id, max.conc, quality) {
-    cond <- "sensitivityInfo(pSet)$sampleid == cell.id"
-    if (!missing(quality)) {
-      if (is.element("quality", colnames(sensitivityInfo(pSet)))) {
-        cond <- paste(
-          cond,
-          "sensitivityInfo(pSet)$quality == quality",
-          sep = " & "
-        )
-      }
+    sinfo <- sensitivityInfo(pSet)
+    cond_idx <- sinfo$sampleid == cell.id
+    if (!missing(quality) && "quality" %in% colnames(sinfo)) {
+      cond_idx <- cond_idx & sinfo$quality == quality
     }
-    if (!missing(max.conc)) {
-      if (is.element("max.conc", colnames(sensitivityInfo(pSet)))) {
-        if (length(max.conc) > 1) {
-          max.conc <- paste(max.conc, collapse = "///")
-        }
-        cond <- paste(
-          cond,
-          "sensitivityInfo(pSet)$max.conc == max.conc",
-          sep = " & "
-        )
-      }
+    if (!missing(max.conc) && "max.conc" %in% colnames(sinfo)) {
+      mc <- if (length(max.conc) > 1) paste(max.conc, collapse = "///") else max.conc
+      cond_idx <- cond_idx & sinfo$max.conc == mc
     }
     if (length(drug.id) > 1) {
       drug.id <- paste(drug.id, collapse = "///")
     }
-    cond <- paste(
-      cond,
-      "sensitivityInfo(pSet)$treatmentid == drug.id",
-      sep = " & "
-    )
+    cond_idx <- cond_idx & sinfo$treatmentid == drug.id
 
-    exp.id <- which(eval(parse(text = cond)))
+    exp.id <- which(cond_idx)
 
     sensitivity.raw.matrix <- list()
     if (length(exp.id) > 0) {
