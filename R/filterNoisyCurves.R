@@ -80,6 +80,9 @@ filterNoisyCurves <- function(
   if (trunc) {
     xx <- pmin(xx, 100)
   }
+  if (length(xx) < 2) {
+    return(0)
+  }
   tt <- t(combn(seq_along(xx), 2, simplify = TRUE))
   tt <- tt[which(((tt[, 2] - tt[, 1]) >= 2) == TRUE), ]
   cum.sum <- unlist(lapply(seq_len(nrow(tt)), function(x) {
