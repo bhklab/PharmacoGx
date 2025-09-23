@@ -14,5 +14,7 @@ connectivityScore <-
     gwc.method = c("spearman", "pearson"),
     ...
   ) {
+    method <- match.arg(method)
+    gwc.method <- match.arg(gwc.method)
     CoreGx::connectivityScore(x, y, method, nperm, nthread, gwc.method, ...)
   }
