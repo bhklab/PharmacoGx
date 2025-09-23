@@ -18,8 +18,9 @@
 #' as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
 #' viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
 #' and EC50 as a concentration.
-#' @param n `numeric` The percentile concentration to compute. If viability_as_pct set, assumed to be percentage, otherwise
-#' assumed to be a decimal value.
+#' @param n `numeric` The percentile concentration to compute. If viability_as_pct is TRUE it is treated as a
+#'   percent inhibition (e.g., `n = 10` finds the concentration that leaves 90% viability); otherwise it is
+#'   assumed to be a decimal fraction.
 #' @param conc_as_log `logical`, if true, assumes that log10-concentration data has been given rather than concentration data,
 #' and that log10(ICn) should be returned instead of ICn.
 #' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
