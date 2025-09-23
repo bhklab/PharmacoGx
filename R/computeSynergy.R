@@ -1147,7 +1147,7 @@ setMethod(
       warning = function(w) {
         message(paste(
           "ZIP reference values have not been pre-computed.",
-          "They will be computed in during delta score calculation."
+          "They will be computed during delta score calculation."
         ))
         buildComboProfiles(object, c("HS", "EC50", "E_inf", "combo_viability"))
       }
