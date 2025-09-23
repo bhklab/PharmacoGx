@@ -217,7 +217,7 @@ geneDrugSensitivityPBCorr <- function(
   xx <- x[ccix]
 
   if (ncol(drugpheno) > 1) {
-    stop("Partial Correlations not implemented for multiple output")
+    stop("Partial correlations not implemented for multiple outputs")
   } else {
     ffd <- "drugpheno.1 ~ . - x"
     ffx <- "x ~ . - drugpheno.1"
@@ -242,7 +242,7 @@ geneDrugSensitivityPBCorr <- function(
     )
   } else if (length(unique(dd[[2]])) > 2) {
     stop(
-      'More than two discrete settings for moleuclar feature not currently supported'
+      'More than two discrete settings for molecular feature not currently supported'
     )
   } else if (length(unique(dd[[2]])) == 1 || min(table(dd[[2]])) < 3) {
     warning(
@@ -255,7 +255,7 @@ geneDrugSensitivityPBCorr <- function(
 
   if (any(unlist(lapply(drugpheno, is.factor)))) {
     stop(
-      "Currently only continous output allowed for point biserial correlations"
+      "Currently only continuous output allowed for point biserial correlations"
     )
   } else {
     if (ncol(dd) > 2) {
