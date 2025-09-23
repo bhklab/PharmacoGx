@@ -20,7 +20,7 @@ getRawSensitivityMatrix <-
     sensitivity.raw.matrix <- list()
     if (length(exp.id) > 0) {
       for (i in seq_len(length(exp.id))) {
-        if (length(grep("///", drug.id)) > 0) {
+        if (grepl("///", drug.id, fixed = TRUE)) {
           all.exp.id <- which(
             sensitivityInfo(pSet)$combination.exp.id ==
               sensitivityInfo(pSet)[exp.id[i], "combination.exp.id"]
