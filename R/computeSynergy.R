@@ -887,7 +887,7 @@ fitTwowayZIP <- function(
   if (add_treatment == 2) {
     ## unique treatment 2 concentrations
     unique_t2_dose <- unique(select_combo[, treatment2dose])
-    cols <- palette(rainbow(length(unique_t2_dose)))
+    cols <- grDevices::rainbow(length(unique_t2_dose))
     if (has_Rsqr[2]) {
       Rsqr_2_to_1 <- vector(mode = "numeric", length = length(unique_t2_dose))
     }
@@ -973,7 +973,7 @@ fitTwowayZIP <- function(
   } else {
     ## unique treatment 1 concentrations
     unique_t1_dose <- unique(select_combo[, treatment1dose])
-    cols <- palette(rainbow(length(unique_t1_dose)))
+    cols <- grDevices::rainbow(length(unique_t1_dose))
     ## TODO: Find a nicer way to extract R squared value
     if (has_Rsqr[1]) {
       Rsqr_1_to_2 <- vector(mode = "numeric", length = length(unique_t1_dose))
@@ -1122,7 +1122,7 @@ setMethod(
   signature(object = "TreatmentResponseExperiment"),
   function(object, residual = "logcosh", nthread = 1L, show_Rsqr = FALSE) {
     if (!is.character(residual)) {
-      stop("argument `residual` must be type of logical")
+      stop("argument `residual` must be type of character")
     } else if (length(residual) != 1) {
       stop("argument `residual` must be of length 1")
     }
