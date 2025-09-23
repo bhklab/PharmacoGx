@@ -66,7 +66,7 @@ test_that("Summarize Molecular Profiles correctly summarizes replicates", {
   )
   expect_equal(
     SummarizedExperiment::assay(testSummary, 1)[, "647-V"],
-    testCells[, -1]
+    testCells[, ncol(testCells)]
   )
 
   GDSCsmall2 <- subsetTo(GDSCsmall, cells = c("22RV1", "23132-87"))
