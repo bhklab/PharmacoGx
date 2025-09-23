@@ -113,7 +113,7 @@ plot.PharmacoSig <- function(
     }
 
     plot.elements <- plot.elements +
-      geom_point(aes(X, Y, color = Cutoff), data = x.m)
+      geom_point(aes(.data$X, .data$Y, color = .data$Cutoff), data = x.m)
 
     if (!missing(color)) {
       ## this is handled here because we want different behaviour based on if we have significance based coloring or not
@@ -128,7 +128,7 @@ plot.PharmacoSig <- function(
     x.m$Cutoff <- NA_character_
 
     plot.elements <- plot.elements +
-      geom_point(aes(X, Y), color = color, data = x.m)
+      geom_point(aes(.data$X, .data$Y), color = color, data = x.m)
   }
 
   plot.elements
