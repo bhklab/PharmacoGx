@@ -41,19 +41,17 @@ computeAUC_old <- function(
   if (missing(area.type)) {
     area.type <- "Fitted"
   }
-  if (length(conc) < 2) {
+  if (length(log_conc) < 2) {
     return(NA)
   }
   if (area.type == "Actual") {
-    # if(trunc) {viability = pmin(as.numeric(viability), 100); viability = pmax(as.numeric(viability), 0)}
     trapezoid.integral <- caTools::trapz(
-      log10(as.numeric(conc) + 1),
+      log_conc,
       as.numeric(viability)
     )
+    ref_level <- if (viability_as_pct) 100 else 1
     AUC <- round(
-      1 -
-        (trapezoid.integral /
-          trapz(log10(as.numeric(conc)), rep(100, length(viability)))),
+      1 - trapezoid.integral / caTools::trapz(log_conc, rep(ref_level, length(viability))),
       digits = 2
     )
   } else {
