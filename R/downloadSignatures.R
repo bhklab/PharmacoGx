@@ -62,7 +62,7 @@ downloadPertSig <- function(
   if (is.na(whichx)) {
     stop(
       'Unknown Dataset. Please use the `Dataset Name` column in the
-            data.frame returned by the availablePSet function to select a
+            data.frame returned by the `availablePSets()` function to select a
             PharmacoSet'
     )
   }
