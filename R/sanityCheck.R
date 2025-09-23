@@ -36,7 +36,7 @@ sanitizeInput <- function(
     }
     if (any(is.na(conc) & (!is.na(viability)))) {
       warning(
-        "Missing concentrations with non-missing viability values encountered. Removing viability values correspoding to those concentrations"
+        "Missing concentrations with non-missing viability values encountered. Removing viability values corresponding to those concentrations"
       )
 
       myx <- !is.na(conc)
@@ -45,7 +45,7 @@ sanitizeInput <- function(
     }
     if (any((!is.na(conc)) & is.na(viability))) {
       warning(
-        "Missing viability with non-missing concentrations values encountered. Removing concentrations values correspoding to those viabilities"
+        "Missing viability with non-missing concentrations values encountered. Removing concentrations values corresponding to those viabilities"
       )
       myx <- !is.na(viability)
       conc <- as.numeric(conc[myx])
