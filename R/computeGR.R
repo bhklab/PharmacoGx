@@ -32,10 +32,16 @@ grRegression <- function(
   #when the drug concentration is GEC_50.
 
   #DO SANITY CHECKS ON INPUT
-  # if(missing(concentration)){
 
-  #   stop("The concentration values the drug was tested on must always be provided.")
   family <- match.arg(family)
+
+  if (missing(conc)) {
+    stop("The concentration values the drug was tested on must always be provided.")
+  }
+
+  if (missing(Hill_fit) && missing(viability)) {
+    stop("Please enter viability data and/or Hill equation parameters.")
+  }
 
   if (missing(Hill_fit)) {
     Hill_fit <- logLogisticRegression(
@@ -63,7 +69,7 @@ grRegression <- function(
     )
     Hill_fit <- cleanData[["Hill_fit"]]
     log_conc <- cleanData[["log_conc"]]
-  } else if (!missing(Hill_fit)) {
+  } else {
     cleanData <- sanitizeInput(
       conc = conc,
       viability = viability,
@@ -75,10 +81,6 @@ grRegression <- function(
     )
     Hill_fit <- cleanData[["Hill_fit"]]
     # log_conc <- cleanData[["log_conc"]]
-  }
-
-  if (missing(viability) && missing(Hill_fit)) {
-    stop("Please enter viability data and/or Hill equation parameters.")
   }
 
   if (missing(duration)) {
