@@ -241,26 +241,24 @@
   min.dose <- 0
   max.dose <- 10^100
   for (i in seq_len(length(doses))) {
-    min.dose <- max(
-      min.dose,
-      min(as.numeric(doses[[i]]), na.rm = TRUE),
-      na.rm = TRUE
-    )
-    max.dose <- min(
-      max.dose,
-      max(as.numeric(doses[[i]]), na.rm = TRUE),
-      na.rm = TRUE
-    )
+    di <- sort(as.numeric(doses[[i]]))
+    min.dose <- max(min.dose, min(di, na.rm = TRUE), na.rm = TRUE)
+    max.dose <- min(max.dose, max(di, na.rm = TRUE), na.rm = TRUE)
+    doses[[i]] <- di
   }
-  common.ranges <- list()
+  common.ranges <- vector("list", length(doses))
+  if (!is.finite(min.dose) || !is.finite(max.dose) || min.dose > max.dose) {
+    return(common.ranges)
+  }
   for (i in seq_len(length(doses))) {
-    common.ranges[[i]] <- doses[[i]][
+    di <- doses[[i]]
+    common.ranges[[i]] <- di[
       seq(
-        which.min(abs(as.numeric(doses[[i]]) - min.dose)),
+        which.min(abs(di - min.dose)),
         max(
           which(
-            abs(as.numeric(doses[[i]]) - max.dose) ==
-              min(abs(as.numeric(doses[[i]]) - max.dose), na.rm = TRUE)
+            abs(di - max.dose) ==
+              min(abs(di - max.dose), na.rm = TRUE)
           )
         )
       )
