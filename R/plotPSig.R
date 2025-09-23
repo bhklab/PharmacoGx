@@ -97,7 +97,7 @@ plot.PharmacoSig <- function(
 
   plot.elements <- ggplot() + xlab(axis.labs[1]) + ylab(axis.labs[2])
 
-  if (!missing(effect_cutoff) | !missing(signif_cutoff)) {
+  if (!missing(effect_cutoff) || !missing(signif_cutoff)) {
     x.m$Cutoff <- "Not Significant"
 
     if (!missing(signif_cutoff)) {
