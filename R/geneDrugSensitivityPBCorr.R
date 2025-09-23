@@ -29,8 +29,6 @@ corPermute <- function(
   log_decision_boundary = 10,
   max_iter = 1 / req_alpha * 100
 ) {
-  num.larger <- 0
-
   cur_success <- 0
   cur_iter <- 1
 
