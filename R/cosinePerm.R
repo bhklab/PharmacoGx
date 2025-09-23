@@ -1,4 +1,4 @@
-#' Cosine Permuations
+#' Cosine Permutations
 #'
 #' @inherit CoreGx::cosinePerm
 #' @inheritParams CoreGx::cosinePerm
