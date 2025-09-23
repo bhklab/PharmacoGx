@@ -1,7 +1,7 @@
 library(PharmacoGx)
 
 context(
-  "Checking the sanitization of input to curve fitting and sensitivity summary funcitons"
+  "Checking the sanitization of input to curve fitting and sensitivity summary functions"
 )
 
 test_that("Function sanitizeInput handles no input correctly.", {
