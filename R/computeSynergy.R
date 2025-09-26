@@ -37,6 +37,30 @@
 #'
 #' @importFrom checkmate assertLogical
 #' @export
+utils::globalVariables(c(
+  "EC50_1",
+  "EC50_2",
+  "EC50_proj_1_to_2",
+  "EC50_proj_2_to_1",
+  "E_inf_1",
+  "E_inf_2",
+  "E_inf_proj_1_to_2",
+  "E_inf_proj_2_to_1",
+  "HS_1",
+  "HS_2",
+  "HS_proj_1_to_2",
+  "HS_proj_2_to_1",
+  "Rsqr_1_to_2",
+  "Rsqr_2_to_1",
+  "ZIP",
+  "combo_viability",
+  "treatment1dose",
+  "treatment1id",
+  "treatment2dose",
+  "treatment2id",
+  "x"
+))
+
 effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
   assertLogical(is_pct, len = 1)
   if (is_pct) {
@@ -72,21 +96,21 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
 #'
 #' @examples
 #' \dontrun{
-#' tre |>
-#'     endoaggregate(
-#'         assay="combo_viability",
-#'         Loewe = PharmacoGx::computeLoewe(
-#'             treatment1dose = treatment1dose,
-#'             treatment2dose = treatment2dose,
-#'             HS_1 = HS_1,
-#'             HS_2 = HS_2,
-#'             E_inf_1 = E_inf_1,
-#'             E_inf_2 = E_inf_2,
-#'             EC50_1 = EC50_1,
-#'             EC50_2 = EC50_2
-#'         ),
-#'         by = assayKeys(tre, "combo_viability")
-#'     ) -> tre
+#' tre <- endoaggregate(
+#'   tre,
+#'   assay = "combo_viability",
+#'   Loewe = PharmacoGx::computeLoewe(
+#'     treatment1dose = treatment1dose,
+#'     treatment2dose = treatment2dose,
+#'     HS_1 = HS_1,
+#'     HS_2 = HS_2,
+#'     E_inf_1 = E_inf_1,
+#'     E_inf_2 = E_inf_2,
+#'     EC50_1 = EC50_1,
+#'     EC50_2 = EC50_2
+#'   ),
+#'   by = assayKeys(tre, "combo_viability")
+#' )
 #' }
 #'
 #' @export
@@ -187,21 +211,21 @@ loeweCI <- function(
 #'
 #' @examples
 #' \dontrun{
-#' tre |>
-#'     endoaggregate(
-#'         assay="combo_viability",
-#'         Loewe = computeLoewe(
-#'             treatment1dose=treatment1dose,
-#'             treatment2dose=treatment2dose,
-#'             HS_1=HS_1,
-#'             HS_2=HS_2,
-#'             E_inf_1=E_inf_1,
-#'             E_inf_2=E_inf_2,
-#'             EC50_1=EC50_1,
-#'             EC50_2=EC50_2
-#'         ),
-#'         by = assayKeys(tre, "combo_viability")
-#'     ) -> tre
+#' tre <- endoaggregate(
+#'   tre,
+#'   assay = "combo_viability",
+#'   Loewe = computeLoewe(
+#'     treatment1dose = treatment1dose,
+#'     treatment2dose = treatment2dose,
+#'     HS_1 = HS_1,
+#'     HS_2 = HS_2,
+#'     E_inf_1 = E_inf_1,
+#'     E_inf_2 = E_inf_2,
+#'     EC50_1 = EC50_1,
+#'     EC50_2 = EC50_2
+#'   ),
+#'   by = assayKeys(tre, "combo_viability")
+#' )
 #' }
 #'
 #' @importFrom stats optimise
@@ -704,54 +728,55 @@ fitTwowayZIP <- function(
     )
   }
 
-  combo_profiles |>
-    aggregate(
-      estimateProjParams(
-        dose_to = treatment1dose,
-        combo_viability = combo_viability,
-        dose_add = unique(treatment2dose),
-        EC50_add = unique(EC50_2),
-        HS_add = unique(HS_2),
-        E_inf_add = unique(E_inf_2),
-        residual = residual,
-        show_Rsqr = show_Rsqr,
-        optim_only = optim_only,
-        loss_args = loss_args
-      ),
-      moreArgs = list(
-        residual = residual,
-        show_Rsqr = show_Rsqr,
-        optim_only = optim_only,
-        loss_args = loss_args
-      ),
-      by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
-      nthread = nthread,
-      enlist = FALSE
-    ) -> fit_2_to_1
-  combo_profiles |>
-    aggregate(
-      estimateProjParams(
-        dose_to = treatment2dose,
-        combo_viability = combo_viability,
-        dose_add = unique(treatment1dose),
-        EC50_add = unique(EC50_1),
-        HS_add = unique(HS_1),
-        E_inf_add = unique(E_inf_1),
-        residual = residual,
-        show_Rsqr = show_Rsqr,
-        optim_only = optim_only,
-        loss_args = loss_args
-      ),
-      moreArgs = list(
-        residual = residual,
-        show_Rsqr = show_Rsqr,
-        optim_only = optim_only,
-        loss_args = loss_args
-      ),
-      by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
-      nthread = nthread,
-      enlist = FALSE
-    ) -> fit_1_to_2
+  fit_2_to_1 <- aggregate(
+    combo_profiles,
+    estimateProjParams(
+      dose_to = treatment1dose,
+      combo_viability = combo_viability,
+      dose_add = unique(treatment2dose),
+      EC50_add = unique(EC50_2),
+      HS_add = unique(HS_2),
+      E_inf_add = unique(E_inf_2),
+      residual = residual,
+      show_Rsqr = show_Rsqr,
+      optim_only = optim_only,
+      loss_args = loss_args
+    ),
+    moreArgs = list(
+      residual = residual,
+      show_Rsqr = show_Rsqr,
+      optim_only = optim_only,
+      loss_args = loss_args
+    ),
+    by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+    nthread = nthread,
+    enlist = FALSE
+  )
+
+  fit_1_to_2 <- aggregate(
+    combo_profiles,
+    estimateProjParams(
+      dose_to = treatment2dose,
+      combo_viability = combo_viability,
+      dose_add = unique(treatment1dose),
+      EC50_add = unique(EC50_1),
+      HS_add = unique(HS_1),
+      E_inf_add = unique(E_inf_1),
+      residual = residual,
+      show_Rsqr = show_Rsqr,
+      optim_only = optim_only,
+      loss_args = loss_args
+    ),
+    moreArgs = list(
+      residual = residual,
+      show_Rsqr = show_Rsqr,
+      optim_only = optim_only,
+      loss_args = loss_args
+    ),
+    by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
+    nthread = nthread,
+    enlist = FALSE
+  )
 
   combo_twowayFit <- combo_profiles[
     fit_1_to_2,
@@ -1184,101 +1209,101 @@ setMethod(
     if (has_ZIP) {
       combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
       if (show_Rsqr) {
-        combo_twowayFit |>
-          aggregate(
-            delta_score = .deltaScore(
-              EC50_1_to_2 = EC50_proj_1_to_2,
-              EC50_2_to_1 = EC50_proj_2_to_1,
-              EC50_1 = EC50_1,
-              EC50_2 = EC50_2,
-              HS_1_to_2 = HS_proj_1_to_2,
-              HS_2_to_1 = HS_proj_2_to_1,
-              HS_1 = HS_1,
-              HS_2 = HS_2,
-              E_inf_1 = E_inf_1,
-              E_inf_2 = E_inf_2,
-              E_inf_2_to_1 = E_inf_proj_2_to_1,
-              E_inf_1_to_2 = E_inf_proj_1_to_2,
-              treatment1dose = treatment1dose,
-              treatment2dose = treatment2dose,
-              ZIP = ZIP
-            ),
-            delta_Rsqr_1_to_2 = Rsqr_1_to_2,
-            delta_Rsqr_2_to_1 = Rsqr_2_to_1,
-            by = combo_keys,
-            nthread = nthread
-          ) -> delta_scores
+        delta_scores <- aggregate(
+          combo_twowayFit,
+          delta_score = .deltaScore(
+            EC50_1_to_2 = EC50_proj_1_to_2,
+            EC50_2_to_1 = EC50_proj_2_to_1,
+            EC50_1 = EC50_1,
+            EC50_2 = EC50_2,
+            HS_1_to_2 = HS_proj_1_to_2,
+            HS_2_to_1 = HS_proj_2_to_1,
+            HS_1 = HS_1,
+            HS_2 = HS_2,
+            E_inf_1 = E_inf_1,
+            E_inf_2 = E_inf_2,
+            E_inf_2_to_1 = E_inf_proj_2_to_1,
+            E_inf_1_to_2 = E_inf_proj_1_to_2,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose,
+            ZIP = ZIP
+          ),
+          delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+          delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+          by = combo_keys,
+          nthread = nthread
+        )
       } else {
-        combo_twowayFit |>
-          aggregate(
-            delta_score = .deltaScore(
-              EC50_1_to_2 = EC50_proj_1_to_2,
-              EC50_2_to_1 = EC50_proj_2_to_1,
-              EC50_1 = EC50_1,
-              EC50_2 = EC50_2,
-              HS_1_to_2 = HS_proj_1_to_2,
-              HS_2_to_1 = HS_proj_2_to_1,
-              HS_1 = HS_1,
-              HS_2 = HS_2,
-              E_inf_1 = E_inf_1,
-              E_inf_2 = E_inf_2,
-              E_inf_2_to_1 = E_inf_proj_2_to_1,
-              E_inf_1_to_2 = E_inf_proj_1_to_2,
-              treatment1dose = treatment1dose,
-              treatment2dose = treatment2dose,
-              ZIP = ZIP
-            ),
-            by = combo_keys,
-            nthread = nthread
-          ) -> delta_scores
+        delta_scores <- aggregate(
+          combo_twowayFit,
+          delta_score = .deltaScore(
+            EC50_1_to_2 = EC50_proj_1_to_2,
+            EC50_2_to_1 = EC50_proj_2_to_1,
+            EC50_1 = EC50_1,
+            EC50_2 = EC50_2,
+            HS_1_to_2 = HS_proj_1_to_2,
+            HS_2_to_1 = HS_proj_2_to_1,
+            HS_1 = HS_1,
+            HS_2 = HS_2,
+            E_inf_1 = E_inf_1,
+            E_inf_2 = E_inf_2,
+            E_inf_2_to_1 = E_inf_proj_2_to_1,
+            E_inf_1_to_2 = E_inf_proj_1_to_2,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose,
+            ZIP = ZIP
+          ),
+          by = combo_keys,
+          nthread = nthread
+        )
       }
     } else {
       if (show_Rsqr) {
-        combo_twowayFit |>
-          aggregate(
-            delta_score = .deltaScore(
-              EC50_1_to_2 = EC50_proj_1_to_2,
-              EC50_2_to_1 = EC50_proj_2_to_1,
-              EC50_1 = EC50_1,
-              EC50_2 = EC50_2,
-              HS_1_to_2 = HS_proj_1_to_2,
-              HS_2_to_1 = HS_proj_2_to_1,
-              HS_1 = HS_1,
-              HS_2 = HS_2,
-              E_inf_1 = E_inf_1,
-              E_inf_2 = E_inf_2,
-              E_inf_2_to_1 = E_inf_proj_2_to_1,
-              E_inf_1_to_2 = E_inf_proj_1_to_2,
-              treatment1dose = treatment1dose,
-              treatment2dose = treatment2dose
-            ),
-            delta_Rsqr_1_to_2 = Rsqr_1_to_2,
-            delta_Rsqr_2_to_1 = Rsqr_2_to_1,
-            by = combo_keys,
-            nthread = nthread
-          ) -> delta_scores
+        delta_scores <- aggregate(
+          combo_twowayFit,
+          delta_score = .deltaScore(
+            EC50_1_to_2 = EC50_proj_1_to_2,
+            EC50_2_to_1 = EC50_proj_2_to_1,
+            EC50_1 = EC50_1,
+            EC50_2 = EC50_2,
+            HS_1_to_2 = HS_proj_1_to_2,
+            HS_2_to_1 = HS_proj_2_to_1,
+            HS_1 = HS_1,
+            HS_2 = HS_2,
+            E_inf_1 = E_inf_1,
+            E_inf_2 = E_inf_2,
+            E_inf_2_to_1 = E_inf_proj_2_to_1,
+            E_inf_1_to_2 = E_inf_proj_1_to_2,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose
+          ),
+          delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+          delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+          by = combo_keys,
+          nthread = nthread
+        )
       } else {
-        combo_twowayFit |>
-          aggregate(
-            delta_score = .deltaScore(
-              EC50_1_to_2 = EC50_proj_1_to_2,
-              EC50_2_to_1 = EC50_proj_2_to_1,
-              EC50_1 = EC50_1,
-              EC50_2 = EC50_2,
-              HS_1_to_2 = HS_proj_1_to_2,
-              HS_2_to_1 = HS_proj_2_to_1,
-              HS_1 = HS_1,
-              HS_2 = HS_2,
-              E_inf_1 = E_inf_1,
-              E_inf_2 = E_inf_2,
-              E_inf_2_to_1 = E_inf_proj_2_to_1,
-              E_inf_1_to_2 = E_inf_proj_1_to_2,
-              treatment1dose = treatment1dose,
-              treatment2dose = treatment2dose
-            ),
-            by = combo_keys,
-            nthread = nthread
-          ) -> delta_scores
+        delta_scores <- aggregate(
+          combo_twowayFit,
+          delta_score = .deltaScore(
+            EC50_1_to_2 = EC50_proj_1_to_2,
+            EC50_2_to_1 = EC50_proj_2_to_1,
+            EC50_1 = EC50_1,
+            EC50_2 = EC50_2,
+            HS_1_to_2 = HS_proj_1_to_2,
+            HS_2_to_1 = HS_proj_2_to_1,
+            HS_1 = HS_1,
+            HS_2 = HS_2,
+            E_inf_1 = E_inf_1,
+            E_inf_2 = E_inf_2,
+            E_inf_2_to_1 = E_inf_proj_2_to_1,
+            E_inf_1_to_2 = E_inf_proj_1_to_2,
+            treatment1dose = treatment1dose,
+            treatment2dose = treatment2dose
+          ),
+          by = combo_keys,
+          nthread = nthread
+        )
       }
     }
     setkeyv(delta_scores, combo_keys)
@@ -1449,102 +1474,102 @@ setMethod(
   setkeyv(combo_twowayFit, combo_keys)
   if (is.null(ZIP)) {
     if (show_Rsqr) {
-      combo_twowayFit |>
-        aggregate(
-          delta_score = .deltaScore(
-            EC50_1_to_2 = EC50_proj_1_to_2,
-            EC50_2_to_1 = EC50_proj_2_to_1,
-            EC50_1 = EC50_1,
-            EC50_2 = EC50_2,
-            HS_1_to_2 = HS_proj_1_to_2,
-            HS_2_to_1 = HS_proj_2_to_1,
-            HS_1 = HS_1,
-            HS_2 = HS_2,
-            E_inf_1 = E_inf_1,
-            E_inf_2 = E_inf_2,
-            E_inf_2_to_1 = E_inf_proj_2_to_1,
-            E_inf_1_to_2 = E_inf_proj_1_to_2,
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose
-          ),
-          delta_Rsqr_1_to_2 = Rsqr_1_to_2,
-          delta_Rsqr_2_to_1 = Rsqr_2_to_1,
-          by = combo_keys,
-          nthread = nthread
-        ) -> delta_scores
+      delta_scores <- aggregate(
+        combo_twowayFit,
+        delta_score = .deltaScore(
+          EC50_1_to_2 = EC50_proj_1_to_2,
+          EC50_2_to_1 = EC50_proj_2_to_1,
+          EC50_1 = EC50_1,
+          EC50_2 = EC50_2,
+          HS_1_to_2 = HS_proj_1_to_2,
+          HS_2_to_1 = HS_proj_2_to_1,
+          HS_1 = HS_1,
+          HS_2 = HS_2,
+          E_inf_1 = E_inf_1,
+          E_inf_2 = E_inf_2,
+          E_inf_2_to_1 = E_inf_proj_2_to_1,
+          E_inf_1_to_2 = E_inf_proj_1_to_2,
+          treatment1dose = treatment1dose,
+          treatment2dose = treatment2dose
+        ),
+        delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+        delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+        by = combo_keys,
+        nthread = nthread
+      )
     } else {
-      combo_twowayFit |>
-        aggregate(
-          delta_score = .deltaScore(
-            EC50_1_to_2 = EC50_proj_1_to_2,
-            EC50_2_to_1 = EC50_proj_2_to_1,
-            EC50_1 = EC50_1,
-            EC50_2 = EC50_2,
-            HS_1_to_2 = HS_proj_1_to_2,
-            HS_2_to_1 = HS_proj_2_to_1,
-            HS_1 = HS_1,
-            HS_2 = HS_2,
-            E_inf_1 = E_inf_1,
-            E_inf_2 = E_inf_2,
-            E_inf_2_to_1 = E_inf_proj_2_to_1,
-            E_inf_1_to_2 = E_inf_proj_1_to_2,
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose
-          ),
-          by = combo_keys,
-          nthread = nthread
-        ) -> delta_scores
+      delta_scores <- aggregate(
+        combo_twowayFit,
+        delta_score = .deltaScore(
+          EC50_1_to_2 = EC50_proj_1_to_2,
+          EC50_2_to_1 = EC50_proj_2_to_1,
+          EC50_1 = EC50_1,
+          EC50_2 = EC50_2,
+          HS_1_to_2 = HS_proj_1_to_2,
+          HS_2_to_1 = HS_proj_2_to_1,
+          HS_1 = HS_1,
+          HS_2 = HS_2,
+          E_inf_1 = E_inf_1,
+          E_inf_2 = E_inf_2,
+          E_inf_2_to_1 = E_inf_proj_2_to_1,
+          E_inf_1_to_2 = E_inf_proj_1_to_2,
+          treatment1dose = treatment1dose,
+          treatment2dose = treatment2dose
+        ),
+        by = combo_keys,
+        nthread = nthread
+      )
     }
   } else {
     combo_twowayFit <- combo_twowayFit[combo_ZIP, on = combo_keys]
     if (show_Rsqr) {
-      combo_twowayFit |>
-        aggregate(
-          delta_score = .deltaScore(
-            EC50_1_to_2 = EC50_proj_1_to_2,
-            EC50_2_to_1 = EC50_proj_2_to_1,
-            EC50_1 = EC50_1,
-            EC50_2 = EC50_2,
-            HS_1_to_2 = HS_proj_1_to_2,
-            HS_2_to_1 = HS_proj_2_to_1,
-            HS_1 = HS_1,
-            HS_2 = HS_2,
-            E_inf_1 = E_inf_1,
-            E_inf_2 = E_inf_2,
-            E_inf_2_to_1 = E_inf_proj_2_to_1,
-            E_inf_1_to_2 = E_inf_proj_1_to_2,
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose,
-            ZIP = ZIP
-          ),
-          delta_Rsqr_1_to_2 = Rsqr_1_to_2,
-          delta_Rsqr_2_to_1 = Rsqr_2_to_1,
-          by = combo_keys,
-          nthread = nthread
-        ) -> delta_scores
+      delta_scores <- aggregate(
+        combo_twowayFit,
+        delta_score = .deltaScore(
+          EC50_1_to_2 = EC50_proj_1_to_2,
+          EC50_2_to_1 = EC50_proj_2_to_1,
+          EC50_1 = EC50_1,
+          EC50_2 = EC50_2,
+          HS_1_to_2 = HS_proj_1_to_2,
+          HS_2_to_1 = HS_proj_2_to_1,
+          HS_1 = HS_1,
+          HS_2 = HS_2,
+          E_inf_1 = E_inf_1,
+          E_inf_2 = E_inf_2,
+          E_inf_2_to_1 = E_inf_proj_2_to_1,
+          E_inf_1_to_2 = E_inf_proj_1_to_2,
+          treatment1dose = treatment1dose,
+          treatment2dose = treatment2dose,
+          ZIP = ZIP
+        ),
+        delta_Rsqr_1_to_2 = Rsqr_1_to_2,
+        delta_Rsqr_2_to_1 = Rsqr_2_to_1,
+        by = combo_keys,
+        nthread = nthread
+      )
     } else {
-      combo_twowayFit |>
-        aggregate(
-          delta_score = .deltaScore(
-            EC50_1_to_2 = EC50_proj_1_to_2,
-            EC50_2_to_1 = EC50_proj_2_to_1,
-            EC50_1 = EC50_1,
-            EC50_2 = EC50_2,
-            HS_1_to_2 = HS_proj_1_to_2,
-            HS_2_to_1 = HS_proj_2_to_1,
-            HS_1 = HS_1,
-            HS_2 = HS_2,
-            E_inf_1 = E_inf_1,
-            E_inf_2 = E_inf_2,
-            E_inf_2_to_1 = E_inf_proj_2_to_1,
-            E_inf_1_to_2 = E_inf_proj_1_to_2,
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose,
-            ZIP = ZIP
-          ),
-          by = combo_keys,
-          nthread = nthread
-        ) -> delta_scores
+      delta_scores <- aggregate(
+        combo_twowayFit,
+        delta_score = .deltaScore(
+          EC50_1_to_2 = EC50_proj_1_to_2,
+          EC50_2_to_1 = EC50_proj_2_to_1,
+          EC50_1 = EC50_1,
+          EC50_2 = EC50_2,
+          HS_1_to_2 = HS_proj_1_to_2,
+          HS_2_to_1 = HS_proj_2_to_1,
+          HS_1 = HS_1,
+          HS_2 = HS_2,
+          E_inf_1 = E_inf_1,
+          E_inf_2 = E_inf_2,
+          E_inf_2_to_1 = E_inf_proj_2_to_1,
+          E_inf_1_to_2 = E_inf_proj_1_to_2,
+          treatment1dose = treatment1dose,
+          treatment2dose = treatment2dose,
+          ZIP = ZIP
+        ),
+        by = combo_keys,
+        nthread = nthread
+      )
     }
   }
   if (show_Rsqr) {
