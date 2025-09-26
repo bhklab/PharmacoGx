@@ -12,37 +12,50 @@
 # @import caTools
 #' @keywords internal
 #' @noRd
-computeAUC_old <- function(conc, viability,
-                       conc_as_log = FALSE,
-                       viability_as_pct = TRUE,
-                       trunc=TRUE,
-                       verbose=TRUE,
-                       area.type=c("Fitted","Actual")) {
-    cleanData <- sanitizeInput(conc, viability,
-                             conc_as_log=conc_as_log,
-                             viability_as_pct=viability_as_pct,
-                             trunc=trunc, verbose=verbose)
-    log_conc <- cleanData[["log_conc"]]
-    viability <- cleanData[["viability"]]
+computeAUC_old <- function(
+  conc,
+  viability,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = TRUE,
+  area.type = c("Fitted", "Actual")
+) {
+  cleanData <- sanitizeInput(
+    conc,
+    viability,
+    conc_as_log = conc_as_log,
+    viability_as_pct = viability_as_pct,
+    trunc = trunc,
+    verbose = verbose
+  )
+  log_conc <- cleanData[["log_conc"]]
+  viability <- cleanData[["viability"]]
 
-#   ii <- which(concentration == 0)
-#   if(length(ii) > 0) {
-#     concentration <- concentration[-ii]
-#     viability <- viability[-ii]
-#   }
+  #   ii <- which(concentration == 0)
+  #   if(length(ii) > 0) {
+  #     concentration <- concentration[-ii]
+  #     viability <- viability[-ii]
+  #   }
 
-  if(missing(area.type)){
+  if (missing(area.type)) {
     area.type <- "Fitted"
   }
-  if(length(conc) < 2){
+  if (length(log_conc) < 2) {
     return(NA)
   }
-  if(area.type == "Actual"){
-    # if(trunc) {viability = pmin(as.numeric(viability), 100); viability = pmax(as.numeric(viability), 0)}
-    trapezoid.integral <- caTools::trapz(log10(as.numeric(conc) + 1) ,as.numeric(viability))
-    AUC <- round(1- (trapezoid.integral/trapz(log10(as.numeric(conc)), rep(100, length(viability)))), digits=2)
-  }else{
+  if (area.type == "Actual") {
+    trapezoid.integral <- caTools::trapz(
+      log_conc,
+      as.numeric(viability)
+    )
+    ref_level <- if (viability_as_pct) 100 else 1
+    AUC <- round(
+      1 - trapezoid.integral / caTools::trapz(log_conc, rep(ref_level, length(viability))),
+      digits = 2
+    )
+  } else {
     AUC <- .computeAUCUnderFittedCurve(conc, viability, trunc)
   }
-  return (AUC)
+  return(AUC)
 }

@@ -8,7 +8,7 @@
 \S4method{computeZIPdelta}{TreatmentResponseExperiment}(object, residual = "logcosh", nthread = 1L, show_Rsqr = FALSE)
 }
 \arguments{
-\item{object}{\link{TreatmentResponseExperiment}
+\item{object}{\link[CoreGx:TreatmentResponseExperiment]{CoreGx::TreatmentResponseExperiment}
 The \code{TreatmentResponseExperiment} from which to extract assays
 \code{mono_profile} and \code{combo_viability} to compute ZIP delta scores.}
 
@@ -30,7 +30,7 @@ Default 1.}
 Default FALSE.}
 }
 \value{
-\link{TreatmentResponseExperiment} with assay \code{combo_scores} containing \code{delta_scores}
+\link[CoreGx:TreatmentResponseExperiment]{CoreGx::TreatmentResponseExperiment} with assay \code{combo_scores} containing \code{delta_scores}
 }
 \description{
 Following the calculation of ZIP delta score as in Appendix A3.

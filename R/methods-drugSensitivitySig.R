@@ -63,19 +63,49 @@
 setMethod(
   "drugSensitivitySig",
   signature(object = "PharmacoSet"),
-  function(object, mDataType, drugs, features, cells, tissues, sensitivity.measure = "auc_recomputed",
-           molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
-           sensitivity.summary.stat = c("mean", "median", "first", "last"),
-           returnValues = c("estimate", "pvalue", "fdr"),
-           sensitivity.cutoff, standardize = c("SD", "rescale", "none"), molecular.cutoff = NA,
-           molecular.cutoff.direction = c("less", "greater"),
-           nthread = 1, parallel.on = c("drug", "gene"), modeling.method = c("anova", "pearson"),
-           inference.method = c("analytic", "resampling"), verbose = TRUE, ...) {
+  function(
+    object,
+    mDataType,
+    drugs,
+    features,
+    cells,
+    tissues,
+    sensitivity.measure = "auc_recomputed",
+    molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+    sensitivity.summary.stat = c("mean", "median", "first", "last"),
+    returnValues = c("estimate", "pvalue", "fdr"),
+    sensitivity.cutoff,
+    standardize = c("SD", "rescale", "none"),
+    molecular.cutoff = NA,
+    molecular.cutoff.direction = c("less", "greater"),
+    nthread = 1,
+    parallel.on = c("drug", "gene"),
+    modeling.method = c("anova", "pearson"),
+    inference.method = c("analytic", "resampling"),
+    verbose = TRUE,
+    ...
+  ) {
     .drugSensitivitySigPharmacoSet(
-      object, mDataType, drugs, features, cells, tissues, sensitivity.measure,
-      molecular.summary.stat, sensitivity.summary.stat, returnValues,
-      sensitivity.cutoff, standardize, molecular.cutoff, molecular.cutoff.direction,
-      nthread, parallel.on, modeling.method, inference.method, verbose, ...
+      object,
+      mDataType,
+      drugs,
+      features,
+      cells,
+      tissues,
+      sensitivity.measure,
+      molecular.summary.stat,
+      sensitivity.summary.stat,
+      returnValues,
+      sensitivity.cutoff,
+      standardize,
+      molecular.cutoff,
+      molecular.cutoff.direction,
+      nthread,
+      parallel.on,
+      modeling.method,
+      inference.method,
+      verbose,
+      ...
     )
   }
 )
@@ -83,26 +113,28 @@ setMethod(
 #' @import parallel
 #' @importFrom SummarizedExperiment assayNames assay
 #' @keywords internal
-.drugSensitivitySigPharmacoSet <- function(object,
-                                           mDataType,
-                                           drugs,
-                                           features,
-                                           cells,
-                                           tissues,
-                                           sensitivity.measure = "auc_recomputed",
-                                           molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
-                                           sensitivity.summary.stat = c("mean", "median", "first", "last"),
-                                           returnValues = c("estimate", "pvalue", "fdr"),
-                                           sensitivity.cutoff, standardize = c("SD", "rescale", "none"),
-                                           molecular.cutoff = NA,
-                                           molecular.cutoff.direction = c("less", "greater"),
-                                           nthread = 1,
-                                           parallel.on = c("drug", "gene"),
-                                           modeling.method = c("anova", "pearson"),
-                                           inference.method = c("analytic", "resampling"),
-                                           verbose = TRUE,
-                                           ...) {
-
+.drugSensitivitySigPharmacoSet <- function(
+  object,
+  mDataType,
+  drugs,
+  features,
+  cells,
+  tissues,
+  sensitivity.measure = "auc_recomputed",
+  molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
+  sensitivity.summary.stat = c("mean", "median", "first", "last"),
+  returnValues = c("estimate", "pvalue", "fdr"),
+  sensitivity.cutoff,
+  standardize = c("SD", "rescale", "none"),
+  molecular.cutoff = NA,
+  molecular.cutoff.direction = c("less", "greater"),
+  nthread = 1,
+  parallel.on = c("drug", "gene"),
+  modeling.method = c("anova", "pearson"),
+  inference.method = c("analytic", "resampling"),
+  verbose = TRUE,
+  ...
+) {
   ### This function needs to: Get a table of AUC values per cell line / drug
   ### Be able to recompute those values on the fly from raw data if needed to change concentration
   ### Be able to choose different summary methods on fly if needed (need to add annotation to table to tell what summary method previously used)
@@ -121,58 +153,107 @@ setMethod(
   modeling.method <- match.arg(modeling.method)
   inference.method <- match.arg(inference.method)
 
-
-
-  if (is.null(dots[["sProfiles"]]) & !all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))) {
-    stop(sprintf("Invalid sensitivity measure for %s, choose among: %s", annotation(object)$name, paste(colnames(sensitivityProfiles(object)), collapse = ", ")))
+  if (
+    is.null(dots[["sProfiles"]]) &
+      !all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))
+  ) {
+    stop(sprintf(
+      "Invalid sensitivity measure for %s, choose among: %s",
+      annotation(object)$name,
+      paste(colnames(sensitivityProfiles(object)), collapse = ", ")
+    ))
   }
 
   if (!(mDataType %in% names(molecularProfilesSlot(object)))) {
-    stop(sprintf("Invalid mDataType for %s, choose among: %s", annotation(object)$name, paste(names(molecularProfilesSlot(object)), collapse = ", ")))
+    stop(sprintf(
+      "Invalid mDataType for %s, choose among: %s",
+      annotation(object)$name,
+      paste(names(molecularProfilesSlot(object)), collapse = ", ")
+    ))
   }
-  switch(S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation,
+  switch(
+    S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation,
     "mutation" = {
       if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop("Molecular summary statistic for mutation must be either 'or' or 'and'")
+        stop(
+          "Molecular summary statistic for mutation must be either 'or' or 'and'"
+        )
       }
     },
     "fusion" = {
       if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop("Molecular summary statistic for fusion must be either 'or' or 'and'")
+        stop(
+          "Molecular summary statistic for fusion must be either 'or' or 'and'"
+        )
       }
     },
     "rna" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      if (
+        !is.element(
+          molecular.summary.stat,
+          c("mean", "median", "first", "last")
+        )
+      ) {
+        stop(
+          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
+        )
       }
     },
     "cnv" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop("Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'")
+      if (
+        !is.element(
+          molecular.summary.stat,
+          c("mean", "median", "first", "last")
+        )
+      ) {
+        stop(
+          "Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'"
+        )
       }
     },
     "rnaseq" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      if (
+        !is.element(
+          molecular.summary.stat,
+          c("mean", "median", "first", "last")
+        )
+      ) {
+        stop(
+          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
+        )
       }
     },
     "isoform" = {
-      if (!is.element(molecular.summary.stat, c("mean", "median", "first", "last"))) {
-        stop("Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'")
+      if (
+        !is.element(
+          molecular.summary.stat,
+          c("mean", "median", "first", "last")
+        )
+      ) {
+        stop(
+          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
+        )
       }
     },
-    stop(sprintf("No summary statistic for %s has been implemented yet", S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation))
+    stop(sprintf(
+      "No summary statistic for %s has been implemented yet",
+      S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation
+    ))
   )
 
-  if (!is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))) {
-    stop("Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'")
+  if (
+    !is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))
+  ) {
+    stop(
+      "Sensitivity summary statistic for sensitivity must be either 'mean', 'median', 'first' or 'last'"
+    )
   }
 
   if (missing(sensitivity.cutoff)) {
     sensitivity.cutoff <- NA
   }
   if (missing(drugs)) {
-    if(is.null(dots[["sProfiles"]])){
+    if (is.null(dots[["sProfiles"]])) {
       drugn <- drugs <- treatmentNames(object)
     } else {
       drugn <- drugs <- rownames(dots[["sProfiles"]])
@@ -206,7 +287,11 @@ setMethod(
   } else {
     fix <- is.element(features, rownames(featureInfo(object, mDataType)))
     if (verbose && !all(fix)) {
-      warning(sprintf("%i/%i features can be found", sum(fix), length(features)))
+      warning(sprintf(
+        "%i/%i features can be found",
+        sum(fix),
+        length(features)
+      ))
     }
     features <- features[fix]
   }
@@ -221,7 +306,8 @@ setMethod(
 
   if (is.null(dots[["sProfiles"]])) {
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
-      return(t(summarizeSensitivityProfiles(object,
+      return(t(summarizeSensitivityProfiles(
+        object,
         sensitivity.measure = sensitivity.measure,
         summary.stat = sensitivity.summary.stat,
         verbose = verbose
@@ -232,7 +318,8 @@ setMethod(
     drugpheno.all <- list(t(sProfiles))
   }
 
-  dix <- is.element(drugn, do.call(colnames, drugpheno.all))
+  drug_cols <- unique(unlist(lapply(drugpheno.all, colnames), use.names = FALSE))
+  dix <- is.element(drugn, drug_cols)
   if (verbose && !all(dix)) {
     warning(sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
   }
@@ -241,7 +328,8 @@ setMethod(
   }
   drugn <- drugn[dix]
 
-  cix <- is.element(celln, do.call(rownames, drugpheno.all))
+  cell_rows <- unique(unlist(lapply(drugpheno.all, rownames), use.names = FALSE))
+  cix <- is.element(celln, cell_rows)
   if (verbose && !all(cix)) {
     warning(sprintf("%i/%i cells can be found", sum(cix), length(celln)))
   }
@@ -267,16 +355,29 @@ setMethod(
 
   if (!is.null(dots[["mProfiles"]])) {
     mProfiles <- dots[["mProfiles"]]
-    SummarizedExperiment::assay(molecularProfilesSlot(object)[[mDataType]]) <- mProfiles[features, colnames(molecularProfilesSlot(object)[[mDataType]]), drop = FALSE]
+    SummarizedExperiment::assay(molecularProfilesSlot(object)[[
+      mDataType
+    ]]) <- mProfiles[
+      features,
+      colnames(molecularProfilesSlot(object)[[mDataType]]),
+      drop = FALSE
+    ]
   }
 
   drugpheno.all <- lapply(drugpheno.all, function(x) {
-    x[intersect(phenoInfo(object, mDataType)[, "sampleid"], celln), , drop = FALSE]
+    x[
+      intersect(phenoInfo(object, mDataType)[, "sampleid"], celln),
+      ,
+      drop = FALSE
+    ]
   })
 
   molcellx <- phenoInfo(object, mDataType)[, "sampleid"] %in% celln
 
-  type <- as.factor(sampleInfo(object)[phenoInfo(object, mDataType)[molcellx, "sampleid"], "tissueid"])
+  type <- as.factor(sampleInfo(object)[
+    phenoInfo(object, mDataType)[molcellx, "sampleid"],
+    "tissueid"
+  ])
 
   if ("batchid" %in% colnames(phenoInfo(object, mDataType))) {
     batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
@@ -293,63 +394,110 @@ setMethod(
 
   ### Calculate approximate number of perms needed
 
-
-
   if (is.null(dots[["req_alpha"]])) {
     req_alpha <- 0.05 / (nrow(molecularProfilesSlot(object)[[mDataType]])) ## bonferonni correction
   } else {
     req_alpha <- dots[["req_alpha"]]
   }
 
-
-
   # splitix <- parallel::splitIndices(nx = length(drugn), ncl = nthread_drug)
   # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-  mcres <- parallel::mclapply(seq_along(drugn), function(x, drugn, expr, drugpheno, type, batch, standardize, nthread, modeling.method, inference.method, req_alpha) {
-    res <- NULL
-    for (i in drugn[x]) {
-      ## using a linear model (x ~ concentration + cell + batch)
-      dd <- lapply(drugpheno, function(x) x[, i])
-      dd <- do.call(cbind, dd)
-      colnames(dd) <- seq_len(ncol(dd))
-      if (!is.na(sensitivity.cutoff)) {
-        dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels = c(0, 1))
+  mcres <- parallel::mclapply(
+    seq_along(drugn),
+    function(
+      x,
+      drugn,
+      expr,
+      drugpheno,
+      type,
+      batch,
+      standardize,
+      nthread,
+      modeling.method,
+      inference.method,
+      req_alpha
+    ) {
+      res <- NULL
+      for (i in drugn[x]) {
+        ## using a linear model (x ~ concentration + cell + batch)
+        dd <- lapply(drugpheno, function(x) x[, i])
+        dd <- do.call(cbind, dd)
+        colnames(dd) <- seq_len(ncol(dd))
+        if (!is.na(sensitivity.cutoff)) {
+          dd <- factor(ifelse(dd > sensitivity.cutoff, 1, 0), levels = c(0, 1))
+        }
+        rr <- rankGeneDrugSensitivity(
+          data = expr,
+          drugpheno = dd,
+          type = type,
+          batch = batch,
+          single.type = FALSE,
+          standardize = standardize,
+          nthread = nthread,
+          verbose = verbose,
+          modeling.method = modeling.method,
+          inference.method = inference.method,
+          req_alpha
+        )
+        res <- c(res, list(rr$all))
       }
-      rr <- rankGeneDrugSensitivity(data = expr, drugpheno = dd, type = type, batch = batch, single.type = FALSE, standardize = standardize, nthread = nthread, verbose = verbose, modeling.method = modeling.method, inference.method = inference.method, req_alpha)
-      res <- c(res, list(rr$all))
-    }
-    names(res) <- drugn[x]
-    return(res)
-  },
-  drugn = drugn, expr = t(molecularProfiles(object, mDataType)[features, molcellx, drop = FALSE]),
-  drugpheno = drugpheno.all, type = type, batch = batch, nthread = nthread_gene, standardize = standardize,
-  modeling.method = modeling.method, inference.method = inference.method,
-  req_alpha = req_alpha, mc.cores = nthread_drug, mc.preschedule = FALSE
+      names(res) <- drugn[x]
+      return(res)
+    },
+    drugn = drugn,
+    expr = t(molecularProfiles(object, mDataType)[
+      features,
+      molcellx,
+      drop = FALSE
+    ]),
+    drugpheno = drugpheno.all,
+    type = type,
+    batch = batch,
+    nthread = nthread_gene,
+    standardize = standardize,
+    modeling.method = modeling.method,
+    inference.method = inference.method,
+    req_alpha = req_alpha,
+    mc.cores = nthread_drug,
+    mc.preschedule = FALSE
   )
 
   res <- do.call(c, mcres)
   res <- res[!vapply(res, is.null, FUN.VALUE = logical(1))]
-  drug.sensitivity <- array(NA,
+  drug.sensitivity <- array(
+    NA,
     dim = c(
       nrow(featureInfo(object, mDataType)[features, , drop = FALSE]),
-      length(res), ncol(res[[1]])
+      length(res),
+      ncol(res[[1]])
     ),
-    dimnames = list(rownames(featureInfo(object, mDataType)[features, , drop = FALSE]), names(res), colnames(res[[1]]))
+    dimnames = list(
+      rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      names(res),
+      colnames(res[[1]])
+    )
   )
   for (j in seq_len(ncol(res[[1]]))) {
-    ttt <- vapply(res, function(x, j, k) {
-      xx <- array(NA, dim = length(k), dimnames = list(k))
-      xx[rownames(x)] <- x[, j, drop = FALSE]
-      return(xx)
-    },
-    j = j,
-    k = rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
-    FUN.VALUE = numeric(dim(drug.sensitivity)[1])
+    ttt <- vapply(
+      res,
+      function(x, j, k) {
+        xx <- array(NA, dim = length(k), dimnames = list(k))
+        xx[rownames(x)] <- x[, j, drop = FALSE]
+        return(xx)
+      },
+      j = j,
+      k = rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      FUN.VALUE = numeric(dim(drug.sensitivity)[1])
     )
-    drug.sensitivity[rownames(featureInfo(object, mDataType)[features, , drop = FALSE]), names(res), j] <- ttt
+    drug.sensitivity[
+      rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      names(res),
+      j
+    ] <- ttt
   }
 
-  drug.sensitivity <- PharmacoSig(drug.sensitivity,
+  drug.sensitivity <- PharmacoSig(
+    drug.sensitivity,
     PSetName = name(object),
     Call = as.character(match.call()),
     SigType = "Sensitivity",

@@ -18,13 +18,24 @@
 #' @param verbose `logical` should warnings be printed
 #' @return The numerical Amax
 #' @export
-computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
+computeAmax <- function(
+  concentration,
+  viability,
+  trunc = TRUE,
+  verbose = FALSE
+) {
   concentration <- as.numeric(concentration[!is.na(concentration)])
   viability <- as.numeric(viability[!is.na(viability)])
   ii <- which(concentration == 0)
-  if(length(ii) > 0) {
+  if (length(ii) > 0) {
     concentration <- concentration[-ii]
     viability <- viability[-ii]
+  }
+  if (length(concentration) < 2) {
+    if (verbose) warning("Insufficient non-zero concentrations for curve fitting")
+    x <- NA_real_
+    names(x) <- "Amax"
+    return(x)
   }
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
@@ -53,11 +64,11 @@ computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
     stop("Concentration vector contains negative data.")
   }
 
-  if (min(viability) < 0 & verbose) {
+  if (min(viability) < 0 && verbose) {
     warning("Warning: Negative viability data.")
   }
 
-  if (max(viability) > 100 & verbose) {
+  if (max(viability) > 100 && verbose) {
     warning("Warning: Viability data exceeds negative control.")
   }
 
@@ -71,13 +82,14 @@ computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   }
 
   #FIT CURVE AND CALCULATE IC50
-  pars <- unlist(logLogisticRegression(log_conc,
-                                       viability,
-                                       conc_as_log = TRUE,
-                                       viability_as_pct = FALSE,
-                                       trunc = trunc))
+  pars <- unlist(logLogisticRegression(
+    log_conc,
+    viability,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE,
+    trunc = trunc
+  ))
   x <- 100 - .Hill(max(log_conc), pars) * 100
   names(x) <- "Amax"
   return(x)
-
 }

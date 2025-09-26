@@ -1,18 +1,16 @@
 .onLoad <- function(libname, pkgname) {
   options(PharmacoGx_useC = TRUE) # setting default option for using c code across package
-
 }
 # Package Start-up Functions
 
 .onAttach <- function(libname, pkgname) {
+  if (interactive() && is.null(options('bhklab.startup_'))) {
+    oldOpts <- options()
+    options(warn = -1)
+    on.exit(options(oldOpts))
 
-    if (interactive() && is.null(options('bhklab.startup_'))) {
-        oldOpts <- options()
-        options(warn=-1)
-        on.exit(options(oldOpts))
-
-        packageStartupMessage(
-        "
+    packageStartupMessage(
+      "
 PharmacoGx package brought to you by:
 
 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557  \u2588\u2588\u2557\u2588\u2588\u2557  \u2588\u2588\u2557\u2588\u2588\u2557      \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557
@@ -26,8 +24,8 @@ For more of our work visit bhklab.ca!
 
 Like PharmacoGx? Check out our companion web-app at PharmacoDB.ca.
         "
-        )
-        # Prevent repeated messages when loading multiple lab packages
-        options(bhklab.startup_=FALSE)
-    }
+    )
+    # Prevent repeated messages when loading multiple lab packages
+    options(bhklab.startup_ = FALSE)
+  }
 }

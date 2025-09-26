@@ -49,8 +49,9 @@ than a percentage, and that E_inf passed in as decimal.}
 \item{trunc}{\code{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
 
-\item{n}{\code{numeric} The percentile concentration to compute. If viability_as_pct set, assumed to be percentage, otherwise
-assumed to be a decimal value.}
+\item{n}{\code{numeric} The percentile concentration to compute. If viability_as_pct is TRUE it is treated as a
+percent inhibition (e.g., \code{n = 10} finds the concentration that leaves 90\% viability); otherwise it is
+assumed to be a decimal fraction.}
 }
 \value{
 \code{numeric(1)} The ICn of the Hill curve over the specified dose
@@ -69,7 +70,7 @@ of a Hill Slope returned by logLogisticRegression can be passed in if they alrea
 
 }}
 \examples{
-dose <- c(0.0025,0.008,0.025,0.08,0.25,0.8,2.53,8) 
+dose <- c(0.0025,0.008,0.025,0.08,0.25,0.8,2.53,8)
 viability <- c(108.67,111,102.16,100.27,90,87,74,57)
 computeIC50(dose, viability)
 computeICn(dose, viability, n=10)

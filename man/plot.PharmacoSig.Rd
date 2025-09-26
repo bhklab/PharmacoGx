@@ -52,7 +52,7 @@ can be easily customized as any other ggplot.
 }
 \examples{
 data(GDSCsmall)
-drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna", 
+drug.sensitivity <- drugSensitivitySig(GDSCsmall, mDataType="rna",
              nthread=1, features = fNames(GDSCsmall, "rna")[1])
 plot(drug.sensitivity)
 

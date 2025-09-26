@@ -13,8 +13,8 @@ data(GDSCsmall)
 \description{
 A small example version of the Genomics of Drug Sensitivity in Cancer Project
 PharmacoSet, used in the documentation examples. All credit for the data goes
-to the Genomics of Drug Sensitivity in Cancer Project group at the Sanger.This is not a full version of the dataset, most of
-of the dataset was removed to make runnable example code. For the full dataset,
+to the Genomics of Drug Sensitivity in Cancer Project group at the Sanger. This is not a full version of the dataset; most of
+the dataset was removed to make runnable example code. For the full dataset,
 please download using the downloadPSet function.
 }
 \references{
