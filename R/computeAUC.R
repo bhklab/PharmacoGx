@@ -31,6 +31,7 @@
 #'
 #' @export
 #' @import caTools
+#' @importFrom stats integrate
 computeAUC <- function(
   concentration,
   viability,
@@ -111,19 +112,34 @@ computeAUC <- function(
     trapezoid.integral <- caTools::trapz(concentration, viability)
     AUC <- 1 - trapezoid.integral / (b - a)
   } else {
-    if (pars[2] == 1) {
-      AUC <- 0
-    } else if (pars[1] == 0) {
-      AUC <- (1 - pars[2]) / 2
+    if (b == a) {
+      return(NA_real_)
+    }
+
+    if (length(pars) >= 8 && all(c(
+      "HS1", "E0", "E_inf1", "HS2", "E_inf2",
+      "log10EC50_1", "log10EC50_2", "Frac"
+    ) %in% names(pars))) {
+      curve_fun <- .pgx_biphasic_curve
+      param_vec <- unname(pars[c(
+        "HS1", "E0", "E_inf1", "HS2", "E_inf2",
+        "log10EC50_1", "log10EC50_2", "Frac"
+      )])
     } else {
-      AUC <- as.numeric(
-        (1 - pars[2]) /
-          (pars[1] * (b - a)) *
-          log10(
-            (1 + (10^(b - pars[3]))^pars[1]) /
-              (1 + (10^(a - pars[3]))^pars[1])
-          )
-      )
+      curve_fun <- .pgx_hill_curve
+      param_vec <- unname(pars[c("HS", "E0", "E_inf", "log10EC50")])
+    }
+
+    integral <- try(stats::integrate(
+      f = function(x) curve_fun(x, param_vec),
+      lower = a,
+      upper = b
+    ), silent = TRUE)
+
+    if (inherits(integral, "try-error")) {
+      AUC <- NA_real_
+    } else {
+      AUC <- 1 - integral$value / (b - a)
     }
   }
 

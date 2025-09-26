@@ -269,12 +269,21 @@
 
 ## predict viability from concentration data and curve parameters
 .Hill <- function(x, pars) {
-  return(pars[2] + (1 - pars[2]) / (1 + (10^x / 10^pars[3])^pars[1]))
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
+  )
+
+  .pgx_hill_curve(
+    x,
+    unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
+  )
 }
 
 ## calculate residual of fit
 ## FIXME:: Why is this different from CoreGx?
-#' @importFrom CoreGx .dmedncauchys .dmednnormals .edmednnormals .edmedncauchys
+#' @importFrom CoreGx .dmedncauchys .edmedncauchys
 .residual <- function(
   x,
   y,
@@ -285,170 +294,65 @@
   trunc = FALSE
 ) {
   family <- match.arg(family)
-  Cauchy_flag = (family == "Cauchy")
-  if (Cauchy_flag == FALSE) {
-    # return(sum((.Hill(x, pars) - y) ^ 2))
-    diffs <- .Hill(x, pars) - y
-    if (trunc == FALSE) {
-      return(sum(-log(.dmednnormals(diffs, n, scale))))
-    } else {
-      down_truncated <- abs(y) >= 1
-      up_truncated <- abs(y) <= 0
-
-      # For up truncated, integrate the cauchy dist up until -
-      #>because anything less gets truncated to 0, and thus the residual
-      #>is -diff, and the prob function becomes discrete For
-      #>down_truncated, 1-cdf(diffs)=cdf(-diffs)
-      return(
-        sum(
-          -log(.dmednnormals(diffs[!(down_truncated | up_truncated)], n, scale))
-        ) +
-          sum(
-            -log(.edmednnormals(
-              -diffs[up_truncated | down_truncated],
-              n,
-              scale
-            ))
-          )
-      )
-    }
-  } else {
-    diffs <- .Hill(x, pars) - y
-    if (trunc == FALSE) {
-      return(sum(-log(.dmedncauchys(diffs, n, scale))))
-    } else {
-      down_truncated <- abs(y) >= 1
-      up_truncated <- abs(y) <= 0
-      # For up truncated, integrate the cauchy dist up until -diff because
-      #> anything less gets truncated to 0, and thus the residual is -diff,
-      #>and the prob function becomes discrete For down_truncated,
-      #>1 - cdf(diffs) = cdf(-diffs)
-      return(
-        sum(
-          -log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))
-        ) +
-          sum(
-            -log(.edmedncauchys(
-              -diffs[up_truncated | down_truncated],
-              n,
-              scale
-            ))
-          )
-      )
-    }
-  }
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
+  )
+  sum(.pgx_curve_residual(
+    x = x,
+    y = y,
+    n = n,
+    pars = unname(internal[c("HS", "E0", "E_inf", "log10EC50")]),
+    f = .pgx_hill_curve,
+    scale = scale,
+    family = family,
+    trunc = trunc,
+    delta = 1
+  ))
 }
 
 ##FIXME:: Why is this different from CoreGx?
 .meshEval <- function(
   log_conc,
   viability,
-  lower_bounds = c(0, 0, -6),
-  upper_bounds = c(4, 1, 6),
-  density = c(2, 10, 2),
+  lower_bounds = NULL,
+  upper_bounds = NULL,
+  density = NULL,
   scale = 0.07,
   n = 1,
   family = c("normal", "Cauchy"),
   trunc = FALSE
 ) {
   family <- match.arg(family)
-  guess <- c(
-    pmin(pmax(1, lower_bounds[1]), upper_bounds[1]),
-    pmin(pmax(min(viability), lower_bounds[2]), upper_bounds[2]),
-    pmin(
-      pmax(log_conc[which.min(abs(viability - 1 / 2))], lower_bounds[3]),
-      upper_bounds[3]
-    )
+  bounds <- .pgx_prepare_bounds(
+    log_conc = log_conc,
+    density = density,
+    step = NULL,
+    lower_bounds = lower_bounds,
+    upper_bounds = upper_bounds,
+    fit_type = "hill"
   )
-  guess_residual <- .residual(
-    log_conc,
-    viability,
-    pars = guess,
+  guess <- .pgx_initial_guess(
+    log_conc = log_conc,
+    viability = viability,
+    lower_bounds = bounds$lower,
+    upper_bounds = bounds$upper,
+    fit_type = "hill"
+  )
+  .pgx_mesh_eval(
+    x = log_conc,
+    y = viability,
+    f = .pgx_hill_curve,
+    guess = unname(guess),
+    lower_bounds = bounds$lower,
+    upper_bounds = bounds$upper,
+    density = bounds$density,
     n = n,
     scale = scale,
     family = family,
     trunc = trunc
   )
-  for (i in seq(
-    from = lower_bounds[1],
-    to = upper_bounds[1],
-    by = 1 / density[1]
-  )) {
-    for (j in seq(
-      from = lower_bounds[2],
-      to = upper_bounds[2],
-      by = 1 / density[2]
-    )) {
-      for (k in seq(
-        from = lower_bounds[3],
-        to = upper_bounds[3],
-        by = 1 / density[3]
-      )) {
-        test_guess_residual <- .residual(
-          log_conc,
-          viability,
-          pars = c(i, j, k),
-          n = n,
-          scale = scale,
-          family = family,
-          trunc = trunc
-        )
-        if (!is.finite(test_guess_residual)) {
-          warning(paste0(
-            " Test Guess Residual is: ",
-            test_guess_residual,
-            "\n Other Pars: log_conc: ",
-            paste(log_conc, collapse = ", "),
-            "\n Viability: ",
-            paste(viability, collapse = ", "),
-            "\n Scale: ",
-            scale,
-            "\n Family: ",
-            family,
-            "\n Trunc ",
-            trunc,
-            "\n HS: ",
-            i,
-            ", Einf: ",
-            j,
-            ", logEC50: ",
-            k,
-            "\n n: ",
-            n
-          ))
-        }
-        if (!length(test_guess_residual)) {
-          warning(paste0(
-            " Test Guess Residual is: ",
-            test_guess_residual,
-            "\n Other Pars: log_conc: ",
-            paste(log_conc, collapse = ", "),
-            "\n Viability: ",
-            paste(viability, collapse = ", "),
-            "\n Scale: ",
-            scale,
-            "\n Family: ",
-            family,
-            "\n Trunc ",
-            trunc,
-            "\n HS: ",
-            i,
-            ", Einf: ",
-            j,
-            ", logEC50: ",
-            k,
-            "\n n: ",
-            n
-          ))
-        }
-        if (test_guess_residual < guess_residual) {
-          guess <- c(i, j, k)
-          guess_residual <- test_guess_residual
-        }
-      }
-    }
-  }
-  return(guess)
 }
 
 ## FIXME:: Documentation?
@@ -481,12 +385,18 @@
     viability_as_pct = FALSE,
     trunc = trunc
   ))
-  x <- .getSupportVec(log_conc)
-  return(
-    1 -
-      trapz(x, .Hill(x, pars)) /
-        (log_conc[length(log_conc)] - log_conc[1])
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
   )
+  x <- .getSupportVec(log_conc)
+  y_hat <- .pgx_hill_curve(
+    x,
+    unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
+  )
+  1 - caTools::trapz(x, y_hat) /
+    (log_conc[length(log_conc)] - log_conc[1])
 }
 
 #This function is being used in computeSlope

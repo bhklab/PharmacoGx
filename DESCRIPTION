@@ -86,6 +86,7 @@ Collate:
     'computeSynergy.R'
     'connectivityScore.R'
     'cosinePerm.R'
+    'curveFittingPGX.R'
     'datasets.R'
     'downloadPSet.R'
     'downloadSignatures.R'

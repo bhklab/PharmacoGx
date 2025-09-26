@@ -48,19 +48,26 @@ computeDSS <- function(
     concentration <- cleanData[["log_conc"]]
   }
 
-  if (pars[[3]] > max(concentration)) {
+  log_ec50 <- pars[["log10EC50"]]
+  if (log_ec50 > max(concentration)) {
     return(0)
   }
 
   if (!viability_as_pct) {
-    t_param = t_param * 100
-    pars[[2]] <- pars[[2]] * 100
+    t_param <- t_param * 100
   }
+
+  hill_external <- list(
+    HS = pars[["HS"]],
+    E0 = pars[["E0"]] * 100,
+    E_inf = pars[["E_inf"]] * 100,
+    EC50 = pars[["log10EC50"]]
+  )
 
   x2 = max(concentration)
   x1 = computeICn(
     concentration = concentration,
-    Hill_fit = unlist(pars),
+    Hill_fit = hill_external,
     n = t_param,
     conc_as_log = TRUE,
     viability_as_pct = TRUE
@@ -72,16 +79,16 @@ computeDSS <- function(
   x1 <- max(x1, min(concentration))
 
   if (censor) {
-    if (pars[[2]] > 50) {
+    if (hill_external$E_inf > 50) {
       return(NA)
-    } else if (all(concentration < pars[[3]])) {
+    } else if (all(concentration < log_ec50)) {
       return(0)
     }
   }
 
   AUC <- computeAUC(
     concentration = c(x1, x2),
-    Hill_fit = unlist(pars),
+    Hill_fit = hill_external,
     conc_as_log = TRUE,
     viability_as_pct = TRUE,
     verbose = verbose,
@@ -93,7 +100,7 @@ computeDSS <- function(
   if (dss_type == 1) {
     return(DSS)
   }
-  DSS <- DSS / log(100 - pars[[2]])
+  DSS <- DSS / log(100 - hill_external$E_inf)
   if (dss_type == 2) {
     return(DSS)
   }

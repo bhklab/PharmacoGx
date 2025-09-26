@@ -75,23 +75,39 @@ computeICn <- function(
       "Insufficient information to calculate ICn. Please enter concentration and viability or Hill parameters."
     )
   }
-  if (viability_as_pct) {
-    n <- n / 100
+  target <- if (viability_as_pct) {
+    1 - (n / 100)
+  } else {
+    1 - n
   }
 
-  n <- 1 - n
+  e0 <- pars[["E0"]]
+  einf <- pars[["E_inf"]]
+  hs <- pars[["HS"]]
+  log_ec50 <- pars[["log10EC50"]]
 
-  if (n < pars[2] || n > 1) {
-    return(NA_real_)
-  } else if (n == pars[2]) {
-    return(Inf)
-  } else if (n == 1) {
+  top <- max(e0, einf)
+  bottom <- min(e0, einf)
+
+  if (target >= top) {
     return(ifelse(conc_as_log, -Inf, 0))
+  }
+  if (target < bottom) {
+    return(Inf)
+  }
+  if (hs <= 0) {
+    return(NA_real_)
+  }
+
+  ratio <- (e0 - einf) / (target - einf) - 1
+  if (!is.finite(ratio) || ratio <= 0) {
+    return(NA_real_)
+  }
+
+  log_icn <- log_ec50 + (1 / hs) * log10(ratio)
+  if (conc_as_log) {
+    log_icn
   } else {
-    return(ifelse(
-      conc_as_log,
-      log10(10^pars[3] * ((n - 1) / (pars[2] - n))^(1 / pars[1])),
-      10^pars[3] * ((n - 1) / (pars[2] - n))^(1 / pars[1])
-    ))
+    10^log_icn
   }
 }
