@@ -204,8 +204,20 @@ setMethod(
     ucell <- setdiff(cell.lines, duplix)
 
     ## keep the non ambiguous cases
-    dd2 <- dd[, match(ucell, pp[, "sampleid"]), drop = FALSE]
-    pp2 <- pp[match(ucell, pp[, "sampleid"]), , drop = FALSE]
+    ucell_idx <- match(ucell, pp[, "sampleid"])
+    missing_ucell <- is.na(ucell_idx) & !is.na(ucell)
+    if (any(missing_ucell)) {
+      alt_idx <- match(ucell[missing_ucell], rownames(pp))
+      ucell_idx[missing_ucell] <- alt_idx
+    }
+    dd_idx <- match(ucell, pp[, "sampleid"])
+    if (any(missing_ucell)) {
+      alt_dd <- match(ucell[missing_ucell], colnames(dd))
+      dd_idx[missing_ucell] <- alt_dd
+    }
+    dd2 <- dd[, dd_idx, drop = FALSE]
+    pp2 <- pp[ucell_idx, , drop = FALSE]
+    rownames(pp2) <- ucell
     if (length(duplix) > 0) {
       if (verbose) {
         message(sprintf(
