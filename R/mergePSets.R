@@ -172,7 +172,7 @@ mergePSets <- function(mDataPSet, sensDataPSet, commonCellsOnly = FALSE, ...) {
 
   annotation(mergePSet)$dateCreated <- date()
 
-  checkPSetStructure(mergePSet)
+  checkPsetStructure(mergePSet)
 
   return(mergePSet)
 }
