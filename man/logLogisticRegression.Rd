@@ -47,9 +47,10 @@ and base-10 logarithm of the EC50 parameters, respectively.}
 
 \item{scale}{is a positive real number specifying the shape parameter of the Cauchy distribution.}
 
-\item{family}{\code{character}, if "cauchy", uses MLE under an assumption of Cauchy-distributed errors
-instead of sum-of-squared-residuals as the objective function for assessing goodness-of-fit of
-dose-response curves to the data. Otherwise, if "normal", uses MLE with a gaussian assumption of errors}
+\item{family}{\code{character}, choose "normal" or "cauchy" (case insensitive). If "cauchy",
+uses MLE under an assumption of Cauchy-distributed errors instead of sum-of-squared-residuals
+as the objective function for assessing goodness-of-fit of dose-response curves to the data.
+Otherwise, if "normal", uses MLE with a gaussian assumption of errors}
 
 \item{median_n}{If the viability points being fit were medians of measurements, they are expected to follow a median of \code{family}
 distribution, which is in general quite different from the case of one measurement. Median_n is the number of measurements
@@ -68,7 +69,7 @@ curve-fitting is performed.}
 \item{verbose}{\code{logical}, if true, causes warnings thrown by the function to be printed.}
 }
 \value{
-A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquared, which is the R^2 of the fit.
+A list containing estimates for HS, E_inf, and EC50. It is annotated with the attribute Rsquare, which is the R^2 of the fit.
 Note that this is calculated using the values actually used for the fit, after truncation and any transform applied. With truncation, this will be
 different from the R^2 compared to the variance of the raw data. This also means that if all points were truncated down or up, there is no variance
 in the data, and the R^2 may be NaN.

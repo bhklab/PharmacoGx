@@ -1,5 +1,29 @@
 # ==== Loewe Additivity
 
+utils::globalVariables(c(
+  "EC50_1",
+  "EC50_2",
+  "EC50_proj_1_to_2",
+  "EC50_proj_2_to_1",
+  "E_inf_1",
+  "E_inf_2",
+  "E_inf_proj_1_to_2",
+  "E_inf_proj_2_to_1",
+  "HS_1",
+  "HS_2",
+  "HS_proj_1_to_2",
+  "HS_proj_2_to_1",
+  "Rsqr_1_to_2",
+  "Rsqr_2_to_1",
+  "ZIP",
+  "combo_viability",
+  "treatment1dose",
+  "treatment1id",
+  "treatment2dose",
+  "treatment2id",
+  "x"
+))
+
 #' @title Inverse function of Hill equation
 #'
 #' @description
@@ -37,30 +61,6 @@
 #'
 #' @importFrom checkmate assertLogical
 #' @export
-utils::globalVariables(c(
-  "EC50_1",
-  "EC50_2",
-  "EC50_proj_1_to_2",
-  "EC50_proj_2_to_1",
-  "E_inf_1",
-  "E_inf_2",
-  "E_inf_proj_1_to_2",
-  "E_inf_proj_2_to_1",
-  "HS_1",
-  "HS_2",
-  "HS_proj_1_to_2",
-  "HS_proj_2_to_1",
-  "Rsqr_1_to_2",
-  "Rsqr_2_to_1",
-  "ZIP",
-  "combo_viability",
-  "treatment1dose",
-  "treatment1id",
-  "treatment2dose",
-  "treatment2id",
-  "x"
-))
-
 effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
   assertLogical(is_pct, len = 1)
   if (is_pct) {

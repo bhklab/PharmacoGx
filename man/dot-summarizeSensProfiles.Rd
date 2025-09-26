@@ -12,7 +12,7 @@
   sample_col = "sampleid",
   cell.lines,
   drugs,
-  summary.stat,
+  summary.stat = c("mean", "median", "first", "last", "max", "min"),
   fill.missing = TRUE
 )
 }

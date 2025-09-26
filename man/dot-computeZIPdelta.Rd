@@ -79,7 +79,7 @@ See reference for details.
 \dontrun{
 ## ZIP is optional. Will be recomputed if not provided.
 combo_profiles <- CoreGx::buildComboProfiles(
-     tre, 
+     tre,
      c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
 combo_profiles[,
         .computeZIPdelta(

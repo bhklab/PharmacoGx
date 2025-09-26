@@ -2,7 +2,7 @@
 % Please edit documentation in R/matthewCor.R
 \name{mcc}
 \alias{mcc}
-\title{Compute a Mathews Correlation Coefficient}
+\title{Compute a Matthews Correlation Coefficient}
 \usage{
 mcc(x, y, nperm = 1000, nthread = 1)
 }

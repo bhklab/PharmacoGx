@@ -14,7 +14,7 @@ fitTwowayZIP(
 )
 }
 \arguments{
-\item{combo_profiles}{\link{data.table} contains three parameters of dose-response curves
+\item{combo_profiles}{\link[data.table:data.table]{data.table::data.table} contains three parameters of dose-response curves
 for each single agent in a drug comnbination,
 and the observed viability of two treatments combined.}
 
@@ -39,7 +39,7 @@ considering the truncated probability distribution (as in their names) for the r
 These get passed to losss via \code{do.call} analagously to using \code{...}.}
 }
 \value{
-\link{data.table} contains parameters of projected dose-response curves
+\link[data.table:data.table]{data.table::data.table} contains parameters of projected dose-response curves
 for adding one treatment to the other.
 }
 \description{
