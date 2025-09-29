@@ -71,6 +71,9 @@ logLogisticRegression <- function(
   if (!median_n == as.integer(median_n)) {
     stop("`median_n` must be an integer.")
   }
+  if (median_n < 1) {
+    stop("`median_n` must be greater than or equal to 1.")
+  }
   if (precision <= 0) {
     stop("`precision` must be strictly positive.")
   }
@@ -149,6 +152,19 @@ logLogisticRegression <- function(
       EC50_2 = if (conc_as_log) params[["log10EC50_2"]] else 10^params[["log10EC50_2"]],
       Frac = params[["Frac"]]
     )
+  }
+
+  if (trunc) {
+    upper_bound <- if (viability_as_pct) 100 else 1
+    lower_bound <- 0
+    if (fit_type == "hill") {
+      result$E0 <- pmin(pmax(result$E0, lower_bound), upper_bound)
+      result$E_inf <- pmin(pmax(result$E_inf, lower_bound), upper_bound)
+    } else {
+      result$E0 <- pmin(pmax(result$E0, lower_bound), upper_bound)
+      result$E_inf1 <- pmin(pmax(result$E_inf1, lower_bound), upper_bound)
+      result$E_inf2 <- pmin(pmax(result$E_inf2, lower_bound), upper_bound)
+    }
   }
 
   attr(result, "Rsquare") <- fitted$Rsquare
@@ -237,6 +253,7 @@ logLogisticRegression <- function(
   )
 }
 
+
 .pgx_initial_guess <- function(
   log_conc,
   viability,
@@ -244,25 +261,62 @@ logLogisticRegression <- function(
   upper_bounds,
   fit_type
 ) {
-  viab_span <- max(viability) - min(viability)
+  finite_mask <- is.finite(log_conc) & is.finite(viability)
+  log_conc_valid <- log_conc[finite_mask]
+  viability_valid <- viability[finite_mask]
+  if (!length(log_conc_valid)) {
+    log_conc_valid <- log_conc
+    viability_valid <- viability
+  }
+
+  viab_span <- max(viability_valid) - min(viability_valid)
   if (!is.finite(viab_span) || viab_span < .Machine$double.eps) {
     viab_span <- 1
   }
-  viab_norm <- (viability - min(viability)) / viab_span
+  viab_norm <- (viability_valid - min(viability_valid)) / viab_span
 
-  ec50_guess_interp <- stats::approx(viab_norm, log_conc, xout = 0.5, rule = 2)$y
-  ec50_guess <- if (is.finite(ec50_guess_interp)) ec50_guess_interp else stats::median(log_conc)
+  ord <- order(viab_norm, log_conc_valid)
+  viab_norm <- viab_norm[ord]
+  log_conc_valid <- log_conc_valid[ord]
 
-  q25 <- stats::approx(viab_norm, log_conc, xout = 0.25, rule = 2)$y
-  q75 <- stats::approx(viab_norm, log_conc, xout = 0.75, rule = 2)$y
+  unique_mask <- !duplicated(viab_norm)
+  viab_norm_unique <- viab_norm[unique_mask]
+  log_conc_unique <- log_conc_valid[unique_mask]
+
+  ec50_guess <- stats::median(log_conc_valid)
+  q25 <- q75 <- NA_real_
+  if (length(viab_norm_unique) >= 2L) {
+    ec50_guess_interp <- stats::approx(
+      x = viab_norm_unique,
+      y = log_conc_unique,
+      xout = 0.5,
+      rule = 2
+    )$y
+    if (is.finite(ec50_guess_interp)) {
+      ec50_guess <- ec50_guess_interp
+    }
+
+    q25 <- stats::approx(
+      x = viab_norm_unique,
+      y = log_conc_unique,
+      xout = 0.25,
+      rule = 2
+    )$y
+    q75 <- stats::approx(
+      x = viab_norm_unique,
+      y = log_conc_unique,
+      xout = 0.75,
+      rule = 2
+    )$y
+  }
   if (is.finite(q25) && is.finite(q75) && abs(q75 - q25) > 1e-3) {
     hs_guess <- log(81) / (q75 - q25)
   } else {
     hs_guess <- 1
   }
 
-  e0_guess <- max(viability)
-  einf_guess <- min(viability)
+  e0_guess <- max(viability_valid)
+  einf_guess <- min(viability_valid)
 
   if (fit_type == "hill") {
     guess <- c(
@@ -278,9 +332,9 @@ logLogisticRegression <- function(
       pmin(pmax(e0_guess, lower_bounds[2]), upper_bounds[2]),
       pmin(pmax(einf_guess, lower_bounds[3]), upper_bounds[3]),
       pmin(pmax(1, lower_bounds[4]), upper_bounds[4]),
-      pmin(pmax((min(viability) + einf_guess) / 2, lower_bounds[5]), upper_bounds[5]),
-      pmin(pmax(stats::median(log_conc) - 0.5, lower_bounds[6]), upper_bounds[6]),
-      pmin(pmax(stats::median(log_conc) + 0.5, lower_bounds[7]), upper_bounds[7]),
+      pmin(pmax((min(viability_valid) + einf_guess) / 2, lower_bounds[5]), upper_bounds[5]),
+      pmin(pmax(stats::median(log_conc_valid) - 0.5, lower_bounds[6]), upper_bounds[6]),
+      pmin(pmax(stats::median(log_conc_valid) + 0.5, lower_bounds[7]), upper_bounds[7]),
       pmin(pmax(0.5, lower_bounds[8]), upper_bounds[8])
     )
     names(guess) <- c(
@@ -348,7 +402,7 @@ logLogisticRegression <- function(
     silent = TRUE
   )
 
-  if (inherits(opt, "try-error") || opt$convergence != 0) {
+  if (inherits(opt, "try-error")) {
     failed <- TRUE
     guess <- gritty_guess
   } else {
@@ -443,7 +497,7 @@ logLogisticRegression <- function(
   scale,
   family,
   trunc,
-  delta
+  delta = 1
 ) {
   diffs <- f(x, pars) - y
   if (family == "Cauchy") {

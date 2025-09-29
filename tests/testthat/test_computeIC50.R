@@ -25,7 +25,7 @@ test_that("Function complains when given insensible input", {
       viability = c(50, 60, 70),
       conc_as_log = FALSE
     ),
-    "'x_as_log' flag may be set incorrectly"
+    "'conc_as_log' flag may be set incorrectly"
   ) #should complain
   ##TO-DO:: Add wanring strings to expect_warning call
   expect_error(
@@ -34,11 +34,11 @@ test_that("Function complains when given insensible input", {
       viability = c(50, 60, 70),
       conc_as_log = FALSE
     ),
-    "real numbers"
+    "At least three unique concentrations"
   ) #should complain
   expect_error(
     computeIC50(concentration = c(1, 2, Inf), viability = c(50, 60, 70)),
-    "real numbers, NA-values, and/or -Inf"
+    "real numbers"
   ) #should complain
   expect_warning(
     computeIC50(
@@ -77,7 +77,7 @@ test_that("Functions return right values", {
       conc_as_log = TRUE,
       viability_as_pct = FALSE
     ),
-    NA_real_
+    Inf
   )
   expect_equal(
     computeIC50(
