@@ -9,7 +9,14 @@
 #'
 #' @examples
 #' data(GDSCsmall)
-#' GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=sampleNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
+#' GDSCsmall <- summarizeMolecularProfiles(
+#'   GDSCsmall,
+#'   mDataType = "rna",
+#'   cell.lines = sampleNames(GDSCsmall),
+#'   summary.stat = "median",
+#'   fill.missing = TRUE,
+#'   verbose = TRUE
+#' )
 #' GDSCsmall
 #'
 #' @param object \code{PharmacoSet} The PharmacoSet to summarize
