@@ -55,7 +55,7 @@ Imports:
     checkmate,
     boot,
     coop
-Depends: R (>= 4.5.0), CoreGx
+Depends: R (>= 3.6), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
 RoxygenNote: 7.3.3
