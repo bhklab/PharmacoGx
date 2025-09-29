@@ -32,7 +32,9 @@ computeAmax <- function(
     viability <- viability[-ii]
   }
   if (length(concentration) < 2) {
-    if (verbose) warning("Insufficient non-zero concentrations for curve fitting")
+    if (verbose) {
+      warning("Insufficient non-zero concentrations for curve fitting")
+    }
     x <- NA_real_
     names(x) <- "Amax"
     return(x)

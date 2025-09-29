@@ -318,7 +318,10 @@ setMethod(
     drugpheno.all <- list(t(sProfiles))
   }
 
-  drug_cols <- unique(unlist(lapply(drugpheno.all, colnames), use.names = FALSE))
+  drug_cols <- unique(unlist(
+    lapply(drugpheno.all, colnames),
+    use.names = FALSE
+  ))
   dix <- is.element(drugn, drug_cols)
   if (verbose && !all(dix)) {
     warning(sprintf("%i/%i drugs can be found", sum(dix), length(drugn)))
@@ -328,7 +331,10 @@ setMethod(
   }
   drugn <- drugn[dix]
 
-  cell_rows <- unique(unlist(lapply(drugpheno.all, rownames), use.names = FALSE))
+  cell_rows <- unique(unlist(
+    lapply(drugpheno.all, rownames),
+    use.names = FALSE
+  ))
   cix <- is.element(celln, cell_rows)
   if (verbose && !all(cix)) {
     warning(sprintf("%i/%i cells can be found", sum(cix), length(celln)))

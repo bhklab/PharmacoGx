@@ -53,7 +53,9 @@ computeAUC <- function(
   }
   if (area.type == "Fitted" && missing(Hill_fit)) {
     if (missing(viability)) {
-      stop("To fit a curve (area.type='Fitted'), supply raw viability or provide Hill_fit.")
+      stop(
+        "To fit a curve (area.type='Fitted'), supply raw viability or provide Hill_fit."
+      )
     }
     Hill_fit <- logLogisticRegression(
       concentration,
@@ -116,25 +118,46 @@ computeAUC <- function(
       return(NA_real_)
     }
 
-    if (length(pars) >= 8 && all(c(
-      "HS1", "E0", "E_inf1", "HS2", "E_inf2",
-      "log10EC50_1", "log10EC50_2", "Frac"
-    ) %in% names(pars))) {
+    if (
+      length(pars) >= 8 &&
+        all(
+          c(
+            "HS1",
+            "E0",
+            "E_inf1",
+            "HS2",
+            "E_inf2",
+            "log10EC50_1",
+            "log10EC50_2",
+            "Frac"
+          ) %in%
+            names(pars)
+        )
+    ) {
       curve_fun <- .pgx_biphasic_curve
       param_vec <- unname(pars[c(
-        "HS1", "E0", "E_inf1", "HS2", "E_inf2",
-        "log10EC50_1", "log10EC50_2", "Frac"
+        "HS1",
+        "E0",
+        "E_inf1",
+        "HS2",
+        "E_inf2",
+        "log10EC50_1",
+        "log10EC50_2",
+        "Frac"
       )])
     } else {
       curve_fun <- .pgx_hill_curve
       param_vec <- unname(pars[c("HS", "E0", "E_inf", "log10EC50")])
     }
 
-    integral <- try(stats::integrate(
-      f = function(x) curve_fun(x, param_vec),
-      lower = a,
-      upper = b
-    ), silent = TRUE)
+    integral <- try(
+      stats::integrate(
+        f = function(x) curve_fun(x, param_vec),
+        lower = a,
+        upper = b
+      ),
+      silent = TRUE
+    )
 
     if (inherits(integral, "try-error")) {
       AUC <- NA_real_

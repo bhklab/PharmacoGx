@@ -154,8 +154,14 @@ curveFittingPGX <- function(
       )
       curve_fun <- .pgx_biphasic_curve
       curve_pars <- unname(fit_internal[c(
-        "HS1", "E0", "E_inf1", "HS2", "E_inf2",
-        "log10EC50_1", "log10EC50_2", "Frac"
+        "HS1",
+        "E0",
+        "E_inf1",
+        "HS2",
+        "E_inf2",
+        "log10EC50_1",
+        "log10EC50_2",
+        "Frac"
       )])
       metrics <- data.table::data.table(
         experiment = exp_dt$experiment[1],
@@ -192,7 +198,12 @@ curveFittingPGX <- function(
       conc = conc,
       observed_viability = viability_pct
     )
-    curves <- merge(curves, observed, by = c("experiment", "conc"), all.x = TRUE)
+    curves <- merge(
+      curves,
+      observed,
+      by = c("experiment", "conc"),
+      all.x = TRUE
+    )
 
     list(metrics = metrics, curves = curves)
   })
@@ -202,8 +213,16 @@ curveFittingPGX <- function(
     return(NULL)
   }
 
-  metrics_dt <- data.table::rbindlist(lapply(fit_results, `[[`, "metrics"), use.names = TRUE, fill = TRUE)
-  curves_dt <- data.table::rbindlist(lapply(fit_results, `[[`, "curves"), use.names = TRUE, fill = TRUE)
+  metrics_dt <- data.table::rbindlist(
+    lapply(fit_results, `[[`, "metrics"),
+    use.names = TRUE,
+    fill = TRUE
+  )
+  curves_dt <- data.table::rbindlist(
+    lapply(fit_results, `[[`, "curves"),
+    use.names = TRUE,
+    fill = TRUE
+  )
 
   if (output_type == "metrics") {
     return(metrics_dt)

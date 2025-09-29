@@ -36,7 +36,9 @@ grRegression <- function(
   family <- match.arg(family)
 
   if (missing(conc)) {
-    stop("The concentration values the drug was tested on must always be provided.")
+    stop(
+      "The concentration values the drug was tested on must always be provided."
+    )
   }
 
   if (missing(Hill_fit) && missing(viability)) {

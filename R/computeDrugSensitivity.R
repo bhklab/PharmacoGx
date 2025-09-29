@@ -257,8 +257,7 @@
         which.min(abs(di - min.dose)),
         max(
           which(
-            abs(di - max.dose) ==
-              min(abs(di - max.dose), na.rm = TRUE)
+            abs(di - max.dose) == min(abs(di - max.dose), na.rm = TRUE)
           )
         )
       )
@@ -395,8 +394,9 @@
     x,
     unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
   )
-  1 - caTools::trapz(x, y_hat) /
-    (log_conc[length(log_conc)] - log_conc[1])
+  1 -
+    caTools::trapz(x, y_hat) /
+      (log_conc[length(log_conc)] - log_conc[1])
 }
 
 #This function is being used in computeSlope

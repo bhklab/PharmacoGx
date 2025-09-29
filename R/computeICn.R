@@ -88,11 +88,12 @@ computeICn <- function(
 
   top <- max(e0, einf)
   bottom <- min(e0, einf)
+  tol <- sqrt(.Machine$double.eps)
 
-  if (target >= top) {
+  if (target >= (top - tol)) {
     return(ifelse(conc_as_log, -Inf, 0))
   }
-  if (target < bottom) {
+  if (target <= (bottom + tol)) {
     return(Inf)
   }
   if (hs <= 0) {

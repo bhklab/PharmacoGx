@@ -117,8 +117,10 @@ computeABC <- function(
   }
 
   #FIT CURVE AND CALCULATE IC50
-  if (max(log_conc1, na.rm = TRUE) < min(log_conc2, na.rm = TRUE) ||
-      max(log_conc2, na.rm = TRUE) < min(log_conc1, na.rm = TRUE)) {
+  if (
+    max(log_conc1, na.rm = TRUE) < min(log_conc2, na.rm = TRUE) ||
+      max(log_conc2, na.rm = TRUE) < min(log_conc1, na.rm = TRUE)
+  ) {
     return(NA)
   } else {
     extrema <- sort(c(

@@ -7,7 +7,11 @@ getRawSensitivityMatrix <-
       cond_idx <- cond_idx & sinfo$quality == quality
     }
     if (!missing(max.conc) && "max.conc" %in% colnames(sinfo)) {
-      mc <- if (length(max.conc) > 1) paste(max.conc, collapse = "///") else max.conc
+      mc <- if (length(max.conc) > 1) {
+        paste(max.conc, collapse = "///")
+      } else {
+        max.conc
+      }
       cond_idx <- cond_idx & sinfo$max.conc == mc
     }
     if (length(drug.id) > 1) {

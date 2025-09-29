@@ -51,7 +51,9 @@ computeAUC_old <- function(
     )
     ref_level <- if (viability_as_pct) 100 else 1
     AUC <- round(
-      1 - trapezoid.integral / caTools::trapz(log_conc, rep(ref_level, length(viability))),
+      1 -
+        trapezoid.integral /
+          caTools::trapz(log_conc, rep(ref_level, length(viability))),
       digits = 2
     )
   } else {
