@@ -169,28 +169,25 @@ sanitizeInput <- function(
   trunc = TRUE,
   verbose = TRUE # Set to 2 to see debug printouts
 ) {
-  if (is.logical(conc_as_log) == FALSE) {
-    print(conc_as_log)
-    stop("'conc_as_log' is not a logical.")
+  if (!is.logical(conc_as_log)) {
+    stop("'conc_as_log' must be a logical value.")
   }
 
-  if (is.logical(viability_as_pct) == FALSE) {
-    print(viability_as_pct)
-    stop("'viability_as_pct' is not a logical.")
+  if (!is.logical(viability_as_pct)) {
+    stop("'viability_as_pct' must be a logical value.")
   }
 
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
+  if (!is.logical(trunc)) {
+    stop("'trunc' must be a logical value.")
   }
   if (!is.finite(verbose)) {
     stop("'verbose' should be a logical (or numerical) argument.")
   }
   if (!missing(viability) && !missing(conc) && missing(Hill_fit)) {
     if (length(conc) != length(viability)) {
-      if (verbose == 2) {
-        print(conc)
-        print(viability)
+      if (identical(verbose, 2)) {
+        message("Concentration input: ", toString(conc))
+        message("Viability input: ", toString(viability))
       }
       stop(
         "Log concentration vector is not of same length as viability vector."
@@ -217,32 +214,36 @@ sanitizeInput <- function(
     viability <- as.numeric(viability[!is.na(viability)])
 
     #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
-    if (prod(is.finite(conc)) != 1) {
-      print(conc)
-      stop("Concentration vector contains elements which are not real numbers.")
+    if (!all(is.finite(conc))) {
+      stop(
+        "Concentration vector contains non-finite values: ",
+        toString(conc[!is.finite(conc)])
+      )
     }
 
-    if (prod(is.finite(viability)) != 1) {
-      print(viability)
-      stop("Viability vector contains elements which are not real numbers.")
+    if (!all(is.finite(viability))) {
+      stop(
+        "Viability vector contains non-finite values: ",
+        toString(viability[!is.finite(viability)])
+      )
     }
 
     if (min(viability) < 0) {
       if (verbose) {
-        warning("Warning: Negative viability data.")
+        warning("Negative viability data detected.")
       }
     }
 
     if (max(viability) > (1 + 99 * viability_as_pct)) {
       if (verbose) {
-        warning("Warning: Viability data exceeds negative control.")
+        warning("Viability data exceeds negative control.")
       }
     }
 
     if (conc_as_log == FALSE && min(conc) < 0) {
-      if (verbose == 2) {
-        print(conc)
-        print(conc_as_log)
+      if (identical(verbose, 2)) {
+        message("Concentration input: ", toString(conc))
+        message("conC_as_log flag: ", conc_as_log)
       }
       stop(
         "Negative concentrations encountered. Concentration data may be inappropriate, or 'conc_as_log' flag may be set incorrectly."
@@ -250,18 +251,18 @@ sanitizeInput <- function(
     }
 
     if (viability_as_pct == TRUE && max(viability) < 5) {
-      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
-      if (verbose == 2) {
-        print(viability)
-        print(viability_as_pct)
+      warning("'viability_as_pct' flag may be set incorrectly.")
+      if (identical(verbose, 2)) {
+        message("Viability input: ", toString(viability))
+        message("viability_as_pct flag: ", viability_as_pct)
       }
     }
 
     if (viability_as_pct == FALSE && max(viability) > 5) {
-      warning("Warning: 'viability_as_pct' flag may be set incorrectly.")
-      if (verbose == 2) {
-        print(viability)
-        print(viability_as_pct)
+      warning("'viability_as_pct' flag may be set incorrectly.")
+      if (identical(verbose, 2)) {
+        message("Viability input: ", toString(viability))
+        message("viability_as_pct flag: ", viability_as_pct)
       }
     }
 
@@ -291,8 +292,8 @@ sanitizeInput <- function(
       viability <- viability / 100
     }
     if (trunc) {
-      viability = pmin(as.numeric(viability), 1)
-      viability = pmax(as.numeric(viability), 0)
+      viability <- pmin(as.numeric(viability), 1)
+      viability <- pmax(as.numeric(viability), 0)
     }
 
     return(list("log_conc" = log_conc, "viability" = viability))
@@ -327,13 +328,17 @@ sanitizeInput <- function(
 
     conc <- as.numeric(conc[!is.na(conc)])
 
-    if (prod(is.finite(conc)) != 1) {
-      print(conc)
-      stop("Concentration vector contains elements which are not real numbers.")
+    if (!all(is.finite(conc))) {
+      stop(
+        "Concentration vector contains non-finite values: ",
+        toString(conc[!is.finite(conc)])
+      )
     }
     if (conc_as_log == FALSE && min(conc) < 0) {
-      print(conc)
-      print(conc_as_log)
+      if (identical(verbose, 2)) {
+        message("Concentration input: ", toString(conc))
+        message("conC_as_log flag: ", conc_as_log)
+      }
       stop(
         "Negative concentrations encountered. Concentration data may be inappropriate, or 'conc_as_log' flag may be set incorrectly."
       )

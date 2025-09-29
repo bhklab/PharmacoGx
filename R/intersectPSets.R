@@ -54,7 +54,7 @@ intersectPSet <- function(
   if (
     "concentrations" %in%
       intersectOn &&
-      anyNA(sapply(pSets, function(x) return(sensitivityRaw(x))))
+      any(vapply(pSets, function(x) is.null(sensitivityRaw(x)), logical(1)))
   ) {
     stop(
       "Intersecting on concentrations requires all PSets to have raw data included."
@@ -66,7 +66,7 @@ intersectPSet <- function(
   }
   if (length(pSets) > 1) {
     if (is.null(names(pSets))) {
-      names(pSets) <- sapply(pSets, name)
+      names(pSets) <- vapply(pSets, name, character(1))
     }
     if ("drugs" %in% intersectOn) {
       common.drugs <- .intersectList(lapply(pSets, function(x) {
@@ -155,7 +155,7 @@ intersectPSet <- function(
       # }, common.exps=common.exps)
 
       if (strictIntersect) {
-        if (length(unique(sapply(expMatch, length))) > 1) {
+        if (length(unique(vapply(expMatch, length, integer(1)))) > 1) {
           stop(
             "Strict Intersecting works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required"
           )
@@ -176,7 +176,7 @@ intersectPSet <- function(
         ("cell.lines" %in% intersectOn) &
         ("concentrations" %in% intersectOn)
     ) {
-      if (length(unique(sapply(expMatch, length))) > 1) {
+      if (length(unique(vapply(expMatch, length, integer(1)))) > 1) {
         stop(
           "Intersecting on concentrations works only when each PSet has 1 replicate per cell-drug pair. Use collapseSensitvityReplicates to reduce the sensitivity data as required"
         )
@@ -213,14 +213,14 @@ intersectPSet <- function(
         if (strictIntersect) {
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function(pSet) {
-              SEs <- names(unlist(sapply(
+              SEs <- names(unlist(lapply(
                 molecularProfilesSlot(pSet),
                 function(SE) {
                   grep(molecular.type, S4Vectors::metadata(SE)$annotation)
                 }
               )))
               if (length(SEs) > 0) {
-                return(.intersectList(sapply(SEs, function(SE) {
+                return(.intersectList(lapply(SEs, function(SE) {
                   if (
                     length(grep(
                       molecular.type,
@@ -241,13 +241,13 @@ intersectPSet <- function(
         } else {
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function(pSet) {
-              SEs <- names(unlist(sapply(
+              SEs <- names(unlist(lapply(
                 molecularProfilesSlot(pSet),
                 function(SE) {
                   grep(molecular.type, S4Vectors::metadata(SE)$annotation)
                 }
               )))
-              return(CoreGx::.unionList(sapply(SEs, function(SE) {
+              return(CoreGx::.unionList(lapply(SEs, function(SE) {
                 if (
                   length(grep(
                     molecular.type,

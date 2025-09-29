@@ -38,7 +38,7 @@ test_that("Function complains when given insensible input", {
   ) #should complain
   expect_error(
     computeIC50(concentration = c(1, 2, Inf), viability = c(50, 60, 70)),
-    "real numbers"
+    "non-finite values"
   ) #should complain
   expect_warning(
     computeIC50(

@@ -71,23 +71,20 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
 #' @return CI under Loewe additive definition
 #'
 #' @examples
-#' \dontrun{
-#' tre <- endoaggregate(
-#'   tre,
-#'   assay = "combo_viability",
-#'   Loewe = PharmacoGx::computeLoewe(
-#'     treatment1dose = treatment1dose,
-#'     treatment2dose = treatment2dose,
-#'     HS_1 = HS_1,
-#'     HS_2 = HS_2,
-#'     E_inf_1 = E_inf_1,
-#'     E_inf_2 = E_inf_2,
-#'     EC50_1 = EC50_1,
-#'     EC50_2 = EC50_2
-#'   ),
-#'   by = assayKeys(tre, "combo_viability")
+#' viability <- c(0.8, 0.6)
+#' doses1 <- c(0.1, 1)
+#' doses2 <- c(0.1, 1)
+#' loeweCI(
+#'   viability = viability,
+#'   treatment1dose = doses1,
+#'   HS_1 = rep(1, length(doses1)),
+#'   E_inf_1 = rep(0, length(doses1)),
+#'   EC50_1 = rep(0.5, length(doses1)),
+#'   treatment2dose = doses2,
+#'   HS_2 = rep(1, length(doses2)),
+#'   E_inf_2 = rep(0, length(doses2)),
+#'   EC50_2 = rep(0.5, length(doses2))
 #' )
-#' }
 #'
 #' @export
 loeweCI <- function(
@@ -186,23 +183,20 @@ loeweCI <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' tre <- endoaggregate(
-#'   tre,
-#'   assay = "combo_viability",
-#'   Loewe = computeLoewe(
-#'     treatment1dose = treatment1dose,
-#'     treatment2dose = treatment2dose,
-#'     HS_1 = HS_1,
-#'     HS_2 = HS_2,
-#'     E_inf_1 = E_inf_1,
-#'     E_inf_2 = E_inf_2,
-#'     EC50_1 = EC50_1,
-#'     EC50_2 = EC50_2
-#'   ),
-#'   by = assayKeys(tre, "combo_viability")
+#' doses1 <- 0.5
+#' doses2 <- 0.3
+#' computeLoewe(
+#'   treatment1dose = doses1,
+#'   HS_1 = 1,
+#'   E_inf_1 = 0.2,
+#'   EC50_1 = 0.4,
+#'   treatment2dose = doses2,
+#'   HS_2 = 1.1,
+#'   E_inf_2 = 0.3,
+#'   EC50_2 = 0.2,
+#'   lower_bound = 0.05,
+#'   upper_bound = 0.95
 #' )
-#' }
 #'
 #' @importFrom stats optimise
 #' @importFrom checkmate assertNumeric assertLogical
@@ -699,7 +693,7 @@ fitTwowayZIP <- function(
   if (!all(has_cols)) {
     stop(
       "Missing required columns of parameters: ",
-      paste(required_cols[!has_cols], sep = ", "),
+      toString(required_cols[!has_cols]),
       call. = FALSE
     )
   }
@@ -850,7 +844,7 @@ fitTwowayZIP <- function(
   if (!all(has_cols)) {
     stop(
       "Missing required columns for plotting: ",
-      paste(required_cols[!has_cols])
+      toString(required_cols[!has_cols])
     )
   }
 
@@ -860,14 +854,14 @@ fitTwowayZIP <- function(
       sampleid == cellline
   ]
   if (dim(select_combo)[1] <= 0) {
-    stop(paste(
-      "No such drug combination with treatment1id:",
+    stop(
+      "No such drug combination with treatment1id: ",
       treatment1,
-      "and treatment2id:",
+      ", treatment2id: ",
       treatment2,
-      "and sampleid:",
+      ", sampleid: ",
       cellline
-    ))
+    )
   }
 
   if (length(add_treatment) > 1) {
@@ -1147,10 +1141,9 @@ setMethod(
         )
       },
       warning = function(w) {
-        message(paste(
-          "ZIP reference values have not been pre-computed.",
-          "They will be computed during delta score calculation."
-        ))
+        message(
+          "ZIP reference values have not been pre-computed. They will be computed during delta score calculation."
+        )
         buildComboProfiles(object, c("HS", "EC50", "E_inf", "combo_viability"))
       }
     )
@@ -1165,8 +1158,8 @@ setMethod(
     missing_params <- !(required_params %in% colnames(combo_profiles))
     if (any(missing_params)) {
       stop(
-        "Missing required paramters for two-way Hill curve fitting: ",
-        paste(required_params[missing_params])
+        "Missing required parameters for two-way Hill curve fitting: ",
+        toString(required_params[missing_params])
       )
     }
     has_ZIP <- "ZIP" %in% colnames(combo_profiles)

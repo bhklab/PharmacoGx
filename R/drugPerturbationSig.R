@@ -113,7 +113,7 @@ drugPerturbationSig <- function(
     drugn,
     function(x, exprs, sampleinfo) {
       res <- NULL
-      i = x
+      i <- x
       ## using a linear model (x ~ concentration + cell + batch + duration)
       res <- rankGeneDrugPerturbation(
         data = exprs,

@@ -175,7 +175,7 @@ geneDrugSensitivity <- function(
   # }
   if (any(unlist(lapply(drugpheno, is.factor)))) {
     ## Added default '' value to ww to fix function if it is passed verbose = FALSE
-    ww = ''
+    ww <- ""
 
     rr0 <- tryCatch(
       try(glm(
@@ -188,11 +188,11 @@ geneDrugSensitivity <- function(
       )),
       warning = function(w) {
         if (verbose) {
-          ww <- "Null model did not convrge"
-          print(ww)
+          ww <- "Null model did not converge"
+          message(ww)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
-            print(tt)
+            message("Type distribution: ", toString(tt))
           }
           return(ww)
         }
@@ -211,8 +211,8 @@ geneDrugSensitivity <- function(
         if (verbose) {
           ww <- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
-          print(ww)
-          print(tt)
+          message(ww)
+          message("Response distribution: ", toString(tt))
         }
         return(ww)
       }
@@ -223,10 +223,10 @@ geneDrugSensitivity <- function(
       warning = function(w) {
         if (verbose) {
           ww <- "Null model did not converge"
-          print(ww)
+          message(ww)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
-            print(tt)
+            message("Type distribution: ", toString(tt))
           }
           return(ww)
         }
@@ -238,8 +238,8 @@ geneDrugSensitivity <- function(
         if (verbose) {
           ww <- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
-          print(ww)
-          print(tt)
+          message(ww)
+          message("Response distribution: ", toString(tt))
         }
         return(ww)
       }

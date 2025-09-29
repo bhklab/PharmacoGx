@@ -64,8 +64,8 @@ computeDSS <- function(
     EC50 = pars[["log10EC50"]]
   )
 
-  x2 = max(concentration)
-  x1 = computeICn(
+  x2 <- max(concentration)
+  x1 <- computeICn(
     concentration = concentration,
     Hill_fit = hill_external,
     n = t_param,

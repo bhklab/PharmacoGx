@@ -101,7 +101,7 @@ setMethod("showSigAnnot", signature(object = "PharmacoSig"), function(object) {
 
 #' @keywords internal
 .showSigAnnotPharmacoSig <- function(object) {
-  print(object@Call)
-  print(object@SessionInfo)
+  show(object@Call)
+  show(object@SessionInfo)
   return(invisible(NULL))
 }

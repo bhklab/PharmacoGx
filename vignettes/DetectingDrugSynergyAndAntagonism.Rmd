@@ -44,7 +44,7 @@ pgx <- BiocStyle::Biocpkg("PharmacoGx")
 dt <- BiocStyle::CRANpkg("data.table")
 
 # knitr options
-knitr::opts_chunk$set(warning=FALSE)
+knitr::opts_chunk$set(warning = FALSE)
 ```
 
 # Synergy/Antagonism Biomarker Discovery
@@ -74,10 +74,10 @@ We selected this dataset for our vignette to simplify comparison with the
 
 ```{r load_dependencies_eval, eval=TRUE, echo=FALSE}
 suppressPackageStartupMessages({
-    library(PharmacoGx)
-    library(CoreGx)
-    library(data.table)
-    library(ggplot2)
+  library(PharmacoGx)
+  library(CoreGx)
+  library(data.table)
+  library(ggplot2)
 })
 ```
 
@@ -96,8 +96,10 @@ which we curated to have informative compound names. You can read the file
 in with your CSV reader of choice.
 
 ```{r}
-input_file <- system.file("extdata/mathews_griner.csv.tar.gz",
-    package="PharmacoGx")
+input_file <- system.file(
+  "extdata/mathews_griner.csv.tar.gz",
+  package = "PharmacoGx"
+)
 mathews_griner <- fread(input_file)
 ```
 
@@ -123,11 +125,13 @@ automatically rename them when the `TreatmentResponseExperiment` gets created!]
 
 ```{r experiment_design_hypothesis}
 groups <- list(
-    rowDataMap=c(
-        treatment1id="RowName", treatment2id="ColName",
-        treatment1dose="RowConcs", treatment2dose="ColConcs"
-    ),
-    colDataMap=c("sampleid")
+  rowDataMap = c(
+    treatment1id = "RowName",
+    treatment2id = "ColName",
+    treatment1dose = "RowConcs",
+    treatment2dose = "ColConcs"
+  ),
+  colDataMap = c("sampleid")
 )
 groups[["assayMap"]] <- c(groups$rowDataMap, groups$colDataMap)
 (groups)
@@ -155,14 +159,14 @@ they may be slower and have less concise syntax.
 
 ```{r handling_technical_replicates}
 # The := operator modifies a data.table by reference (i.e., without making a copy)
-mathews_griner[, tech_rep := seq_len(.N), by=c(groups[["assayMap"]])]
+mathews_griner[, tech_rep := seq_len(.N), by = c(groups[["assayMap"]])]
 if (max(mathews_griner[["tech_rep"]]) > 1) {
-    groups[["colDataMap"]] <- c(groups[["colDataMap"]], "tech_rep")
-    groups[["assayMap"]] <- c(groups[["assayMap"]], "tech_rep")
+  groups[["colDataMap"]] <- c(groups[["colDataMap"]], "tech_rep")
+  groups[["assayMap"]] <- c(groups[["assayMap"]], "tech_rep")
 } else {
-    # delete the additional column if not needed
-    message("No technical replicates in this dataset!")
-    mathews_griner[["tech_reps"]] <- NULL
+  # delete the additional column if not needed
+  message("No technical replicates in this dataset!")
+  mathews_griner[["tech_reps"]] <- NULL
 }
 ```
 
@@ -185,7 +189,7 @@ sample metadata or assay data&mdash;and returns the column names for each group
 in the "mapped_columns" list item.
 
 ```{r build_tredatamapper}
-(treMapper <- TREDataMapper(rawdata=mathews_griner))
+(treMapper <- TREDataMapper(rawdata = mathews_griner))
 ```
 
 We will know we have successfully mapped all of our data if the "unmapped" list
@@ -197,7 +201,7 @@ only have one unique value. These will be assigned to the `metadata` slot of
 the `TreatmentResponseExperiment` to save memory.]
 
 ```{r evaluate_tre_mapping_guess}
-(guess <- guessMapping(treMapper, groups, subset=TRUE))
+(guess <- guessMapping(treMapper, groups, subset = TRUE))
 ```
 
 Once we have mapped all our columns, we can assign their names to the
@@ -208,10 +212,12 @@ since there can be more than one item in each of these slots of a
 `TreatmentResponseExperiment`.]
 
 ```{r update_tredatamapper_with_guess}
-metadataMap(treMapper) <- list(experiment_metadata=guess$metadata$mapped_columns)
+metadataMap(treMapper) <- list(
+  experiment_metadata = guess$metadata$mapped_columns
+)
 rowDataMap(treMapper) <- guess$rowDataMap
 colDataMap(treMapper) <- guess$colDataMap
-assayMap(treMapper) <- list(raw=guess$assayMap)
+assayMap(treMapper) <- list(raw = guess$assayMap)
 treMapper
 ```
 
@@ -248,10 +254,11 @@ contains a reference to the table being queried.]
 ```{r normalize_to_dose_0_0_control}
 raw <- tre[["raw"]]
 raw[,
-    viability := viability / .SD[treatment1dose == 0 & treatment2dose == 0, viability],
-    by=c("treatment1id", "treatment2id", "sampleid", "tech_rep")
+  viability := viability /
+    .SD[treatment1dose == 0 & treatment2dose == 0, viability],
+  by = c("treatment1id", "treatment2id", "sampleid", "tech_rep")
 ]
-raw[, viability := pmax(0, viability)]  # truncate min viability at 0
+raw[, viability := pmax(0, viability)] # truncate min viability at 0
 tre[["raw"]] <- raw
 ```
 
@@ -324,13 +331,13 @@ in `...` will be the column name for that computation in the resulting
 
 ```{r creating_monotherapy_assay}
 tre_qc <- tre |>
-    endoaggregate(
-        subset=treatment2dose == 0,  # filter to only monotherapy rows
-        assay="raw",
-        target="mono_viability",  # create a new assay named mono_viability
-        mean_viability=pmin(1, mean(viability)),
-        by=c("treatment1id", "treatment1dose", "sampleid")
-    )
+  endoaggregate(
+    subset = treatment2dose == 0, # filter to only monotherapy rows
+    assay = "raw",
+    target = "mono_viability", # create a new assay named mono_viability
+    mean_viability = pmin(1, mean(viability)),
+    by = c("treatment1id", "treatment1dose", "sampleid")
+  )
 ```
 
 Once we have isolated our monotherapy viabilities, we can once again use
@@ -346,31 +353,35 @@ as is necessary to store the analysis results in our
 
 ```{r monotherapy_curve_fits, messages=TRUE, eval=FALSE}
 tre_fit <- tre_qc |>
-    endoaggregate(
-        {  # the entire code block is evaluated for each group in our group by
-            # 1. fit a log logistic curve over the dose range
-            fit <- PharmacoGx::logLogisticRegression(treatment1dose, mean_viability,
-                viability_as_pct=FALSE)
-            # 2. compute curve summary metrics
-            ic50 <- PharmacoGx::computeIC50(treatment1dose, Hill_fit=fit)
-            aac <- PharmacoGx::computeAUC(treatment1dose, Hill_fit=fit)
-            # 3. assemble the results into a list, each item will become a
-            #   column in the target assay.
-            list(
-                HS=fit[["HS"]],
-                E_inf = fit[["E_inf"]],
-                EC50 = fit[["EC50"]],
-                Rsq=as.numeric(unlist(attributes(fit))),
-                aac_recomputed=aac,
-                ic50_recomputed=ic50
-            )
-        },
-        assay="mono_viability",
-        target="mono_profiles",
-        enlist=FALSE,  # this option enables the use of a code block for aggregation
-        by=c("treatment1id", "sampleid"),
-        nthread=2  # parallelize over multiple cores to speed up the computation
-    )
+  endoaggregate(
+    {
+      # the entire code block is evaluated for each group in our group by
+      # 1. fit a log logistic curve over the dose range
+      fit <- PharmacoGx::logLogisticRegression(
+        treatment1dose,
+        mean_viability,
+        viability_as_pct = FALSE
+      )
+      # 2. compute curve summary metrics
+      ic50 <- PharmacoGx::computeIC50(treatment1dose, Hill_fit = fit)
+      aac <- PharmacoGx::computeAUC(treatment1dose, Hill_fit = fit)
+      # 3. assemble the results into a list, each item will become a
+      #   column in the target assay.
+      list(
+        HS = fit[["HS"]],
+        E_inf = fit[["E_inf"]],
+        EC50 = fit[["EC50"]],
+        Rsq = as.numeric(unlist(attributes(fit))),
+        aac_recomputed = aac,
+        ic50_recomputed = ic50
+      )
+    },
+    assay = "mono_viability",
+    target = "mono_profiles",
+    enlist = FALSE, # this option enables the use of a code block for aggregation
+    by = c("treatment1id", "sampleid"),
+    nthread = 2 # parallelize over multiple cores to speed up the computation
+  )
 ```
 
 ## Joining Monotherapy Curve Fits to Combinations
@@ -384,13 +395,18 @@ first argument. In this case, the column will be called "mean_viability".]
 
 ```{r create_combo_viability, message=FALSE, eval=FALSE}
 tre_combo <- tre_fit |>
-    endoaggregate(
-        assay="raw",
-        target="combo_viability",
-        mean(viability),
-        by=c("treatment1id", "treatment2id", "treatment1dose", "treatment2dose",
-            "sampleid")
+  endoaggregate(
+    assay = "raw",
+    target = "combo_viability",
+    mean(viability),
+    by = c(
+      "treatment1id",
+      "treatment2id",
+      "treatment1dose",
+      "treatment2dose",
+      "sampleid"
     )
+  )
 ```
 
 The `mergeAssays` method is a convenient way to perform joins between the
@@ -404,18 +420,18 @@ result to be piped into additional calls, as demonstrated below.]
 
 ```{r add_monotherapy_fits_to_combo_viability, eval=FALSE}
 tre_combo <- tre_combo |>
-    mergeAssays(
-        x="combo_viability",
-        y="mono_profiles",
-        by=c("treatment1id", "sampleid")
-    ) |>
-    mergeAssays(
-        x="combo_viability",
-        y="mono_profiles",
-        by.x=c("treatment2id", "sampleid"),
-        by.y=c("treatment1id", "sampleid"),
-        suffixes=c("_1", "_2")  # add sufixes to duplicate column names
-    )
+  mergeAssays(
+    x = "combo_viability",
+    y = "mono_profiles",
+    by = c("treatment1id", "sampleid")
+  ) |>
+  mergeAssays(
+    x = "combo_viability",
+    y = "mono_profiles",
+    by.x = c("treatment2id", "sampleid"),
+    by.y = c("treatment1id", "sampleid"),
+    suffixes = c("_1", "_2") # add sufixes to duplicate column names
+  )
 ```
 
 The `endoaggregate` method is compatible with standard `data.table` syntax,
@@ -431,16 +447,16 @@ entire assay key to the by argument to compute the function for every row
 
 ```{r eval=FALSE}
 tre_combo <- tre_combo |>
-    endoaggregate(
-        viability_1=.SD[treatment2dose == 0, mean_viability],
-        assay="combo_viability",
-        by=c("treatment1id", "treatment1dose", "sampleid")
-    ) |>
-    endoaggregate(
-        viability_2=.SD[treatment1dose == 0, mean_viability],
-        assay="combo_viability",
-        by=c("treatment1id", "treatment2dose", "sampleid")
-    )
+  endoaggregate(
+    viability_1 = .SD[treatment2dose == 0, mean_viability],
+    assay = "combo_viability",
+    by = c("treatment1id", "treatment1dose", "sampleid")
+  ) |>
+  endoaggregate(
+    viability_2 = .SD[treatment1dose == 0, mean_viability],
+    assay = "combo_viability",
+    by = c("treatment1id", "treatment2dose", "sampleid")
+  )
 ```
 
 Now that we have assembled all the requisite information into the
@@ -473,21 +489,33 @@ null reference models of drug synergy.
 
 ```{r compute_synergy_null_hypotheses, message=FALSE, eval=FALSE}
 tre_synergy <- tre_combo |>
-    endoaggregate(
-        assay="combo_viability",
-        HSA_ref=PharmacoGx::computeHSA(viability_1, viability_2),
-        Bliss_ref=PharmacoGx::computeBliss(viability_1, viability_2),
-        Loewe_ref=PharmacoGx::computeLoewe(
-            treatment1dose, HS_1=HS_1, EC50_1=EC50_1, E_inf_1=E_inf_1,
-            treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
-        ),
-        ZIP_ref=computeZIP(
-            treatment1dose, HS_1=HS_1, EC50_1=EC50_1, E_inf_1=E_inf_1,
-            treatment2dose, HS_2=HS_2, EC50_2=EC50_2, E_inf_2=E_inf_2
-        ),
-        by=assayKeys(tre_combo, "combo_viability"),
-        nthread=2
-    )
+  endoaggregate(
+    assay = "combo_viability",
+    HSA_ref = PharmacoGx::computeHSA(viability_1, viability_2),
+    Bliss_ref = PharmacoGx::computeBliss(viability_1, viability_2),
+    Loewe_ref = PharmacoGx::computeLoewe(
+      treatment1dose,
+      HS_1 = HS_1,
+      EC50_1 = EC50_1,
+      E_inf_1 = E_inf_1,
+      treatment2dose,
+      HS_2 = HS_2,
+      EC50_2 = EC50_2,
+      E_inf_2 = E_inf_2
+    ),
+    ZIP_ref = computeZIP(
+      treatment1dose,
+      HS_1 = HS_1,
+      EC50_1 = EC50_1,
+      E_inf_1 = E_inf_1,
+      treatment2dose,
+      HS_2 = HS_2,
+      EC50_2 = EC50_2,
+      E_inf_2 = E_inf_2
+    ),
+    by = assayKeys(tre_combo, "combo_viability"),
+    nthread = 2
+  )
 ```
 
 Once we have our null hypotheis for no drug synergy, computing a
@@ -499,14 +527,14 @@ model.
 
 ```{r synergy_score_vs_reference, eval=FALSE}
 tre_synergy <- tre_synergy |>
-    endoaggregate(
-        assay="combo_viability",
-        HSA_score=HSA_ref - mean_viability,
-        Bliss_score=Bliss_ref - mean_viability,
-        Loewe_score=Loewe_ref - mean_viability,
-        ZIP_score=ZIP_ref - mean_viability,
-        by=assayKeys(tre_synergy, "combo_viability")
-    )
+  endoaggregate(
+    assay = "combo_viability",
+    HSA_score = HSA_ref - mean_viability,
+    Bliss_score = Bliss_ref - mean_viability,
+    Loewe_score = Loewe_ref - mean_viability,
+    ZIP_score = ZIP_ref - mean_viability,
+    by = assayKeys(tre_synergy, "combo_viability")
+  )
 ```
 
 In addition to standard synergy scores, the ZIP model also provides a more
@@ -523,43 +551,43 @@ for the two-way curve fits.
 
 ```{r zip_two_way_fit, message=FALSE, eval=FALSE}
 tre_zip <- tre_synergy |>
-    endoaggregate(
-        assay="combo_viability",
-        subset=treatment2dose != 0,
-        {
-            zip_fit <- estimateProjParams(
-                dose_to=treatment1dose,
-                combo_viability=mean_viability,
-                dose_add=unique(treatment2dose),
-                EC50_add=unique(EC50_2),
-                HS_add=unique(HS_2),
-                E_inf_add=unique(E_inf_2)
-            )
-            setNames(zip_fit, paste0(names(zip_fit), "_2_to_1"))
-        },
-        enlist=FALSE,
-        by=c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
-        nthread=2
-    )
+  endoaggregate(
+    assay = "combo_viability",
+    subset = treatment2dose != 0,
+    {
+      zip_fit <- estimateProjParams(
+        dose_to = treatment1dose,
+        combo_viability = mean_viability,
+        dose_add = unique(treatment2dose),
+        EC50_add = unique(EC50_2),
+        HS_add = unique(HS_2),
+        E_inf_add = unique(E_inf_2)
+      )
+      setNames(zip_fit, paste0(names(zip_fit), "_2_to_1"))
+    },
+    enlist = FALSE,
+    by = c("treatment1id", "treatment2id", "treatment2dose", "sampleid"),
+    nthread = 2
+  )
 tre_zip <- tre_zip |>
-    endoaggregate(
-        assay="combo_viability",
-        subset=treatment1dose != 0,
-        {
-            zip_fit <- estimateProjParams(
-                dose_to=treatment2dose,
-                combo_viability=mean_viability,
-                dose_add=unique(treatment1dose),
-                EC50_add=unique(EC50_1),
-                HS_add=unique(HS_1),
-                E_inf_add=unique(E_inf_1)
-            )
-            setNames(zip_fit, paste0(names(zip_fit), "_1_to_2"))
-        },
-        enlist=FALSE,
-        by=c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
-        nthread=2
-    )
+  endoaggregate(
+    assay = "combo_viability",
+    subset = treatment1dose != 0,
+    {
+      zip_fit <- estimateProjParams(
+        dose_to = treatment2dose,
+        combo_viability = mean_viability,
+        dose_add = unique(treatment1dose),
+        EC50_add = unique(EC50_1),
+        HS_add = unique(HS_1),
+        E_inf_add = unique(E_inf_1)
+      )
+      setNames(zip_fit, paste0(names(zip_fit), "_1_to_2"))
+    },
+    enlist = FALSE,
+    by = c("treatment1id", "treatment2id", "treatment1dose", "sampleid"),
+    nthread = 2
+  )
 ```
 
 Then we use the `.deltaScore` function to compute the final delta score
@@ -567,20 +595,27 @@ using the two-way fit curve parameters from the previous step.
 
 ```{r compute_zip_delta, message=FALSE, eval=FALSE}
 tre_zip <- tre_zip |>
-    endoaggregate(
-        assay="combo_viability",
-        ZIP_delta=.deltaScore(
-            EC50_1_to_2=EC50_proj_1_to_2, EC50_2_to_1=EC50_proj_2_to_1,
-            EC50_1=EC50_1, EC50_2=EC50_2,
-            HS_1_to_2=HS_proj_1_to_2, HS_2_to_1=HS_proj_2_to_1,
-            HS_1=HS_1, HS_2=HS_2,
-            E_inf_1_to_2=E_inf_proj_1_to_2, E_inf_2_to_1=E_inf_proj_2_to_1,
-            E_inf_1=E_inf_1, E_inf_2=E_inf_2,
-            treatment1dose=treatment1dose, treatment2dose=treatment2dose,
-            ZIP=ZIP_ref
-        ),
-        by=assayKeys(tre_zip, "combo_viability")
-    )
+  endoaggregate(
+    assay = "combo_viability",
+    ZIP_delta = .deltaScore(
+      EC50_1_to_2 = EC50_proj_1_to_2,
+      EC50_2_to_1 = EC50_proj_2_to_1,
+      EC50_1 = EC50_1,
+      EC50_2 = EC50_2,
+      HS_1_to_2 = HS_proj_1_to_2,
+      HS_2_to_1 = HS_proj_2_to_1,
+      HS_1 = HS_1,
+      HS_2 = HS_2,
+      E_inf_1_to_2 = E_inf_proj_1_to_2,
+      E_inf_2_to_1 = E_inf_proj_2_to_1,
+      E_inf_1 = E_inf_1,
+      E_inf_2 = E_inf_2,
+      treatment1dose = treatment1dose,
+      treatment2dose = treatment2dose,
+      ZIP = ZIP_ref
+    ),
+    by = assayKeys(tre_zip, "combo_viability")
+  )
 ```
 
 Now that we have computed synergy scores for all of our drug pairs, we can
@@ -604,17 +639,17 @@ the 15 most synergistic treatment pairs based on their ZIP delta score.
 ```{r compute_top_synergy, eval=FALSE}
 combo_viab <- tre_zip[["combo_viability"]]
 (top_15_combo <- combo_viab[
-    Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
-    .(
-        max_delta=max(ZIP_delta, na.rm=TRUE),
-        mean_delta=mean(ZIP_delta, na.rm=TRUE),
-        max_bliss=max(Bliss_score, na.rm=TRUE),
-        mean_bliss=mean(Bliss_score, na.rm=TRUE)
-    ),
-    by=.(treatment1id, treatment2id, sampleid)
+  Rsq_1 > 0.5 & Rsqr_1_to_2 > 0.5 & Rsqr_2_to_1 > 0.5,
+  .(
+    max_delta = max(ZIP_delta, na.rm = TRUE),
+    mean_delta = mean(ZIP_delta, na.rm = TRUE),
+    max_bliss = max(Bliss_score, na.rm = TRUE),
+    mean_bliss = mean(Bliss_score, na.rm = TRUE)
+  ),
+  by = .(treatment1id, treatment2id, sampleid)
 ][
-    order(-max_delta),
-    unique(.SD)
+  order(-max_delta),
+  unique(.SD)
 ][1:15])
 ```
 
@@ -624,9 +659,12 @@ the `data.table::setnafill` function with the last observation carried forward
 strategy.
 
 ```{r handle_synergy_missing, eval=FALSE}
-top_15_combo_df <- combo_viab[top_15_combo, on=c('treatment1id', 'treatment2id', 'sampleid')]
+top_15_combo_df <- combo_viab[
+  top_15_combo,
+  on = c('treatment1id', 'treatment2id', 'sampleid')
+]
 # Last observation carried forward for NA/NaN delta scores, to make plot look nicer
-setnafill(top_15_combo_df, type="locf", cols="ZIP_delta")
+setnafill(top_15_combo_df, type = "locf", cols = "ZIP_delta")
 ```
 
 The `ggplot2` package can be used to visualize the synergy scores for our
@@ -637,22 +675,22 @@ full dose range of each drug combination matrix.
 
 ```{r synergy_contour_plot, fig.wide=TRUE, eval=FALSE}
 top_15_combo_df |>
-    ggplot(aes(x=treatment1dose, y=treatment2dose, z=ZIP_delta * 100)) +
-    scale_x_log10(oob=scales::squish_infinite) +
-    scale_y_log10(oob=scales::squish_infinite) +
-    geom_contour_filled(
-        breaks=c(-100, -80, -40, -20, -10, -1, 1, 10, 20, 40, 80, 100)
-    ) +
-    facet_wrap(~ treatment1id, nrow=3, ncol=5) +
-    scale_fill_brewer(palette="RdBu", direction=-1, drop=FALSE)
+  ggplot(aes(x = treatment1dose, y = treatment2dose, z = ZIP_delta * 100)) +
+  scale_x_log10(oob = scales::squish_infinite) +
+  scale_y_log10(oob = scales::squish_infinite) +
+  geom_contour_filled(
+    breaks = c(-100, -80, -40, -20, -10, -1, 1, 10, 20, 40, 80, 100)
+  ) +
+  facet_wrap(~treatment1id, nrow = 3, ncol = 5) +
+  scale_fill_brewer(palette = "RdBu", direction = -1, drop = FALSE)
 ```
 
 ```{r synergy_heatmap, fig.wide=TRUE, eval=FALSE}
 top_15_combo_df |>
-    ggplot(aes(x=factor(treatment1dose), y=factor(treatment2dose))) +
-    geom_tile(aes(fill=ZIP_delta * 100)) +
-    facet_wrap(~treatment1id, nrow=3, ncol=5) +
-    scale_fill_gradient2(low="blue", mid="white", high="red", midpoint=0)
+  ggplot(aes(x = factor(treatment1dose), y = factor(treatment2dose))) +
+  geom_tile(aes(fill = ZIP_delta * 100)) +
+  facet_wrap(~treatment1id, nrow = 3, ncol = 5) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 ```
 
 To learn how to use synergy scores for biomarker discovery please review

@@ -7,7 +7,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 # #' @importClassesFrom CoreGx LongTable TreatmentResponseExperiment
 # setClassUnion('list_OR_LongTable', c('list', 'LongTable'))
 
-.local_class = "PharmacoSet"
+.local_class <- "PharmacoSet"
 
 #' A Class to Contain PharmacoGenomic datasets together with their curations
 #'

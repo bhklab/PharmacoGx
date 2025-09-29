@@ -138,18 +138,42 @@ logLogisticRegression <- function(
     result <- list(
       HS = params[["HS"]],
       E0 = if (viability_as_pct) params[["E0"]] * 100 else params[["E0"]],
-      E_inf = if (viability_as_pct) params[["E_inf"]] * 100 else params[["E_inf"]],
-      EC50 = if (conc_as_log) params[["log10EC50"]] else 10^params[["log10EC50"]]
+      E_inf = if (viability_as_pct) {
+        params[["E_inf"]] * 100
+      } else {
+        params[["E_inf"]]
+      },
+      EC50 = if (conc_as_log) {
+        params[["log10EC50"]]
+      } else {
+        10^params[["log10EC50"]]
+      }
     )
   } else {
     result <- list(
       HS1 = params[["HS1"]],
       E0 = if (viability_as_pct) params[["E0"]] * 100 else params[["E0"]],
-      E_inf1 = if (viability_as_pct) params[["E_inf1"]] * 100 else params[["E_inf1"]],
+      E_inf1 = if (viability_as_pct) {
+        params[["E_inf1"]] * 100
+      } else {
+        params[["E_inf1"]]
+      },
       HS2 = params[["HS2"]],
-      E_inf2 = if (viability_as_pct) params[["E_inf2"]] * 100 else params[["E_inf2"]],
-      EC50_1 = if (conc_as_log) params[["log10EC50_1"]] else 10^params[["log10EC50_1"]],
-      EC50_2 = if (conc_as_log) params[["log10EC50_2"]] else 10^params[["log10EC50_2"]],
+      E_inf2 = if (viability_as_pct) {
+        params[["E_inf2"]] * 100
+      } else {
+        params[["E_inf2"]]
+      },
+      EC50_1 = if (conc_as_log) {
+        params[["log10EC50_1"]]
+      } else {
+        10^params[["log10EC50_1"]]
+      },
+      EC50_2 = if (conc_as_log) {
+        params[["log10EC50_2"]]
+      } else {
+        10^params[["log10EC50_2"]]
+      },
       Frac = params[["Frac"]]
     )
   }
@@ -184,8 +208,26 @@ logLogisticRegression <- function(
     default_upper <- c(4.5, 1.2, 1.2, max(log_conc) + 2)
     default_density <- c(2, 10, 10, 5)
   } else {
-    default_lower <- c(0.1, 0, 0, min(log_conc) - 3, 0.1, 0, min(log_conc) - 3, 0)
-    default_upper <- c(5, 1.5, 1.5, max(log_conc) + 3, 5, 1.5, max(log_conc) + 3, 1)
+    default_lower <- c(
+      0.1,
+      0,
+      0,
+      min(log_conc) - 3,
+      0.1,
+      0,
+      min(log_conc) - 3,
+      0
+    )
+    default_upper <- c(
+      5,
+      1.5,
+      1.5,
+      max(log_conc) + 3,
+      5,
+      1.5,
+      max(log_conc) + 3,
+      1
+    )
     default_density <- c(2, 10, 10, 5, 10, 5, 5, 5)
   }
 
@@ -197,7 +239,9 @@ logLogisticRegression <- function(
       density <- c(density[1], default_density[2], density[2], density[3])
     }
     if (length(density) != length(default_density)) {
-      stop("`density` must match the parameter count for the selected fit type.")
+      stop(
+        "`density` must match the parameter count for the selected fit type."
+      )
     }
   }
 
@@ -221,7 +265,9 @@ logLogisticRegression <- function(
       lower_bounds <- c(lower_bounds[1], 0, lower_bounds[2], lower_bounds[3])
     }
     if (length(lower_bounds) != length(default_lower)) {
-      stop("`lower_bounds` must match the parameter count for the selected fit type.")
+      stop(
+        "`lower_bounds` must match the parameter count for the selected fit type."
+      )
     }
   }
 
@@ -233,7 +279,9 @@ logLogisticRegression <- function(
       upper_bounds <- c(upper_bounds[1], 1.2, upper_bounds[2], upper_bounds[3])
     }
     if (length(upper_bounds) != length(default_upper)) {
-      stop("`upper_bounds` must match the parameter count for the selected fit type.")
+      stop(
+        "`upper_bounds` must match the parameter count for the selected fit type."
+      )
     }
   }
 
@@ -332,14 +380,29 @@ logLogisticRegression <- function(
       pmin(pmax(e0_guess, lower_bounds[2]), upper_bounds[2]),
       pmin(pmax(einf_guess, lower_bounds[3]), upper_bounds[3]),
       pmin(pmax(1, lower_bounds[4]), upper_bounds[4]),
-      pmin(pmax((min(viability_valid) + einf_guess) / 2, lower_bounds[5]), upper_bounds[5]),
-      pmin(pmax(stats::median(log_conc_valid) - 0.5, lower_bounds[6]), upper_bounds[6]),
-      pmin(pmax(stats::median(log_conc_valid) + 0.5, lower_bounds[7]), upper_bounds[7]),
+      pmin(
+        pmax((min(viability_valid) + einf_guess) / 2, lower_bounds[5]),
+        upper_bounds[5]
+      ),
+      pmin(
+        pmax(stats::median(log_conc_valid) - 0.5, lower_bounds[6]),
+        upper_bounds[6]
+      ),
+      pmin(
+        pmax(stats::median(log_conc_valid) + 0.5, lower_bounds[7]),
+        upper_bounds[7]
+      ),
       pmin(pmax(0.5, lower_bounds[8]), upper_bounds[8])
     )
     names(guess) <- c(
-      "HS1", "E0", "E_inf1", "HS2", "E_inf2",
-      "log10EC50_1", "log10EC50_2", "Frac"
+      "HS1",
+      "E0",
+      "E_inf1",
+      "HS2",
+      "E_inf2",
+      "log10EC50_1",
+      "log10EC50_2",
+      "Frac"
     )
   }
   guess
@@ -507,8 +570,16 @@ logLogisticRegression <- function(
       down_truncated <- abs(y) >= 1
       up_truncated <- abs(y) <= 0
       c(
-        -log(CoreGx::.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale)),
-        -log(CoreGx::.edmedncauchys(-diffs[up_truncated | down_truncated], n, scale))
+        -log(CoreGx::.dmedncauchys(
+          diffs[!(down_truncated | up_truncated)],
+          n,
+          scale
+        )),
+        -log(CoreGx::.edmedncauchys(
+          -diffs[up_truncated | down_truncated],
+          n,
+          scale
+        ))
       )
     }
   } else {
@@ -557,7 +628,8 @@ logLogisticRegression <- function(
   periods <- rep(1, length(guess))
   if (length(guess) > 1) {
     for (idx in 2:length(guess)) {
-      periods[idx] <- periods[idx - 1] * (density[idx - 1] * (upper_bounds[idx - 1] - lower_bounds[idx - 1]) + 1)
+      periods[idx] <- periods[idx - 1] *
+        (density[idx - 1] * (upper_bounds[idx - 1] - lower_bounds[idx - 1]) + 1)
     }
   }
 

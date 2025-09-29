@@ -1,8 +1,8 @@
 Package: PharmacoGx
 Type: Package
 Title: Analysis of Large-Scale Pharmacogenomic Data
-Version: 3.13.2
-Date: 2025-05-22
+Version: 3.14.0
+Date: 2025-09-29
 Authors@R: c(
     person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
         role=c("aut")),
@@ -55,13 +55,14 @@ Imports:
     checkmate,
     boot,
     coop
-Depends: R (>= 3.6), CoreGx
+Depends: R (>= 4.5.0), CoreGx
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE, r6=FALSE)
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
-biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
+URL: https://github.com/bhklab/PharmacoGx, https://bhklab.github.io/PharmacoGx/
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification, Survival
 BugReports: https://github.com/bhklab/PharmacoGx/issues
 Collate:
     'GR.R'

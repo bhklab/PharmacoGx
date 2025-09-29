@@ -182,14 +182,11 @@ setMethod(
     by = c(treatment_col, sample_col)
   ]
 
-  print(profSummary)
-
   # NA pad the missing cells and drugs
   if (fill.missing) {
     allCombos <- data.table(expand.grid(drugs, cell.lines))
     colnames(allCombos) <- c(treatment_col, sample_col)
     profSummary <- profSummary[allCombos, on = c(treatment_col, sample_col)]
-    print(profSummary)
   }
 
   # reshape and convert to matrix

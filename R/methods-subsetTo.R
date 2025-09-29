@@ -67,9 +67,9 @@ setMethod(
   keep.controls = TRUE,
   ...
 ) {
-  drop = FALSE #TODO:: Is this supposed to be here?
+  drop <- FALSE #TODO:: Is this supposed to be here?
 
-  adArgs = list(...)
+  adArgs <- list(...)
   if ('exps' %in% names(adArgs)) {
     exps <- adArgs[['exps']]
     if (is(exps, 'data.frame')) {

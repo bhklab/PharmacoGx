@@ -42,24 +42,31 @@ computeAmax <- function(
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (!all(is.finite(concentration))) {
-    print(concentration)
-    stop("Concentration vector contains elements which are not real numbers.")
+    stop(
+      "Concentration vector contains non-finite values: ",
+      toString(concentration[!is.finite(concentration)])
+    )
   }
 
   if (!all(is.finite(viability))) {
-    print(viability)
-    stop("Viability vector contains elements which are not real numbers.")
+    stop(
+      "Viability vector contains non-finite values: ",
+      toString(viability[!is.finite(viability)])
+    )
   }
 
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
+  if (!is.logical(trunc)) {
+    stop("'trunc' must be a logical value.")
   }
 
   if (length(concentration) != length(viability)) {
-    print(concentration)
-    print(viability)
-    stop("Concentration vector is not of same length as viability vector.")
+    stop(
+      "Concentration vector is not the same length as the viability vector.",
+      " Lengths: ",
+      length(concentration),
+      " vs ",
+      length(viability)
+    )
   }
 
   if (min(concentration) < 0) {
@@ -67,11 +74,11 @@ computeAmax <- function(
   }
 
   if (min(viability) < 0 && verbose) {
-    warning("Warning: Negative viability data.")
+    warning("Negative viability data detected.")
   }
 
   if (max(viability) > 100 && verbose) {
-    warning("Warning: Viability data exceeds negative control.")
+    warning("Viability data exceeds negative control.")
   }
 
   #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION

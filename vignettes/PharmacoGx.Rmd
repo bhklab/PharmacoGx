@@ -117,8 +117,9 @@ dependencies are available from CRAN or Bioconductor.
 \vspace{5pt}
 \footnotesize
 ```{r install-pkg, eval=FALSE, results='hide'}
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
 BiocManager::install('PharmacoGx')
 ```
 \normalsize
@@ -317,27 +318,38 @@ GSEA connectivity score to determine the correlation between the two signatures.
 \vspace{5pt}
 \footnotesize
 ```{r, eval=TRUE, results='asis'}
-  library(PharmacoGx)
-  library(pander)
-  data(CMAPsmall)
-  drug.perturbation <- drugPerturbationSig(CMAPsmall,
-                                           mDataType="rna",
-                                           verbose=FALSE)
-  data(HDAC_genes)
+library(PharmacoGx)
+library(pander)
+data(CMAPsmall)
+drug.perturbation <- drugPerturbationSig(
+  CMAPsmall,
+  mDataType = "rna",
+  verbose = FALSE
+)
+data(HDAC_genes)
 
-  res <- apply(drug.perturbation[,,c("tstat", "fdr")],
-               2, function(x, HDAC){
-	    return(connectivityScore(x=x,
-	                             y=HDAC[,2,drop=FALSE],
-                               method="fgsea", nperm=100))
-	}, HDAC=HDAC_genes)
+res <- apply(
+  drug.perturbation[,, c("tstat", "fdr")],
+  2,
+  function(x, HDAC) {
+    return(connectivityScore(
+      x = x,
+      y = HDAC[, 2, drop = FALSE],
+      method = "fgsea",
+      nperm = 100
+    ))
+  },
+  HDAC = HDAC_genes
+)
 
-  rownames(res) <- c("Connectivity", "P Value")
-  res <- t(res)
-  res <- res[order(res[,1], decreasing=TRUE),]
-  pander::pandoc.table(res,
-    caption='Connectivity Score results for HDAC inhibitor gene signature.',
-    style = 'rmarkdown')
+rownames(res) <- c("Connectivity", "P Value")
+res <- t(res)
+res <- res[order(res[, 1], decreasing = TRUE), ]
+pander::pandoc.table(
+  res,
+  caption = 'Connectivity Score results for HDAC inhibitor gene signature.',
+  style = 'rmarkdown'
+)
 ```
 \normalsize
 
@@ -572,7 +584,6 @@ contribution towards testing and feedback during the design of the package.
 \vspace{5pt}
 \footnotesize
 ```{r sessioninfo, eval = TRUE}
-# set eval = FALSE if you don't want this info (useful for reproducibility) to appear
 sessionInfo()
 ```
 \normalsize
