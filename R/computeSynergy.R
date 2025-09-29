@@ -1,29 +1,5 @@
 # ==== Loewe Additivity
 
-utils::globalVariables(c(
-  "EC50_1",
-  "EC50_2",
-  "EC50_proj_1_to_2",
-  "EC50_proj_2_to_1",
-  "E_inf_1",
-  "E_inf_2",
-  "E_inf_proj_1_to_2",
-  "E_inf_proj_2_to_1",
-  "HS_1",
-  "HS_2",
-  "HS_proj_1_to_2",
-  "HS_proj_2_to_1",
-  "Rsqr_1_to_2",
-  "Rsqr_2_to_1",
-  "ZIP",
-  "combo_viability",
-  "treatment1dose",
-  "treatment1id",
-  "treatment2dose",
-  "treatment2id",
-  "x"
-))
-
 #' @title Inverse function of Hill equation
 #'
 #' @description
@@ -39,7 +15,7 @@ utils::globalVariables(c(
 #' }
 #'
 #' @param viability `numeric` is a vector whose entries are the viability values
-#'     in the range \[0, 1\] if `is_pct` is `FALSE` or \[0, 100\] if it is
+#'     between 0 and 1 when `is_pct` is `FALSE` or between 0 and 100 when it is
 #'     `TRUE`.
 #' @param EC50 `numeric` is a vector of relative EC50 for drug-response equation.
 #' @param HS `numeric` Hill coefficient of the drug-response equation
@@ -146,7 +122,7 @@ loeweCI <- function(
 
 ## Objective function to mimimise for solving E_Loewe
 #' @param viability `numeric` is a vector whose entries are the viability values
-#'     in the range [0, 1].
+#'     in the range 0 to 1.
 #' @param treatment1dose `numeric` a vector of concentrations for treatment 1
 #' @param HS_1 `numeric` Hill coefficient of treatment 1
 #' @param E_inf_1 `numeric` the maximum attainable effect of treatment 1.
@@ -823,7 +799,8 @@ fitTwowayZIP <- function(
 #'      The added treatment in projected Hill curves, either integer 1 or 2.
 #'      1 means adding treatment 1 to treatment 2.
 #'
-#' @return produce a plot with projected Hill curves of adding treatment [add_treatment]
+#' @return produce a plot with projected Hill curves of the selected
+#'     `add_treatment`
 #'
 #' @importFrom graphics plot curve points legend
 #' @importFrom grDevices palette rainbow
@@ -943,7 +920,7 @@ fitTwowayZIP <- function(
       ])
       HS_add <- unique(select_combo[treatment2dose == dose_add, HS_2])
       dose_to <- select_combo[treatment2dose == dose_add, treatment1dose]
-      E_ninf_proj <- PharmacoGx:::.Hill(
+      E_ninf_proj <- .Hill(
         log10(dose_add),
         c(HS_add, E_inf_add, log10(EC50_add))
       )
@@ -1026,7 +1003,7 @@ fitTwowayZIP <- function(
       EC50_add <- unique(select_combo[treatment1dose == dose_add, EC50_1])
       HS_add <- unique(select_combo[treatment1dose == dose_add, HS_1])
       E_inf_add <- unique(select_combo[treatment1dose == dose_add, E_inf_1])
-      E_ninf_proj <- PharmacoGx:::.Hill(
+      E_ninf_proj <- .Hill(
         log10(dose_add),
         c(HS_add, E_inf_add, log10(EC50_add))
       )
@@ -1326,6 +1303,30 @@ setMethod(
     return(object)
   }
 )
+
+utils::globalVariables(c(
+  "EC50_1",
+  "EC50_2",
+  "EC50_proj_1_to_2",
+  "EC50_proj_2_to_1",
+  "E_inf_1",
+  "E_inf_2",
+  "E_inf_proj_1_to_2",
+  "E_inf_proj_2_to_1",
+  "HS_1",
+  "HS_2",
+  "HS_proj_1_to_2",
+  "HS_proj_2_to_1",
+  "Rsqr_1_to_2",
+  "Rsqr_2_to_1",
+  "ZIP",
+  "combo_viability",
+  "treatment1dose",
+  "treatment1id",
+  "treatment2dose",
+  "treatment2id",
+  "x"
+))
 
 #' @title Vector-based version of [computeZIPdelta]
 #'

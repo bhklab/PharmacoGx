@@ -162,7 +162,7 @@ mergePSets <- function(mDataPSet, sensDataPSet, commonCellsOnly = FALSE, ...) {
   ] <- paste0(name(sensDataPSet), "///", name(mDataPSet))
   curation(mergePSet)$tissue <- tissue.curation.df
 
-  sensNumber(mergePSet) <- PharmacoGx:::.summarizeSensitivityNumbers(mergePSet)
+  sensNumber(mergePSet) <- .summarizeSensitivityNumbers(mergePSet)
 
   annotation(mergePSet)$name <- paste(
     name(mDataPSet),

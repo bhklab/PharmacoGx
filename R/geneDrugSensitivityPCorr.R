@@ -217,7 +217,7 @@ geneDrugSensitivityPCorr <- function(
           NG <- length(table(factor(dd[, 3])))
           N <- as.numeric(length(x))
 
-          p.value <- PharmacoGx:::partialCorQUICKSTOP(
+          p.value <- partialCorQUICKSTOP(
             x,
             y,
             obs.cor,
@@ -319,7 +319,7 @@ geneDrugSensitivityPCorr <- function(
           NG <- 1L
           N <- as.numeric(length(x))
 
-          p.value <- PharmacoGx:::partialCorQUICKSTOP(
+          p.value <- partialCorQUICKSTOP(
             x,
             y,
             obs.cor,
