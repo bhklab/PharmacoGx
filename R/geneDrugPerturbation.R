@@ -48,7 +48,7 @@ geneDrugPerturbation <- function(
 
   ### add experiment duration if the vector consists of more than one different value
 
-  if (length(sort(unique(duration))) > 2) {
+  if (length(sort(unique(duration))) > 1) {
     ff0 <- sprintf("%s + duration", ff0)
     ff <- sprintf("%s + duration", ff)
   }
