@@ -68,7 +68,7 @@ logLogisticRegression <- function(
   family <- match.arg(tolower(family), c("normal", "cauchy"))
   family <- if (family == "cauchy") "Cauchy" else "normal"
 
-  if (!median_n == as.integer(median_n)) {
+  if (!is.numeric(median_n) || median_n != round(median_n)) {
     stop("`median_n` must be an integer.")
   }
   if (median_n < 1) {
