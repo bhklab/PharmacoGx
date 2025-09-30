@@ -9,7 +9,7 @@ PharmacoSet2(
   treatment = data.frame(),
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
-  treatmentResponse = TreatmentResponseExperiment(),
+  treatmentResponse = CoreGx::TreatmentResponseExperiment(),
   perturbation = list(),
   curation = list(sample = data.frame(), treatment = data.frame(), tissue = data.frame()),
   datasetType = "sensitivity"
