@@ -35,6 +35,8 @@ computeDSS <- function(
     pars <- cleanData[["Hill_fit"]]
     concentration <- cleanData[["log_conc"]]
   } else {
+    # sanitizeInput normalizes concentration, returning log10(conc) when
+    # conc_as_log = FALSE and leaving it unchanged otherwise
     cleanData <- sanitizeInput(
       conc = concentration,
       viability = viability,
@@ -43,7 +45,7 @@ computeDSS <- function(
       viability_as_pct = viability_as_pct,
       trunc = trunc,
       verbose = verbose
-    ) #is this coercing the concentration to log?
+    )
     pars <- cleanData[["Hill_fit"]]
     concentration <- cleanData[["log_conc"]]
   }
