@@ -61,7 +61,7 @@ logLogisticRegression <- function(
   conc_as_log = FALSE,
   viability_as_pct = TRUE,
   trunc = TRUE,
-  verbose = TRUE,
+  verbose = FALSE,
   fit_type = c("hill", "biphasic")
 ) {
   fit_type <- match.arg(tolower(fit_type), c("hill", "biphasic"))

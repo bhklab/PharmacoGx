@@ -170,7 +170,7 @@ PharmacoSet2 <- function(
   treatment = data.frame(),
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
-  treatmentResponse = TreatmentResponseExperiment(),
+  treatmentResponse = CoreGx::TreatmentResponseExperiment(),
   perturbation = list(),
   curation = list(
     sample = data.frame(),
