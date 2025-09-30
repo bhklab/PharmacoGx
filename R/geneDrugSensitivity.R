@@ -174,8 +174,8 @@ geneDrugSensitivity <- function(
 
   # }
   if (any(unlist(lapply(drugpheno, is.factor)))) {
-    ## Added default '' value to ww to fix function if it is passed verbose = FALSE
-    ww <- ""
+    ## Track convergence warnings while respecting verbose flag
+    ww <- NULL
 
     rr0 <- tryCatch(
       try(glm(
@@ -188,7 +188,7 @@ geneDrugSensitivity <- function(
       )),
       warning = function(w) {
         if (verbose) {
-          ww <- "Null model did not converge"
+          ww <<- "Null model did not converge"
           message(ww)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
@@ -196,6 +196,7 @@ geneDrugSensitivity <- function(
           }
           return(ww)
         }
+        return(NULL)
       }
     )
     rr1 <- tryCatch(
@@ -209,39 +210,45 @@ geneDrugSensitivity <- function(
       )),
       warning = function(w) {
         if (verbose) {
-          ww <- "Model did not converge"
+          ww <<- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
           message(ww)
           message("Response distribution: ", toString(tt))
+          return(ww)
         }
-        return(ww)
+        return(NULL)
       }
     )
   } else {
+    ww <- NULL
     rr0 <- tryCatch(
       try(lm(formula(paste(ff0, "~ . -x", sep = " ")), data = dd)),
       warning = function(w) {
         if (verbose) {
-          ww <- "Null model did not converge"
+          ww <<- "Null model did not converge"
           message(ww)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
             message("Type distribution: ", toString(tt))
           }
+        }
+        if (verbose) {
           return(ww)
         }
+        return(NULL)
       }
     )
     rr1 <- tryCatch(
       try(lm(formula(paste(ff0, "~ . ", sep = " ")), data = dd)),
       warning = function(w) {
         if (verbose) {
-          ww <- "Model did not converge"
+          ww <<- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
           message(ww)
           message("Response distribution: ", toString(tt))
+          return(ww)
         }
-        return(ww)
+        return(NULL)
       }
     )
   }
