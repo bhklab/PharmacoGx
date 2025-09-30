@@ -50,18 +50,18 @@ computeDSS <- function(
     concentration <- cleanData[["log_conc"]]
   }
 
-  ec50 <- pars[["EC50"]]
-  if (!is.null(ec50) && !is.na(ec50)) {
-    log_ec50 <- if (conc_as_log) {
-      ec50
-    } else {
-      log10(ec50)
-    }
+  ec50 <- if ("EC50" %in% names(pars)) pars[["EC50"]] else NA_real_
+  log_ec50 <- if ("log10EC50" %in% names(pars)) {
+    pars[["log10EC50"]]
   } else {
-    log_ec50 <- pars[["log10EC50"]]
+    NA_real_
   }
 
-  if (is.null(log_ec50) || is.na(log_ec50)) {
+  if (!is.na(ec50)) {
+    log_ec50 <- if (conc_as_log) ec50 else log10(ec50)
+  }
+
+  if (is.na(log_ec50)) {
     stop("Unable to determine EC50 from Hill fit parameters.")
   }
 
@@ -69,24 +69,23 @@ computeDSS <- function(
     return(0)
   }
 
-  if (!viability_as_pct) {
-    t_param <- t_param * 100
-  }
+  t_param_pct <- if (viability_as_pct) t_param else t_param * 100
+  t_param_fraction <- t_param_pct / 100
 
   hill_external <- list(
     HS = pars[["HS"]],
-    E0 = pars[["E0"]] * 100,
-    E_inf = pars[["E_inf"]] * 100,
-    EC50 = log_ec50
+    E0 = pars[["E0"]],
+    E_inf = pars[["E_inf"]],
+    log10EC50 = log_ec50
   )
 
   x2 <- max(concentration)
   x1 <- computeICn(
     concentration = concentration,
     Hill_fit = hill_external,
-    n = t_param,
+    n = t_param_fraction,
     conc_as_log = TRUE,
-    viability_as_pct = TRUE
+    viability_as_pct = FALSE
   )
   if (!is.finite(x1)) {
     return(0)
@@ -94,29 +93,31 @@ computeDSS <- function(
 
   x1 <- max(x1, min(concentration))
 
+  e_inf_pct <- hill_external$E_inf * 100
   if (censor) {
-    if (hill_external$E_inf > 50) {
+    if (e_inf_pct > 50) {
       return(NA)
     } else if (all(concentration < log_ec50)) {
       return(0)
     }
   }
 
-  AUC <- computeAUC(
+  auc_fraction <- computeAUC(
     concentration = c(x1, x2),
     Hill_fit = hill_external,
     conc_as_log = TRUE,
-    viability_as_pct = TRUE,
+    viability_as_pct = FALSE,
     verbose = verbose,
     trunc = trunc
   )
+  AUC <- auc_fraction * 100
 
-  DSS <- (AUC * (x2 - x1) - t_param * (x2 - x1)) /
-    ((100 - t_param) * (max(concentration) - min(concentration)))
+  DSS <- (AUC * (x2 - x1) - t_param_pct * (x2 - x1)) /
+    ((100 - t_param_pct) * (max(concentration) - min(concentration)))
   if (dss_type == 1) {
     return(DSS)
   }
-  DSS <- DSS / log(100 - hill_external$E_inf)
+  DSS <- DSS / log(100 - e_inf_pct)
   if (dss_type == 2) {
     return(DSS)
   }
