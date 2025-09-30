@@ -199,10 +199,12 @@ drugDoseResponseCurve <-
       plot.type <- "Actual"
     }
 
-    if (is(treatmentResponse(pSets[[1]]), "LongTable")) {
-      pSets[[1]] <- subsetByTreatment(pSets[[1]], treatments = drug)
+    for (i in seq_len(length(pSets))) {
+      if (is(treatmentResponse(pSets[[i]]), "LongTable")) {
+        pSets[[i]] <- subsetByTreatment(pSets[[i]], treatments = drug)
+      }
+      pSets[[i]] <- subsetBySample(pSets[[i]], samples = cellline)
     }
-    pSets[[1]] <- subsetBySample(pSets[[1]], samples = cellline)
 
     doses <- list()
     responses <- list()
@@ -358,9 +360,12 @@ drugDoseResponseCurve <-
           }
         } else {
           warning(
-            "The cell line and drug combo were not tested together. Aborting function."
+            sprintf(
+              "The cell line and drug combo were not tested together in %s. Skipping.",
+              name(pSets[[i]])
+            )
           )
-          return()
+          next
         }
       }
     }
