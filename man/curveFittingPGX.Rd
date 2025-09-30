@@ -31,6 +31,8 @@ One of \code{"hill"} or \code{"biphasic"}.}
 \value{
 Depending on \code{output_type}, either a \code{data.table} with fitted curve
 coordinates, a \code{data.table} of summary metrics, or a list containing both.
+Returns \code{NULL} when no experiments remain after filtering or minimum
+measurement checks.
 }
 \description{
 Fits dose-response curves for each cell/drug experiment contained in

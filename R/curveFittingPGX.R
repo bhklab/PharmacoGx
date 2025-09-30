@@ -16,6 +16,8 @@
 #'
 #' @return Depending on `output_type`, either a `data.table` with fitted curve
 #'   coordinates, a `data.table` of summary metrics, or a list containing both.
+#'   Returns `NULL` when no experiments remain after filtering or minimum
+#'   measurement checks.
 #'
 #' @export
 #' @importFrom data.table as.data.table data.table rbindlist setorder
@@ -51,7 +53,7 @@ curveFittingPGX <- function(
     dt <- dt[cell_id %in% cell_subset]
   }
   if (!nrow(dt)) {
-    stop("No data remains after applying subset filters.")
+    return(NULL)
   }
 
   keep_experiments <- dt[, .N, by = experiment][N >= 3, experiment]
