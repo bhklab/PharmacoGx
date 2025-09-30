@@ -1,20 +1,4 @@
 log_denom <- function(suc, total, p) {
-  tmp <- 0
-  # if(log10(p)>-32)
-  # {
-  tmp <- (suc) * log(p)
-  # } else {
-  #  warning("p reached precision threshold")
-  # }
-  # if(log10(1.0-p)>-32)
-  # {
-  tmp <- tmp + (total - suc) * log(1 - p)
-  # } else {
-  #    warning("1-p reached precision threshold")
-  # }
-  return(tmp)
-}
-log_denom <- function(suc, total, p) {
   return((suc) * log(p) + (total - suc) * log(1 - p))
 }
 
