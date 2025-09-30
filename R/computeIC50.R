@@ -20,7 +20,7 @@ computeIC50 <- function(
     n = ifelse(viability_as_pct, 50, .5),
     conc_as_log = conc_as_log,
     viability_as_pct = viability_as_pct,
-    verbose = TRUE,
-    trunc = TRUE
+    verbose = verbose,
+    trunc = trunc
   ))
 }
