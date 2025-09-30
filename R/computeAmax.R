@@ -59,6 +59,10 @@ computeAmax <- function(
     stop("'trunc' must be a logical value.")
   }
 
+  if (!is.logical(verbose) || length(verbose) != 1L || is.na(verbose)) {
+    stop("'verbose' must be a logical value.")
+  }
+
   if (length(concentration) != length(viability)) {
     stop(
       "Concentration vector is not the same length as the viability vector.",
