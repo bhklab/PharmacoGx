@@ -70,6 +70,7 @@ computeICn <- function(
       verbose = verbose
     )
     pars <- cleanData[["Hill_fit"]]
+    concentration <- cleanData[["log_conc"]]
   } else {
     stop(
       "Insufficient information to calculate ICn. Please enter concentration and viability or Hill parameters."
