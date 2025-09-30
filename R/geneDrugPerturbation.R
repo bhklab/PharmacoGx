@@ -66,7 +66,7 @@ geneDrugPerturbation <- function(
       "estimate" = NA,
       "se" = NA,
       "n" = nn,
-      "tsat" = NA,
+      "tstat" = NA,
       "fstat" = NA,
       "pvalue" = NA
     )
@@ -96,7 +96,7 @@ geneDrugPerturbation <- function(
       "estimate" = mm$coefficients["concentration", "Estimate"],
       "se" = mm$coefficients["concentration", "Std. Error"],
       "n" = nn,
-      "tsat" = mm$coefficients["concentration", "t value"],
+      "tstat" = mm$coefficients["concentration", "t value"],
       "fstat" = mmc$F[2],
       "pvalue" = mmc$'Pr(>F)'[2]
     )
