@@ -50,7 +50,21 @@ computeDSS <- function(
     concentration <- cleanData[["log_conc"]]
   }
 
-  log_ec50 <- pars[["log10EC50"]]
+  ec50 <- pars[["EC50"]]
+  if (!is.null(ec50) && !is.na(ec50)) {
+    log_ec50 <- if (conc_as_log) {
+      ec50
+    } else {
+      log10(ec50)
+    }
+  } else {
+    log_ec50 <- pars[["log10EC50"]]
+  }
+
+  if (is.null(log_ec50) || is.na(log_ec50)) {
+    stop("Unable to determine EC50 from Hill fit parameters.")
+  }
+
   if (log_ec50 > max(concentration)) {
     return(0)
   }
@@ -63,7 +77,7 @@ computeDSS <- function(
     HS = pars[["HS"]],
     E0 = pars[["E0"]] * 100,
     E_inf = pars[["E_inf"]] * 100,
-    EC50 = pars[["log10EC50"]]
+    EC50 = log_ec50
   )
 
   x2 <- max(concentration)
