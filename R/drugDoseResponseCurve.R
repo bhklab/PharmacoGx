@@ -379,43 +379,57 @@ drugDoseResponseCurve <-
         responses2[[i]] <- viabilities[[i]]
         if (length(legends.label) > 0) {
           if (any(grepl("AUC", x = toupper(legends.label)))) {
-            legend.values2[[i]] <- paste(
-              legend.values2[i][[1]],
-              sprintf(
-                "%s = %s",
-                "AUC",
-                round(
-                  computeAUC(
-                    concentrations[[i]],
-                    viabilities[[i]],
-                    conc_as_log = FALSE,
-                    viability_as_pct = TRUE
-                  ) /
-                    100,
-                  digits = 2
-                )
-              ),
-              sep = ", "
+            auc_label <- sprintf(
+              "%s = %s",
+              "AUC",
+              round(
+                computeAUC(
+                  concentrations[[i]],
+                  viabilities[[i]],
+                  conc_as_log = FALSE,
+                  viability_as_pct = TRUE
+                ) /
+                  100,
+                digits = 2
+              )
             )
+            if (
+              is.null(legend.values2[[i]]) || length(legend.values2[[i]]) == 0
+            ) {
+              legend.values2[[i]] <- auc_label
+            } else {
+              legend.values2[[i]] <- paste(
+                legend.values2[[i]],
+                auc_label,
+                sep = ", "
+              )
+            }
           }
           if (any(grepl("IC50", x = toupper(legends.label)))) {
-            legend.values2[[i]] <- paste(
-              legend.values2[i][[1]],
-              sprintf(
-                "%s = %s",
-                "IC50",
-                round(
-                  computeIC50(
-                    concentrations[[i]],
-                    viabilities[[i]],
-                    conc_as_log = FALSE,
-                    viability_as_pct = TRUE
-                  ),
-                  digits = 2
-                )
-              ),
-              sep = ", "
+            ic50_label <- sprintf(
+              "%s = %s",
+              "IC50",
+              round(
+                computeIC50(
+                  concentrations[[i]],
+                  viabilities[[i]],
+                  conc_as_log = FALSE,
+                  viability_as_pct = TRUE
+                ),
+                digits = 2
+              )
             )
+            if (
+              is.null(legend.values2[[i]]) || length(legend.values2[[i]]) == 0
+            ) {
+              legend.values2[[i]] <- ic50_label
+            } else {
+              legend.values2[[i]] <- paste(
+                legend.values2[[i]],
+                ic50_label,
+                sep = ", "
+              )
+            }
           }
         } else {
           legend.values2[[i]] <- ""
