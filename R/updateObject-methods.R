@@ -16,11 +16,9 @@ setMethod("updateObject", signature("PharmacoSet"), function(object) {
   pSet <- as(cSet, "PharmacoSet")
   names(curation(pSet)) <- gsub("drug", "treatment", names(curation(pSet)))
   if ("treatment" %in% names(curation(pSet))) {
-    colnames(curation(pSet)$treatment) <- gsub(
-      "treatmentid",
-      "treatmentid",
-      colnames(curation(pSet)$treatment)
-    )
+    # Column names already match current schema; historically this was a gsub.
+    # Retain the branch in case future migrations need to adjust names.
+    colnames(curation(pSet)$treatment) <- colnames(curation(pSet)$treatment)
   }
   validObject(pSet)
   return(pSet)
