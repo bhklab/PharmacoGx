@@ -175,8 +175,6 @@ geneDrugSensitivity <- function(
   # }
   if (any(unlist(lapply(drugpheno, is.factor)))) {
     ## Track convergence warnings while respecting verbose flag
-    ww <- NULL
-
     rr0 <- tryCatch(
       try(glm(
         formula(drugpheno.1 ~ . - x),
@@ -188,13 +186,13 @@ geneDrugSensitivity <- function(
       )),
       warning = function(w) {
         if (verbose) {
-          ww <<- "Null model did not converge"
-          message(ww)
+          msg <- "Null model did not converge"
+          message(msg)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
             message("Type distribution: ", toString(tt))
           }
-          return(ww)
+          return(msg)
         }
         return(NULL)
       }
@@ -210,30 +208,29 @@ geneDrugSensitivity <- function(
       )),
       warning = function(w) {
         if (verbose) {
-          ww <<- "Model did not converge"
+          msg <- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
-          message(ww)
+          message(msg)
           message("Response distribution: ", toString(tt))
-          return(ww)
+          return(msg)
         }
         return(NULL)
       }
     )
   } else {
-    ww <- NULL
     rr0 <- tryCatch(
       try(lm(formula(paste(ff0, "~ . -x", sep = " ")), data = dd)),
       warning = function(w) {
         if (verbose) {
-          ww <<- "Null model did not converge"
-          message(ww)
+          msg <- "Null model did not converge"
+          message(msg)
           if ("type" %in% colnames(dd)) {
             tt <- table(dd[, "type"])
             message("Type distribution: ", toString(tt))
           }
         }
         if (verbose) {
-          return(ww)
+          return(msg)
         }
         return(NULL)
       }
@@ -242,11 +239,11 @@ geneDrugSensitivity <- function(
       try(lm(formula(paste(ff0, "~ . ", sep = " ")), data = dd)),
       warning = function(w) {
         if (verbose) {
-          ww <<- "Model did not converge"
+          msg <- "Model did not converge"
           tt <- table(dd[, "drugpheno.1"])
-          message(ww)
+          message(msg)
           message("Response distribution: ", toString(tt))
-          return(ww)
+          return(msg)
         }
         return(NULL)
       }
