@@ -504,30 +504,54 @@ logLogisticRegression <- function(
   ))
 
   if (failed || any(!is.finite(guess)) || guess_residual >= gritty_residual) {
-    guess <- .pgx_mesh_eval(
-      x = x,
-      y = y,
-      f = f,
-      guess = gritty_guess,
-      lower_bounds = lower_bounds,
-      upper_bounds = upper_bounds,
-      density = density,
-      n = median_n,
-      scale = scale,
-      family = family,
-      trunc = trunc
-    )
-    guess_residual <- sum(.pgx_curve_residual(
-      x = x,
-      y = y,
-      n = median_n,
-      pars = guess,
-      f = f,
-      scale = scale,
-      family = family,
-      trunc = trunc,
-      delta = delta
+    density_vec <- rep_len(density, length(lower_bounds))
+    grid_counts <- ceiling(pmax(
+      1,
+      (upper_bounds - lower_bounds) * density_vec + 1
     ))
+    grid_size <- prod(grid_counts)
+    max_grid_points <- getOption("PharmacoGx.max_mesh_points", 1e5)
+
+    if (grid_size <= max_grid_points) {
+      guess <- .pgx_mesh_eval(
+        x = x,
+        y = y,
+        f = f,
+        guess = gritty_guess,
+        lower_bounds = lower_bounds,
+        upper_bounds = upper_bounds,
+        density = density,
+        n = median_n,
+        scale = scale,
+        family = family,
+        trunc = trunc
+      )
+      guess_residual <- sum(.pgx_curve_residual(
+        x = x,
+        y = y,
+        n = median_n,
+        pars = guess,
+        f = f,
+        scale = scale,
+        family = family,
+        trunc = trunc,
+        delta = delta
+      ))
+    } else {
+      warning(
+        sprintf(
+          paste(
+            "Skipping full mesh evaluation: grid size (%s) exceeds max_grid_points (%s).",
+            "Adjust density or option 'PharmacoGx.max_mesh_points' to enable mesh search."
+          ),
+          format(grid_size, scientific = TRUE),
+          format(max_grid_points, scientific = TRUE)
+        )
+      )
+      guess <- gritty_guess
+      guess_residual <- gritty_residual
+    }
+
     guess <- .pgx_pattern_search(
       x = x,
       y = y,
