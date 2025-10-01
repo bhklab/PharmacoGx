@@ -106,10 +106,17 @@ rankGeneDrugPerturbation <-
           stop("data for some control experiments are missing!")
         }
         if (verbose) {
+          batch_types <- unique(type[c(xpix, ctrlix)])
+          batch_types <- batch_types[!is.na(batch_types)]
+          batch_label <- if (length(batch_types)) {
+            paste(batch_types, collapse = ",")
+          } else {
+            "unknown"
+          }
           message(
             sprintf(
               "type %s: batch %i/%i -> %i vs %i",
-              utype[bb],
+              batch_label,
               bb,
               length(ubatch),
               length(xpix),
