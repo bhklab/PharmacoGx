@@ -69,7 +69,8 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE) {
   if (missing(i)) {
     cell_names <- samples
   } else if (is.character(i)) {
-    cell_names <- resolve_names(i, samples, "cell")
+    matched <- i[i %in% samples]
+    cell_names <- matched
     cells_requested_empty <- cells_requested_empty || length(cell_names) == 0
   } else if (is.numeric(i)) {
     idx <- validate_index(i, length(samples), "cell")
