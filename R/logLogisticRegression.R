@@ -595,18 +595,23 @@ logLogisticRegression <- function(
     } else {
       down_truncated <- abs(y) >= 1
       up_truncated <- abs(y) <= 0
-      c(
-        -log(CoreGx::.dmedncauchys(
-          diffs[!(down_truncated | up_truncated)],
-          n,
-          scale
-        )),
-        -log(CoreGx::.edmedncauchys(
-          -diffs[up_truncated | down_truncated],
+      truncated_idx <- down_truncated | up_truncated
+      residual <- numeric(length(y))
+      if (any(!truncated_idx)) {
+        residual[!truncated_idx] <- -log(CoreGx::.dmedncauchys(
+          diffs[!truncated_idx],
           n,
           scale
         ))
-      )
+      }
+      if (any(truncated_idx)) {
+        residual[truncated_idx] <- -log(CoreGx::.edmedncauchys(
+          -diffs[truncated_idx],
+          n,
+          scale
+        ))
+      }
+      residual
     }
   } else {
     huber_loss <- ifelse(
@@ -619,10 +624,15 @@ logLogisticRegression <- function(
     } else {
       down_truncated <- abs(y) >= 1
       up_truncated <- abs(y) <= 0
-      c(
-        huber_loss[!(down_truncated | up_truncated)],
-        huber_loss[up_truncated | down_truncated]
-      )
+      truncated_idx <- down_truncated | up_truncated
+      residual <- numeric(length(y))
+      if (any(!truncated_idx)) {
+        residual[!truncated_idx] <- huber_loss[!truncated_idx]
+      }
+      if (any(truncated_idx)) {
+        residual[truncated_idx] <- huber_loss[truncated_idx]
+      }
+      residual
     }
   }
 }
