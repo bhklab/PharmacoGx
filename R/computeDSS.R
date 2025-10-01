@@ -92,7 +92,7 @@ computeDSS <- function(
     return(0)
   }
 
-  x1 <- max(x1, min(concentration))
+  x1 <- min(max(x1, min(concentration)), x2)
 
   e_inf_pct <- hill_external$E_inf * 100
   if (censor) {
