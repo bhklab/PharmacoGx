@@ -28,7 +28,8 @@ geneDrugPerturbation <- function(
   ## NOTE:: The use of T/F warning from BiocCheck is a false positive on the string 'Pr(>F)'
 
   nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
-  if (length(sort(unique(concentration))) < 2) {
+  unique_conc <- unique(concentration[!is.na(concentration)])
+  if (length(unique_conc) < 2) {
     warning("No drug concentrations tested")
     tt <- rep(NA, length(nc))
     names(tt) <- nc
