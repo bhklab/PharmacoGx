@@ -12,8 +12,8 @@ test_that("Function complains when given insensible input", {
     "Please pass in only one"
   )
   # expect_silent(computeIC50(concentration = c(1, 2, 3),
-  # 		# 	viability1 = c(50, 60, 70),
-  # 	Hill_fit2 = c(0.5, 0.2, 1)))
+  #     #   viability1 = c(50, 60, 70),
+  #   Hill_fit2 = c(0.5, 0.2, 1)))
 
   expect_error(
     computeIC50(concentration = c(1, 2, 3, 5), viability = c(50, 60, 70)),

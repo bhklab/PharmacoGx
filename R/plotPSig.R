@@ -48,9 +48,9 @@ plot.PharmacoSig <- function(
   ndots <- length(dots)
 
   # if(length(dim(x))==2){
-  # 	dim(x) <- c(1, dim(x))
+  #   dim(x) <- c(1, dim(x))
   # } else if(length(dim(x)) == 1) {
-  # 	dim(x) <- c(1, 1, dim(x))
+  #   dim(x) <- c(1, 1, dim(x))
   # }
 
   if (missing(adjust.method)) {

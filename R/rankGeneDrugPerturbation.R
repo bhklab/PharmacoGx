@@ -3,19 +3,19 @@
 ##
 ## inputs:
 ##      - data: gene expression data matrix
-##			- drug: single or vector of drug(s) of interest; if a vector of drugs is provided, they will be considered as being the same drug and will be jointly analyszed
-##			- drug.id: drug used in each experiment
-##			- drug.concentration: drug concentration used in each experiment
-##			- type: cell or tissue type for each experiment
-##			- xp: type of experiment (perturbation or control)
+##      - drug: single or vector of drug(s) of interest; if a vector of drugs is provided, they will be considered as being the same drug and will be jointly analyszed
+##      - drug.id: drug used in each experiment
+##      - drug.concentration: drug concentration used in each experiment
+##      - type: cell or tissue type for each experiment
+##      - xp: type of experiment (perturbation or control)
 ##      - batch: experiment batches
 ##      - duration: The duration of the experiment, in a consistent unit
-##			- single.type: Should the statitsics be computed for each cell/tissue type separately?
+##      - single.type: Should the statitsics be computed for each cell/tissue type separately?
 ##      - nthread: number of parallel threads (bound to the maximum number of cores available)
 ##
 ## outputs:
 ## list of datafraes with the statistics for each gene, for each type
-##			- list of data.frame with similar results for each type line separately if any
+##      - list of data.frame with similar results for each type line separately if any
 ##
 #################################################
 
