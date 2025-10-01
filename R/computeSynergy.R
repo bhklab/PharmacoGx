@@ -629,20 +629,22 @@ estimateProjParams <- function(
 #' of the treatment being added to the other treament at a fixed dose.
 #'
 #' @examples
-#' combo_profiles <- data.table::data.table(
+#' combo_profiles <- data.table::as.data.table(expand.grid(
+#'   treatment1dose = c(0.1, 1, 10),
+#'   treatment2dose = c(0.2, 1, 5)
+#' ))
+#' combo_profiles[, `:=`(
 #'   treatment1id = "drugA",
 #'   treatment2id = "drugB",
-#'   treatment1dose = c(0.5, 1),
-#'   treatment2dose = c(0.5, 1),
 #'   sampleid = "cell1",
-#'   combo_viability = c(0.8, 0.6),
+#'   combo_viability = 0.85 - 0.05 * treatment1dose - 0.04 * treatment2dose,
 #'   HS_1 = 1,
 #'   HS_2 = 1,
 #'   E_inf_1 = 0.2,
 #'   E_inf_2 = 0.3,
 #'   EC50_1 = 0.5,
 #'   EC50_2 = 0.6
-#' )
+#' )]
 #' fitTwowayZIP(combo_profiles)
 #'
 #' @param combo_profiles [data.table] contains three parameters of dose-response curves
@@ -1114,7 +1116,9 @@ setGeneric(name = "computeZIPdelta", def = function(object, ...) {
 #'
 #' @examples
 #' \donttest{
-#' tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+#' if (exists("tre")) {
+#'   computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+#' }
 #' }
 #'
 #' @references
