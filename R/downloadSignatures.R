@@ -8,7 +8,7 @@
 #'
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #'     if (interactive()) downloadPertSig("CMAP_2016")
 #' }
 #'

@@ -38,3 +38,13 @@ measurement checks.
 Fits dose-response curves for each cell/drug experiment contained in
 \code{scrn_data} using the updated four-parameter Hill or biphasic model.
 }
+\examples{
+scrn <- data.frame(
+  cell_id = rep(c("cellA", "cellB"), each = 3),
+  drug_id = rep("drugX", 6),
+  conc = rep(c(0.1, 1, 10), 2),
+  viability = c(0.95, 0.75, 0.5, 0.9, 0.7, 0.45)
+)
+curveFittingPGX(scrn, output_type = "metrics", main_fit_func = "hill")
+
+}

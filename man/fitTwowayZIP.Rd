@@ -47,10 +47,21 @@ Fit projected dose-response curves with \code{E_min} as the viability
 of the treatment being added to the other treament at a fixed dose.
 }
 \examples{
-\dontrun{
-combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
-combo_twowayFit <- fitTwowayZIP(combo_profiles)
-}
+combo_profiles <- data.table::data.table(
+  treatment1id = "drugA",
+  treatment2id = "drugB",
+  treatment1dose = c(0.5, 1),
+  treatment2dose = c(0.5, 1),
+  sampleid = "cell1",
+  combo_viability = c(0.8, 0.6),
+  HS_1 = 1,
+  HS_2 = 1,
+  E_inf_1 = 0.2,
+  E_inf_2 = 0.3,
+  EC50_1 = 0.5,
+  EC50_2 = 0.6
+)
+fitTwowayZIP(combo_profiles)
 
 }
 \references{

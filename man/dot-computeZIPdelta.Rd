@@ -76,7 +76,7 @@ Following the calculation of ZIP delta score as in Appendix A3.
 See reference for details.
 }
 \examples{
-\dontrun{
+\donttest{
 ## ZIP is optional. Will be recomputed if not provided.
 combo_profiles <- CoreGx::buildComboProfiles(
      tre,

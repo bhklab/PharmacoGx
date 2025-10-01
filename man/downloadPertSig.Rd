@@ -44,7 +44,7 @@ and start their analysis from the already computed signatures
 }
 \examples{
 
-\dontrun{
+\donttest{
     if (interactive()) downloadPertSig("CMAP_2016")
 }
 

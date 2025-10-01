@@ -629,10 +629,21 @@ estimateProjParams <- function(
 #' of the treatment being added to the other treament at a fixed dose.
 #'
 #' @examples
-#' \dontrun{
-#' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
-#' combo_twowayFit <- fitTwowayZIP(combo_profiles)
-#' }
+#' combo_profiles <- data.table::data.table(
+#'   treatment1id = "drugA",
+#'   treatment2id = "drugB",
+#'   treatment1dose = c(0.5, 1),
+#'   treatment2dose = c(0.5, 1),
+#'   sampleid = "cell1",
+#'   combo_viability = c(0.8, 0.6),
+#'   HS_1 = 1,
+#'   HS_2 = 1,
+#'   E_inf_1 = 0.2,
+#'   E_inf_2 = 0.3,
+#'   EC50_1 = 0.5,
+#'   EC50_2 = 0.6
+#' )
+#' fitTwowayZIP(combo_profiles)
 #'
 #' @param combo_profiles [data.table] contains three parameters of dose-response curves
 #'     for each single agent in a drug comnbination,
@@ -802,7 +813,7 @@ fitTwowayZIP <- function(
 #' @export
 #' @noRd
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
 #' combo_twowayFit <- fitTwowayZIP(combo_profiles)
 #' .plotProjHill(combo_twowayFit,
@@ -1102,7 +1113,7 @@ setGeneric(name = "computeZIPdelta", def = function(object, ...) {
 #' @return [TreatmentResponseExperiment] with assay `combo_scores` containing `delta_scores`
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
 #' }
 #'
@@ -1360,7 +1371,7 @@ utils::globalVariables(c(
 #' @return `numeric` delta scores of every dose combinations for any given treatment combinations.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ## ZIP is optional. Will be recomputed if not provided.
 #' combo_profiles <- CoreGx::buildComboProfiles(
 #'      tre,

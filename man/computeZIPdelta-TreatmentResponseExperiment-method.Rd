@@ -39,7 +39,7 @@ See reference for details.
 Compute ZIP delta score as described in the original paper.
 }
 \examples{
-\dontrun{
+\donttest{
 tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
 }
 

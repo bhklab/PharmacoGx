@@ -50,7 +50,7 @@ availablePSets <- function(canonical = TRUE) {
 #' \code{PharmacoGx}. User \code{availablePSets} to discover which PSets are available.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'     if (interactive()) downloadPSet("CTRPv2_2015")
 #' }
 #'
