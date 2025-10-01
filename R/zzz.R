@@ -4,7 +4,7 @@
 # Package Start-up Functions
 
 .onAttach <- function(libname, pkgname) {
-  if (interactive() && is.null(options('bhklab.startup_'))) {
+  if (interactive() && is.null(getOption('bhklab.startup_'))) {
     oldOpts <- options()
     options(warn = -1)
     on.exit(options(oldOpts))
