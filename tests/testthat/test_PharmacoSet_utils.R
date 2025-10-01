@@ -25,4 +25,14 @@ test_that('subsetBySample works...', {
   })
 })
 
-test_that('subsetByFeature works...', {})
+test_that('subsetByFeature works...', {
+  expect_true({
+    features <- head(rownames(featureInfo(CCLEsmall, 'rna')), 5)
+    suppressMessages({
+      CCLE_sub <- subsetByFeature(CCLEsmall, features = features, mDataTypes = 'rna')
+    })
+    assay_data <- SummarizedExperiment::assay(molecularProfiles(CCLE_sub, mDataType = 'rna'))
+    identical(sort(rownames(featureInfo(CCLE_sub, 'rna'))), sort(features)) &&
+      nrow(assay_data) == length(features)
+  })
+})
