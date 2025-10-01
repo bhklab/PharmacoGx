@@ -35,22 +35,18 @@ geneDrugSensitivity <- function(
   ## NOTE:: The use of T/F warning from BiocCheck is a false positive on the string 'Pr(>F)'
   standardize <- match.arg(standardize)
 
-  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep = ".")
-
-  drugpheno <- data.frame(
-    vapply(
-      drugpheno,
-      function(x) {
-        if (!is.factor(x)) {
-          x[is.infinite(x)] <- NA
-        }
-        return(list(x))
-      },
-      USE.NAMES = TRUE,
-      FUN.VALUE = list(1)
-    ),
-    check.names = FALSE
-  )
+  if (is.null(dim(drugpheno))) {
+    drugpheno <- data.frame("drugpheno.1" = drugpheno, check.names = FALSE)
+  } else {
+    colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep = ".")
+    drugpheno <- as.data.frame(drugpheno, check.names = FALSE)
+  }
+  drugpheno[] <- lapply(drugpheno, function(col) {
+    if (!is.factor(col)) {
+      col[is.infinite(col)] <- NA_real_
+    }
+    col
+  })
 
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
