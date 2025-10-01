@@ -51,7 +51,8 @@ setMethod(
       cells = cells,
       drugs = drugs,
       molecular.data.cells = molecular.data.cells,
-      keep.controls = keep.controls
+      keep.controls = keep.controls,
+      ...
     )
   }
 )
@@ -65,6 +66,8 @@ setMethod(
   drugs = NULL,
   molecular.data.cells = NULL,
   keep.controls = TRUE,
+  allow.empty.cells = FALSE,
+  allow.empty.drugs = FALSE,
   ...
 ) {
   drop <- FALSE #TODO:: Is this supposed to be here?
@@ -114,10 +117,19 @@ setMethod(
 
       column_indices <- NULL
 
-      if (length(cells) == 0 && length(drugs) == 0) {
+      if (
+        !allow.empty.cells &&
+          !allow.empty.drugs &&
+          length(cells) == 0 &&
+          length(drugs) == 0
+      ) {
         column_indices <- seq_len(ncol(SE)) # This still returns the number of samples in an SE, but without a label
       }
-      if (length(cells) == 0 && datasetType(object) == 'sensitivity') {
+      if (
+        !allow.empty.cells &&
+          length(cells) == 0 &&
+          datasetType(object) == 'sensitivity'
+      ) {
         column_indices <- seq_len(ncol(SE))
       }
 
@@ -160,7 +172,11 @@ setMethod(
         }
       }
 
-      if (length(drugs_index) != 0 && length(cell_line_index) != 0) {
+      if (allow.empty.cells && length(cells) == 0) {
+        column_indices <- integer(0)
+      } else if (allow.empty.drugs && length(drugs) == 0) {
+        column_indices <- integer(0)
+      } else if (length(drugs_index) != 0 && length(cell_line_index) != 0) {
         if (length(intersect(drugs_index, cell_line_index)) == 0) {
           stop('This Drug - Cell Line combination was not tested together.')
         }
@@ -244,7 +260,7 @@ setMethod(
     )
   }
 
-  if (length(drugs) == 0) {
+  if (length(drugs) == 0 && !allow.empty.drugs) {
     if (datasetType(object) == 'sensitivity' | datasetType(object) == 'both') {
       drugs <- unique(sensitivityInfo(object)[["treatmentid"]])
     }
@@ -260,7 +276,7 @@ setMethod(
       )
     }
   }
-  if (length(cells) == 0) {
+  if (length(cells) == 0 && !allow.empty.cells) {
     cells <- union(
       cells,
       na.omit(CoreGx::.unionList(lapply(
