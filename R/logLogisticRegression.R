@@ -626,7 +626,7 @@ logLogisticRegression <- function(
       up_truncated <- abs(y) <= 0
       c(
         huber_loss[!(down_truncated | up_truncated)],
-        delta * (abs(-diffs[up_truncated | down_truncated]) - 0.5 * delta)
+        huber_loss[up_truncated | down_truncated]
       )
     }
   }
