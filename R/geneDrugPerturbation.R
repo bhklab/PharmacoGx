@@ -91,13 +91,13 @@ geneDrugPerturbation <- function(
     )
 
     mmc <- stats::anova(mm0, mm)
-    mm <- summary(mm)
+    mm_summary <- summary(mm)
     ## extract statistics
     tt <- c(
-      "estimate" = mm$coefficients["concentration", "Estimate"],
-      "se" = mm$coefficients["concentration", "Std. Error"],
+      "estimate" = mm_summary$coefficients["concentration", "Estimate"],
+      "se" = mm_summary$coefficients["concentration", "Std. Error"],
       "n" = nn,
-      "tstat" = mm$coefficients["concentration", "t value"],
+      "tstat" = mm_summary$coefficients["concentration", "t value"],
       "fstat" = mmc$F[2],
       "pvalue" = mmc$'Pr(>F)'[2]
     )
