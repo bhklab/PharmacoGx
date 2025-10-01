@@ -2,7 +2,7 @@ library(PharmacoGx)
 
 context("drugSensitivitySig defaults")
 
-test_that("drugSensitivitySig works with defaulted optional arguments", {
+test_that("drugSensitivitySig works with explicit optional arguments", {
   data(CCLEsmall)
   res <- drugSensitivitySig(
     CCLEsmall,
@@ -14,6 +14,20 @@ test_that("drugSensitivitySig works with defaulted optional arguments", {
     returnValues = "estimate",
     modeling.method = "anova",
     inference.method = "analytic",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  )
+  expect_s4_class(res, "PharmacoSig")
+  expect_equal(dim(res), c(1, length(treatmentNames(CCLEsmall)), 8))
+})
+
+test_that("drugSensitivitySig works with default optional arguments", {
+  data(CCLEsmall)
+  res <- drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "rna",
+    features = rownames(featureInfo(CCLEsmall, "rna"))[1],
     parallel.on = "drug",
     nthread = 1,
     verbose = FALSE
