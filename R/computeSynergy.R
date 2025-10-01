@@ -1755,6 +1755,6 @@ computeBliss <- function(viability_1, viability_2) {
 #'
 #' @export
 computeHSA <- function(viability_1, viability_2) {
-  HSA_ref <- min(viability_1, viability_2)
+  HSA_ref <- pmin(viability_1, viability_2)
   return(HSA_ref)
 }
