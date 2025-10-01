@@ -231,6 +231,8 @@ logLogisticRegression <- function(
     default_density <- c(2, 10, 10, 5, 10, 5, 5, 5)
   }
 
+  default_step <- 0.5 / default_density
+
   if (is.null(density)) {
     density <- default_density
   } else {
@@ -243,6 +245,10 @@ logLogisticRegression <- function(
         "`density` must match the parameter count for the selected fit type."
       )
     }
+    invalid_density <- !is.finite(density)
+    if (any(invalid_density)) {
+      density[invalid_density] <- default_density[invalid_density]
+    }
   }
 
   if (is.null(step)) {
@@ -254,6 +260,10 @@ logLogisticRegression <- function(
     }
     if (length(step) != length(default_density)) {
       stop("`step` must match the parameter count for the selected fit type.")
+    }
+    invalid_step <- !is.finite(step)
+    if (any(invalid_step)) {
+      step[invalid_step] <- default_step[invalid_step]
     }
   }
 
@@ -269,6 +279,10 @@ logLogisticRegression <- function(
         "`lower_bounds` must match the parameter count for the selected fit type."
       )
     }
+    invalid_lower <- !is.finite(lower_bounds)
+    if (any(invalid_lower)) {
+      lower_bounds[invalid_lower] <- default_lower[invalid_lower]
+    }
   }
 
   if (is.null(upper_bounds)) {
@@ -283,10 +297,22 @@ logLogisticRegression <- function(
         "`upper_bounds` must match the parameter count for the selected fit type."
       )
     }
+    invalid_upper <- !is.finite(upper_bounds)
+    if (any(invalid_upper)) {
+      upper_bounds[invalid_upper] <- default_upper[invalid_upper]
+    }
   }
 
-  if (any(upper_bounds - lower_bounds <= 0)) {
+  if (!all(is.finite(upper_bounds)) || !all(is.finite(lower_bounds))) {
+    stop("`lower_bounds` and `upper_bounds` must contain finite values.")
+  }
+
+  if (any((upper_bounds - lower_bounds) <= 0)) {
     stop("Upper bounds must exceed lower bounds for all parameters.")
+  }
+
+  if (!all(is.finite(density)) || !all(is.finite(step))) {
+    stop("`density` and `step` must contain finite positive values.")
   }
 
   if (any(density <= 0) || any(step <= 0)) {
