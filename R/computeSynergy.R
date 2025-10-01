@@ -340,8 +340,18 @@ computeZIP <- function(
   assertNumeric(EC50_1, len = len)
   assertNumeric(EC50_2, len = len)
 
-  y_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
-  y_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
+  y_1 <- hillCurve(
+    dose = log10(treatment1dose),
+    HS = HS_1,
+    EC50 = log10(EC50_1),
+    E_inf = E_inf_1
+  )
+  y_2 <- hillCurve(
+    dose = log10(treatment2dose),
+    HS = HS_2,
+    EC50 = log10(EC50_2),
+    E_inf = E_inf_2
+  )
   y_zip <- y_1 * y_2
   return(y_zip)
 }
