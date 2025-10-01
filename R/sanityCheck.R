@@ -169,6 +169,16 @@ sanitizeInput <- function(
   trunc = TRUE,
   verbose = TRUE # Set to 2 to see debug printouts
 ) {
+  to_numeric <- function(values) {
+    if (length(values) == 0L) {
+      return(numeric(0))
+    }
+    if (is.numeric(values)) {
+      return(as.numeric(values))
+    }
+    suppressWarnings(as.numeric(as.character(values)))
+  }
+
   if (!is.logical(conc_as_log)) {
     stop("'conc_as_log' must be a logical value.")
   }
@@ -194,24 +204,54 @@ sanitizeInput <- function(
       )
     }
     if (any(is.na(conc) & (!is.na(viability)))) {
-      warning(
-        "Missing concentrations with non-missing viability values encountered. Removing viability values corresponding to those concentrations"
-      )
+      if (verbose) {
+        message(
+          "Missing concentrations with non-missing viability values encountered. Removing viability values corresponding to those concentrations"
+        )
+      }
 
       myx <- !is.na(conc)
-      conc <- as.numeric(conc[myx])
-      viability <- as.numeric(viability[myx])
+      conc <- conc[myx]
+      viability <- viability[myx]
     }
     if (any((!is.na(conc)) & is.na(viability))) {
-      warning(
-        "Missing viability with non-missing concentrations values encountered. Removing concentrations values corresponding to those viabilities"
-      )
+      if (verbose) {
+        message(
+          "Missing viability with non-missing concentrations values encountered. Removing concentrations values corresponding to those viabilities"
+        )
+      }
       myx <- !is.na(viability)
-      conc <- as.numeric(conc[myx])
-      viability <- as.numeric(viability[myx])
+      conc <- conc[myx]
+      viability <- viability[myx]
     }
-    conc <- as.numeric(conc[!is.na(conc)])
-    viability <- as.numeric(viability[!is.na(viability)])
+
+    conc_numeric <- to_numeric(conc)
+    invalid_conc <- is.na(conc_numeric)
+    if (any(invalid_conc)) {
+      if (verbose) {
+        message(
+          "Non-numeric concentration values encountered. Removing corresponding entries."
+        )
+      }
+      conc_numeric <- conc_numeric[!invalid_conc]
+      viability <- viability[!invalid_conc]
+    }
+
+    conc <- conc_numeric
+
+    viability_numeric <- to_numeric(viability)
+    invalid_viability <- is.na(viability_numeric)
+    if (any(invalid_viability)) {
+      if (verbose) {
+        message(
+          "Non-numeric viability values encountered. Removing corresponding entries."
+        )
+      }
+      viability_numeric <- viability_numeric[!invalid_viability]
+      conc <- conc[!invalid_viability]
+    }
+
+    viability <- viability_numeric
 
     #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
     if (!all(is.finite(conc))) {
@@ -326,7 +366,11 @@ sanitizeInput <- function(
       return(list("Hill_fit" = Hill_fit))
     }
 
-    conc <- as.numeric(conc[!is.na(conc)])
+    conc <- conc[!is.na(conc)]
+    conc <- to_numeric(conc)
+    if (anyNA(conc)) {
+      stop("Concentration vector contains non-numeric values.")
+    }
 
     if (!all(is.finite(conc))) {
       stop(

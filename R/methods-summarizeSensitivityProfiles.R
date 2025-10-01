@@ -261,10 +261,12 @@ setMethod(
     is.factor(dd[, sensitivity.measure]) |
       is.character(dd[, sensitivity.measure])
   ) {
-    warning(
-      "Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
+    if (verbose) {
+      message(
+        "Sensitivity measure is stored as a factor or character in the pSet. This is incorrect.\n
              Please correct this and/or file an issue. Fixing in the call of this function."
-    )
+      )
+    }
     dd[, sensitivity.measure] <- as.numeric(as.character(dd[,
       sensitivity.measure
     ]))
