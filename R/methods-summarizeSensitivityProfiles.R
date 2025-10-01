@@ -102,7 +102,7 @@ setMethod(
   checkmate::assert(
     (profiles_assay %in% names(longTable)),
     msg = paste0(
-      "[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ",
+      "[PharmacoGx::summarizeSensitivityProfiles,LongTable-method] ",
       "The assay '",
       profiles_assay,
       "' is not in the LongTable object."
