@@ -95,7 +95,7 @@ drugDoseResponseCurve <-
     xlim,
     mycol,
     title,
-    plot.type = c("Fitted", "Actual", "Both"),
+    plot.type = c("Actual", "Fitted", "Both"),
     summarize.replicates = TRUE,
     lwd = 0.5,
     cex = 0.7,
@@ -195,9 +195,7 @@ drugDoseResponseCurve <-
       }
     }
 
-    if (missing(plot.type)) {
-      plot.type <- "Actual"
-    }
+    plot.type <- match.arg(plot.type)
 
     for (i in seq_len(length(pSets))) {
       if (is(treatmentResponse(pSets[[i]]), "LongTable")) {
