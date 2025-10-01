@@ -63,6 +63,7 @@ combo_profiles[, `:=`(
   EC50_1 = 0.5,
   EC50_2 = 0.6
 )]
+combo_profiles <- combo_profiles[order(treatment1dose, treatment2dose)]
 fitTwowayZIP(combo_profiles)
 
 }
