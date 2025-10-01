@@ -24,13 +24,9 @@ computeAmax <- function(
   trunc = TRUE,
   verbose = FALSE
 ) {
-  concentration <- as.numeric(concentration[!is.na(concentration)])
-  viability <- as.numeric(viability[!is.na(viability)])
-  ii <- which(concentration == 0)
-  if (length(ii) > 0) {
-    concentration <- concentration[-ii]
-    viability <- viability[-ii]
-  }
+  keep <- !is.na(concentration) & !is.na(viability) & concentration != 0
+  concentration <- as.numeric(concentration[keep])
+  viability <- as.numeric(viability[keep])
   if (length(concentration) < 2) {
     if (verbose) {
       warning("Insufficient non-zero concentrations for curve fitting")
