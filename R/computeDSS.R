@@ -118,7 +118,22 @@ computeDSS <- function(
   if (dss_type == 1) {
     return(DSS)
   }
-  DSS <- DSS / log(100 - e_inf_pct)
+  delta <- 100 - e_inf_pct
+  if (!is.finite(delta)) {
+    if (verbose) {
+      warning("Asymptotic viability is non-finite; returning NA for DSS.")
+    }
+    return(NA_real_)
+  }
+  if (delta <= 0) {
+    if (verbose) {
+      warning(
+        "E_inf exceeds or equals 100%; DSS type 2/3 undefined, returning NA."
+      )
+    }
+    return(NA_real_)
+  }
+  DSS <- DSS / log(delta)
   if (dss_type == 2) {
     return(DSS)
   }
