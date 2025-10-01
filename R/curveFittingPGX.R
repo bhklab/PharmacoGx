@@ -84,26 +84,28 @@ curveFittingPGX <- function(
     }
 
     rsq <- attr(fit, "Rsquare")
-    auc <- suppressWarnings(
+    auc <- tryCatch(
       computeAUC(
         concentration = conc,
         Hill_fit = fit,
         conc_as_log = FALSE,
         viability_as_pct = TRUE,
         trunc = TRUE
-      )
+      ),
+      warning = function(w) NA_real_
     )
 
     support <- CoreGx::.getSupportVec(log10(conc))
 
     if (main_fit_func == "hill") {
-      ic50 <- suppressWarnings(
+      ic50 <- tryCatch(
         computeIC50(
           Hill_fit = fit,
           conc_as_log = FALSE,
           viability_as_pct = TRUE,
           trunc = TRUE
-        )
+        ),
+        warning = function(w) NA_real_
       )
       fit_internal <- .normalizeHillPars(
         hill_fit = fit,
@@ -140,13 +142,14 @@ curveFittingPGX <- function(
       ic50 <- if (inherits(hill_fit, "try-error")) {
         NA_real_
       } else {
-        suppressWarnings(
+        tryCatch(
           computeIC50(
             Hill_fit = hill_fit,
             conc_as_log = FALSE,
             viability_as_pct = TRUE,
             trunc = TRUE
-          )
+          ),
+          warning = function(w) NA_real_
         )
       }
       fit_internal <- .normalizeBiphasicPars(

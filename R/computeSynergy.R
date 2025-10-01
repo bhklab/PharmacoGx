@@ -229,8 +229,8 @@ computeLoewe <- function(
   assertLogical(verbose, len = 1)
 
   ## Find viability that minimises the distance between Loewe CI and 1
-  if (verbose) {
-    loewe_guess <- optimise(
+  loewe_guess <- if (verbose) {
+    optimise(
       f = .loeweLoss,
       lower = lower_bound,
       upper = upper_bound,
@@ -244,8 +244,8 @@ computeLoewe <- function(
       EC50_2 = EC50_2
     )
   } else {
-    suppressWarnings({
-      loewe_guess <- optimise(
+    withCallingHandlers(
+      optimise(
         f = .loeweLoss,
         lower = lower_bound,
         upper = upper_bound,
@@ -257,8 +257,9 @@ computeLoewe <- function(
         HS_2 = HS_2,
         E_inf_2 = E_inf_2,
         EC50_2 = EC50_2
-      )
-    })
+      ),
+      warning = function(w) invokeRestart("muffleWarning")
+    )
   }
 
   guess_err <- loewe_guess$objective
