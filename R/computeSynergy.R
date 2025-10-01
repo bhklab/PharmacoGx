@@ -43,19 +43,21 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
     viability <- viability / 100
     E_inf <- E_inf / 100
   }
-  if (!is.finite(EC50) || EC50 <= 0) {
-    return(rep(NA_real_, length(viability)))
-  }
-  if (!is.finite(HS) || HS == 0) {
-    return(rep(NA_real_, length(viability)))
-  }
+  len <- length(viability)
+  EC50 <- rep_len(EC50, len)
+  HS <- rep_len(HS, len)
+  E_inf <- rep_len(E_inf, len)
+
+  dose <- rep(NA_real_, len)
+
+  invalid_param <- !is.finite(EC50) | EC50 <= 0 | !is.finite(HS) | HS == 0
   denom <- viability - E_inf
   ratio <- (1 - viability) / denom
-  invalid <- !is.finite(denom) | denom == 0 | !is.finite(ratio) | ratio <= 0
-  dose <- rep(NA_real_, length(viability))
+  invalid <- invalid_param | !is.finite(denom) | denom == 0 | !is.finite(ratio) | ratio <= 0
   valid_idx <- !invalid
+
   if (any(valid_idx)) {
-    dose[valid_idx] <- EC50 * ratio[valid_idx]^(1 / HS)
+    dose[valid_idx] <- EC50[valid_idx] * ratio[valid_idx]^(1 / HS[valid_idx])
   }
   dose
 }
