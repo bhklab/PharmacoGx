@@ -105,18 +105,28 @@ geneDrugSensitivity <- function(
   }
 
   ## standardized coefficient in linear model
-  if (length(table(drugpheno)) > 2 & standardize != "none") {
-    switch(
-      standardize,
-      "SD" = drugpheno <- apply(drugpheno, 2, function(x) {
-        return(x[ccix] / sd(as.numeric(x[ccix])))
-      }),
-      "rescale" = drugpheno <- apply(drugpheno, 2, function(x) {
-        return(.rescale(as.numeric(x[ccix]), q = 0.05, na.rm = TRUE))
+  drugpheno <- drugpheno[ccix, , drop = FALSE]
+  if (length(table(drugpheno)) > 2 && standardize != "none") {
+    if (standardize == "SD") {
+      drugpheno[] <- lapply(drugpheno, function(col) {
+        if (is.factor(col)) {
+          return(col)
+        }
+        sd_col <- sd(as.numeric(col), na.rm = TRUE)
+        if (is.na(sd_col) || sd_col == 0) {
+          return(col)
+        }
+        col / sd_col
       })
-    )
-  } else {
-    drugpheno <- drugpheno[ccix, , drop = FALSE]
+    } else if (standardize == "rescale") {
+      drugpheno[] <- lapply(drugpheno, function(col) {
+        if (is.factor(col)) {
+          return(col)
+        }
+        .rescale(as.numeric(col), q = 0.05, na.rm = TRUE)
+      })
+    }
+    drugpheno <- as.data.frame(drugpheno, stringsAsFactors = FALSE, check.names = FALSE)
   }
   if (length(table(x)) > 2 & standardize != "none") {
     switch(
