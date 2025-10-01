@@ -785,6 +785,18 @@ logLogisticRegression <- function(
   guess
 }
 
+#' Evaluate a Hill curve at log10 concentrations
+#'
+#' Computes viability predictions for a four-parameter Hill model given log10
+#' concentration inputs and parameter vector.
+#'
+#' @param x `numeric` vector of log10-transformed concentrations.
+#' @param pars `numeric` vector containing `HS`, `E0`, `E_inf`, and `log10EC50`
+#'   in that order.
+#'
+#' @return `numeric` vector of predicted viabilities on the 0–1 scale.
+#'
+#' @keywords internal
 .pgx_hill_curve <- function(x, pars) {
   hs <- pars[1]
   e0 <- pars[2]
@@ -793,6 +805,19 @@ logLogisticRegression <- function(
   einf + (e0 - einf) / (1 + (10^x / 10^log_ec50)^hs)
 }
 
+#' Evaluate a biphasic Hill curve at log10 concentrations
+#'
+#' Produces viability predictions for a two-component (biphasic) Hill model
+#' using log10 dose inputs and the combined parameter vector.
+#'
+#' @param x `numeric` vector of log10-transformed concentrations.
+#' @param pars `numeric` vector containing biphasic parameters in the order
+#'   `HS1`, `E0`, `E_inf1`, `HS2`, `E_inf2`, `log10EC50_1`, `log10EC50_2`,
+#'   `Frac`.
+#'
+#' @return `numeric` vector of predicted viabilities on the 0–1 scale.
+#'
+#' @keywords internal
 .pgx_biphasic_curve <- function(x, pars) {
   hs1 <- pars[1]
   e0 <- pars[2]

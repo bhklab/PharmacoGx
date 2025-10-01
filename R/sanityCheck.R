@@ -1,3 +1,18 @@
+#' Normalise Hill fit parameters
+#'
+#' Standardises the output of a Hill fit into a named parameter vector with
+#' consistent scaling for downstream utilities.
+#'
+#' @param hill_fit `list` or numeric vector containing fitted Hill parameters.
+#' @param conc_as_log `logical(1)` Whether concentrations were provided on the
+#'   log10 scale (`TRUE`) or as raw values (`FALSE`).
+#' @param viability_as_pct `logical(1)` Whether viabilities are expressed as
+#'   percentages (0–100) instead of proportions (0–1).
+#'
+#' @return `numeric` vector with elements `HS`, `E0`, `E_inf`, `log10EC50` and an
+#'   attached `Rsquare` attribute when available.
+#'
+#' @keywords internal
 .normalizeHillPars <- function(
   hill_fit,
   conc_as_log = FALSE,
@@ -74,6 +89,22 @@
   pars
 }
 
+#' Normalise biphasic Hill fit parameters
+#'
+#' Converts biphasic Hill model outputs into a standardised parameter vector for
+#' internal routines.
+#'
+#' @param hill_fit `list` or numeric vector containing biphasic Hill parameters.
+#' @param conc_as_log `logical(1)` Whether concentrations were supplied on the
+#'   log10 scale (`TRUE`) or as raw values (`FALSE`).
+#' @param viability_as_pct `logical(1)` Whether viabilities are expressed as
+#'   percentages (0–100) instead of proportions (0–1).
+#'
+#' @return `numeric` vector with elements `HS1`, `E0`, `E_inf1`, `HS2`, `E_inf2`,
+#'   `log10EC50_1`, `log10EC50_2`, and `Frac`, carrying the `Rsquare` attribute
+#'   when supplied.
+#'
+#' @keywords internal
 .normalizeBiphasicPars <- function(
   hill_fit,
   conc_as_log = FALSE,
