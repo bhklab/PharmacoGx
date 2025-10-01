@@ -246,7 +246,9 @@ geneDrugSensitivityPBCorr <- function(
       lm1 <- lm(formula(ffd), dd)
       var1 <- residuals(lm1)
       var2 <- residuals(lm(formula(ffx), dd))
-      df <- lm1$df - 2L # taking the residual degrees of freedom minus 2 parameters estimated for pearson cor.
+      # For partial point-biserial correlation, residual df already excludes fitted covariates;
+      # subtract 1 to remove the binary predictor, giving n - k - 2 overall degrees of freedom.
+      df <- lm1$df.residual - 1L
     } else {
       ## doing this if statement in the case there are some numerical differences between mean centred values and raw values
       var1 <- dd[, "drugpheno.1"]
