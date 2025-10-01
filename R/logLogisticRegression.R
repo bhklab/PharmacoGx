@@ -317,6 +317,13 @@ logLogisticRegression <- function(
     viability_valid <- viability
   }
 
+  if (!length(log_conc_valid) || !length(viability_valid)) {
+    stop(
+      "Unable to compute initial guesses: all concentration or viability values are non-finite. ",
+      "Please verify input data."
+    )
+  }
+
   viab_span <- max(viability_valid) - min(viability_valid)
   if (!is.finite(viab_span) || viab_span < .Machine$double.eps) {
     viab_span <- 1
