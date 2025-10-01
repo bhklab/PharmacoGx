@@ -66,15 +66,15 @@ setMethod(
   function(
     object,
     mDataType,
-    drugs,
-    features,
-    cells,
-    tissues,
+    drugs = NULL,
+    features = NULL,
+    cells = NULL,
+    tissues = NULL,
     sensitivity.measure = "auc_recomputed",
     molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
     sensitivity.summary.stat = c("mean", "median", "first", "last"),
     returnValues = c("estimate", "pvalue", "fdr"),
-    sensitivity.cutoff,
+    sensitivity.cutoff = NULL,
     standardize = c("SD", "rescale", "none"),
     molecular.cutoff = NA,
     molecular.cutoff.direction = c("less", "greater"),
@@ -249,10 +249,10 @@ setMethod(
     )
   }
 
-  if (missing(sensitivity.cutoff)) {
+  if (missing(sensitivity.cutoff) || is.null(sensitivity.cutoff)) {
     sensitivity.cutoff <- NA
   }
-  if (missing(drugs)) {
+  if (missing(drugs) || is.null(drugs)) {
     if (is.null(dots[["sProfiles"]])) {
       drugn <- drugs <- treatmentNames(object)
     } else {
@@ -262,7 +262,7 @@ setMethod(
     drugn <- drugs
   }
 
-  if (missing(cells)) {
+  if (missing(cells) || is.null(cells)) {
     celln <- cells <- sampleNames(object)
   } else {
     celln <- cells
@@ -282,7 +282,7 @@ setMethod(
     nthread_drug <- 1
   }
 
-  if (missing(features)) {
+  if (missing(features) || is.null(features)) {
     features <- rownames(featureInfo(object, mDataType))
   } else {
     fix <- is.element(features, rownames(featureInfo(object, mDataType)))
@@ -344,7 +344,7 @@ setMethod(
   }
   celln <- celln[cix]
 
-  if (!missing(tissues)) {
+  if (!missing(tissues) && !is.null(tissues)) {
     celln <- celln[sampleInfo(object)[celln, "tissueid"] %in% tissues]
   } else {
     tissues <- unique(sampleInfo(object)[celln, "tissueid"])
