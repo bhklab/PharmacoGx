@@ -43,7 +43,21 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
     viability <- viability / 100
     E_inf <- E_inf / 100
   }
-  EC50 * ((1 - viability) / (viability - E_inf))^(1 / HS)
+  if (!is.finite(EC50) || EC50 <= 0) {
+    return(rep(NA_real_, length(viability)))
+  }
+  if (!is.finite(HS) || HS == 0) {
+    return(rep(NA_real_, length(viability)))
+  }
+  denom <- viability - E_inf
+  ratio <- (1 - viability) / denom
+  invalid <- !is.finite(denom) | denom == 0 | !is.finite(ratio) | ratio <= 0
+  dose <- rep(NA_real_, length(viability))
+  valid_idx <- !invalid
+  if (any(valid_idx)) {
+    dose[valid_idx] <- EC50 * ratio[valid_idx]^(1 / HS)
+  }
+  dose
 }
 
 #' @title Loewe Additive Combination Index (CI)
