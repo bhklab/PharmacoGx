@@ -50,19 +50,20 @@ computeDSS <- function(
     concentration <- cleanData[["log_conc"]]
   }
 
-  ec50 <- if ("EC50" %in% names(pars)) pars[["EC50"]] else NA_real_
-  log_ec50 <- if ("log10EC50" %in% names(pars)) {
-    pars[["log10EC50"]]
+  if ("log10EC50" %in% names(pars)) {
+    log_ec50 <- as.numeric(pars[["log10EC50"]])
+  } else if ("EC50" %in% names(pars)) {
+    ec50 <- as.numeric(pars[["EC50"]])
+    if (!is.finite(ec50) || length(ec50) != 1 || ec50 <= 0) {
+      stop("Hill fit EC50 must be a single positive finite value.")
+    }
+    log_ec50 <- log10(ec50)
   } else {
-    NA_real_
+    stop("Hill fit parameters must include 'log10EC50' or 'EC50'.")
   }
 
-  if (!is.na(ec50)) {
-    log_ec50 <- if (conc_as_log) ec50 else log10(ec50)
-  }
-
-  if (is.na(log_ec50)) {
-    stop("Unable to determine EC50 from Hill fit parameters.")
+  if (!is.finite(log_ec50) || length(log_ec50) != 1) {
+    stop("Failed to derive a valid log10 EC50 from Hill fit parameters.")
   }
 
   if (log_ec50 > max(concentration)) {
