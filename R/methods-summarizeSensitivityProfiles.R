@@ -196,7 +196,9 @@ setMethod(
     get(treatment_col) ~ get(sample_col),
     value.var = 'V1'
   )
-  summaryMatrix <- as.matrix(profSummary, rownames = 'treatment_col')
+  treatment_vals <- profSummary[[treatment_col]]
+  summaryMatrix <- as.matrix(profSummary[, -1, with = FALSE])
+  rownames(summaryMatrix) <- treatment_vals
   return(summaryMatrix)
 }
 
