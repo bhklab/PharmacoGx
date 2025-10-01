@@ -661,16 +661,16 @@ logLogisticRegression <- function(
     trunc = trunc
   ))
 
-  periods <- rep(1, length(guess))
-  if (length(guess) > 1) {
-    for (idx in 2:length(guess)) {
-      periods[idx] <- periods[idx - 1] *
-        (density[idx - 1] * (upper_bounds[idx - 1] - lower_bounds[idx - 1]) + 1)
-    }
-  }
+  density_vec <- rep_len(density, length(guess))
+  ranges <- upper_bounds - lower_bounds
+  grid_counts <- pmax(1L, as.integer(round(density_vec * ranges)) + 1L)
+  step_sizes <- numeric(length(guess))
+  multi_step <- grid_counts > 1L
+  step_sizes[multi_step] <- ranges[multi_step] / (grid_counts[multi_step] - 1L)
 
-  current <- lower_bounds
-  total_points <- prod((upper_bounds - lower_bounds) * density + 1)
+  total_points <- prod(grid_counts)
+  indices <- integer(length(guess))
+  current <- lower_bounds + indices * step_sizes
 
   for (point in seq_len(total_points)) {
     test_residual <- sum(.pgx_curve_residual(
@@ -687,12 +687,15 @@ logLogisticRegression <- function(
       guess <- current
       guess_residual <- test_residual
     }
-    for (idx in seq_along(guess)) {
-      if (point %% periods[idx] == 0) {
-        current[idx] <- current[idx] + 1 / density[idx]
-        if (current[idx] > upper_bounds[idx]) {
-          current[idx] <- lower_bounds[idx]
+    if (point < total_points) {
+      for (idx in seq_along(indices)) {
+        indices[idx] <- indices[idx] + 1L
+        if (indices[idx] < grid_counts[idx]) {
+          current[idx] <- lower_bounds[idx] + indices[idx] * step_sizes[idx]
+          break
         }
+        indices[idx] <- 0L
+        current[idx] <- lower_bounds[idx]
       }
     }
   }
