@@ -85,7 +85,7 @@ rankGeneDrugPerturbation <-
     res.type <- NULL
 
     ## build input matrix
-    inpumat <- NULL
+    inputmat <- NULL # collects combined metadata for treated and control samples
     ## for each batch/vehicle of perturbations+controls (test within each batch/vehicle to avoid batch effect)
     ubatch <- sort(unique(batch[!is.na(xp) & xp == "perturbation"]))
     names(ubatch) <- paste("batch", ubatch, sep = "")
@@ -126,8 +126,8 @@ rankGeneDrugPerturbation <-
         }
         ## transformation of drug concentrations values
         conc <- drug.concentration * 10^6
-        inpumat <- rbind(
-          inpumat,
+        inputmat <- rbind(
+          inputmat,
           data.frame(
             "treated" = c(rep(1, length(xpix)), rep(0, length(ctrlix))),
             "type" = c(type[xpix], type[ctrlix]),
@@ -139,13 +139,21 @@ rankGeneDrugPerturbation <-
       }
     }
 
-    inpumat[, "type"] <- factor(inpumat[, "type"], ordered = FALSE)
-    inpumat[, "batch"] <- factor(inpumat[, "batch"], ordered = FALSE)
+    if (is.null(inputmat) || nrow(inputmat) == 0) {
+      warning(sprintf(
+        "No perturbation data available for drug(s) %s.",
+        paste(drug, collapse = ", ")
+      ))
+      return(list("all.type" = NULL, "single.type" = NULL))
+    }
+
+    inputmat[, "type"] <- factor(inputmat[, "type"], ordered = FALSE)
+    inputmat[, "batch"] <- factor(inputmat[, "batch"], ordered = FALSE)
 
     if (
-      nrow(inpumat) < 3 ||
-        length(sort(unique(inpumat[, "concentration"]))) < 2 ||
-        length(unique(inpumat[, "duration"])) < 2
+      nrow(inputmat) < 3 ||
+        length(sort(unique(inputmat[, "concentration"]))) < 2 ||
+        length(unique(inputmat[, "duration"])) < 2
     ) {
       ## not enough experiments in drug list
       warning(sprintf(
@@ -156,7 +164,7 @@ rankGeneDrugPerturbation <-
     }
 
     res <- NULL
-    utype <- sort(unique(as.character(inpumat[, "type"])))
+    utype <- sort(unique(as.character(inputmat[, "type"])))
     ltype <- list("all" = utype)
     if (single.type) {
       ltype <- c(ltype, as.list(utype))
@@ -164,15 +172,16 @@ rankGeneDrugPerturbation <-
     }
     for (ll in seq_len(length(ltype))) {
       ## select the type of cell line/tissue of interest
-      inpumat2 <- inpumat[
-        !is.na(inpumat[, "type"]) & is.element(inpumat[, "type"], ltype[[ll]]),
+      inputmat2 <- inputmat[
+        !is.na(inputmat[, "type"]) &
+          is.element(inputmat[, "type"], ltype[[ll]]),
         ,
         drop = FALSE
       ]
-      inpumat2 <- inpumat2[complete.cases(inpumat2), , drop = FALSE]
+      inputmat2 <- inputmat2[complete.cases(inputmat2), , drop = FALSE]
       if (
-        nrow(inpumat2) < 3 ||
-          length(sort(unique(inpumat2[, "concentration"]))) < 2
+        nrow(inputmat2) < 3 ||
+          length(sort(unique(inputmat2[, "concentration"]))) < 2
       ) {
         ## not enough experiments in data
         nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
@@ -192,31 +201,31 @@ rankGeneDrugPerturbation <-
           ]
           mcres <- parallel::mclapply(
             splitix,
-            function(x, data, inpumat) {
+            function(x, data, inputmat) {
               res <- t(apply(
-                data[rownames(inpumat), x, drop = FALSE],
+                data[rownames(inputmat), x, drop = FALSE],
                 2,
                 geneDrugPerturbation,
-                concentration = inpumat[, "concentration"],
-                type = inpumat[, "type"],
-                batch = inpumat[, "batch"],
-                duration = inpumat[, "duration"]
+                concentration = inputmat[, "concentration"],
+                type = inputmat[, "type"],
+                batch = inputmat[, "batch"],
+                duration = inputmat[, "duration"]
               ))
               return(res)
             },
             data = data,
-            inpumat = inpumat2
+            inputmat = inputmat2
           )
           rest <- do.call(rbind, mcres)
         } else {
           rest <- t(apply(
-            data[rownames(inpumat2), , drop = FALSE],
+            data[rownames(inputmat2), , drop = FALSE],
             2,
             geneDrugPerturbation,
-            concentration = inpumat2[, "concentration"],
-            type = inpumat2[, "type"],
-            batch = inpumat2[, "batch"],
-            duration = inpumat2[, "duration"]
+            concentration = inputmat2[, "concentration"],
+            type = inputmat2[, "type"],
+            batch = inputmat2[, "batch"],
+            duration = inputmat2[, "duration"]
           ))
         }
       }
