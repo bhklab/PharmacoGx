@@ -50,7 +50,8 @@ setMethod(
         cell.lines,
         drugs,
         summary.stat,
-        fill.missing
+        fill.missing,
+        verbose
       )
     } else {
       .summarizeSensitivityProfilesPharmacoSet(
@@ -82,7 +83,8 @@ setMethod(
   cell.lines,
   drugs,
   summary.stat = c("mean", "median", "first", "last", "max", "min"),
-  fill.missing = TRUE
+  fill.missing = TRUE,
+  verbose = TRUE
 ) {
   # handle missing
   if (missing(cell.lines)) {
