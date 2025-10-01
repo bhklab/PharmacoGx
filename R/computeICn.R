@@ -28,7 +28,7 @@
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
 #' @param verbose `logical`, if true, causes warnings thrown by the function to be printed.
-#' @return a numeric value for the concentration of the nth precentile viability reduction
+#' @return a numeric value for the concentration of the nth percentile viability reduction
 #' @export
 computeICn <- function(
   concentration,
