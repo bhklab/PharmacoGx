@@ -46,9 +46,9 @@ geneDrugPerturbation <- function(
     ff <- sprintf("%s + batch", ff)
   }
 
-  ### add experiment duration if the vector consists of more than one different value
+  ### add experiment duration if the vector consists of more than two different values
 
-  if (length(sort(unique(duration))) > 1) {
+  if (length(sort(unique(duration))) > 2) {
     ff0 <- sprintf("%s + duration", ff0)
     ff <- sprintf("%s + duration", ff)
   }
