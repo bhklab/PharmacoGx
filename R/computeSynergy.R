@@ -1678,16 +1678,16 @@ utils::globalVariables(c(
   viability_1 <- .Hill(log10(treatment1dose), c(HS_1, E_inf_1, log10(EC50_1)))
   viability_2 <- .Hill(log10(treatment2dose), c(HS_2, E_inf_2, log10(EC50_2)))
   viability_2_to_1 <- hillCurve(
-    dose = treatment1dose,
+    dose = log10(treatment1dose),
     HS = HS_2_to_1,
-    EC50 = EC50_2_to_1,
+    EC50 = log10(EC50_2_to_1),
     E_ninf = viability_2,
     E_inf = E_inf_2_to_1
   )
   viability_1_to_2 <- hillCurve(
-    dose = treatment2dose,
+    dose = log10(treatment2dose),
     HS = HS_1_to_2,
-    EC50 = EC50_1_to_2,
+    EC50 = log10(EC50_1_to_2),
     E_ninf = viability_1,
     E_inf = E_inf_1_to_2
   )
