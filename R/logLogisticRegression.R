@@ -538,16 +538,11 @@ logLogisticRegression <- function(
         delta = delta
       ))
     } else {
-      warning(
-        sprintf(
-          paste(
-            "Skipping full mesh evaluation: grid size (%s) exceeds max_grid_points (%s).",
-            "Adjust density or option 'PharmacoGx.max_mesh_points' to enable mesh search."
-          ),
-          format(grid_size, scientific = TRUE),
-          format(max_grid_points, scientific = TRUE)
-        )
-      )
+      warning(sprintf(
+        "Skipping full mesh evaluation: grid size (%s) exceeds max_grid_points (%s). Adjust density or option 'PharmacoGx.max_mesh_points' to enable mesh search.",
+        format(grid_size, scientific = TRUE),
+        format(max_grid_points, scientific = TRUE)
+      ))
       guess <- gritty_guess
       guess_residual <- gritty_residual
     }
