@@ -41,6 +41,25 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE) {
     as.integer(idx)
   }
 
+  resolve_names <- function(requested, available, axis) {
+    if (length(requested) == 0L) {
+      return(character(0))
+    }
+    normalized <- requested
+    if (!is.character(normalized)) {
+      normalized <- as.character(normalized)
+    }
+    normalized <- normalized[!is.na(normalized) & nzchar(normalized)]
+    if (length(normalized) == 0L) {
+      return(character(0))
+    }
+    matched_idx <- match(normalized, available, nomatch = NA_integer_)
+    if (all(is.na(matched_idx))) {
+      return(character(0))
+    }
+    available[matched_idx[!is.na(matched_idx)]]
+  }
+
   samples <- sampleNames(x)
   treatments <- treatmentNames(x)
 
@@ -50,7 +69,8 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE) {
   if (missing(i)) {
     cell_names <- samples
   } else if (is.character(i)) {
-    cell_names <- i
+    cell_names <- resolve_names(i, samples, "cell")
+    cells_requested_empty <- cells_requested_empty || length(cell_names) == 0
   } else if (is.numeric(i)) {
     idx <- validate_index(i, length(samples), "cell")
     cell_names <- if (length(idx)) samples[idx] else character(0)
@@ -65,7 +85,8 @@ setMethod(`[`, 'PharmacoSet', function(x, i, j, ..., drop = FALSE) {
   if (missing(j)) {
     drug_names <- treatments
   } else if (is.character(j)) {
-    drug_names <- j
+    drug_names <- resolve_names(j, treatments, "drug")
+    drugs_requested_empty <- drugs_requested_empty || length(drug_names) == 0
   } else if (is.numeric(j)) {
     idx <- validate_index(j, length(treatments), "drug")
     drug_names <- if (length(idx)) treatments[idx] else character(0)
