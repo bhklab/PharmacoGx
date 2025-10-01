@@ -173,6 +173,8 @@ geneDrugSensitivityPBCorr <- function(
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
 
+  xx <- x[ccix]
+
   rest <- c(
     "estimate" = NA_real_,
     "n" = as.numeric(nn),
@@ -183,7 +185,7 @@ geneDrugSensitivityPBCorr <- function(
     "upper" = NA_real_
   )
 
-  if (nn <= 3 || all(duplicated(x)[-1L])) {
+  if (nn <= 3 || length(unique(xx)) <= 1) {
     ## not enough samples with complete information or no variation in gene expression
     return(rest)
   }
@@ -197,8 +199,6 @@ geneDrugSensitivityPBCorr <- function(
   }
 
   drugpheno <- drugpheno[ccix, , drop = FALSE]
-
-  xx <- x[ccix]
 
   if (ncol(drugpheno) > 1) {
     stop("Partial correlations not implemented for multiple outputs")
