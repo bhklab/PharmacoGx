@@ -448,23 +448,41 @@ drugDoseResponseCurve <-
       mycol <- RColorBrewer::brewer.pal(n = 7, name = "Set1")
     }
 
-    dose.range <- c(10^100, 0)
+    dose.range <- c(Inf, -Inf)
     viability.range <- c(0, 10)
+    filtered_doses <- vector("list", length(doses))
+    filtered_responses <- vector("list", length(responses))
     for (i in seq_len(length(doses))) {
-      dose.range <- c(
-        min(dose.range[1], min(doses[[i]], na.rm = TRUE), na.rm = TRUE),
-        max(dose.range[2], max(doses[[i]], na.rm = TRUE), na.rm = TRUE)
-      )
-      viability.range <- c(
-        0,
-        max(viability.range[2], max(responses[[i]], na.rm = TRUE), na.rm = TRUE)
-      )
+      dose_vec <- doses[[i]]
+      resp_vec <- responses[[i]]
+      valid_idx <- is.finite(dose_vec) & is.finite(resp_vec) &
+        !is.na(dose_vec) & !is.na(resp_vec) & dose_vec > 0
+      filtered_doses[[i]] <- dose_vec[valid_idx]
+      filtered_responses[[i]] <- resp_vec[valid_idx]
+      if (length(filtered_doses[[i]]) > 0) {
+        dose.range <- c(
+          min(dose.range[1], min(filtered_doses[[i]], na.rm = TRUE), na.rm = TRUE),
+          max(dose.range[2], max(filtered_doses[[i]], na.rm = TRUE), na.rm = TRUE)
+        )
+        viability.range <- c(
+          0,
+          max(
+            viability.range[2],
+            max(filtered_responses[[i]], na.rm = TRUE),
+            na.rm = TRUE
+          )
+        )
+      }
+    }
+    if (!is.finite(dose.range[1]) || !is.finite(dose.range[2])) {
+      warning("No positive finite doses available for plotting.")
+      return(invisible(NULL))
     }
     x1 <- 10^10
     x2 <- 0
 
     if (length(doses) > 1) {
-      common.ranges <- .getCommonConcentrationRange(doses)
+      common.ranges <- .getCommonConcentrationRange(filtered_doses)
 
       for (i in seq_len(length(doses))) {
         x1 <- min(x1, min(common.ranges[[i]]))
@@ -517,12 +535,8 @@ drugDoseResponseCurve <-
     }
 
     for (i in seq_len(length(doses))) {
-      dose_vec <- doses[[i]]
-      resp_vec <- responses[[i]]
-      valid_idx <- is.finite(dose_vec) & is.finite(resp_vec) & !is.na(dose_vec) &
-        !is.na(resp_vec) & dose_vec > 0
-      filtered_dose <- dose_vec[valid_idx]
-      filtered_resp <- resp_vec[valid_idx]
+      filtered_dose <- filtered_doses[[i]]
+      filtered_resp <- filtered_responses[[i]]
 
       if (length(filtered_dose) < 2 || length(unique(filtered_resp)) < 2) {
         next
