@@ -19,7 +19,7 @@ drugDoseResponseCurve(
   xlim,
   mycol,
   title,
-  plot.type = c("Fitted", "Actual", "Both"),
+  plot.type = c("Actual", "Fitted", "Both"),
   summarize.replicates = TRUE,
   lwd = 0.5,
   cex = 0.7,

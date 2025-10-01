@@ -57,7 +57,7 @@ assumed to be a decimal fraction.}
 \code{numeric(1)} The ICn of the Hill curve over the specified dose
 range.
 
-a numeric value for the concentration of the nth precentile viability reduction
+a numeric value for the concentration of the nth percentile viability reduction
 }
 \description{
 Returns the ICn for any given nth percentile when given concentration and viability as input, normalized by the concentration

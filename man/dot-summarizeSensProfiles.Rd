@@ -13,7 +13,8 @@
   cell.lines,
   drugs,
   summary.stat = c("mean", "median", "first", "last", "max", "min"),
-  fill.missing = TRUE
+  fill.missing = TRUE,
+  verbose = TRUE
 )
 }
 \value{
