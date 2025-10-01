@@ -9,7 +9,7 @@ matching_logic <- function(pp, dd, ucell) {
     alt_idx <- match(ucell[missing_ucell], rownames(pp))
     ucell_idx[missing_ucell] <- alt_idx
   }
-  dd_idx <- match(ucell, pp[, "sampleid"])
+  dd_idx <- match(pp[ucell_idx, "sampleid"], colnames(dd))
   if (any(missing_ucell)) {
     alt_dd <- match(ucell[missing_ucell], colnames(dd))
     dd_idx[missing_ucell] <- alt_dd
