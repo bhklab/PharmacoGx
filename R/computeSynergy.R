@@ -645,6 +645,7 @@ estimateProjParams <- function(
 #'   EC50_1 = 0.5,
 #'   EC50_2 = 0.6
 #' )]
+#' combo_profiles <- combo_profiles[order(treatment1dose, treatment2dose)]
 #' fitTwowayZIP(combo_profiles)
 #'
 #' @param combo_profiles [data.table] contains three parameters of dose-response curves

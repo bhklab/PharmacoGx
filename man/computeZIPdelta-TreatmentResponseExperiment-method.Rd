@@ -40,7 +40,9 @@ Compute ZIP delta score as described in the original paper.
 }
 \examples{
 \donttest{
-tre <- computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+if (exists("tre")) {
+  computeZIPdelta(tre, residual = "Cauchy", nthread = 2L)
+}
 }
 
 }
