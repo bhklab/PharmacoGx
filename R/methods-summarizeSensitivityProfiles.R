@@ -137,7 +137,7 @@ setMethod(
   # ensure selected measure is an option
   if (!(sensitivity.measure %in% profileOpts)) {
     stop(.errorMsg(
-      '[PharmacoGx::summarizeSensivitiyProfiles,LongTable-method] ',
+      '[PharmacoGx::summarizeSensitivityProfiles,LongTable-method] ',
       'there is no measure ',
       sensitivity.measure,
       ' in this PharmacoSet.',
