@@ -517,57 +517,66 @@ drugDoseResponseCurve <-
     }
 
     for (i in seq_len(length(doses))) {
-      points(doses[[i]], responses[[i]], pch = 20, col = mycol[i], cex = cex)
+      dose_vec <- doses[[i]]
+      resp_vec <- responses[[i]]
+      valid_idx <- is.finite(dose_vec) & is.finite(resp_vec) & !is.na(dose_vec) &
+        !is.na(resp_vec) & dose_vec > 0
+      filtered_dose <- dose_vec[valid_idx]
+      filtered_resp <- resp_vec[valid_idx]
+
+      if (length(filtered_dose) < 2 || length(unique(filtered_resp)) < 2) {
+        next
+      }
+
+      points(filtered_dose, filtered_resp, pch = 20, col = mycol[i], cex = cex)
+
+      ordered_idx <- order(filtered_dose)
+      ordered_dose <- filtered_dose[ordered_idx]
+      ordered_resp <- filtered_resp[ordered_idx]
+
+      draw_fitted <- function() {
+        fit <- try(
+          logLogisticRegression(
+            conc = filtered_dose,
+            viability = filtered_resp
+          ),
+          silent = TRUE
+        )
+        if (inherits(fit, "try-error")) {
+          return()
+        }
+        log10_x_vals <- .getSupportVec(log10(filtered_dose))
+        pred <- .Hill(
+          log10_x_vals,
+          pars = c(
+            fit$HS,
+            fit$E_inf / 100,
+            log10(fit$EC50)
+          )
+        ) * 100
+        if (trunc) {
+          pred <- pmin(pmax(pred, 0), 100)
+        }
+        lines(
+          10^log10_x_vals,
+          pred,
+          lty = 1,
+          lwd = lwd,
+          col = mycol[i]
+        )
+      }
 
       switch(
         plot.type,
         "Actual" = {
-          lines(doses[[i]], responses[[i]], lty = 1, lwd = lwd, col = mycol[i])
+          lines(ordered_dose, ordered_resp, lty = 1, lwd = lwd, col = mycol[i])
         },
         "Fitted" = {
-          log_logistic_params <- logLogisticRegression(
-            conc = doses[[i]],
-            viability = responses[[i]]
-          )
-          log10_x_vals <- .getSupportVec(log10(doses[[i]]))
-          lines(
-            10^log10_x_vals,
-            .Hill(
-              log10_x_vals,
-              pars = c(
-                log_logistic_params$HS,
-                log_logistic_params$E_inf / 100,
-                log10(log_logistic_params$EC50)
-              )
-            ) *
-              100,
-            lty = 1,
-            lwd = lwd,
-            col = mycol[i]
-          )
+          draw_fitted()
         },
         "Both" = {
-          lines(doses[[i]], responses[[i]], lty = 1, lwd = lwd, col = mycol[i])
-          log_logistic_params <- logLogisticRegression(
-            conc = doses[[i]],
-            viability = responses[[i]]
-          )
-          log10_x_vals <- .getSupportVec(log10(doses[[i]]))
-          lines(
-            10^log10_x_vals,
-            .Hill(
-              log10_x_vals,
-              pars = c(
-                log_logistic_params$HS,
-                log_logistic_params$E_inf / 100,
-                log10(log_logistic_params$EC50)
-              )
-            ) *
-              100,
-            lty = 1,
-            lwd = lwd,
-            col = mycol[i]
-          )
+          lines(ordered_dose, ordered_resp, lty = 1, lwd = lwd, col = mycol[i])
+          draw_fitted()
         }
       )
       legends <- c(legends, sprintf("%s%s", pSetNames[[i]], legend.values[[i]]))
