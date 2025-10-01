@@ -231,59 +231,88 @@ computeLoewe <- function(
   len <- length(treatment1dose)
   assertNumeric(treatment1dose, len = len)
   assertNumeric(treatment2dose, len = len)
-  assertNumeric(HS_1, len = len)
-  assertNumeric(HS_2, len = len)
-  assertNumeric(E_inf_1, len = len)
-  assertNumeric(E_inf_2, len = len)
-  assertNumeric(EC50_1, len = len)
-  assertNumeric(EC50_2, len = len)
+  assertNumeric(HS_1, min.len = 1)
+  assertNumeric(HS_2, min.len = 1)
+  assertNumeric(E_inf_1, min.len = 1)
+  assertNumeric(E_inf_2, min.len = 1)
+  assertNumeric(EC50_1, min.len = 1)
+  assertNumeric(EC50_2, min.len = 1)
   assertNumeric(tol, len = 1)
   assertNumeric(lower_bound, len = 1)
   assertNumeric(upper_bound, len = 1)
   assertLogical(verbose, len = 1)
 
-  ## Find viability that minimises the distance between Loewe CI and 1
-  loewe_guess <- if (verbose) {
-    optimise(
-      f = .loeweLoss,
-      lower = lower_bound,
-      upper = upper_bound,
-      treatment1dose = treatment1dose,
-      HS_1 = HS_1,
-      E_inf_1 = E_inf_1,
-      EC50_1 = EC50_1,
-      treatment2dose = treatment2dose,
-      HS_2 = HS_2,
-      E_inf_2 = E_inf_2,
-      EC50_2 = EC50_2
-    )
-  } else {
-    withCallingHandlers(
-      optimise(
-        f = .loeweLoss,
-        lower = lower_bound,
-        upper = upper_bound,
-        treatment1dose = treatment1dose,
-        HS_1 = HS_1,
-        E_inf_1 = E_inf_1,
-        EC50_1 = EC50_1,
-        treatment2dose = treatment2dose,
-        HS_2 = HS_2,
-        E_inf_2 = E_inf_2,
-        EC50_2 = EC50_2
-      ),
-      warning = function(w) invokeRestart("muffleWarning")
-    )
+  expand_param <- function(param, name) {
+    if (length(param) == len) {
+      return(param)
+    }
+    if (length(param) == 1L) {
+      return(rep_len(param, len))
+    }
+    stop(sprintf("`%s` must have length 1 or %d.", name, len))
   }
 
-  guess_err <- loewe_guess$objective
-  loewe_estimate <- loewe_guess$minimum
+  HS_1 <- expand_param(HS_1, "HS_1")
+  HS_2 <- expand_param(HS_2, "HS_2")
+  E_inf_1 <- expand_param(E_inf_1, "E_inf_1")
+  E_inf_2 <- expand_param(E_inf_2, "E_inf_2")
+  EC50_1 <- expand_param(EC50_1, "EC50_1")
+  EC50_2 <- expand_param(EC50_2, "EC50_2")
 
-  if (is.na(guess_err) || is.nan(guess_err) || guess_err > tol) {
-    loewe_estimate <- NA_real_
+  optimise_wrapper <- function(fun) {
+    if (verbose) {
+      optimise(fun, lower = lower_bound, upper = upper_bound)
+    } else {
+      withCallingHandlers(
+        optimise(fun, lower = lower_bound, upper = upper_bound),
+        warning = function(w) invokeRestart("muffleWarning")
+      )
+    }
   }
 
-  return(loewe_estimate)
+  estimates <- rep(NA_real_, len)
+
+  for (idx in seq_len(len)) {
+    params <- c(
+      treatment1dose[idx],
+      HS_1[idx],
+      E_inf_1[idx],
+      EC50_1[idx],
+      treatment2dose[idx],
+      HS_2[idx],
+      E_inf_2[idx],
+      EC50_2[idx]
+    )
+    if (any(!is.finite(params))) {
+      next
+    }
+
+    loss_fn <- function(v) {
+      .loeweLoss(
+        viability = v,
+        treatment1dose = treatment1dose[idx],
+        HS_1 = HS_1[idx],
+        E_inf_1 = E_inf_1[idx],
+        EC50_1 = EC50_1[idx],
+        treatment2dose = treatment2dose[idx],
+        HS_2 = HS_2[idx],
+        E_inf_2 = E_inf_2[idx],
+        EC50_2 = EC50_2[idx]
+      )
+    }
+
+    opt_res <- tryCatch(optimise_wrapper(loss_fn), error = function(e) NULL)
+    if (is.null(opt_res)) {
+      next
+    }
+
+    err_val <- opt_res$objective
+    if (!is.na(err_val) && !is.nan(err_val) && err_val <= tol) {
+      estimates[idx] <- opt_res$minimum
+    }
+  }
+
+  return(estimates)
 }
 
 
