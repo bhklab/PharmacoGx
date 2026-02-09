@@ -53,7 +53,11 @@ effectToDose <- function(viability, EC50, HS, E_inf, is_pct = FALSE) {
   invalid_param <- !is.finite(EC50) | EC50 <= 0 | !is.finite(HS) | HS == 0
   denom <- viability - E_inf
   ratio <- (1 - viability) / denom
-  invalid <- invalid_param | !is.finite(denom) | denom == 0 | !is.finite(ratio) | ratio <= 0
+  invalid <- invalid_param |
+    !is.finite(denom) |
+    denom == 0 |
+    !is.finite(ratio) |
+    ratio <= 0
   valid_idx <- !invalid
 
   if (any(valid_idx)) {

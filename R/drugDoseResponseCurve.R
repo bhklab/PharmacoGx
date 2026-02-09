@@ -455,14 +455,25 @@ drugDoseResponseCurve <-
     for (i in seq_len(length(doses))) {
       dose_vec <- doses[[i]]
       resp_vec <- responses[[i]]
-      valid_idx <- is.finite(dose_vec) & is.finite(resp_vec) &
-        !is.na(dose_vec) & !is.na(resp_vec) & dose_vec > 0
+      valid_idx <- is.finite(dose_vec) &
+        is.finite(resp_vec) &
+        !is.na(dose_vec) &
+        !is.na(resp_vec) &
+        dose_vec > 0
       filtered_doses[[i]] <- dose_vec[valid_idx]
       filtered_responses[[i]] <- resp_vec[valid_idx]
       if (length(filtered_doses[[i]]) > 0) {
         dose.range <- c(
-          min(dose.range[1], min(filtered_doses[[i]], na.rm = TRUE), na.rm = TRUE),
-          max(dose.range[2], max(filtered_doses[[i]], na.rm = TRUE), na.rm = TRUE)
+          min(
+            dose.range[1],
+            min(filtered_doses[[i]], na.rm = TRUE),
+            na.rm = TRUE
+          ),
+          max(
+            dose.range[2],
+            max(filtered_doses[[i]], na.rm = TRUE),
+            na.rm = TRUE
+          )
         )
         viability.range <- c(
           0,
@@ -567,7 +578,8 @@ drugDoseResponseCurve <-
             fit$E_inf / 100,
             log10(fit$EC50)
           )
-        ) * 100
+        ) *
+          100
         if (trunc) {
           pred <- pmin(pmax(pred, 0), 100)
         }

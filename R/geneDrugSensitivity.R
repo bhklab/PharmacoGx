@@ -38,7 +38,11 @@ geneDrugSensitivity <- function(
   if (is.null(dim(drugpheno))) {
     drugpheno <- data.frame("drugpheno.1" = drugpheno, check.names = FALSE)
   } else {
-    colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep = ".")
+    colnames(drugpheno) <- paste(
+      "drugpheno",
+      seq_len(ncol(drugpheno)),
+      sep = "."
+    )
     drugpheno <- as.data.frame(drugpheno, check.names = FALSE)
   }
   drugpheno[] <- lapply(drugpheno, function(col) {
@@ -126,7 +130,11 @@ geneDrugSensitivity <- function(
         .rescale(as.numeric(col), q = 0.05, na.rm = TRUE)
       })
     }
-    drugpheno <- as.data.frame(drugpheno, stringsAsFactors = FALSE, check.names = FALSE)
+    drugpheno <- as.data.frame(
+      drugpheno,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
   }
   if (length(table(x)) > 2 & standardize != "none") {
     switch(

@@ -27,7 +27,11 @@ test_that("missing cells absent everywhere remain NA", {
 })
 
 test_that("duplicate rownames fallback picks first occurrence", {
-  pp <- matrix(c(NA, NA, "C"), ncol = 1, dimnames = list(c("dup", "dup", "other"), "sampleid"))
+  pp <- matrix(
+    c(NA, NA, "C"),
+    ncol = 1,
+    dimnames = list(c("dup", "dup", "other"), "sampleid")
+  )
   dd <- matrix(1:9, nrow = 3, dimnames = list(NULL, c("X", "Y", "C")))
   res <- matching_logic(pp, dd, c("dup"))
   expect_equal(res$ucell_idx, 1L)
