@@ -98,7 +98,17 @@ computeAmax <- function(
     viability_as_pct = FALSE,
     trunc = trunc
   ))
-  x <- 100 - .Hill(max(log_conc), pars) * 100
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
+  )
+  x <- 100 -
+    .pgx_hill_curve(
+      max(log_conc),
+      unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
+    ) *
+      100
   names(x) <- "Amax"
   return(x)
 }
