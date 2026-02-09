@@ -51,22 +51,19 @@ Computes the Loewe additive combination index (CI) from its definition
 }
 }
 \examples{
-\dontrun{
-tre |>
-    endoaggregate(
-        assay="combo_viability",
-        Loewe = PharmacoGx::computeLoewe(
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose,
-            HS_1 = HS_1,
-            HS_2 = HS_2,
-            E_inf_1 = E_inf_1,
-            E_inf_2 = E_inf_2,
-            EC50_1 = EC50_1,
-            EC50_2 = EC50_2
-        ),
-        by = assayKeys(tre, "combo_viability")
-    ) -> tre
-}
+viability <- c(0.8, 0.6)
+doses1 <- c(0.1, 1)
+doses2 <- c(0.1, 1)
+loeweCI(
+  viability = viability,
+  treatment1dose = doses1,
+  HS_1 = rep(1, length(doses1)),
+  E_inf_1 = rep(0, length(doses1)),
+  EC50_1 = rep(0.5, length(doses1)),
+  treatment2dose = doses2,
+  HS_2 = rep(1, length(doses2)),
+  E_inf_2 = rep(0, length(doses2)),
+  EC50_2 = rep(0.5, length(doses2))
+)
 
 }

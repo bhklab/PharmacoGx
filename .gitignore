@@ -16,6 +16,7 @@ check/*
 PSets/**
 .*
 *.html
+AGENTS.md
 
 # exceptions
 !.github

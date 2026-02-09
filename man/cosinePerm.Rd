@@ -2,7 +2,7 @@
 % Please edit documentation in R/cosinePerm.R
 \name{cosinePerm}
 \alias{cosinePerm}
-\title{Cosine Permuations}
+\title{Cosine Permutations}
 \usage{
 cosinePerm(
   x,

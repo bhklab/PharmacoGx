@@ -338,9 +338,10 @@ PharmacoGx::PharmacoSet2(
   treatmentResponse = CoreGx::TreatmentResponseExperiment(),
   perturbation = list(),
   curation = list(
-    sample = data.frame(), 
-    treatment = data.frame(), 
-    tissue = data.frame()),
+    sample = data.frame(),
+    treatment = data.frame(),
+    tissue = data.frame()
+  ),
   datasetType = "sensitivity"
 )
 
@@ -352,17 +353,18 @@ PharmacoGx::PharmacoSet2(
 ```{r eval=FALSE}
 PharmacoGx::PharmacoSet(
   name,
-  molecularProfiles=list(),
-  sample=data.frame(),
-  treatment=data.frame(),
-  sensitivityInfo=data.frame(),
-  sensitivityRaw=array(dim=c(0,0,0)),
-  sensitivityProfiles=matrix(),
-  curationTreatment=data.frame(),
-  curationSample=data.frame(),
-  curationTissue=data.frame(),
-  datasetType=c("sensitivity", "perturbation", "both"),
-  verify = TRUE)
+  molecularProfiles = list(),
+  sample = data.frame(),
+  treatment = data.frame(),
+  sensitivityInfo = data.frame(),
+  sensitivityRaw = array(dim = c(0, 0, 0)),
+  sensitivityProfiles = matrix(),
+  curationTreatment = data.frame(),
+  curationSample = data.frame(),
+  curationTissue = data.frame(),
+  datasetType = c("sensitivity", "perturbation", "both"),
+  verify = TRUE
+)
 ```
 
 Here, `name` is the name of the PharmacoSet as described in annotations above,
@@ -376,3 +378,9 @@ the pSet after its construction. Any data detailed above but missing from this
 constructor call will be created by the constructor, and the default empty
 values are as in the call above. Notice that none of the values should be set
 as NA, they should be omited if the data is not being provided.
+
+## Session information
+
+```{r session-info, echo=FALSE}
+sessionInfo()
+```

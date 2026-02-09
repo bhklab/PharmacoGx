@@ -52,22 +52,19 @@ Predict the response of a treatment combination under
 the Loewe additive null assumption.
 }
 \examples{
-\dontrun{
-tre |>
-    endoaggregate(
-        assay="combo_viability",
-        Loewe = computeLoewe(
-            treatment1dose=treatment1dose,
-            treatment2dose=treatment2dose,
-            HS_1=HS_1,
-            HS_2=HS_2,
-            E_inf_1=E_inf_1,
-            E_inf_2=E_inf_2,
-            EC50_1=EC50_1,
-            EC50_2=EC50_2
-        ),
-        by = assayKeys(tre, "combo_viability")
-    ) -> tre
-}
+doses1 <- 0.5
+doses2 <- 0.3
+computeLoewe(
+  treatment1dose = doses1,
+  HS_1 = 1,
+  E_inf_1 = 0.2,
+  EC50_1 = 0.4,
+  treatment2dose = doses2,
+  HS_2 = 1.1,
+  E_inf_2 = 0.3,
+  EC50_2 = 0.2,
+  lower_bound = 0.05,
+  upper_bound = 0.95
+)
 
 }

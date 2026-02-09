@@ -18,47 +18,67 @@
 #' @param verbose `logical` should warnings be printed
 #' @return The numerical Amax
 #' @export
-computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
-  concentration <- as.numeric(concentration[!is.na(concentration)])
-  viability <- as.numeric(viability[!is.na(viability)])
-  ii <- which(concentration == 0)
-  if(length(ii) > 0) {
-    concentration <- concentration[-ii]
-    viability <- viability[-ii]
+computeAmax <- function(
+  concentration,
+  viability,
+  trunc = TRUE,
+  verbose = FALSE
+) {
+  keep <- !is.na(concentration) & !is.na(viability) & concentration != 0
+  concentration <- as.numeric(concentration[keep])
+  viability <- as.numeric(viability[keep])
+  if (length(concentration) < 2) {
+    if (verbose) {
+      warning("Insufficient non-zero concentrations for curve fitting")
+    }
+    x <- NA_real_
+    names(x) <- "Amax"
+    return(x)
   }
 
   #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
   if (!all(is.finite(concentration))) {
-    print(concentration)
-    stop("Concentration vector contains elements which are not real numbers.")
+    stop(
+      "Concentration vector contains non-finite values: ",
+      toString(concentration[!is.finite(concentration)])
+    )
   }
 
   if (!all(is.finite(viability))) {
-    print(viability)
-    stop("Viability vector contains elements which are not real numbers.")
+    stop(
+      "Viability vector contains non-finite values: ",
+      toString(viability[!is.finite(viability)])
+    )
   }
 
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
+  if (!is.logical(trunc)) {
+    stop("'trunc' must be a logical value.")
+  }
+
+  if (!is.logical(verbose) || length(verbose) != 1L || is.na(verbose)) {
+    stop("'verbose' must be a logical value.")
   }
 
   if (length(concentration) != length(viability)) {
-    print(concentration)
-    print(viability)
-    stop("Concentration vector is not of same length as viability vector.")
+    stop(
+      "Concentration vector is not the same length as the viability vector.",
+      " Lengths: ",
+      length(concentration),
+      " vs ",
+      length(viability)
+    )
   }
 
   if (min(concentration) < 0) {
     stop("Concentration vector contains negative data.")
   }
 
-  if (min(viability) < 0 & verbose) {
-    warning("Warning: Negative viability data.")
+  if (min(viability) < 0 && verbose) {
+    warning("Negative viability data detected.")
   }
 
-  if (max(viability) > 100 & verbose) {
-    warning("Warning: Viability data exceeds negative control.")
+  if (max(viability) > 100 && verbose) {
+    warning("Viability data exceeds negative control.")
   }
 
   #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
@@ -71,13 +91,24 @@ computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
   }
 
   #FIT CURVE AND CALCULATE IC50
-  pars <- unlist(logLogisticRegression(log_conc,
-                                       viability,
-                                       conc_as_log = TRUE,
-                                       viability_as_pct = FALSE,
-                                       trunc = trunc))
-  x <- 100 - .Hill(max(log_conc), pars) * 100
+  pars <- unlist(logLogisticRegression(
+    log_conc,
+    viability,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE,
+    trunc = trunc
+  ))
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
+  )
+  x <- 100 -
+    .pgx_hill_curve(
+      max(log_conc),
+      unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
+    ) *
+      100
   names(x) <- "Amax"
   return(x)
-
 }
