@@ -46,9 +46,9 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   number of experiments for each cell-drug pair
 #' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame}
 #'   summarizing the available perturbation data,
-#' @slot curation A \code{list} containing mappings for \code{$treatment},
-#'   \code{cell}, \code{tissue} names  used in the data set to universal
-#'   identifiers used between different PharmacoSet objects
+#' @slot curation A \code{list} containing mappings for \code{$sample},
+#'   \code{$tissue}, and \code{$treatment} names used in the data set to
+#'   universal identifiers used between different PharmacoSet objects
 #' @slot datasetType A \code{character} string of 'sensitivity',
 #'   'perturbation', or both detailing what type of data can be found in the
 #'   PharmacoSet, for proper processing of the data

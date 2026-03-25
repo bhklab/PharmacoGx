@@ -245,8 +245,8 @@ setReplaceMethod(
 
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_get_curation(class_=.local_class,
-#' data_=.local_data, details_="Contains three `data.frame`s, 'cell' with
-#' cell-line ids and 'tissue' with tissue ids and 'drug' with drug ids.")
+#' data_=.local_data, details_="Contains three `data.frame`s, 'sample' with
+#' sample ids, 'tissue' with tissue ids and 'treatment' with treatment ids.")
 #' @importMethodsFrom CoreGx curation
 setMethod('curation', signature(object = "PharmacoSet"), function(object) {
   callNextMethod(object = object)
@@ -255,7 +255,7 @@ setMethod('curation', signature(object = "PharmacoSet"), function(object) {
 #' @rdname PharmacoSet-accessors
 #' @eval CoreGx:::.docs_CoreSet_set_curation(class_=.local_class,
 #' data_=.local_data, details_="For a `PharmacoSet` object the slot should
-#' contain tissue, cell-line and drug id `data.frame`s.")
+#' contain sample, tissue and treatment id `data.frame`s.")
 #' @importMethodsFrom CoreGx curation<-
 setReplaceMethod(
   "curation",
