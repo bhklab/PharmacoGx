@@ -191,6 +191,107 @@
   pars
 }
 
+.pgx_extract_fit_response_params <- function(raw_fit) {
+  hill <- unlist(raw_fit, use.names = TRUE)
+  if (!length(hill)) {
+    return(numeric(0))
+  }
+
+  lower_names <- tolower(names(hill))
+  if (all(is.na(lower_names))) {
+    lower_names <- rep("", length(hill))
+  }
+
+  get_param <- function(candidates, fallback_index = NA_integer_) {
+    idx <- match(candidates, lower_names)
+    idx <- idx[!is.na(idx)][1]
+    if (!is.na(idx)) {
+      return(as.numeric(hill[idx]))
+    }
+    if (!is.na(fallback_index) && fallback_index <= length(hill)) {
+      return(as.numeric(hill[fallback_index]))
+    }
+    NA_real_
+  }
+
+  if (
+    any(lower_names %in% c("hs1", "e_inf1", "einf1")) ||
+      length(hill) >= 8
+  ) {
+    c(
+      E0 = get_param(
+        c("e0", "etop"),
+        fallback_index = 2
+      ),
+      E_inf1 = get_param(
+        c("e_inf1", "einf1"),
+        fallback_index = 3
+      ),
+      E_inf2 = get_param(
+        c("e_inf2", "einf2"),
+        fallback_index = 5
+      )
+    )
+  } else {
+    c(
+      E0 = get_param(
+        c("e0", "etop"),
+        fallback_index = if (length(hill) >= 4) 2 else NA_integer_
+      ),
+      E_inf = get_param(
+        c("e_inf", "einf", "einfty"),
+        fallback_index = if (length(hill) >= 4) {
+          3
+        } else if (length(hill) >= 3) {
+          2
+        } else {
+          NA_integer_
+        }
+      )
+    )
+  }
+}
+
+.pgx_warn_if_hill_fit_scale_mismatch <- function(
+  raw_fit,
+  viability_as_pct,
+  verbose
+) {
+  if (!verbose) {
+    return(invisible(NULL))
+  }
+
+  response_params <- .pgx_extract_fit_response_params(raw_fit)
+  response_params <- response_params[!is.na(response_params)]
+  if (!length(response_params)) {
+    return(invisible(NULL))
+  }
+
+  tol <- sqrt(.Machine$double.eps)
+  top_param <- response_params[["E0"]]
+  scale_warning <- "'viability_as_pct' flag may be set incorrectly for 'Hill_fit'."
+
+  if (!viability_as_pct && any(response_params > 1 + tol)) {
+    warning(scale_warning)
+  } else if (
+    viability_as_pct &&
+      !is.null(top_param) &&
+      is.finite(top_param) &&
+      top_param <= 1 + tol
+  ) {
+    warning(scale_warning)
+  } else {
+    return(invisible(NULL))
+  }
+
+  if (identical(verbose, 2)) {
+    message("Hill_fit input: ", toString(unlist(raw_fit, use.names = TRUE)))
+    message("viability_as_pct flag: ", viability_as_pct)
+  }
+
+  invisible(NULL)
+}
+
 sanitizeInput <- function(
   conc,
   viability,
@@ -371,6 +472,11 @@ sanitizeInput <- function(
   }
   if (!missing(Hill_fit) && missing(viability)) {
     raw_fit <- Hill_fit
+    .pgx_warn_if_hill_fit_scale_mismatch(
+      raw_fit = raw_fit,
+      viability_as_pct = viability_as_pct,
+      verbose = verbose
+    )
     lower_names <- tolower(names(unlist(raw_fit, use.names = TRUE)))
     if (
       any(lower_names %in% c("hs1", "e_inf1", "einf1")) ||
@@ -387,10 +493,6 @@ sanitizeInput <- function(
         conc_as_log = conc_as_log,
         viability_as_pct = viability_as_pct
       )
-    }
-
-    if (!viability_as_pct && Hill_fit[["E_inf"]] > 1) {
-      warning("'viability_as_pct' flag may be set incorrectly.")
     }
 
     if (missing(conc)) {
