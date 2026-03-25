@@ -25,7 +25,7 @@ interface and simplifying analyses between several datasets. As such, it was
 designed to be flexible enough to hold datasets of two different natures
 while providing a common interface. The class can accomidate datasets
 containing both drug dose response data, as well as datasets contaning
-genetic profiles of cell lines pre and post treatement with compounds, known
+genetic profiles of cell lines pre and post treatment with compounds, known
 respecitively as sensitivity and perturbation datasets.
 }
 \section{Slots}{
