@@ -77,8 +77,11 @@ missed default colors from Rcolorbrewer package will be used as curves color.}
 the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 If this parameter is missed by default actual curve is plotted.}
 
-\item{summarize.replicates}{\code{character} If this parameter is set to true replicates
-are summarized and replicates are plotted individually otherwise}
+\item{summarize.replicates}{\code{logical(1)} If \code{TRUE}, replicate measurements at
+identical concentrations are summarized by median viability before plotting
+and fitting. If replicate experiments have non-identical dose grids, only
+exact duplicate doses are summarized and a warning is emitted. If \code{FALSE},
+replicate experiments are plotted individually.}
 
 \item{lwd}{\code{numeric} The line width to plot with}
 

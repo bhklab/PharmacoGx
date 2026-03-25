@@ -51,8 +51,11 @@
 #' @param plot.type `character` Plot type which can be the actual one ("Actual") or
 #' the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 #' If this parameter is missed by default actual curve is plotted.
-#' @param summarize.replicates `character` If this parameter is set to true replicates
-#' are summarized and replicates are plotted individually otherwise
+#' @param summarize.replicates `logical(1)` If `TRUE`, replicate measurements at
+#' identical concentrations are summarized by median viability before plotting
+#' and fitting. If replicate experiments have non-identical dose grids, only
+#' exact duplicate doses are summarized and a warning is emitted. If `FALSE`,
+#' replicate experiments are plotted individually.
 #' @param title `character` The title of the graph. If no title is provided, then it defaults to
 #' 'Drug':'Cell Line'.
 #' @param lwd `numeric` The line width to plot with
@@ -197,6 +200,56 @@ drugDoseResponseCurve <-
 
     plot.type <- match.arg(plot.type)
 
+    .extract_drug_responses <- function(pSet, experiments) {
+      response.list <- lapply(experiments, function(exp) {
+        drug.responses <- data.frame(
+          Dose = as.numeric(as.vector(sensitivityRaw(pSet)[exp, , "Dose"])),
+          Viability = as.numeric(as.vector(sensitivityRaw(pSet)[
+            exp,
+            ,
+            "Viability"
+          ])),
+          stringsAsFactors = FALSE
+        )
+        valid.idx <- complete.cases(drug.responses) &
+          is.finite(drug.responses$Dose) &
+          is.finite(drug.responses$Viability) &
+          drug.responses$Dose > 0
+        drug.responses[valid.idx, , drop = FALSE]
+      })
+      names(response.list) <- rownames(sensitivityInfo(pSet))[experiments]
+      response.list
+    }
+
+    .dose_grids_identical <- function(response.list) {
+      if (length(response.list) <= 1) {
+        return(TRUE)
+      }
+
+      reference.dose <- sort(response.list[[1]]$Dose)
+      all(vapply(
+        response.list[-1],
+        function(drug.responses) {
+          identical(sort(drug.responses$Dose), reference.dose)
+        },
+        logical(1)
+      ))
+    }
+
+    .summarize_responses <- function(response.list) {
+      combined.responses <- do.call(rbind, response.list)
+      if (is.null(combined.responses) || nrow(combined.responses) == 0) {
+        return(data.frame(Dose = numeric(), Viability = numeric()))
+      }
+
+      summarized.responses <- stats::aggregate(
+        Viability ~ Dose,
+        data = combined.responses,
+        FUN = function(x) median(as.numeric(x), na.rm = TRUE)
+      )
+      summarized.responses[order(summarized.responses$Dose), , drop = FALSE]
+    }
+
     for (i in seq_len(length(pSets))) {
       if (is(treatmentResponse(pSets[[i]]), "LongTable")) {
         pSets[[i]] <- subsetByTreatment(pSets[[i]], treatments = drug)
@@ -218,37 +271,23 @@ drugDoseResponseCurve <-
         if (length(exp_i) > 0) {
           if (summarize.replicates) {
             pSetNames[[i]] <- name(pSets[[i]])
-            drug.responses <- as.data.frame(
-              cbind(
-                "Dose" = as.numeric(as.vector(sensitivityRaw(pSets[[i]])[
-                  exp_i,
-                  ,
-                  "Dose"
-                ])),
-                "Viability" = as.numeric(as.vector(sensitivityRaw(pSets[[i]])[
-                  exp_i,
-                  ,
-                  "Viability"
-                ]))
-              ),
-              stringsAsFactors = FALSE
-            )
-            drug.responses <- drug.responses[complete.cases(drug.responses), ]
-            # tryCatch(
-            #   drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
-            #     "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
-            #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
-            # , error = function(e) {
-            #   if (length(exp_i) == 1) {
-            #   drug.responses <- as.data.frame(cbind("Dose"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"])),
-            #     "Viability"=as.numeric(as.vector(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"]))), stringsAsFactors=FALSE)
-            #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
-            # }else{
-            #   drug.responses <- as.data.frame(cbind("Dose"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Dose"], 1, function(x){median(as.numeric(x), na.rm=TRUE)}),
-            #     "Viability"=apply(sensitivityRaw(pSets[[i]])[exp_i, , "Viability"], 2, function(x){median(as.numeric(x), na.rm=TRUE)})), stringsAsFactors=FALSE)
-            #   drug.responses <- drug.responses[complete.cases(drug.responses), ]
-            # }
-            # })
+            response.list <- .extract_drug_responses(pSets[[i]], exp_i)
+            identical.dose.grids <- .dose_grids_identical(response.list)
+            drug.responses <- .summarize_responses(response.list)
+
+            if (length(response.list) > 1 && !identical.dose.grids) {
+              warning(
+                sprintf(
+                  paste(
+                    "Replicate dose grids differ for %s:%s in %s;",
+                    "only exact duplicate doses were summarized."
+                  ),
+                  drug,
+                  cellline,
+                  name(pSets[[i]])
+                )
+              )
+            }
 
             doses[[i]] <- drug.responses$Dose
             responses[[i]] <- drug.responses$Viability
