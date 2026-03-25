@@ -416,6 +416,7 @@ drugDoseResponseCurve <-
       for (i in seq_len(length(concentrations))) {
         doses2[[i]] <- concentrations[[i]]
         responses2[[i]] <- viabilities[[i]]
+        legend_label <- character(0)
         if (length(legends.label) > 0) {
           if (any(grepl("AUC", x = toupper(legends.label)))) {
             auc_label <- sprintf(
@@ -432,17 +433,7 @@ drugDoseResponseCurve <-
                 digits = 2
               )
             )
-            if (
-              is.null(legend.values2[[i]]) || length(legend.values2[[i]]) == 0
-            ) {
-              legend.values2[[i]] <- auc_label
-            } else {
-              legend.values2[[i]] <- paste(
-                legend.values2[[i]],
-                auc_label,
-                sep = ", "
-              )
-            }
+            legend_label <- c(legend_label, auc_label)
           }
           if (any(grepl("IC50", x = toupper(legends.label)))) {
             ic50_label <- sprintf(
@@ -458,18 +449,9 @@ drugDoseResponseCurve <-
                 digits = 2
               )
             )
-            if (
-              is.null(legend.values2[[i]]) || length(legend.values2[[i]]) == 0
-            ) {
-              legend.values2[[i]] <- ic50_label
-            } else {
-              legend.values2[[i]] <- paste(
-                legend.values2[[i]],
-                ic50_label,
-                sep = ", "
-              )
-            }
+            legend_label <- c(legend_label, ic50_label)
           }
+          legend.values2[[i]] <- paste(legend_label, collapse = ", ")
         } else {
           legend.values2[[i]] <- ""
         }

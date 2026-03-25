@@ -168,3 +168,34 @@ test_that("summarize.replicates = FALSE leaves replicate observations unsummariz
 
   expect_length(capture$calls$lines, 2)
 })
+
+test_that("manual concentrations and viabilities plot with default legend labels", {
+  open_test_device()
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  expect_silent(
+    expect_invisible(
+      drugDoseResponseCurve(
+        concentrations = list("Experiment 1" = c(0.008, 0.04, 0.2, 1)),
+        viabilities = list(c(100, 50, 30, 1)),
+        plot.type = "Both"
+      )
+    )
+  )
+})
+
+test_that("manual unsorted concentrations warn but still plot", {
+  open_test_device()
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  expect_warning(
+    expect_invisible(
+      drugDoseResponseCurve(
+        concentrations = list("Experiment 1" = c(1, 0.2, 0.04, 0.008)),
+        viabilities = list(c(1, 30, 50, 100)),
+        plot.type = "Actual"
+      )
+    ),
+    regexp = "Concentration Values were unsorted"
+  )
+})
