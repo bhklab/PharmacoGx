@@ -399,12 +399,6 @@
       (log_conc[length(log_conc)] - log_conc[1])
 }
 
-#This function is being used in computeSlope
-.optimizeRegression <- function(x, y, x0 = -3, y0 = 100) {
-  beta1 <- (sum(x * y) - y0 * sum(x)) / (sum(x * x) - x0 * sum(x))
-  return(beta1)
-}
-
 updateMaxConc <- function(pSet) {
   sensitivityInfo(pSet)$max.conc <- apply(
     sensitivityRaw(pSet)[,, "Dose"],
