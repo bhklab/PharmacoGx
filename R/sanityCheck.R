@@ -307,7 +307,7 @@ sanitizeInput <- function(
 
     if (max(viability) > (1 + 99 * viability_as_pct)) {
       if (verbose) {
-        warning("Viability data exceeds negative control.")
+        message("Viability values above 100% detected.")
       }
     }
 

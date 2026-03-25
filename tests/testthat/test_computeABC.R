@@ -103,3 +103,15 @@ test_that("Function values make sense", {
     0
   )
 })
+
+test_that("computeABC example emits an informational message for viability above 100", {
+  dose1 <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
+  viability1 <- c(108.67, 111, 102.16, 100.27, 90, 87, 74, 57)
+  dose2 <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
+  viability2 <- c(100.94, 112.5, 86, 104.16, 75, 68, 48, 29)
+
+  expect_message(
+    computeABC(dose1, dose2, viability1, viability2),
+    "Viability values above 100% detected"
+  )
+})
