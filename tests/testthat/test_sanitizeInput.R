@@ -116,4 +116,17 @@ test_that("Function sanitizeInput returns correct values.", {
       viability = c(110, 90, 80, 70, 60, 50, 40) / 100
     )
   )
+  expect_equal(
+    PharmacoGx:::sanitizeInput(
+      conc = c(-3, -2, -1, 0, 1, 2, 3),
+      Hill_fit = c(1, 0, 0),
+      conc_as_log = TRUE,
+      viability_as_pct = FALSE,
+      verbose = TRUE
+    ),
+    list(
+      Hill_fit = c(HS = 1, E0 = 1, E_inf = 0, log10EC50 = 0),
+      log_conc = c(-3, -2, -1, 0, 1, 2, 3)
+    )
+  )
 })

@@ -268,7 +268,7 @@
   }
 
   tol <- sqrt(.Machine$double.eps)
-  top_param <- response_params[["E0"]]
+  top_param <- unname(response_params["E0"])
   scale_warning <- "'viability_as_pct' flag may be set incorrectly for 'Hill_fit'."
 
   if (!viability_as_pct && any(response_params > 1 + tol)) {
