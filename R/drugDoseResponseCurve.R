@@ -464,9 +464,17 @@ drugDoseResponseCurve <-
       pSetNames <- c(pSetNames, pSetNames2)
     }
 
-    if (missing(mycol)) {
+    n_curves <- length(doses)
+    if (missing(mycol) || is.null(mycol) || length(mycol) == 0) {
       # require(RColorBrewer) || stop("Library RColorBrewer is not available!")
-      mycol <- RColorBrewer::brewer.pal(n = 7, name = "Set1")
+      base_colors <- RColorBrewer::brewer.pal(n = 7, name = "Set1")
+      if (n_curves <= length(base_colors)) {
+        mycol <- base_colors[seq_len(n_curves)]
+      } else {
+        mycol <- grDevices::colorRampPalette(base_colors)(n_curves)
+      }
+    } else if (length(mycol) < n_curves) {
+      mycol <- rep_len(mycol, n_curves)
     }
 
     dose.range <- c(Inf, -Inf)
