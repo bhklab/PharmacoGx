@@ -292,6 +292,45 @@
   invisible(NULL)
 }
 
+.pgx_warn_if_conc_flag_mismatch <- function(conc, conc_as_log, verbose) {
+  if (!verbose || !conc_as_log) {
+    return(invisible(NULL))
+  }
+
+  positive_conc <- sort(unique(conc[is.finite(conc) & conc > 0]))
+  if (length(positive_conc) < 4L) {
+    return(invisible(NULL))
+  }
+
+  raw_diff <- diff(positive_conc)
+  log_diff <- diff(log10(positive_conc))
+  if (
+    any(!is.finite(raw_diff)) ||
+      any(!is.finite(log_diff)) ||
+      mean(raw_diff) == 0 ||
+      mean(log_diff) == 0
+  ) {
+    return(invisible(NULL))
+  }
+
+  raw_cv <- stats::sd(raw_diff) / abs(mean(raw_diff))
+  log_cv <- stats::sd(log_diff) / abs(mean(log_diff))
+
+  if (!is.finite(raw_cv) || !is.finite(log_cv)) {
+    return(invisible(NULL))
+  }
+
+  if (log_cv < 0.1 && raw_cv > 0.5) {
+    warning("'conc_as_log' flag may be set incorrectly.")
+    if (identical(verbose, 2)) {
+      message("Concentration input: ", toString(conc))
+      message("conc_as_log flag: ", conc_as_log)
+    }
+  }
+
+  invisible(NULL)
+}
+
 sanitizeInput <- function(
   conc,
   viability,
@@ -392,6 +431,12 @@ sanitizeInput <- function(
         toString(conc[!is.finite(conc)])
       )
     }
+
+    .pgx_warn_if_conc_flag_mismatch(
+      conc = conc,
+      conc_as_log = conc_as_log,
+      verbose = verbose
+    )
 
     if (!all(is.finite(viability))) {
       stop(
@@ -511,6 +556,12 @@ sanitizeInput <- function(
         toString(conc[!is.finite(conc)])
       )
     }
+
+    .pgx_warn_if_conc_flag_mismatch(
+      conc = conc,
+      conc_as_log = conc_as_log,
+      verbose = verbose
+    )
     if (conc_as_log == FALSE && min(conc) < 0) {
       if (identical(verbose, 2)) {
         message("Concentration input: ", toString(conc))
