@@ -77,12 +77,21 @@ test_that("Functions return right values", {
       conc_as_log = TRUE,
       viability_as_pct = FALSE
     ),
-    Inf
+    0
   )
   expect_equal(
     computeIC50(
       concentration = seq(1, 3),
       Hill_fit = c(1, .5, 0),
+      conc_as_log = TRUE,
+      viability_as_pct = FALSE
+    ),
+    0
+  )
+  expect_equal(
+    computeAC50(
+      concentration = seq(1, 3),
+      Hill_fit = c(1, .6, .55),
       conc_as_log = TRUE,
       viability_as_pct = FALSE
     ),
@@ -110,5 +119,40 @@ test_that("Functions return right values", {
       viability_as_pct = FALSE
     ),
     -Inf
+  )
+})
+
+test_that("Relative IC50 follows fitted half-max while AC50 keeps absolute target", {
+  fit <- c(HS = 1, E0 = 1, E_inf = 0.2, EC50 = 1)
+
+  expect_equal(
+    computeIC50(
+      concentration = 10^(seq(-2, 2)),
+      Hill_fit = fit,
+      conc_as_log = FALSE,
+      viability_as_pct = FALSE
+    ),
+    1
+  )
+
+  expect_equal(
+    computeAC50(
+      concentration = 10^(seq(-2, 2)),
+      Hill_fit = fit,
+      conc_as_log = FALSE,
+      viability_as_pct = FALSE
+    ),
+    5 / 3
+  )
+
+  expect_warning(
+    computeIC50(
+      concentration = 10^(seq(-2, 2)),
+      Hill_fit = fit,
+      reference = "absolute",
+      conc_as_log = FALSE,
+      viability_as_pct = FALSE
+    ),
+    "deprecated"
   )
 })
