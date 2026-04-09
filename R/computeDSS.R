@@ -70,7 +70,19 @@ computeDSS <- function(
     return(0)
   }
 
-  t_param_pct <- if (viability_as_pct) t_param else t_param * 100
+  if (!viability_as_pct && t_param <= 1) {
+    warning(
+      paste(
+        "Fractional `t_param` values are deprecated when",
+        "`viability_as_pct = FALSE`.",
+        "Interpreting the input as a fractional inhibition threshold."
+      ),
+      call. = FALSE
+    )
+    t_param_pct <- t_param * 100
+  } else {
+    t_param_pct <- t_param
+  }
   t_param_fraction <- t_param_pct / 100
 
   hill_external <- list(
@@ -81,7 +93,7 @@ computeDSS <- function(
   )
 
   x2 <- max(concentration)
-  x1 <- computeICn(
+  x1 <- computeACn(
     concentration = concentration,
     Hill_fit = hill_external,
     n = t_param_fraction,
