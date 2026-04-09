@@ -1,3 +1,66 @@
+# Sensitivity-measure aliases retained for one release while AAC naming is
+# adopted across the API.
+.pgx_legacy_sensitivity_measure_aliases <- c(
+  auc_recomputed = "aac_recomputed",
+  auc_recomputed_star = "aac_recomputed_star"
+)
+
+.resolveSensitivityMeasureName <- function(
+  sensitivity.measure,
+  available_measures,
+  warn_legacy = TRUE
+) {
+  legacy_measure <- names(.pgx_legacy_sensitivity_measure_aliases)[
+    names(.pgx_legacy_sensitivity_measure_aliases) == sensitivity.measure
+  ]
+  if (length(legacy_measure) > 0) {
+    canonical_measure <- .pgx_legacy_sensitivity_measure_aliases[[
+      legacy_measure
+    ]]
+    if (warn_legacy) {
+      warning(
+        sprintf(
+          "Sensitivity measure `%s` is deprecated; use `%s` instead.",
+          sensitivity.measure,
+          canonical_measure
+        ),
+        call. = FALSE
+      )
+    }
+    if (canonical_measure %in% available_measures) {
+      return(canonical_measure)
+    }
+    return(sensitivity.measure)
+  }
+
+  canonical_measure <- .pgx_legacy_sensitivity_measure_aliases[
+    .pgx_legacy_sensitivity_measure_aliases == sensitivity.measure
+  ]
+  if (
+    length(canonical_measure) > 0 &&
+      !(sensitivity.measure %in% available_measures) &&
+      names(canonical_measure) %in% available_measures
+  ) {
+    return(names(canonical_measure))
+  }
+
+  sensitivity.measure
+}
+
+.resolveSensitivityMeasureNames <- function(
+  sensitivity.measure,
+  available_measures,
+  warn_legacy = TRUE
+) {
+  vapply(
+    sensitivity.measure,
+    .resolveSensitivityMeasureName,
+    character(1),
+    available_measures = available_measures,
+    warn_legacy = warn_legacy
+  )
+}
+
 #' @importFrom BiocParallel bplapply
 .calculateSensitivitiesStar <- function(
   pSets = list(),
@@ -14,6 +77,7 @@
     stop("expriments is empty!")
   }
   for (study in names(pSets)) {
+    sensitivityProfiles(pSets[[study]])$aac_recomputed_star <- NA
     sensitivityProfiles(pSets[[study]])$auc_recomputed_star <- NA
   }
   if (!is.na(cap)) {
@@ -47,7 +111,7 @@
   on.exit(options(op))
 
   for (study in names(pSets)) {
-    auc_recomputed_star <- unlist(
+    aac_recomputed_star <- unlist(
       bplapply(
         rownames(sensitivityRaw(pSets[[study]])),
         FUN = function(experiment, exps, study, dataset, area.type) {
@@ -55,7 +119,7 @@
             return(NA_real_)
           }
           return(
-            computeAUC(
+            computeAAC(
               concentration = as.numeric(dataset[experiment, , 1]),
               viability = as.numeric(dataset[experiment, , 2]),
               trunc = trunc,
@@ -72,13 +136,16 @@
         area.type = area.type
       )
     )
+    sensitivityProfiles(pSets[[study]])$aac_recomputed_star <-
+      aac_recomputed_star
     sensitivityProfiles(pSets[[study]])$auc_recomputed_star <-
-      auc_recomputed_star
+      aac_recomputed_star
   }
   return(pSets)
 }
 
-## This function computes AUC for the whole raw sensitivity data of a pset
+## This function computes normalized response area and IC50 for the whole raw
+## sensitivity data of a pset.
 .calculateFromRaw <- function(
   raw.sensitivity,
   cap = NA,
@@ -89,8 +156,8 @@
 ) {
   family <- match.arg(family)
 
-  AUC <- vector(length = dim(raw.sensitivity)[1])
-  names(AUC) <- dimnames(raw.sensitivity)[[1]]
+  AAC <- vector(length = dim(raw.sensitivity)[1])
+  names(AAC) <- dimnames(raw.sensitivity)[[1]]
 
   IC50 <- vector(length = dim(raw.sensitivity)[1])
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
@@ -99,7 +166,7 @@
 
   if (nthread == 1) {
     pars <- lapply(
-      names(AUC),
+      names(AAC),
       FUN = function(exp, raw.sensitivity, family, scale, n) {
         if (
           length(grep("///", raw.sensitivity[exp, , "Dose"])) > 0 ||
@@ -125,13 +192,13 @@
       n = n
     )
     names(pars) <- dimnames(raw.sensitivity)[[1]]
-    AUC <- unlist(lapply(
+    AAC <- unlist(lapply(
       names(pars),
       FUN = function(exp, raw.sensitivity, pars) {
         if (any(is.na(pars[[exp]]))) {
           NA
         } else {
-          computeAUC(
+          computeAAC(
             concentration = raw.sensitivity[exp, , "Dose"],
             Hill_fit = pars[[exp]],
             trunc = trunc,
@@ -161,7 +228,7 @@
     ))
   } else {
     pars <- parallel::mclapply(
-      names(AUC),
+      names(AAC),
       FUN = function(exp, raw.sensitivity, family, scale, n, trunc) {
         if (
           length(grep("///", raw.sensitivity[exp, , "Dose"])) > 0 ||
@@ -189,13 +256,13 @@
       mc.cores = nthread
     )
     names(pars) <- dimnames(raw.sensitivity)[[1]]
-    AUC <- unlist(parallel::mclapply(
+    AAC <- unlist(parallel::mclapply(
       names(pars),
       FUN = function(exp, raw.sensitivity, pars, trunc) {
         if (any(is.na(pars[[exp]]))) {
           NA
         } else {
-          computeAUC(
+          computeAAC(
             concentration = raw.sensitivity[exp, , "Dose"],
             Hill_fit = pars[[exp]],
             trunc = trunc,
@@ -228,10 +295,10 @@
       mc.cores = nthread
     ))
   }
-  names(AUC) <- dimnames(raw.sensitivity)[[1]]
+  names(AAC) <- dimnames(raw.sensitivity)[[1]]
   names(IC50) <- dimnames(raw.sensitivity)[[1]]
 
-  return(list("AUC" = AUC, "IC50" = IC50, "pars" = pars))
+  return(list("AAC" = AAC, "AUC" = AAC, "IC50" = IC50, "pars" = pars))
 }
 
 

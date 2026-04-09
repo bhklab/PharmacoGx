@@ -115,7 +115,7 @@ computeDSS <- function(
     }
   }
 
-  auc_fraction <- computeAUC(
+  auc_fraction <- computeAAC(
     concentration = c(x1, x2),
     Hill_fit = hill_external,
     conc_as_log = TRUE,

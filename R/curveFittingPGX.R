@@ -103,6 +103,16 @@ curveFittingPGX <- function(
       ),
       warning = function(w) NA_real_
     )
+    aac <- tryCatch(
+      computeAAC(
+        concentration = conc,
+        Hill_fit = fit,
+        conc_as_log = FALSE,
+        viability_as_pct = TRUE,
+        trunc = TRUE
+      ),
+      warning = function(w) NA_real_
+    )
 
     support <- CoreGx::.getSupportVec(log10(conc))
 
@@ -134,6 +144,7 @@ curveFittingPGX <- function(
         emax = curve_fun(log10(max(conc)), curve_pars) * 100,
         Rsquare = rsq,
         auc = auc,
+        aac = aac,
         ic50 = ic50
       )
     } else {
@@ -192,6 +203,7 @@ curveFittingPGX <- function(
         emax = curve_fun(log10(max(conc)), curve_pars) * 100,
         Rsquare = rsq,
         auc = auc,
+        aac = aac,
         ic50 = ic50
       )
     }

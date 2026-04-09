@@ -13,7 +13,7 @@ analysis.}
   features = NULL,
   cells = NULL,
   tissues = NULL,
-  sensitivity.measure = "auc_recomputed",
+  sensitivity.measure = "aac_recomputed",
   molecular.summary.stat = c("mean", "median", "first", "last", "or", "and"),
   sensitivity.summary.stat = c("mean", "median", "first", "last"),
   returnValues = c("estimate", "pvalue", "fdr"),

@@ -30,7 +30,7 @@ setMethod(
   signature(object = "PharmacoSet"),
   function(
     object,
-    sensitivity.measure = "auc_recomputed",
+    sensitivity.measure = "aac_recomputed",
     cell.lines,
     profiles_assay = "profiles",
     treatment_col = "treatmentid",
@@ -76,7 +76,7 @@ setMethod(
 #' @keywords internal
 .summarizeSensProfiles <- function(
   object,
-  sensitivity.measure = 'auc_recomputed',
+  sensitivity.measure = "aac_recomputed",
   profiles_assay = "profiles",
   treatment_col = "treatmentid",
   sample_col = "sampleid",
@@ -119,6 +119,11 @@ setMethod(
     key = FALSE
   )
   profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
+  sensitivity.measure <- .resolveSensitivityMeasureName(
+    sensitivity.measure = sensitivity.measure,
+    available_measures = c(profileOpts, "max.conc"),
+    warn_legacy = verbose
+  )
 
   # compute max concentration and add it to the profiles
   if (sensitivity.measure == 'max.conc') {
@@ -220,6 +225,11 @@ setMethod(
 ) {
   summary.stat <- match.arg(summary.stat)
   #sensitivity.measure <- match.arg(sensitivity.measure)
+  sensitivity.measure <- .resolveSensitivityMeasureName(
+    sensitivity.measure = sensitivity.measure,
+    available_measures = c(colnames(sensitivityProfiles(object)), "max.conc"),
+    warn_legacy = verbose
+  )
   if (
     !(sensitivity.measure %in%
       c(colnames(sensitivityProfiles(object)), "max.conc"))

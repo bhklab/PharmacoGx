@@ -16,6 +16,25 @@ test_that("Summarize Sensitivity Profiles function outputs data with right dimen
   expect_equivalent(is(testSummary, "matrix"), TRUE)
 })
 
+test_that("summarizeSensitivityProfiles defaults to AAC semantics with legacy fallback", {
+  defaultSummary <- summarizeSensitivityProfiles(GDSCsmall, verbose = FALSE)
+  legacySummary <- suppressWarnings(summarizeSensitivityProfiles(
+    GDSCsmall,
+    sensitivity.measure = "auc_recomputed",
+    verbose = FALSE
+  ))
+
+  expect_equal(defaultSummary, legacySummary)
+  expect_warning(
+    summarizeSensitivityProfiles(
+      GDSCsmall,
+      sensitivity.measure = "auc_recomputed",
+      fill.missing = FALSE
+    ),
+    "deprecated"
+  )
+})
+
 test_that("summarizeSensitivityProfiles produces correct values.", {
   GDSCsmall2 <- subsetTo(GDSCsmall, drugs = "AZD6482")
   testCells <- sensitivityProfiles(GDSCsmall2)[

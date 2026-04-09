@@ -36,7 +36,7 @@
 #' @param viability_as_pct `logical`, if false, assumes that viability is given as a decimal rather
 #' than a percentage, and that E_inf passed in as decimal. Applies only to the viabilities parameter.
 #' @param legends.label `numeric` A vector of sensitivity measurment types which could
-#' be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.
+#' be any combination of  ic50_published, auc_published, aac_recomputed and aac_recomputed_star.
 #' A legend will be displayed on the top right of the plot which each line of the legend is
 #' the values of requested sensitivity measerments for one of the requested pSets.
 #' If this parameter is missed no legend would be provided for the plot.
@@ -91,7 +91,7 @@ drugDoseResponseCurve <-
       "ic50_published",
       "gi50_published",
       "auc_published",
-      "auc_recomputed",
+      "aac_recomputed",
       "ic50_recomputed"
     ),
     ylim = c(0, 100),
@@ -295,14 +295,22 @@ drugDoseResponseCurve <-
               i
             ]]))
             if (!missing(legends.label)) {
+              resolved_legends.label <- .resolveSensitivityMeasureNames(
+                sensitivity.measure = legends.label,
+                available_measures = colnames(sensitivityProfiles(pSets[[i]])),
+                warn_legacy = FALSE
+              )
               if (length(legends.label) > 1) {
                 legend.values[[i]] <- paste(
-                  unlist(lapply(legends.label, function(x) {
+                  unlist(lapply(seq_along(legends.label), function(idx) {
                     sprintf(
                       "%s = %s",
-                      x,
+                      legends.label[[idx]],
                       round(
-                        as.numeric(sensitivityProfiles(pSets[[i]])[exp_i, x]),
+                        as.numeric(sensitivityProfiles(pSets[[i]])[
+                          exp_i,
+                          resolved_legends.label[[idx]]
+                        ]),
                         digits = 2
                       )
                     )
@@ -316,7 +324,7 @@ drugDoseResponseCurve <-
                   round(
                     as.numeric(sensitivityProfiles(pSets[[i]])[
                       exp_i,
-                      legends.label
+                      resolved_legends.label
                     ]),
                     digits = 2
                   )
@@ -352,14 +360,24 @@ drugDoseResponseCurve <-
                 j
               ]]) <- seq_len(length(doses[[j]]))
               if (!missing(legends.label)) {
+                resolved_legends.label <- .resolveSensitivityMeasureNames(
+                  sensitivity.measure = legends.label,
+                  available_measures = colnames(sensitivityProfiles(pSets[[
+                    i
+                  ]])),
+                  warn_legacy = FALSE
+                )
                 if (length(legends.label) > 1) {
                   legend.values[[j]] <- paste(
-                    unlist(lapply(legends.label, function(x) {
+                    unlist(lapply(seq_along(legends.label), function(idx) {
                       sprintf(
                         "%s = %s",
-                        x,
+                        legends.label[[idx]],
                         round(
-                          as.numeric(sensitivityProfiles(pSets[[i]])[exp, x]),
+                          as.numeric(sensitivityProfiles(pSets[[i]])[
+                            exp,
+                            resolved_legends.label[[idx]]
+                          ]),
                           digits = 2
                         )
                       )
@@ -374,7 +392,7 @@ drugDoseResponseCurve <-
                     round(
                       as.numeric(sensitivityProfiles(pSets[[i]])[
                         exp,
-                        legends.label
+                        resolved_legends.label
                       ]),
                       digits = 2
                     )
@@ -418,6 +436,23 @@ drugDoseResponseCurve <-
         responses2[[i]] <- viabilities[[i]]
         legend_label <- character(0)
         if (length(legends.label) > 0) {
+          if (any(grepl("AAC", x = toupper(legends.label)))) {
+            aac_label <- sprintf(
+              "%s = %s",
+              "AAC",
+              round(
+                computeAAC(
+                  concentrations[[i]],
+                  viabilities[[i]],
+                  conc_as_log = FALSE,
+                  viability_as_pct = TRUE
+                ) /
+                  100,
+                digits = 2
+              )
+            )
+            legend_label <- c(legend_label, aac_label)
+          }
           if (any(grepl("AUC", x = toupper(legends.label)))) {
             auc_label <- sprintf(
               "%s = %s",

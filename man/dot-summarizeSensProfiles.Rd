@@ -6,7 +6,7 @@
 \usage{
 .summarizeSensProfiles(
   object,
-  sensitivity.measure = "auc_recomputed",
+  sensitivity.measure = "aac_recomputed",
   profiles_assay = "profiles",
   treatment_col = "treatmentid",
   sample_col = "sampleid",

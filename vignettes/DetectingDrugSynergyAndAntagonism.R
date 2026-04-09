@@ -116,7 +116,7 @@ tre_fit <- tre_qc |>
       )
       # 2. compute curve summary metrics
       ic50 <- computeIC50(treatment1dose, Hill_fit = fit)
-      aac <- computeAUC(treatment1dose, Hill_fit = fit)
+      aac <- computeAAC(treatment1dose, Hill_fit = fit)
       # 3. assemble the results into a list, each item will become a
       #   column in the target assay.
       list(
