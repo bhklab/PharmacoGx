@@ -677,8 +677,8 @@ estimateProjParams <- function(
   } else {
     return(list(
       HS_proj = proj_params[1],
-      E_inf_proj = proj_params[2],
-      EC50_proj = proj_params[3],
+      EC50_proj = proj_params[2],
+      E_inf_proj = proj_params[3],
       E_ninf_proj = E_ninf_proj
     ))
   }
