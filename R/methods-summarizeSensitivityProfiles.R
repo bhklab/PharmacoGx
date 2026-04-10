@@ -67,6 +67,59 @@ setMethod(
   }
 )
 
+.resolveLongTableSensitivityColumns <- function(
+  sens_profiles,
+  treatment_col = "treatmentid",
+  sample_col = "sampleid"
+) {
+  available_cols <- colnames(sens_profiles)
+
+  if (!(sample_col %in% available_cols)) {
+    stop(.errorMsg(
+      "[PharmacoGx::summarizeSensitivityProfiles,LongTable-method] ",
+      "The sample column '",
+      sample_col,
+      "' is not present in the profiles assay. ",
+      "Available columns: ",
+      .collapse(available_cols)
+    ))
+  }
+
+  if (treatment_col %in% available_cols) {
+    return(list(
+      sens_profiles = sens_profiles,
+      treatment_col = treatment_col,
+      sample_col = sample_col
+    ))
+  }
+
+  if (
+    identical(treatment_col, "treatmentid") &&
+      "treatment1id" %in% available_cols
+  ) {
+    if ("treatment2id" %in% available_cols) {
+      mono_rows <- is.na(sens_profiles[["treatment2id"]]) |
+        sens_profiles[["treatment2id"]] == ""
+      sens_profiles <- sens_profiles[mono_rows]
+    }
+
+    return(list(
+      sens_profiles = sens_profiles,
+      treatment_col = "treatment1id",
+      sample_col = sample_col
+    ))
+  }
+
+  stop(.errorMsg(
+    "[PharmacoGx::summarizeSensitivityProfiles,LongTable-method] ",
+    "The treatment column '",
+    treatment_col,
+    "' is not present in the profiles assay. ",
+    "Available columns: ",
+    .collapse(available_cols)
+  ))
+}
+
 #' Summarize the sensitivity profiles when the sensitivity slot is a LongTable
 #'
 #' @return [matrix] A matrix with cell lines going down the rows, drugs across
@@ -118,6 +171,15 @@ setMethod(
     withDimnames = TRUE,
     key = FALSE
   )
+  sensProfiles <- data.table::as.data.table(sensProfiles)
+  resolvedCols <- .resolveLongTableSensitivityColumns(
+    sens_profiles = sensProfiles,
+    treatment_col = treatment_col,
+    sample_col = sample_col
+  )
+  sensProfiles <- resolvedCols$sens_profiles
+  treatment_col <- resolvedCols$treatment_col
+  sample_col <- resolvedCols$sample_col
   profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
   sensitivity.measure <- .resolveSensitivityMeasureName(
     sensitivity.measure = sensitivity.measure,
@@ -149,7 +211,9 @@ setMethod(
       sensitivity.measure,
       ' in this PharmacoSet.',
       ' Please select one of: ',
-      .collapse(profileOpts)
+      .collapse(profileOpts),
+      '. For atypical LongTable datasets, pass an explicit sensitivity.measure ',
+      '(for example "SCORE") or provide sProfiles directly to drugSensitivitySig().'
     ))
   }
 
@@ -181,8 +245,6 @@ setMethod(
       }
     )
   }
-  sensProfiles <- data.table::as.data.table(sensProfiles)
-
   # do the summary
   profSummary <- sensProfiles[,
     summary.function(get(sensitivity.measure)),
@@ -200,12 +262,12 @@ setMethod(
   setorderv(profSummary, c(sample_col, treatment_col))
   profSummary <- dcast(
     profSummary,
-    get(treatment_col) ~ get(sample_col),
+    stats::as.formula(paste(treatment_col, "~", sample_col)),
     value.var = 'V1'
   )
   treatment_vals <- profSummary[[treatment_col]]
   summaryMatrix <- as.matrix(profSummary[, -1, with = FALSE])
-  rownames(summaryMatrix) <- treatment_vals
+  dimnames(summaryMatrix) <- list(treatment_vals, colnames(summaryMatrix))
   return(summaryMatrix)
 }
 
