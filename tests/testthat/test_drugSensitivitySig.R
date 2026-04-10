@@ -191,3 +191,48 @@ test_that("drugSensitivitySig accepts continuous custom annotations and mirna", 
   expect_equal(dim(mirna_res), c(2, length(drugs), 8))
   expect_equal(dim(custom_res), c(2, length(drugs), 8))
 })
+
+test_that("drugSensitivitySig supports lm alias and spearman for continuous inputs", {
+  data(CCLEsmall)
+  drugs <- treatmentNames(CCLEsmall)[1:2]
+  cells <- sampleNames(CCLEsmall)[1:10]
+  features <- rownames(featureInfo(CCLEsmall, "rna"))[1:2]
+
+  anova_res <- drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "rna",
+    drugs = drugs,
+    cells = cells,
+    features = features,
+    modeling.method = "anova",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  )
+  lm_res <- drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "rna",
+    drugs = drugs,
+    cells = cells,
+    features = features,
+    modeling.method = "lm",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  )
+  spearman_res <- suppressWarnings(drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "rna",
+    drugs = drugs,
+    cells = cells,
+    features = features,
+    modeling.method = "spearman",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+
+  expect_equal(lm_res@.Data, anova_res@.Data)
+  expect_s4_class(spearman_res, "PharmacoSig")
+  expect_equal(dim(spearman_res), c(length(features), length(drugs), 8))
+})

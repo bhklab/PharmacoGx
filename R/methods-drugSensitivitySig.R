@@ -69,10 +69,15 @@
 #' @param molecular.cutoff.direction `character` One of "less" or "greater", allows to set direction of binarization.
 #' @param verbose `logical` 'TRUE' if the warnings and other informative message shoud be displayed
 #' @param parallel.on One of "gene" or "drug", chooses which level to parallelize computation (by gene, or by drug).
-#' @param modeling.method One of "anova" or "pearson". If "anova", nested linear models (including and excluding the molecular feature) adjusted for
-#'   are fit after the data is standardized, and ANOVA is used to estimate significance. If "pearson", partial correlation adjusted for tissue of origin are
-#'   fit to the data, and a Pearson t-test (or permutation) test are used. Note that the difference is in whether standardization is done across the whole
-#'   dataset (anova) or within each tissue (pearson), as well as the test applied.
+#' @param modeling.method One of "anova", "lm", "pearson", or "spearman". If "anova" or
+#'   "lm", nested linear models (including and excluding the molecular feature) adjusted for
+#'   are fit after the data is standardized, and ANOVA is used to estimate significance. If
+#'   "pearson", partial correlation adjusted for tissue of origin are fit to the data, and a
+#'   Pearson t-test (or permutation) test are used. If "spearman", continuous molecular and
+#'   sensitivity inputs are rank-transformed before running the same covariate-adjusted partial
+#'   correlation workflow as "pearson". Note that the difference is in whether standardization is
+#'   done across the whole dataset (anova/lm) or within each tissue (pearson/spearman), as well
+#'   as the test applied.
 #' @param inference.method Should "analytic" or "resampling" (permutation testing + bootstrap) inference be used to estimate significance.
 #'   For permutation testing, QUICK-STOP is used to adaptively stop permutations. Resampling is currently only implemented for "pearson" modelling method.
 #' @param ... additional arguments not currently fully supported by the function
@@ -102,7 +107,7 @@ setMethod(
     molecular.cutoff.direction = c("less", "greater"),
     nthread = 1,
     parallel.on = c("drug", "gene"),
-    modeling.method = c("anova", "pearson"),
+    modeling.method = c("anova", "pearson", "lm", "spearman"),
     inference.method = c("analytic", "resampling"),
     verbose = TRUE,
     ...
@@ -152,7 +157,7 @@ setMethod(
   molecular.cutoff.direction = c("less", "greater"),
   nthread = 1,
   parallel.on = c("drug", "gene"),
-  modeling.method = c("anova", "pearson"),
+  modeling.method = c("anova", "pearson", "lm", "spearman"),
   inference.method = c("analytic", "resampling"),
   verbose = TRUE,
   ...
@@ -173,6 +178,9 @@ setMethod(
   dots <- list(...)
   ndots <- length(dots)
   modeling.method <- match.arg(modeling.method)
+  if (identical(modeling.method, "lm")) {
+    modeling.method <- "anova"
+  }
   inference.method <- match.arg(inference.method)
   has_s_profiles <- !is.null(dots[["sProfiles"]])
 
@@ -203,6 +211,11 @@ setMethod(
     molecularProfilesSlot(object)[[mDataType]]
   )$annotation
   if (.isBinaryMolecularAnnotation(molecular_annotation)) {
+    if (identical(modeling.method, "spearman")) {
+      stop(
+        "Spearman modeling is only implemented for continuous molecular annotations. Use 'pearson', 'anova', or 'lm' for binary annotations."
+      )
+    }
     if (!is.element(molecular.summary.stat, c("or", "and"))) {
       stop(sprintf(
         "Molecular summary statistic for %s must be either 'or' or 'and'",

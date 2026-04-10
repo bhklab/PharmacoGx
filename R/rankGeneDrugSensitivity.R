@@ -28,7 +28,7 @@ rankGeneDrugSensitivity <- function(
   standardize = "SD",
   nthread = 1,
   verbose = FALSE,
-  modeling.method = c("anova", "pearson"),
+  modeling.method = c("anova", "pearson", "lm", "spearman"),
   inference.method = c("analytic", "resampling"),
   req_alpha = 0.05
 ) {
@@ -43,6 +43,9 @@ rankGeneDrugSensitivity <- function(
   }
 
   modeling.method <- match.arg(modeling.method)
+  if (identical(modeling.method, "lm")) {
+    modeling.method <- "anova"
+  }
   inference.method <- match.arg(inference.method)
 
   if (modeling.method == "anova" && inference.method == "resampling") {
@@ -67,6 +70,20 @@ rankGeneDrugSensitivity <- function(
     )
   }
   rownames(drugpheno) <- names(type) <- names(batch) <- rownames(data)
+  if (modeling.method == "spearman") {
+    if (any(unlist(lapply(drugpheno, is.factor)))) {
+      stop(
+        "Spearman modeling requires continuous sensitivity inputs. Use 'pearson', 'anova', or 'lm' for discrete sensitivity data."
+      )
+    }
+    drugpheno <- data.frame(
+      lapply(drugpheno, function(x) {
+        rank(as.numeric(x), na.last = "keep", ties.method = "average")
+      }),
+      check.names = FALSE
+    )
+    rownames(drugpheno) <- rownames(data)
+  }
 
   fit_feature <- function(feature_idx, data, type, batch, drugpheno) {
     feature_data <- data[, feature_idx]
@@ -79,6 +96,28 @@ rankGeneDrugSensitivity <- function(
         drugpheno = drugpheno,
         verbose = verbose,
         standardize = standardize
+      ))
+    }
+
+    if (modeling.method == "spearman") {
+      if (!is.numeric(feature_data)) {
+        stop(
+          "Spearman modeling is only implemented for continuous molecular features. Use 'pearson', 'anova', or 'lm' for discrete features."
+        )
+      }
+
+      return(geneDrugSensitivityPCorr(
+        rank(
+          as.numeric(feature_data),
+          na.last = "keep",
+          ties.method = "average"
+        ),
+        type = type,
+        batch = batch,
+        drugpheno = drugpheno,
+        verbose = verbose,
+        test = inference.method,
+        req_alpha = req_alpha
       ))
     }
 
@@ -135,7 +174,7 @@ rankGeneDrugSensitivity <- function(
     } else {
       nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue", "df", "fdr")
     }
-  } else if (modeling.method == "pearson") {
+  } else if (modeling.method %in% c("pearson", "spearman")) {
     nc <- c("estimate", "n", "df", "significant", "pvalue", "lower", "upper")
   }
 
