@@ -421,9 +421,20 @@ setMethod(
     req_alpha <- dots[["req_alpha"]]
   }
 
-  # splitix <- parallel::splitIndices(nx = length(drugn), ncl = nthread_drug)
-  # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-  mcres <- parallel::mclapply(
+  apply_over_drugs <- if (nthread_drug > 1) {
+    function(X, FUN, ...) {
+      parallel::mclapply(
+        X,
+        FUN,
+        ...,
+        mc.cores = nthread_drug,
+        mc.preschedule = FALSE
+      )
+    }
+  } else {
+    lapply
+  }
+  mcres <- apply_over_drugs(
     seq_along(drugn),
     function(
       x,
@@ -477,9 +488,7 @@ setMethod(
     standardize = standardize,
     modeling.method = modeling.method,
     inference.method = inference.method,
-    req_alpha = req_alpha,
-    mc.cores = nthread_drug,
-    mc.preschedule = FALSE
+    req_alpha = req_alpha
   )
 
   res <- do.call(c, mcres)

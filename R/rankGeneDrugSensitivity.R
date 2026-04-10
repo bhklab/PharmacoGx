@@ -68,6 +68,43 @@ rankGeneDrugSensitivity <- function(
   }
   rownames(drugpheno) <- names(type) <- names(batch) <- rownames(data)
 
+  fit_feature <- function(feature_idx, data, type, batch, drugpheno) {
+    feature_data <- data[, feature_idx]
+
+    if (modeling.method == "anova") {
+      return(geneDrugSensitivity(
+        feature_data,
+        type = type,
+        batch = batch,
+        drugpheno = drugpheno,
+        verbose = verbose,
+        standardize = standardize
+      ))
+    }
+
+    if (!is.character(feature_data)) {
+      return(geneDrugSensitivityPCorr(
+        feature_data,
+        type = type,
+        batch = batch,
+        drugpheno = drugpheno,
+        verbose = verbose,
+        test = inference.method,
+        req_alpha = req_alpha
+      ))
+    }
+
+    geneDrugSensitivityPBCorr(
+      as.factor(feature_data),
+      type = type,
+      batch = batch,
+      drugpheno = drugpheno,
+      verbose = verbose,
+      test = inference.method,
+      req_alpha = req_alpha
+    )
+  }
+
   res <- NULL
   utype <- sort(unique(as.character(type)))
   ltype <- list("all" = utype)
@@ -125,74 +162,38 @@ rankGeneDrugSensitivity <- function(
       ))
       res <- c(res, rest)
     } else {
-      # splitix <- parallel::splitIndices(nx=ncol(data), ncl=nthread)
-      # splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-      mcres <- parallel::mclapply(
+      feature_names <- colnames(data[iix, , drop = FALSE])
+      apply_over_features <- if (nthread > 1) {
+        function(X, FUN, ...) {
+          parallel::mclapply(
+            X,
+            FUN,
+            ...,
+            mc.cores = nthread,
+            mc.preschedule = TRUE
+          )
+        }
+      } else {
+        lapply
+      }
+      mcres <- apply_over_features(
         seq_len(ncol(data)),
-        function(
-          x,
-          data,
-          type,
-          batch,
-          drugpheno,
-          standardize,
-          modeling.method,
-          inference.method,
-          req_alpha
-        ) {
-          if (modeling.method == "anova") {
-            res <- t(apply(
-              data[, x, drop = FALSE],
-              2,
-              geneDrugSensitivity,
-              type = type,
-              batch = batch,
-              drugpheno = drugpheno,
-              verbose = verbose,
-              standardize = standardize
-            ))
-          } else if (modeling.method == "pearson") {
-            if (!is.character(data)) {
-              res <- t(apply(
-                data[, x, drop = FALSE],
-                2,
-                geneDrugSensitivityPCorr,
-                type = type,
-                batch = batch,
-                drugpheno = drugpheno,
-                verbose = verbose,
-                test = inference.method,
-                req_alpha = req_alpha
-              ))
-            } else {
-              res <- t(apply(data[, x, drop = FALSE], 2, function(dataIn) {
-                geneDrugSensitivityPBCorr(
-                  as.factor(dataIn),
-                  type = type,
-                  batch = batch,
-                  drugpheno = drugpheno,
-                  verbose = verbose,
-                  test = inference.method,
-                  req_alpha = req_alpha
-                )
-              }))
-            }
-          }
-
-          return(res)
-        },
+        fit_feature,
         data = data[iix, , drop = FALSE],
         type = type[iix],
         batch = batch[iix],
-        drugpheno = drugpheno[iix, , drop = FALSE],
-        standardize = standardize,
-        modeling.method = modeling.method,
-        inference.method = inference.method,
-        req_alpha = req_alpha,
-        mc.cores = nthread,
-        mc.preschedule = TRUE
+        drugpheno = drugpheno[iix, , drop = FALSE]
       )
-      rest <- do.call(rbind, mcres)
+      rest <- do.call(
+        rbind,
+        lapply(seq_along(mcres), function(i) {
+          matrix(
+            mcres[[i]],
+            nrow = 1,
+            dimnames = list(feature_names[[i]], names(mcres[[i]]))
+          )
+        })
+      )
       rest <- cbind(rest, "fdr" = p.adjust(rest[, "pvalue"], method = "fdr"))
       # rest <- rest[ , nc, drop=FALSE]
       res <- c(res, list(rest))
