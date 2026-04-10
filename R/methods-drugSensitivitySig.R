@@ -152,23 +152,22 @@ setMethod(
   ndots <- length(dots)
   modeling.method <- match.arg(modeling.method)
   inference.method <- match.arg(inference.method)
-  if (is.null(dots[["sProfiles"]])) {
+  has_s_profiles <- !is.null(dots[["sProfiles"]])
+
+  if (!has_s_profiles) {
+    available_sensitivity_measures <- colnames(sensitivityProfiles(object))
     sensitivity.measure <- .resolveSensitivityMeasureNames(
       sensitivity.measure = sensitivity.measure,
-      available_measures = colnames(sensitivityProfiles(object)),
+      available_measures = available_sensitivity_measures,
       warn_legacy = verbose
     )
-  }
-
-  if (
-    is.null(dots[["sProfiles"]]) &
-      !all(sensitivity.measure %in% colnames(sensitivityProfiles(object)))
-  ) {
-    stop(sprintf(
-      "Invalid sensitivity measure for %s, choose among: %s",
-      annotation(object)$name,
-      paste(colnames(sensitivityProfiles(object)), collapse = ", ")
-    ))
+    if (!all(sensitivity.measure %in% available_sensitivity_measures)) {
+      stop(sprintf(
+        "Invalid sensitivity measure for %s, choose among: %s",
+        annotation(object)$name,
+        paste(available_sensitivity_measures, collapse = ", ")
+      ))
+    }
   }
 
   if (!(mDataType %in% names(molecularProfilesSlot(object)))) {
@@ -260,7 +259,7 @@ setMethod(
     sensitivity.cutoff <- NA
   }
   if (missing(drugs) || is.null(drugs)) {
-    if (is.null(dots[["sProfiles"]])) {
+    if (!has_s_profiles) {
       drugn <- drugs <- treatmentNames(object)
     } else {
       drugn <- drugs <- rownames(dots[["sProfiles"]])
@@ -311,11 +310,13 @@ setMethod(
   #   inference.method <- "analytic"
   # }
 
-  if (is.null(dots[["sProfiles"]])) {
+  if (!has_s_profiles) {
     drugpheno.all <- lapply(sensitivity.measure, function(sensitivity.measure) {
       return(t(summarizeSensitivityProfiles(
         object,
         sensitivity.measure = sensitivity.measure,
+        cell.lines = celln,
+        drugs = drugn,
         summary.stat = sensitivity.summary.stat,
         verbose = verbose
       )))
@@ -357,49 +358,56 @@ setMethod(
     tissues <- unique(sampleInfo(object)[celln, "tissueid"])
   }
 
-  molecularProfilesSlot(object)[[mDataType]] <- summarizeMolecularProfiles(
+  molecular_profiles <- summarizeMolecularProfiles(
     object = object,
     mDataType = mDataType,
+    cell.lines = celln,
+    features = features,
     summary.stat = molecular.summary.stat,
     binarize.threshold = molecular.cutoff,
     binarize.direction = molecular.cutoff.direction,
     verbose = verbose
-  )[features, ]
+  )
 
   if (!is.null(dots[["mProfiles"]])) {
     mProfiles <- dots[["mProfiles"]]
-    SummarizedExperiment::assay(molecularProfilesSlot(object)[[
-      mDataType
-    ]]) <- mProfiles[
+    SummarizedExperiment::assay(molecular_profiles) <- mProfiles[
       features,
-      colnames(molecularProfilesSlot(object)[[mDataType]]),
+      colnames(molecular_profiles),
       drop = FALSE
     ]
   }
 
+  molecular_pheno <- as.data.frame(SummarizedExperiment::colData(
+    molecular_profiles
+  ))
+  molecular_sample_ids <- molecular_pheno[, "sampleid"]
   drugpheno.all <- lapply(drugpheno.all, function(x) {
     x[
-      intersect(phenoInfo(object, mDataType)[, "sampleid"], celln),
+      molecular_sample_ids[molecular_sample_ids %in% rownames(x)],
       ,
       drop = FALSE
     ]
   })
+  shared_cells <- molecular_sample_ids[
+    molecular_sample_ids %in% rownames(drugpheno.all[[1]])
+  ]
+  molecular_keep <- molecular_sample_ids %in% shared_cells
 
-  molcellx <- phenoInfo(object, mDataType)[, "sampleid"] %in% celln
-
-  type <- as.factor(sampleInfo(object)[
-    phenoInfo(object, mDataType)[molcellx, "sampleid"],
-    "tissueid"
-  ])
-
-  if ("batchid" %in% colnames(phenoInfo(object, mDataType))) {
-    batch <- phenoInfo(object, mDataType)[molcellx, "batchid"]
+  if ("tissueid" %in% colnames(molecular_pheno)) {
+    type <- as.factor(molecular_pheno[molecular_keep, "tissueid"])
   } else {
-    batch <- rep(NA, times = nrow(phenoInfo(object, mDataType)))
+    type <- as.factor(sampleInfo(object)[shared_cells, "tissueid"])
+  }
+
+  if ("batchid" %in% colnames(molecular_pheno)) {
+    batch <- molecular_pheno[molecular_keep, "batchid"]
+  } else {
+    batch <- rep(NA, times = sum(molecular_keep))
   }
   batch[!is.na(batch) & batch == "NA"] <- NA
   batch <- as.factor(batch)
-  names(batch) <- phenoInfo(object, mDataType)[molcellx, "sampleid"]
+  names(batch) <- molecular_sample_ids[molecular_keep]
   batch <- batch[rownames(drugpheno.all[[1]])]
   if (verbose) {
     message("Computing drug sensitivity signatures...")
@@ -408,7 +416,7 @@ setMethod(
   ### Calculate approximate number of perms needed
 
   if (is.null(dots[["req_alpha"]])) {
-    req_alpha <- 0.05 / (nrow(molecularProfilesSlot(object)[[mDataType]])) ## bonferonni correction
+    req_alpha <- 0.05 / nrow(molecular_profiles) ## bonferonni correction
   } else {
     req_alpha <- dots[["req_alpha"]]
   }
@@ -458,9 +466,8 @@ setMethod(
       return(res)
     },
     drugn = drugn,
-    expr = t(molecularProfiles(object, mDataType)[
-      features,
-      molcellx,
+    expr = t(SummarizedExperiment::assay(molecular_profiles)[,
+      molecular_keep,
       drop = FALSE
     ]),
     drugpheno = drugpheno.all,
@@ -480,12 +487,12 @@ setMethod(
   drug.sensitivity <- array(
     NA,
     dim = c(
-      nrow(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      nrow(molecular_profiles),
       length(res),
       ncol(res[[1]])
     ),
     dimnames = list(
-      rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      rownames(molecular_profiles),
       names(res),
       colnames(res[[1]])
     )
@@ -499,11 +506,11 @@ setMethod(
         return(xx)
       },
       j = j,
-      k = rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      k = rownames(molecular_profiles),
       FUN.VALUE = numeric(dim(drug.sensitivity)[1])
     )
     drug.sensitivity[
-      rownames(featureInfo(object, mDataType)[features, , drop = FALSE]),
+      rownames(molecular_profiles),
       names(res),
       j
     ] <- ttt
