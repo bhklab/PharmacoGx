@@ -1,3 +1,25 @@
+#' @keywords internal
+.normalizeMolecularAnnotation <- function(annotation) {
+  if (length(annotation) == 0 || is.na(annotation[[1]])) {
+    return(NA_character_)
+  }
+
+  annotation <- tolower(annotation[[1]])
+  sub("\\..*$", "", annotation)
+}
+
+#' @keywords internal
+.isContinuousMolecularAnnotation <- function(annotation) {
+  .normalizeMolecularAnnotation(annotation) %in%
+    c("rna", "rnaseq", "isoform", "cnv", "mirna")
+}
+
+#' @keywords internal
+.isBinaryMolecularAnnotation <- function(annotation) {
+  .normalizeMolecularAnnotation(annotation) %in%
+    c("mutation", "fusion")
+}
+
 #' Creates a signature representing the association between gene expression (or
 #' other molecular profile) and drug dose response, for use in drug sensitivity
 #' analysis.
@@ -177,75 +199,37 @@ setMethod(
       paste(names(molecularProfilesSlot(object)), collapse = ", ")
     ))
   }
-  switch(
-    S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation,
-    "mutation" = {
-      if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop(
-          "Molecular summary statistic for mutation must be either 'or' or 'and'"
-        )
-      }
-    },
-    "fusion" = {
-      if (!is.element(molecular.summary.stat, c("or", "and"))) {
-        stop(
-          "Molecular summary statistic for fusion must be either 'or' or 'and'"
-        )
-      }
-    },
-    "rna" = {
-      if (
-        !is.element(
-          molecular.summary.stat,
-          c("mean", "median", "first", "last")
-        )
-      ) {
-        stop(
-          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
-        )
-      }
-    },
-    "cnv" = {
-      if (
-        !is.element(
-          molecular.summary.stat,
-          c("mean", "median", "first", "last")
-        )
-      ) {
-        stop(
-          "Molecular summary statistic for cnv must be either 'mean', 'median', 'first' or 'last'"
-        )
-      }
-    },
-    "rnaseq" = {
-      if (
-        !is.element(
-          molecular.summary.stat,
-          c("mean", "median", "first", "last")
-        )
-      ) {
-        stop(
-          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
-        )
-      }
-    },
-    "isoform" = {
-      if (
-        !is.element(
-          molecular.summary.stat,
-          c("mean", "median", "first", "last")
-        )
-      ) {
-        stop(
-          "Molecular summary statistic for rna must be either 'mean', 'median', 'first' or 'last'"
-        )
-      }
-    },
+  molecular_annotation <- S4Vectors::metadata(
+    molecularProfilesSlot(object)[[mDataType]]
+  )$annotation
+  if (.isBinaryMolecularAnnotation(molecular_annotation)) {
+    if (!is.element(molecular.summary.stat, c("or", "and"))) {
+      stop(sprintf(
+        "Molecular summary statistic for %s must be either 'or' or 'and'",
+        .normalizeMolecularAnnotation(molecular_annotation)
+      ))
+    }
+  } else if (.isContinuousMolecularAnnotation(molecular_annotation)) {
+    if (
+      !is.element(
+        molecular.summary.stat,
+        c("mean", "median", "first", "last")
+      )
+    ) {
+      stop(sprintf(
+        paste(
+          "Molecular summary statistic for %s must be either",
+          "'mean', 'median', 'first' or 'last'"
+        ),
+        .normalizeMolecularAnnotation(molecular_annotation)
+      ))
+    }
+  } else {
     stop(sprintf(
       "No summary statistic for %s has been implemented yet",
-      S4Vectors::metadata(molecularProfilesSlot(object)[[mDataType]])$annotation
+      molecular_annotation
     ))
-  )
+  }
 
   if (
     !is.element(sensitivity.summary.stat, c("mean", "median", "first", "last"))

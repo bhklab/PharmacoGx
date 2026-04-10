@@ -139,3 +139,55 @@ test_that("drugSensitivitySig supports bundled non-RNA modalities with supplied 
   expect_equal(dim(cnv_res), c(2, length(drugs), 8))
   expect_equal(dim(mutation_res), c(2, length(drugs), 8))
 })
+
+test_that("drugSensitivitySig accepts continuous custom annotations and mirna", {
+  data(CCLEsmall)
+  drugs <- treatmentNames(CCLEsmall)[1:2]
+  cells <- sampleNames(CCLEsmall)[1:10]
+  sProfiles <- summarizeSensitivityProfiles(
+    CCLEsmall,
+    sensitivity.measure = "aac_recomputed",
+    drugs = drugs,
+    cell.lines = cells,
+    verbose = FALSE
+  )
+
+  mirna_pset <- CCLEsmall
+  S4Vectors::metadata(molecularProfilesSlot(mirna_pset)[[
+    "rna"
+  ]])$annotation <- "mirna"
+  mirna_res <- suppressWarnings(drugSensitivitySig(
+    mirna_pset,
+    mDataType = "rna",
+    drugs = drugs,
+    cells = cells,
+    features = rownames(featureInfo(mirna_pset, "rna"))[1:2],
+    sProfiles = sProfiles,
+    modeling.method = "pearson",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+
+  custom_pset <- CCLEsmall
+  S4Vectors::metadata(molecularProfilesSlot(custom_pset)[[
+    "rna"
+  ]])$annotation <- "rnaseq.comp"
+  custom_res <- suppressWarnings(drugSensitivitySig(
+    custom_pset,
+    mDataType = "rna",
+    drugs = drugs,
+    cells = cells,
+    features = rownames(featureInfo(custom_pset, "rna"))[1:2],
+    sProfiles = sProfiles,
+    modeling.method = "pearson",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+
+  expect_s4_class(mirna_res, "PharmacoSig")
+  expect_s4_class(custom_res, "PharmacoSig")
+  expect_equal(dim(mirna_res), c(2, length(drugs), 8))
+  expect_equal(dim(custom_res), c(2, length(drugs), 8))
+})

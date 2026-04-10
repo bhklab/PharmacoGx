@@ -95,20 +95,18 @@ setMethod(
     summary.stat <- match.arg(summary.stat)
     binarize.direction <- match.arg(binarize.direction)
 
+    molecular_annotation <- S4Vectors::metadata(molecularProfilesSlot(object)[[
+      mDataType
+    ]])$annotation
+
     if (
-      (!S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation %in%
-        c("mutation", "fusion")) &
+      !.isBinaryMolecularAnnotation(molecular_annotation) &&
         (!summary.stat %in% c("mean", "median", "first", "last"))
     ) {
       stop("Invalid summary.stat, choose among: mean, median, first, last")
     }
     if (
-      (S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation %in%
-        c("mutation", "fusion")) &
+      .isBinaryMolecularAnnotation(molecular_annotation) &&
         (!summary.stat %in% c("and", "or"))
     ) {
       stop("Invalid summary.stat, choose among: and, or")
@@ -138,12 +136,7 @@ setMethod(
     dd <- molecularProfiles(object, mDataType)
     pp <- phenoInfo(object, mDataType)
 
-    if (
-      S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation ==
-        "mutation"
-    ) {
+    if (.normalizeMolecularAnnotation(molecular_annotation) == "mutation") {
       tt <- dd
       tt[which(!is.na(dd) & dd == "wt")] <- FALSE
       tt[which(!is.na(dd) & dd != "wt")] <- TRUE
@@ -151,12 +144,7 @@ setMethod(
       dimnames(tt) <- dimnames(dd)
       dd <- tt
     }
-    if (
-      S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation ==
-        "fusion"
-    ) {
+    if (.normalizeMolecularAnnotation(molecular_annotation) == "fusion") {
       tt <- dd
       tt[which(!is.na(dd) & dd == "0")] <- FALSE
       tt[which(!is.na(dd) & dd != "0")] <- TRUE
@@ -165,10 +153,7 @@ setMethod(
       dd <- tt
     }
     if (
-      S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation %in%
-        c("cnv", "rna", "rnaseq", "isoform") &&
+      .isContinuousMolecularAnnotation(molecular_annotation) &&
         !is.na(binarize.threshold)
     ) {
       tt <- dd
