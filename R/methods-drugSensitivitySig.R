@@ -40,8 +40,10 @@
 #' print(drug.sensitivity)
 #'
 #' @param object `PharmacoSet` a PharmacoSet of the perturbation experiment type
-#' @param mDataType `character` which one of the molecular data types to use
-#'   in the analysis, out of dna, rna, rnaseq, snp, cnv
+#' @param mDataType `character` identifying which molecular data type to use in
+#'   the analysis. Continuous annotations such as `rna`, `rnaseq`, `isoform`,
+#'   `cnv`, and `mirna` are supported, including dotted variants such as
+#'   `rnaseq.comp`.
 #' @param drugs `character` a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
 #' @param features `character` a vector of features for which to compute the
@@ -56,7 +58,9 @@
 #'   should the function return for each gene drug pair?
 #' @param sensitivity.measure `character` which measure of the drug dose
 #'   sensitivity should the function use for its computations? Use the
-#'   sensitivityMeasures function to find out what measures are available for each PSet.
+#'   sensitivityMeasures function to find out what measures are available for
+#'   each PSet. For atypical LongTable-backed datasets, this may need to be set
+#'   explicitly, for example to `"SCORE"`.
 #' @param molecular.summary.stat `character` What summary statistic should be used to
 #'   summarize duplicates for cell line molecular profile measurements?
 #' @param sensitivity.summary.stat `character` What summary statistic should be used to
@@ -79,8 +83,13 @@
 #'   done across the whole dataset (anova/lm) or within each tissue (pearson/spearman), as well
 #'   as the test applied.
 #' @param inference.method Should "analytic" or "resampling" (permutation testing + bootstrap) inference be used to estimate significance.
-#'   For permutation testing, QUICK-STOP is used to adaptively stop permutations. Resampling is currently only implemented for "pearson" modelling method.
-#' @param ... additional arguments not currently fully supported by the function
+#'   For permutation testing, QUICK-STOP is used to adaptively stop permutations.
+#'   Resampling is currently implemented for the partial-correlation workflow
+#'   used by `"pearson"` and `"spearman"`.
+#' @param ... Optional overrides including `sProfiles`, a drug-by-cell
+#'   sensitivity matrix that bypasses internal sensitivity summarization, and
+#'   `mProfiles`, a feature-by-cell molecular matrix that replaces the
+#'   summarized molecular assay after feature and cell subsetting.
 #'
 #' @return `array` a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.

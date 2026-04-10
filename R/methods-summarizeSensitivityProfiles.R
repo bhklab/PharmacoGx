@@ -5,13 +5,19 @@
 #' summarising the drug senstitivity data of a PharmacoSet into drug-cell line
 #' pairs
 #'
+#' For LongTable-backed sensitivity data, the default treatment identifier is
+#' `treatmentid`. If that column is absent but `treatment1id` is present, the
+#' summary falls back to monotherapy rows from `treatment1id` and drops rows
+#' with a non-empty `treatment2id`. Combination summaries still require an
+#' explicit input matrix or explicit column configuration.
+#'
 #' @examples
 #' data(GDSCsmall)
 #' GDSCauc <- summarizeSensitivityProfiles(GDSCsmall,
 #'     sensitivity.measure='auc_published')
 #'
 #' @param object [PharmacoSet] The PharmacoSet from which to extract the data
-#' @param sensitivity.measure [character] The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object.
+#' @param sensitivity.measure [character] The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object. For atypical LongTable datasets, this may need to be set explicitly.
 #' @param cell.lines [character] The cell lines to be summarized. If any cell lines have no data, they will be filled with missing values.
 #' @param profiles_assay [character] The name of the assay in the PharmacoSet object that contains the sensitivity profiles.
 #' @param treatment_col [character] The name of the column in the profiles assay that contains the treatment IDs.

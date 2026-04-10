@@ -23,7 +23,7 @@ analysis.}
   molecular.cutoff.direction = c("less", "greater"),
   nthread = 1,
   parallel.on = c("drug", "gene"),
-  modeling.method = c("anova", "pearson"),
+  modeling.method = c("anova", "pearson", "lm", "spearman"),
   inference.method = c("analytic", "resampling"),
   verbose = TRUE,
   ...
@@ -32,8 +32,10 @@ analysis.}
 \arguments{
 \item{object}{\code{PharmacoSet} a PharmacoSet of the perturbation experiment type}
 
-\item{mDataType}{\code{character} which one of the molecular data types to use
-in the analysis, out of dna, rna, rnaseq, snp, cnv}
+\item{mDataType}{\code{character} identifying which molecular data type to use in
+the analysis. Continuous annotations such as \code{rna}, \code{rnaseq}, \code{isoform},
+\code{cnv}, and \code{mirna} are supported, including dotted variants such as
+\code{rnaseq.comp}.}
 
 \item{drugs}{\code{character} a vector of drug names for which to compute the
 signatures. Should match the names used in the PharmacoSet.}
@@ -49,7 +51,9 @@ Should be a subset of sampleInfo(pSet)$tissueid}
 
 \item{sensitivity.measure}{\code{character} which measure of the drug dose
 sensitivity should the function use for its computations? Use the
-sensitivityMeasures function to find out what measures are available for each PSet.}
+sensitivityMeasures function to find out what measures are available for
+each PSet. For atypical LongTable-backed datasets, this may need to be set
+explicitly, for example to \code{"SCORE"}.}
 
 \item{molecular.summary.stat}{\code{character} What summary statistic should be used to
 summarize duplicates for cell line molecular profile measurements?}
@@ -75,17 +79,27 @@ should the computation be parallelized over?}
 
 \item{parallel.on}{One of "gene" or "drug", chooses which level to parallelize computation (by gene, or by drug).}
 
-\item{modeling.method}{One of "anova" or "pearson". If "anova", nested linear models (including and excluding the molecular feature) adjusted for
-are fit after the data is standardized, and ANOVA is used to estimate significance. If "pearson", partial correlation adjusted for tissue of origin are
-fit to the data, and a Pearson t-test (or permutation) test are used. Note that the difference is in whether standardization is done across the whole
-dataset (anova) or within each tissue (pearson), as well as the test applied.}
+\item{modeling.method}{One of "anova", "lm", "pearson", or "spearman". If "anova" or
+"lm", nested linear models (including and excluding the molecular feature) adjusted for
+are fit after the data is standardized, and ANOVA is used to estimate significance. If
+"pearson", partial correlation adjusted for tissue of origin are fit to the data, and a
+Pearson t-test (or permutation) test are used. If "spearman", continuous molecular and
+sensitivity inputs are rank-transformed before running the same covariate-adjusted partial
+correlation workflow as "pearson". Note that the difference is in whether standardization is
+done across the whole dataset (anova/lm) or within each tissue (pearson/spearman), as well
+as the test applied.}
 
 \item{inference.method}{Should "analytic" or "resampling" (permutation testing + bootstrap) inference be used to estimate significance.
-For permutation testing, QUICK-STOP is used to adaptively stop permutations. Resampling is currently only implemented for "pearson" modelling method.}
+For permutation testing, QUICK-STOP is used to adaptively stop permutations.
+Resampling is currently implemented for the partial-correlation workflow
+used by \code{"pearson"} and \code{"spearman"}.}
 
 \item{verbose}{\code{logical} 'TRUE' if the warnings and other informative message shoud be displayed}
 
-\item{...}{additional arguments not currently fully supported by the function}
+\item{...}{Optional overrides including \code{sProfiles}, a drug-by-cell
+sensitivity matrix that bypasses internal sensitivity summarization, and
+\code{mProfiles}, a feature-by-cell molecular matrix that replaces the
+summarized molecular assay after feature and cell subsetting.}
 }
 \value{
 \code{array} a 3D array with genes in the first dimension, drugs in the

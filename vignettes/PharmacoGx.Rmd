@@ -203,6 +203,13 @@ sensitivity profile per cell line within each dataset. We can then compare the
 gene expression and sensitivity measures between the datasets using a standard
 correlation coefficient.
 
+For LongTable-backed sensitivity data, `summarizeSensitivityProfiles()` first
+uses `treatmentid` when it is available. If a dataset instead stores
+monotherapy treatments in `treatment1id`, the function now falls back to that
+column and ignores rows with a non-empty `treatment2id`. Combination response
+summaries still require an explicit sensitivity matrix, and atypical profile
+columns may require an explicit `sensitivity.measure` such as `"SCORE"`.
+
 \vspace{5pt}
 \footnotesize
 ```{r inconsistencies, results='hide', eval=TRUE, message = FALSE }
