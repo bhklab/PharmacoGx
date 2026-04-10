@@ -81,3 +81,61 @@ test_that("drugSensitivitySig ignores invalid sensitivity.measure when sProfiles
   expect_s4_class(res, "PharmacoSig")
   expect_equal(dim(res), c(2, length(drugs), 8))
 })
+
+test_that("drugSensitivitySig supports bundled non-RNA modalities with supplied sProfiles", {
+  data(CCLEsmall)
+  drugs <- treatmentNames(CCLEsmall)[1:2]
+  cells <- sampleNames(CCLEsmall)[1:10]
+  sProfiles <- summarizeSensitivityProfiles(
+    CCLEsmall,
+    sensitivity.measure = "aac_recomputed",
+    drugs = drugs,
+    cell.lines = cells,
+    verbose = FALSE
+  )
+
+  rnaseq_res <- suppressWarnings(drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "rnaseq",
+    drugs = drugs,
+    cells = cells,
+    features = rownames(featureInfo(CCLEsmall, "rnaseq"))[1:2],
+    sProfiles = sProfiles,
+    modeling.method = "pearson",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+  cnv_res <- suppressWarnings(drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "cnv",
+    drugs = drugs,
+    cells = cells,
+    features = rownames(featureInfo(CCLEsmall, "cnv"))[1:2],
+    sProfiles = sProfiles,
+    modeling.method = "pearson",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+  mutation_res <- suppressWarnings(drugSensitivitySig(
+    CCLEsmall,
+    mDataType = "mutation",
+    drugs = drugs,
+    cells = cells,
+    features = rownames(featureInfo(CCLEsmall, "mutation"))[1:2],
+    sProfiles = sProfiles,
+    molecular.summary.stat = "or",
+    modeling.method = "pearson",
+    parallel.on = "drug",
+    nthread = 1,
+    verbose = FALSE
+  ))
+
+  expect_s4_class(rnaseq_res, "PharmacoSig")
+  expect_s4_class(cnv_res, "PharmacoSig")
+  expect_s4_class(mutation_res, "PharmacoSig")
+  expect_equal(dim(rnaseq_res), c(2, length(drugs), 8))
+  expect_equal(dim(cnv_res), c(2, length(drugs), 8))
+  expect_equal(dim(mutation_res), c(2, length(drugs), 8))
+})
