@@ -23,12 +23,31 @@
 #' @import jsonlite
 availablePSets <- function(canonical=TRUE){
 
-  if (canonical) {
-    avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/canonical")
+  url <- if (canonical) {
+    "https://www.orcestra.ca/api/pset/canonical"
   } else {
-    avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/available")
+    "https://www.orcestra.ca/api/pset/available"
   }
-
+  
+  txt <- tryCatch(
+    paste(readLines(url, warn = FALSE), collapse = "\n"),
+    error = function(e) {
+      stop("Failed to retrieve PharmacoSet metadata from Orcestra.", call. = FALSE)
+    }
+  )
+  
+  avail.psets <- tryCatch(
+    jsonlite::fromJSON(txt),
+    error = function(e) {
+      stop(
+        paste0(
+          "Orcestra metadata endpoint did not return valid JSON. Response begins with: ",
+          substr(txt, 1, 200)
+        ),
+        call. = FALSE
+      )
+    }
+  )
 
   pSetTable <- data.frame("Dataset Name" = avail.psets$dataset$name,
                           "Date Created" = avail.psets$dateCreated,
@@ -124,3 +143,5 @@ downloadPSet <- function(name, saveDir=tempdir(), pSetFileName=NULL,
     write.table(pSetTable, file=outfn)
   }
 }
+
+
