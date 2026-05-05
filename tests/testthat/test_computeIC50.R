@@ -19,11 +19,11 @@ test_that("Function complains when given insensible input", {
     computeIC50(concentration = c(1, 2, 3, 5), viability = c(50, 60, 70)),
     "is not of same length"
   ) #should complain
-  expect_error(
+  expect_warning(
     computeIC50(
-      concentration = c(-1, 2, 3),
-      viability = c(50, 60, 70),
-      conc_as_log = FALSE
+      concentration = c(0.001, 0.01, 0.1, 1),
+      viability = c(90, 80, 70, 60),
+      conc_as_log = TRUE
     ),
     "'conc_as_log' flag may be set incorrectly"
   ) #should complain
