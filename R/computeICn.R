@@ -189,14 +189,21 @@ computeACn <- function(
 #' By default, inhibition is measured relative to the fitted dynamic range of the
 #' curve, so `computeIC50()` returns the half-maximal inhibitory concentration.
 #' Absolute-threshold helpers `computeACn()` and `computeAC50()` are provided for
-#' the historical "absolute viability" behaviour.
+#' the historical "absolute viability" behaviour. Use `computeAC50()`, not the
+#' default `computeIC50()`, when comparing against published AC50 values that
+#' represent an absolute 50% viability threshold.
 #'
 #' @examples
 #' dose <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
 #' viability <- c(108.67, 111, 102.16, 100.27, 90, 87, 74, 57)
+#'
+#' # Relative half-maximal inhibition concentration.
 #' computeIC50(dose, viability)
-#' computeICn(dose, viability, n = 10)
+#'
+#' # Absolute 50% viability threshold, suitable for published AC50 comparisons.
 #' computeAC50(dose, viability)
+#'
+#' computeICn(dose, viability, n = 10)
 #'
 #' @param concentration `numeric` is a vector of drug concentrations.
 #' @param viability `numeric` is a vector whose entries are the viability values observed in the presence of the

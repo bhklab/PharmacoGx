@@ -145,8 +145,9 @@ test_that("Relative IC50 follows fitted half-max while AC50 keeps absolute targe
     5 / 3
   )
 
+  absolute_ic50 <- NULL
   expect_warning(
-    computeIC50(
+    absolute_ic50 <- computeIC50(
       concentration = 10^(seq(-2, 2)),
       Hill_fit = fit,
       reference = "absolute",
@@ -154,6 +155,15 @@ test_that("Relative IC50 follows fitted half-max while AC50 keeps absolute targe
       viability_as_pct = FALSE
     ),
     "deprecated"
+  )
+  expect_equal(
+    absolute_ic50,
+    computeAC50(
+      concentration = 10^(seq(-2, 2)),
+      Hill_fit = fit,
+      conc_as_log = FALSE,
+      viability_as_pct = FALSE
+    )
   )
 })
 

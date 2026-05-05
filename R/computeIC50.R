@@ -1,4 +1,5 @@
-#' @describeIn computeICn Returns the IC50 of a Drug Dose response curve
+#' @describeIn computeICn Returns the relative IC50 of a drug dose-response
+#'   curve. Use `computeAC50()` for an absolute 50% viability threshold.
 #'
 #' @return `numeric(1)` The IC50 of the Hill curve over the specified dose
 #'   range.
@@ -29,8 +30,9 @@ computeIC50 <- function(
   )
 }
 
-#' @describeIn computeICn Returns the AC50 of a Drug Dose response curve using
-#'   an absolute viability threshold.
+#' @describeIn computeICn Returns the AC50 of a drug dose-response curve using
+#'   an absolute 50% viability threshold. This is the appropriate helper for
+#'   comparisons against published AC50 values.
 #' @return `numeric(1)` The AC50 of the Hill curve over the specified dose
 #'   range.
 #' @export

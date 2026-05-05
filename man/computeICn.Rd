@@ -97,14 +97,18 @@ Returns the concentration corresponding to the requested percent inhibition.
 By default, inhibition is measured relative to the fitted dynamic range of the
 curve, so \code{computeIC50()} returns the half-maximal inhibitory concentration.
 Absolute-threshold helpers \code{computeACn()} and \code{computeAC50()} are provided for
-the historical "absolute viability" behaviour.
+the historical "absolute viability" behaviour. Use \code{computeAC50()}, not the
+default \code{computeIC50()}, when comparing against published AC50 values that
+represent an absolute 50\% viability threshold.
 }
 \section{Functions}{
 \itemize{
-\item \code{computeIC50()}: Returns the IC50 of a Drug Dose response curve
+\item \code{computeIC50()}: Returns the relative IC50 of a drug dose-response
+curve. Use \code{computeAC50()} for an absolute 50\% viability threshold.
 
-\item \code{computeAC50()}: Returns the AC50 of a Drug Dose response curve using
-an absolute viability threshold.
+\item \code{computeAC50()}: Returns the AC50 of a drug dose-response curve using
+an absolute 50\% viability threshold. This is the appropriate helper for
+comparisons against published AC50 values.
 
 \item \code{computeACn()}: Returns the ACn of a drug dose response curve using an
 absolute viability threshold.
@@ -113,8 +117,13 @@ absolute viability threshold.
 \examples{
 dose <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
 viability <- c(108.67, 111, 102.16, 100.27, 90, 87, 74, 57)
+
+# Relative half-maximal inhibition concentration.
 computeIC50(dose, viability)
-computeICn(dose, viability, n = 10)
+
+# Absolute 50\% viability threshold, suitable for published AC50 comparisons.
 computeAC50(dose, viability)
+
+computeICn(dose, viability, n = 10)
 
 }
