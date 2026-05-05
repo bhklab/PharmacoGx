@@ -61,6 +61,21 @@
   }
 }
 
+.is_biphasic_fit <- function(pars) {
+  required_names <- c(
+    "HS1",
+    "E0",
+    "E_inf1",
+    "HS2",
+    "E_inf2",
+    "log10EC50_1",
+    "log10EC50_2",
+    "Frac"
+  )
+  length(pars) >= length(required_names) &&
+    all(required_names %in% names(pars))
+}
+
 #' @describeIn computeICn Returns the ACn of a drug dose response curve using an
 #'   absolute viability threshold.
 #' @export
@@ -133,6 +148,15 @@ computeACn <- function(
   } else {
     stop(
       "Insufficient information to calculate ICn. Please enter concentration and viability or Hill parameters."
+    )
+  }
+
+  if (.is_biphasic_fit(pars)) {
+    stop(
+      "computeICn() and computeIC50() currently support Hill fits only. ",
+      "For biphasic fits, fit a Hill model for IC metrics or use an AUC-based ",
+      "summary.",
+      call. = FALSE
     )
   }
 

@@ -156,3 +156,34 @@ test_that("Relative IC50 follows fitted half-max while AC50 keeps absolute targe
     "deprecated"
   )
 })
+
+test_that("ICn helpers reject biphasic fits with a clear error", {
+  biphasic_fit <- c(
+    HS1 = 1.3,
+    E0 = 1,
+    E_inf1 = 0.3,
+    HS2 = 0.8,
+    E_inf2 = 0.1,
+    EC50_1 = 0.3,
+    EC50_2 = 3,
+    Frac = 0.6
+  )
+
+  expect_error(
+    computeIC50(
+      concentration = 10^seq(-2, 2),
+      Hill_fit = biphasic_fit,
+      viability_as_pct = FALSE
+    ),
+    "currently support Hill fits only"
+  )
+  expect_error(
+    computeICn(
+      concentration = 10^seq(-2, 2),
+      Hill_fit = biphasic_fit,
+      n = 0.5,
+      viability_as_pct = FALSE
+    ),
+    "currently support Hill fits only"
+  )
+})
