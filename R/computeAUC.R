@@ -8,6 +8,7 @@
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 ) {
   if (missing(concentration)) {
@@ -19,6 +20,8 @@
   } else {
     area.type <- match.arg(area.type)
   }
+
+  fit_type <- match.arg(tolower(fit_type), c("hill", "biphasic"))
 
   if (area.type == "Fitted" && missing(Hill_fit)) {
     if (missing(viability)) {
@@ -32,6 +35,7 @@
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
+      fit_type = fit_type,
       verbose = verbose
     )
     cleanData <- sanitizeInput(
@@ -168,6 +172,10 @@
 #'   computed.
 #' @param area.type Character string indicating whether to compute the normalized
 #'   area using the observed data (`"Actual"`) or a fitted curve (`"Fitted"`).
+#' @param fit_type Character string selecting the curve family to fit when
+#'   `area.type = "Fitted"` and `Hill_fit` is not supplied. One of `"hill"`
+#'   (default) or `"biphasic"`. Ignored when a precomputed `Hill_fit` is supplied
+#'   or when `area.type = "Actual"`.
 #' @param verbose `logical`, if true, causes warnings thrown by the function to
 #'   be printed.
 #' @return Numeric normalized viability-area value.
@@ -183,6 +191,7 @@ computeAUC <- function(
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 ) {
   auc <- .compute_normalized_viability_area(
@@ -193,6 +202,7 @@ computeAUC <- function(
     viability_as_pct = viability_as_pct,
     trunc = trunc,
     area.type = area.type,
+    fit_type = fit_type,
     verbose = verbose
   )
 
@@ -215,6 +225,7 @@ computeAAC <- function(
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 ) {
   aac <- 1 -
@@ -226,6 +237,7 @@ computeAAC <- function(
       viability_as_pct = viability_as_pct,
       trunc = trunc,
       area.type = area.type,
+      fit_type = fit_type,
       verbose = verbose
     )
 

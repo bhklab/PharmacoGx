@@ -13,6 +13,7 @@ computeAUC(
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 )
 
@@ -24,6 +25,7 @@ computeAAC(
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 )
 }
@@ -54,6 +56,11 @@ computed.}
 
 \item{area.type}{Character string indicating whether to compute the normalized
 area using the observed data (\code{"Actual"}) or a fitted curve (\code{"Fitted"}).}
+
+\item{fit_type}{Character string selecting the curve family to fit when
+\code{area.type = "Fitted"} and \code{Hill_fit} is not supplied. One of \code{"hill"}
+(default) or \code{"biphasic"}. Ignored when a precomputed \code{Hill_fit} is supplied
+or when \code{area.type = "Actual"}.}
 
 \item{verbose}{\code{logical}, if true, causes warnings thrown by the function to
 be printed.}
