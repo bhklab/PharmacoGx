@@ -139,12 +139,38 @@
   integral$value / (b - a)
 }
 
+.computeAUC_semantics_message_state <- new.env(parent = emptyenv())
+.computeAUC_semantics_message_state$issued <- FALSE
+
+.signal_computeAUC_semantics_change <- function() {
+  if (isTRUE(.computeAUC_semantics_message_state$issued)) {
+    return(invisible(NULL))
+  }
+
+  packageStartupMessage(
+    paste0(
+      "Breaking change in PharmacoGx 3.14.0: computeAUC() now returns ",
+      "normalized viability area from .compute_normalized_viability_area(); ",
+      "use computeAAC() for the previous normalized response-area semantics."
+    )
+  )
+  .computeAUC_semantics_message_state$issued <- TRUE
+  invisible(NULL)
+}
+
 #' Computes the normalized viability area for a drug dose response curve
 #'
 #' Returns the normalized area under the viability curve over the experiment's
 #' concentration range on the log10 dose scale. Larger values therefore imply
 #' greater viability and lower drug sensitivity. Use `computeAAC()` to obtain
 #' the complementary normalized response area used for sensitivity summaries.
+#'
+#' @details
+#' **Breaking change in PharmacoGx 3.14.0:** `computeAUC()` now returns the
+#' normalized viability area computed by `.compute_normalized_viability_area()`.
+#' Earlier releases returned the complementary normalized response area. Use
+#' `computeAAC()` when migrating code that relied on the former response-area
+#' semantics.
 #'
 #' @examples
 #' dose <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
@@ -194,6 +220,8 @@ computeAUC <- function(
   fit_type = c("hill", "biphasic"),
   verbose = TRUE
 ) {
+  .signal_computeAUC_semantics_change()
+
   auc <- .compute_normalized_viability_area(
     concentration = concentration,
     viability = viability,

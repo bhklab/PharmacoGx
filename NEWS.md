@@ -1,5 +1,11 @@
 # Package Release News
 
+# 3.14.0
+- Breaking change: `computeAUC()` now returns the normalized viability area from
+  `.compute_normalized_viability_area()`. In earlier releases it returned the
+  complementary normalized response area; use `computeAAC()` to preserve the
+  previous sensitivity-summary semantics.
+
 # 3.13.1
 - Updated *only* the `sessionInfo` fields example data sets due to errors
 

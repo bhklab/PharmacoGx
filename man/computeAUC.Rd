@@ -76,6 +76,13 @@ concentration range on the log10 dose scale. Larger values therefore imply
 greater viability and lower drug sensitivity. Use \code{computeAAC()} to obtain
 the complementary normalized response area used for sensitivity summaries.
 }
+\details{
+\strong{Breaking change in PharmacoGx 3.14.0:} \code{computeAUC()} now returns the
+normalized viability area computed by \code{.compute_normalized_viability_area()}.
+Earlier releases returned the complementary normalized response area. Use
+\code{computeAAC()} when migrating code that relied on the former response-area
+semantics.
+}
 \section{Functions}{
 \itemize{
 \item \code{computeAAC()}: Computes the normalized response area (AAC) for a drug
