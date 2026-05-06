@@ -13,8 +13,8 @@ data(CMAPsmall)
 \description{
 A small example version of the Connectivity Map PharmacoSet, used in the
 documentation examples. All credit for the data goes to the Connectivity Map
-group at the Broad Institute. This is not a full version of the dataset, most of
-of the dataset was removed to make runnable example code. For the full dataset,
+group at the Broad Institute. This is not a full version of the dataset; most of
+the dataset was removed to make runnable example code. For the full dataset,
 please download using the downloadPSet function.
 }
 \references{

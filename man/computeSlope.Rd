@@ -2,30 +2,32 @@
 % Please edit documentation in R/computeSlope.R
 \name{computeSlope}
 \alias{computeSlope}
-\title{Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking
-its concentration and viability as input.}
+\title{Compute the linear slope of a drug response curve}
 \usage{
 computeSlope(concentration, viability, trunc = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{concentration}{\code{numeric} A concentration range that the AUC should be computed for that range.
-Concentration range by default considered as not logarithmic scaled. Converted to numeric by function if necessary.}
+\item{concentration}{\code{numeric} vector of drug concentrations. Concentrations
+are assumed to be provided on the raw scale and are transformed to
+\code{log10(concentration)} internally before fitting.}
 
-\item{viability}{\code{numeric} Viablities corresponding to the concentration range passed as first parameter.
-The range of viablity values by definition should be between 0 and 100. But the viabalities greater than
-100 and lower than 0 are also accepted.}
+\item{viability}{\code{numeric} vector of percent viability values aligned to
+\code{concentration}. Values outside the range \verb{[0, 100]} are accepted and can
+be truncated with \code{trunc}.}
 
-\item{trunc}{\code{logical(1)} A flag that identify if the viabality values should be truncated to be in the
-range of (0,100)}
+\item{trunc}{\code{logical(1)} If \code{TRUE}, clip viability values to lie in
+\verb{[0, 100]} before fitting the regression.}
 
-\item{verbose}{\code{logical(1)} If 'TRUE' the function will retrun warnings and other infomrative messages.}
+\item{verbose}{\code{logical(1)} If \code{TRUE}, emit warnings and informative messages
+produced while sanitizing the inputs.}
 }
 \value{
-Returns the normalized linear slope of the drug response curve
+Returns the negative ordinary least-squares slope of normalized
+viability (0-1 scale) regressed on \code{log10(concentration)}, rounded to two
+decimals.
 }
 \description{
-Return Slope (normalized slope of the drug response curve) for an experiment of a pSet by taking
-its concentration and viability as input.
+Compute the linear slope of a drug response curve
 }
 \examples{
 dose <- c(0.0025,0.008,0.025,0.08,0.25,0.8,2.53,8)

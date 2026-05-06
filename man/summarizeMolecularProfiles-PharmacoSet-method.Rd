@@ -29,7 +29,7 @@ for example: rna, rnaseq, snp}
 \item{cell.lines}{\code{character} The cell lines to be summarized.
 If any cell.line has no data, missing values will be created}
 
-\item{features}{\code{caracter} A vector of the feature names to include in the summary}
+\item{features}{\code{character} A vector of the feature names to include in the summary}
 
 \item{summary.stat}{\code{character} which summary method to use if there are repeated
 cell.lines? Choices are "mean", "median", "first", or "last"
@@ -65,7 +65,14 @@ perturbation dataset.
 }
 \examples{
 data(GDSCsmall)
-GDSCsmall <- summarizeMolecularProfiles(GDSCsmall, mDataType = "rna", cell.lines=sampleNames(GDSCsmall), summary.stat = 'median', fill.missing = TRUE, verbose=TRUE)
+GDSCsmall <- summarizeMolecularProfiles(
+  GDSCsmall,
+  mDataType = "rna",
+  cell.lines = sampleNames(GDSCsmall),
+  summary.stat = "median",
+  fill.missing = TRUE,
+  verbose = TRUE
+)
 GDSCsmall
 
 }

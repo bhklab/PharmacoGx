@@ -2,7 +2,8 @@
 % Please edit documentation in R/computeAUC.R
 \name{computeAUC}
 \alias{computeAUC}
-\title{Computes the AUC for a Drug Dose Viability Curve}
+\alias{computeAAC}
+\title{Computes the normalized viability area for a drug dose response curve}
 \usage{
 computeAUC(
   concentration,
@@ -12,47 +13,86 @@ computeAUC(
   viability_as_pct = TRUE,
   trunc = TRUE,
   area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
+  verbose = TRUE
+)
+
+computeAAC(
+  concentration,
+  viability,
+  Hill_fit,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  area.type = c("Fitted", "Actual"),
+  fit_type = c("hill", "biphasic"),
   verbose = TRUE
 )
 }
 \arguments{
-\item{concentration}{\code{numeric} is a vector of drug concentrations.}
+\item{concentration}{\code{numeric} vector of drug concentrations.}
 
-\item{viability}{\code{numeric} is a vector whose entries are the viability values observed in the presence of the
-drug concentrations whose logarithms are in the corresponding entries of conc, where viability 0
-indicates that all cells died, and viability 1 indicates that the drug had no effect on the cells.}
+\item{viability}{\code{numeric} vector of observed viabilities aligned to
+\code{concentration}. Viability can be supplied as percentages or proportions,
+depending on \code{viability_as_pct}.}
 
-\item{Hill_fit}{\code{list} or \code{vector} In the order: c("Hill Slope", "E_inf", "EC50"), the parameters of a Hill Slope
-as returned by logLogisticRegression. If conc_as_log is set then the function assumes logEC50 is passed in, and if
-viability_as_pct flag is set, it assumes E_inf is passed in as a percent. Otherwise, E_inf is assumed to be a decimal,
-and EC50 as a concentration.}
+\item{Hill_fit}{\code{list} or \code{vector} of Hill-curve parameters as returned by
+\code{logLogisticRegression}. When \code{conc_as_log = TRUE}, EC50 values are assumed
+to already be on the log10 scale. When \code{viability_as_pct = TRUE}, response
+parameters such as \code{E0} and \code{E_inf} are assumed to be expressed as
+percentages; otherwise they are assumed to be proportions.}
 
-\item{conc_as_log}{\code{logical}, if true, assumes that log10-concentration data has been given rather than concentration data.}
+\item{conc_as_log}{\code{logical}, if \code{TRUE}, assumes that log10-concentration data
+has been given rather than concentration data.}
 
-\item{viability_as_pct}{\code{logical}, if false, assumes that viability is given as a decimal rather
-than a percentage, and returns AUC as a decimal. Otherwise, viability is interpreted as percent, and AUC is returned 0-100.}
+\item{viability_as_pct}{\code{logical}, if \code{FALSE}, assumes that viability is
+given as a proportion rather than a percentage, and returns the normalized
+area on the 0-1 scale. Otherwise, viability is interpreted as a percentage
+and the result is returned on the 0-100 scale.}
 
-\item{trunc}{\code{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
-curve-fitting is performed.}
+\item{trunc}{\code{logical}, if \code{TRUE}, clips viability data to lie between 0 and
+1 after scale normalization and before either the actual or fitted area is
+computed.}
 
-\item{area.type}{Should the area be computed using the actual data ("Actual"), or a fitted curve ("Fitted")}
+\item{area.type}{Character string indicating whether to compute the normalized
+area using the observed data (\code{"Actual"}) or a fitted curve (\code{"Fitted"}).}
 
-\item{verbose}{\code{logical}, if true, causes warnings thrown by the function to be printed.}
+\item{fit_type}{Character string selecting the curve family to fit when
+\code{area.type = "Fitted"} and \code{Hill_fit} is not supplied. One of \code{"hill"}
+(default) or \code{"biphasic"}. Ignored when a precomputed \code{Hill_fit} is supplied
+or when \code{area.type = "Actual"}.}
+
+\item{verbose}{\code{logical}, if true, causes warnings thrown by the function to
+be printed.}
 }
 \value{
-Numeric AUC value
+Numeric normalized viability-area value.
+
+Numeric normalized response-area value.
 }
 \description{
-Returns the AUC (Area Under the drug response Curve) given concentration and viability as input, normalized by the concentration
-range of the experiment. The area returned is the response (1-Viablility) area, i.e. area under the curve when the response curve
-is plotted on a log10 concentration scale, with high AUC implying high sensitivity to the drug. The function can calculate both
-the area under a fitted Hill Curve to the data, and a trapz numeric integral of the actual data provided. Alternatively, the parameters
-of a Hill Slope returned by logLogisticRegression can be passed in if they already known.
+Returns the normalized area under the viability curve over the experiment's
+concentration range on the log10 dose scale. Larger values therefore imply
+greater viability and lower drug sensitivity. Use \code{computeAAC()} to obtain
+the complementary normalized response area used for sensitivity summaries.
 }
-\examples{
-dose <- c(0.0025,0.008,0.025,0.08,0.25,0.8,2.53,8) 
-viability <- c(108.67,111,102.16,100.27,90,87,74,57)
-computeAUC(dose, viability)
+\details{
+\strong{Breaking change in PharmacoGx 3.14.0:} \code{computeAUC()} now returns the
+normalized viability area computed by \code{.compute_normalized_viability_area()}.
+Earlier releases returned the complementary normalized response area. Use
+\code{computeAAC()} when migrating code that relied on the former response-area
+semantics.
+}
+\section{Functions}{
+\itemize{
+\item \code{computeAAC()}: Computes the normalized response area (AAC) for a drug
+dose response curve.
 
+}}
+\examples{
+dose <- c(0.0025, 0.008, 0.025, 0.08, 0.25, 0.8, 2.53, 8)
+viability <- c(108.67, 111, 102.16, 100.27, 90, 87, 74, 57)
+computeAUC(dose, viability)
+computeAAC(dose, viability)
 
 }

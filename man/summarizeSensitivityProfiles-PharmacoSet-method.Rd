@@ -7,7 +7,7 @@ drug vs cell line table}
 \usage{
 \S4method{summarizeSensitivityProfiles}{PharmacoSet}(
   object,
-  sensitivity.measure = "auc_recomputed",
+  sensitivity.measure = "aac_recomputed",
   cell.lines,
   profiles_assay = "profiles",
   treatment_col = "treatmentid",
@@ -21,7 +21,7 @@ drug vs cell line table}
 \arguments{
 \item{object}{\link{PharmacoSet} The PharmacoSet from which to extract the data}
 
-\item{sensitivity.measure}{\link{character} The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object.}
+\item{sensitivity.measure}{\link{character} The sensitivity measure to use. Use the sensitivityMeasures function to find out what measures are available for each object. For atypical LongTable datasets, this may need to be set explicitly.}
 
 \item{cell.lines}{\link{character} The cell lines to be summarized. If any cell lines have no data, they will be filled with missing values.}
 
@@ -46,6 +46,13 @@ drug vs cell line table}
 This function creates a table with cell lines as rows and drugs as columns,
 summarising the drug senstitivity data of a PharmacoSet into drug-cell line
 pairs
+}
+\details{
+For LongTable-backed sensitivity data, the default treatment identifier is
+\code{treatmentid}. If that column is absent but \code{treatment1id} is present, the
+summary falls back to monotherapy rows from \code{treatment1id} and drops rows
+with a non-empty \code{treatment2id}. Combination summaries still require an
+explicit input matrix or explicit column configuration.
 }
 \examples{
 data(GDSCsmall)

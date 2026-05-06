@@ -311,15 +311,15 @@ Arguments:
 \subsection{@curation}{
 
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
-PharmacoSet object and the original data publication. Contains three \code{data.frame}s, 'cell' with
-cell-line ids and 'tissue' with tissue ids and 'drug' with drug ids.
+PharmacoSet object and the original data publication. Contains three \code{data.frame}s, 'sample' with
+sample ids, 'tissue' with tissue ids and 'treatment' with treatment ids.
 }
 
 \strong{curation<-}: Update the \code{curation} slot of a PharmacoSet object. Arugments:
 \itemize{
 \item value: A \code{list} of \code{data.frame}s, one for each type of curated
 identifier. For a \code{PharmacoSet} object the slot should
-contain tissue, cell-line and drug id \code{data.frame}s.
+contain sample, tissue and treatment id \code{data.frame}s.
 }
 
 \subsection{datasetType slot}{

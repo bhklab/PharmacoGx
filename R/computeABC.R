@@ -37,81 +37,108 @@
 #'
 #' @importFrom CoreGx .getSupportVec
 #' @export
-computeABC <- function(conc1, conc2, viability1, viability2,
-                        Hill_fit1,
-                        Hill_fit2,
-                        conc_as_log = FALSE,
-                        viability_as_pct = TRUE,
-                        trunc = TRUE,
-                        verbose=TRUE) {
-
-if (missing(conc1) | missing(conc2)){
-
-    stop("Both Concentration vectors the drugs were tested on must always be provided.")
-
-}
-if (missing(Hill_fit1) | missing(Hill_fit2)) {
-
-    Hill_fit1 <- logLogisticRegression(conc1,
+computeABC <- function(
+  conc1,
+  conc2,
+  viability1,
+  viability2,
+  Hill_fit1,
+  Hill_fit2,
+  conc_as_log = FALSE,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = TRUE
+) {
+  if (missing(conc1) || missing(conc2)) {
+    stop(
+      "Both Concentration vectors the drugs were tested on must always be provided."
+    )
+  }
+  if (missing(Hill_fit1) || missing(Hill_fit2)) {
+    Hill_fit1 <- logLogisticRegression(
+      conc1,
       viability1,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
-      verbose = verbose)
-    cleanData <- sanitizeInput(conc=conc1,
-      Hill_fit=Hill_fit1,
+      verbose = verbose
+    )
+    cleanData <- sanitizeInput(
+      conc = conc1,
+      Hill_fit = Hill_fit1,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
-      verbose = verbose)
+      verbose = verbose
+    )
     pars1 <- cleanData[["Hill_fit"]]
     log_conc1 <- cleanData[["log_conc"]]
-    Hill_fit2 <- logLogisticRegression(conc2,
+    Hill_fit2 <- logLogisticRegression(
+      conc2,
       viability2,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
-      verbose = verbose)
-    cleanData <- sanitizeInput(conc=conc2,
-      Hill_fit=Hill_fit2,
+      verbose = verbose
+    )
+    cleanData <- sanitizeInput(
+      conc = conc2,
+      Hill_fit = Hill_fit2,
       conc_as_log = conc_as_log,
       viability_as_pct = viability_as_pct,
       trunc = trunc,
-      verbose = verbose)
+      verbose = verbose
+    )
     pars2 <- cleanData[["Hill_fit"]]
     log_conc2 <- cleanData[["log_conc"]]
-
-} else {
-
-  cleanData <- sanitizeInput(conc = conc1,
-    viability = viability1,
-    Hill_fit = Hill_fit1,
-    conc_as_log = conc_as_log,
-    viability_as_pct = viability_as_pct,
-    trunc = trunc,
-    verbose = verbose)
-  pars1 <- cleanData[["Hill_fit"]]
-  log_conc1 <- cleanData[["log_conc"]]
-  cleanData <- sanitizeInput(conc = conc2,
-    viability = viability2,
-    Hill_fit = Hill_fit2,
-    conc_as_log = conc_as_log,
-    viability_as_pct = viability_as_pct,
-    trunc = trunc,
-    verbose = verbose)
-  pars2 <- cleanData[["Hill_fit"]]
-  log_conc2 <- cleanData[["log_conc"]]
-}
+  } else {
+    cleanData <- sanitizeInput(
+      conc = conc1,
+      viability = viability1,
+      Hill_fit = Hill_fit1,
+      conc_as_log = conc_as_log,
+      viability_as_pct = viability_as_pct,
+      trunc = trunc,
+      verbose = verbose
+    )
+    pars1 <- cleanData[["Hill_fit"]]
+    log_conc1 <- cleanData[["log_conc"]]
+    cleanData <- sanitizeInput(
+      conc = conc2,
+      viability = viability2,
+      Hill_fit = Hill_fit2,
+      conc_as_log = conc_as_log,
+      viability_as_pct = viability_as_pct,
+      trunc = trunc,
+      verbose = verbose
+    )
+    pars2 <- cleanData[["Hill_fit"]]
+    log_conc2 <- cleanData[["log_conc"]]
+  }
 
   #FIT CURVE AND CALCULATE IC50
-  if (max(log_conc1) < min(log_conc2) | max(log_conc2) < min(log_conc1)) {
+  if (
+    max(log_conc1, na.rm = TRUE) < min(log_conc2, na.rm = TRUE) ||
+      max(log_conc2, na.rm = TRUE) < min(log_conc1, na.rm = TRUE)
+  ) {
     return(NA)
   } else {
-    extrema <- sort(c(min(log_conc1), max(log_conc1), min(log_conc2), max(log_conc2)))
+    extrema <- sort(c(
+      min(log_conc1, na.rm = TRUE),
+      max(log_conc1, na.rm = TRUE),
+      min(log_conc2, na.rm = TRUE),
+      max(log_conc2, na.rm = TRUE)
+    ))
     support <- .getSupportVec(c(extrema[2], extrema[3]))
-    ABC <- as.numeric(caTools::trapz(support, abs(.Hill(support, pars1) - .Hill(support, pars2))) / (extrema[3] - extrema[2]))
-    if(viability_as_pct){
-      ABC <- ABC*100
+    ABC <- as.numeric(
+      caTools::trapz(
+        support,
+        abs(.Hill(support, pars1) - .Hill(support, pars2))
+      ) /
+        (extrema[3] - extrema[2])
+    )
+    if (viability_as_pct) {
+      ABC <- ABC * 100
     }
     return(ABC)
   }

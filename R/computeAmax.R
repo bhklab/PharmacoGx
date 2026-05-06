@@ -11,73 +11,80 @@
 #'
 #' @param viability `numeric` is a vector whose entries are the viability values observed in the presence of the
 #' drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-#' of viability in the absence of any drug.
+#' of viability in the absence of any drug when `viability_as_pct = TRUE`, or
+#' as decimals when `viability_as_pct = FALSE`.
 #'
+#' @param viability_as_pct `logical(1)` whether the viability values are given
+#' as percentages or decimals.
 #' @param trunc `logical`, if true, causes viability data to be truncated to lie between 0 and 1 before
 #' curve-fitting is performed.
 #' @param verbose `logical` should warnings be printed
-#' @return The numerical Amax
+#' @return The numerical Amax expressed as a percentage.
 #' @export
-computeAmax <- function(concentration, viability, trunc = TRUE, verbose=FALSE) {
-  concentration <- as.numeric(concentration[!is.na(concentration)])
-  viability <- as.numeric(viability[!is.na(viability)])
-  ii <- which(concentration == 0)
-  if(length(ii) > 0) {
-    concentration <- concentration[-ii]
-    viability <- viability[-ii]
+computeAmax <- function(
+  concentration,
+  viability,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = FALSE
+) {
+  if (
+    !is.logical(viability_as_pct) ||
+      length(viability_as_pct) != 1L ||
+      is.na(viability_as_pct)
+  ) {
+    stop("'viability_as_pct' must be a logical value.")
   }
 
-  #CHECK THAT FUNCTION INPUTS ARE APPROPRIATE
-  if (!all(is.finite(concentration))) {
-    print(concentration)
-    stop("Concentration vector contains elements which are not real numbers.")
+  if (!is.logical(trunc) || length(trunc) != 1L || is.na(trunc)) {
+    stop("'trunc' must be a logical value.")
   }
 
-  if (!all(is.finite(viability))) {
-    print(viability)
-    stop("Viability vector contains elements which are not real numbers.")
+  if (!is.logical(verbose) || length(verbose) != 1L || is.na(verbose)) {
+    stop("'verbose' must be a logical value.")
   }
 
-  if (is.logical(trunc) == FALSE) {
-    print(trunc)
-    stop("'trunc' is not a logical.")
-  }
+  clean_data <- sanitizeInput(
+    conc = concentration,
+    viability = viability,
+    conc_as_log = FALSE,
+    viability_as_pct = viability_as_pct,
+    trunc = trunc,
+    verbose = verbose
+  )
 
-  if (length(concentration) != length(viability)) {
-    print(concentration)
-    print(viability)
-    stop("Concentration vector is not of same length as viability vector.")
-  }
+  log_conc <- clean_data[["log_conc"]]
+  viability_clean <- clean_data[["viability"]]
 
-  if (min(concentration) < 0) {
-    stop("Concentration vector contains negative data.")
-  }
-
-  if (min(viability) < 0 & verbose) {
-    warning("Warning: Negative viability data.")
-  }
-
-  if (max(viability) > 100 & verbose) {
-    warning("Warning: Viability data exceeds negative control.")
-  }
-
-  #CONVERT DOSE-RESPONSE DATA TO APPROPRIATE INTERNAL REPRESENTATION
-  log_conc <- log10(concentration)
-  viability <- viability / 100
-
-  if (trunc == TRUE) {
-    viability[which(viability < 0)] <- 0
-    viability[which(viability > 1)] <- 1
+  if (length(log_conc) < 2L) {
+    if (verbose) {
+      warning("Insufficient non-zero concentrations for curve fitting")
+    }
+    x <- NA_real_
+    names(x) <- "Amax"
+    return(x)
   }
 
   #FIT CURVE AND CALCULATE IC50
-  pars <- unlist(logLogisticRegression(log_conc,
-                                       viability,
-                                       conc_as_log = TRUE,
-                                       viability_as_pct = FALSE,
-                                       trunc = trunc))
-  x <- 100 - .Hill(max(log_conc), pars) * 100
+  pars <- unlist(logLogisticRegression(
+    log_conc,
+    viability_clean,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE,
+    trunc = FALSE,
+    verbose = FALSE
+  ))
+  internal <- .normalizeHillPars(
+    hill_fit = pars,
+    conc_as_log = TRUE,
+    viability_as_pct = FALSE
+  )
+  x <- 100 -
+    .pgx_hill_curve(
+      max(log_conc),
+      unname(internal[c("HS", "E0", "E_inf", "log10EC50")])
+    ) *
+      100
   names(x) <- "Amax"
   return(x)
-
 }

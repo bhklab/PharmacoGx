@@ -76,27 +76,41 @@ Following the calculation of ZIP delta score as in Appendix A3.
 See reference for details.
 }
 \examples{
-\dontrun{
-## ZIP is optional. Will be recomputed if not provided.
-combo_profiles <- CoreGx::buildComboProfiles(
-     tre, 
-     c("HS", "EC50", "E_inf", "ZIP", "combo_viability"))
-combo_profiles[,
-        .computeZIPdelta(
-            treatment1id = treatment1id,
-            treatment2id = treatment2id,
-            treatment1dose = treatment1dose,
-            treatment2dose = treatment2dose,
-            sampleid = sampleid,
-            HS_1 = HS_1, HS_2 = HS_2,
-            EC50_1 = EC50_1, EC50_2 = EC50_2,
-            E_inf_1 = E_inf_1, E_inf_2 = E_inf_2,
-            combo_viability = combo_viability,
-            ZIP = ZIP,
-            nthread = 4,
-            show_Rsqr = TRUE
-        )
-    ] -> delta_scores
+\donttest{
+combo_profiles <- data.table::as.data.table(expand.grid(
+  treatment1dose = c(0.1, 1, 10),
+  treatment2dose = c(0.2, 1, 5)
+))
+combo_profiles[, `:=`(
+  treatment1id = "drugA",
+  treatment2id = "drugB",
+  sampleid = "cell1",
+  combo_viability = 0.9 - 0.03 * treatment1dose - 0.04 * treatment2dose,
+  HS_1 = 1,
+  HS_2 = 1,
+  E_inf_1 = 0.2,
+  E_inf_2 = 0.3,
+  EC50_1 = 0.5,
+  EC50_2 = 0.6
+)]
+combo_profiles <- combo_profiles[order(treatment1dose, treatment2dose)]
+
+delta_scores <- .computeZIPdelta(
+  treatment1id = combo_profiles$treatment1id,
+  treatment2id = combo_profiles$treatment2id,
+  treatment1dose = combo_profiles$treatment1dose,
+  treatment2dose = combo_profiles$treatment2dose,
+  sampleid = combo_profiles$sampleid,
+  HS_1 = combo_profiles$HS_1,
+  HS_2 = combo_profiles$HS_2,
+  EC50_1 = combo_profiles$EC50_1,
+  EC50_2 = combo_profiles$EC50_2,
+  E_inf_1 = combo_profiles$E_inf_1,
+  E_inf_2 = combo_profiles$E_inf_2,
+  combo_viability = combo_profiles$combo_viability,
+  show_Rsqr = TRUE
+)
+delta_scores
 }
 
 }

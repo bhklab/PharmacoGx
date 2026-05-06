@@ -6,14 +6,15 @@
 \usage{
 .summarizeSensProfiles(
   object,
-  sensitivity.measure = "auc_recomputed",
+  sensitivity.measure = "aac_recomputed",
   profiles_assay = "profiles",
   treatment_col = "treatmentid",
   sample_col = "sampleid",
   cell.lines,
   drugs,
-  summary.stat,
-  fill.missing = TRUE
+  summary.stat = c("mean", "median", "first", "last", "max", "min"),
+  fill.missing = TRUE,
+  verbose = TRUE
 )
 }
 \value{
