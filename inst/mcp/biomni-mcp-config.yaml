@@ -1,0 +1,202 @@
+mcp_servers:
+  pharmacogx:
+    enabled: true
+    description: "PharmacoGx MCP tools for preclinical pharmacogenomic demos"
+    command:
+      - "Rscript"
+      - "/absolute/path/to/PharmacoGx/inst/mcp/run-pharmacogx-mcp.R"
+    tools:
+      - biomni_name: pgx_list_example_datasets
+        description: "List bundled PharmacoGx demo datasets"
+        parameters: {}
+      - biomni_name: pgx_list_entities
+        description: "List treatments, samples, sensitivity measures, or datasets"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+            description: "One of GDSCsmall, CCLEsmall, or CMAPsmall"
+          entity:
+            type: str
+            required: false
+            default: "treatments"
+            description: "treatments, samples, sensitivity_measures, or datasets"
+      - biomni_name: pgx_list_available_covariates
+        description: "List sample, treatment, sensitivity, and molecular covariates"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+      - biomni_name: pgx_get_sample_metadata
+        description: "Return sample or cell-line annotation rows"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          samples:
+            type: list
+            required: true
+          fields:
+            type: list
+            required: false
+          match_mode:
+            type: str
+            required: false
+            default: "exact"
+          limit:
+            type: int
+            required: false
+            default: 25
+      - biomni_name: pgx_get_treatment_metadata
+        description: "Return treatment or drug annotation rows"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          treatments:
+            type: list
+            required: true
+          fields:
+            type: list
+            required: false
+          match_mode:
+            type: str
+            required: false
+            default: "exact"
+          limit:
+            type: int
+            required: false
+            default: 25
+      - biomni_name: pgx_filter_samples
+        description: "Filter sample annotations by available metadata fields"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          filters:
+            type: dict
+            required: true
+          operator:
+            type: str
+            required: false
+            default: "and"
+          match_mode:
+            type: str
+            required: false
+            default: "contains"
+          fields:
+            type: list
+            required: false
+          limit:
+            type: int
+            required: false
+            default: 50
+      - biomni_name: pgx_compare_metrics
+        description: "Compare sensitivity measures with rank correlations and overlap"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          drug:
+            type: str
+            required: false
+          metrics:
+            type: list
+            required: false
+          top_n:
+            type: int
+            required: false
+            default: 10
+          rank_direction:
+            type: str
+            required: false
+            default: "auto"
+      - biomni_name: pgx_top_responders
+        description: "Rank cell-line responders for one drug"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          drug:
+            type: str
+            required: true
+          sensitivity_measure:
+            type: str
+            required: false
+            default: "auc_recomputed"
+      - biomni_name: pgx_summarize_sensitivity
+        description: "Return filtered sensitivity records for a PharmacoGx demo dataset"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          sensitivity_measure:
+            type: str
+            required: false
+            default: "auc_recomputed"
+          drugs:
+            type: list
+            required: false
+          cell_lines:
+            type: list
+            required: false
+      - biomni_name: pgx_compute_dose_response_metrics
+        description: "Compute AUC, AAC, IC50, and AC50 for a dose-response vector"
+        parameters:
+          concentration:
+            type: list
+            required: true
+          viability:
+            type: list
+            required: true
+      - biomni_name: pgx_compute_synergy_reference
+        description: "Compute Bliss and HSA null references for monotherapy viability vectors"
+        parameters:
+          viability_1:
+            type: list
+            required: true
+          viability_2:
+            type: list
+            required: true
+      - biomni_name: pgx_list_available_psets
+        description: "Fetch remote PharmacoSet download metadata"
+        parameters:
+          canonical:
+            type: bool
+            required: false
+            default: true
+          limit:
+            type: int
+            required: false
+            default: 25
+      - biomni_name: pgx_download_pset
+        description: "Download a named PharmacoSet after explicit confirmation"
+        parameters:
+          name:
+            type: str
+            required: true
+          save_dir:
+            type: str
+            required: false
+          pset_file_name:
+            type: str
+            required: false
+          timeout:
+            type: float
+            required: false
+            default: 600
+          confirm_download:
+            type: bool
+            required: false
+            default: false
+      - biomni_name: pgx_session_info
+        description: "Return R and package version metadata for the PharmacoGx MCP demo"
+        parameters: {}
