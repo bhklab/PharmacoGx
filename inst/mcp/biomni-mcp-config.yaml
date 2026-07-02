@@ -256,6 +256,167 @@ mcp_servers:
             type: str
             required: false
             default: "BH"
+      - biomni_name: pgx_suggest_biomarker_candidates
+        description: "Return workflow seed biomarker candidates for selected drugs"
+        parameters:
+          drug:
+            type: str
+            required: false
+          limit:
+            type: int
+            required: false
+            default: 20
+      - biomni_name: pgx_multi_pset_association_test
+        description: "Run independent per-PSet feature-response associations and summarize consensus"
+        parameters:
+          datasets:
+            type: list
+            required: true
+          drug:
+            type: str
+            required: true
+          metric:
+            type: str
+            required: false
+            default: "auc_recomputed"
+          mDataType:
+            type: str
+            required: true
+          features:
+            type: list
+            required: true
+          method:
+            type: str
+            required: false
+            default: "spearman"
+          feature_match_mode:
+            type: str
+            required: false
+            default: "exact"
+          summary_stat:
+            type: str
+            required: false
+          p_adjust_method:
+            type: str
+            required: false
+            default: "BH"
+      - biomni_name: pgx_list_treatment_response_tables
+        description: "List treatmentResponse tables and score candidates"
+        parameters:
+          dataset:
+            type: str
+            required: true
+          limit_columns:
+            type: int
+            required: false
+            default: 50
+      - biomni_name: pgx_rank_synergy_combinations
+        description: "Rank drug combinations from combo treatmentResponse tables"
+        parameters:
+          dataset:
+            type: str
+            required: true
+          table:
+            type: str
+            required: false
+            default: "auto"
+          score:
+            type: str
+            required: false
+          rank_direction:
+            type: str
+            required: false
+            default: "auto"
+          min_samples:
+            type: int
+            required: false
+            default: 3
+          limit:
+            type: int
+            required: false
+            default: 20
+      - biomni_name: pgx_get_combo_response_records
+        description: "Return bounded combo response records for selected treatments"
+        parameters:
+          dataset:
+            type: str
+            required: true
+          treatment1:
+            type: str
+            required: false
+          treatment2:
+            type: str
+            required: false
+          table:
+            type: str
+            required: false
+            default: "auto"
+          score:
+            type: str
+            required: false
+          match_mode:
+            type: str
+            required: false
+            default: "exact"
+          symmetric:
+            type: bool
+            required: false
+            default: true
+          fields:
+            type: list
+            required: false
+          limit:
+            type: int
+            required: false
+            default: 100
+      - biomni_name: pgx_combo_biomarker_association
+        description: "Associate molecular features with combo response or synergy"
+        parameters:
+          dataset:
+            type: str
+            required: true
+          treatment1:
+            type: str
+            required: true
+          treatment2:
+            type: str
+            required: true
+          mDataType:
+            type: str
+            required: true
+          features:
+            type: list
+            required: true
+          table:
+            type: str
+            required: false
+            default: "auto"
+          score:
+            type: str
+            required: false
+          method:
+            type: str
+            required: false
+            default: "spearman"
+          match_mode:
+            type: str
+            required: false
+            default: "exact"
+          symmetric:
+            type: bool
+            required: false
+            default: true
+          feature_match_mode:
+            type: str
+            required: false
+            default: "exact"
+          summary_stat:
+            type: str
+            required: false
+          p_adjust_method:
+            type: str
+            required: false
+            default: "BH"
       - biomni_name: pgx_detect_assay_mode
         description: "Detect whether a dataset is monotherapy, combination, mixed, or perturbation-only"
         parameters:

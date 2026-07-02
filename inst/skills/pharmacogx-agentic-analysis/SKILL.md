@@ -27,7 +27,13 @@ Prefer typed PharmacoGx MCP tools over arbitrary R execution. Current tools:
 - `pgx_validate_pset_inputs`
 - `pgx_get_molecular_profile`
 - `pgx_association_test`
+- `pgx_suggest_biomarker_candidates`
+- `pgx_multi_pset_association_test`
 - `pgx_detect_assay_mode`
+- `pgx_list_treatment_response_tables`
+- `pgx_rank_synergy_combinations`
+- `pgx_get_combo_response_records`
+- `pgx_combo_biomarker_association`
 - `pgx_find_pset_overlap`
 - `pgx_compare_pset_response`
 - `pgx_list_available_psets`
@@ -39,8 +45,9 @@ Prefer typed PharmacoGx MCP tools over arbitrary R execution. Current tools:
 1. Start by identifying the dataset, PharmacoSet, sample, treatment, metric,
    molecular profile, and metadata fields needed for the question.
 2. Use bundled toy datasets (`GDSCsmall`, `CCLEsmall`, `CMAPsmall`) only for
-   examples, testing, and lightweight demonstrations. Clearly say when results
-   come from toy data.
+   examples, testing, and lightweight demonstrations. For real analysis, accept
+   explicit local `.qs` or `.rds` PharmacoSet file paths. Clearly say whether
+   results come from toy data or local PSet-backed data.
 3. Use `pgx_list_available_psets` for larger downloadable PharmacoSets only
    when the user asks for external data. Do not call `pgx_download_pset` unless
    the user explicitly approves runtime, storage, and network use.
@@ -62,6 +69,8 @@ Use:
 - `pgx_list_available_covariates` before using sample, treatment, or molecular
   fields.
 - `pgx_detect_assay_mode` before any combination or synergy analysis.
+- `pgx_list_treatment_response_tables` when a real combo PSet may store useful
+  endpoints in treatmentResponse `profiles`, `synergy`, or `raw` tables.
 
 If the requested dataset, sample, drug, metric, molecular profile, or metadata
 field is unavailable, state what is missing and ask for a valid option.
@@ -138,6 +147,13 @@ first distinguish:
 
 Use:
 
+- `pgx_list_treatment_response_tables` to find available combo endpoints and
+  numeric score columns.
+- `pgx_rank_synergy_combinations` to rank high-confidence drug combinations
+  from combo treatmentResponse tables.
+- `pgx_get_combo_response_records` to inspect selected combination rows.
+- `pgx_combo_biomarker_association` to associate molecular features with a
+  selected combo response or synergy phenotype.
 - `pgx_detect_assay_mode` to check whether a dataset appears monotherapy,
   combination, mixed, or perturbation-only.
 - `pgx_compute_synergy_reference` only when monotherapy viability vectors are
@@ -181,7 +197,11 @@ Use:
 
 - `pgx_get_molecular_profile` to inspect molecular values for selected features
   and samples.
+- `pgx_suggest_biomarker_candidates` only to seed expected positive-control
+  features such as SLC29A1/hENT1 for gemcitabine or PDE3A for anagrelide.
 - `pgx_association_test` for exploratory feature-response association.
+- `pgx_multi_pset_association_test` to run independent per-PSet associations
+  and summarize cross-PSet support without pooling raw data.
 
 Default to Spearman for continuous molecular features versus continuous
 sensitivity metrics. Use Wilcoxon/group comparison for binary or categorical
@@ -192,6 +212,10 @@ Do not claim molecular biomarker associations unless molecular profile data
 were actually used. For bundled small datasets, avoid strong biomarker claims;
 describe results as exploratory fixtures.
 
+For multi-PSet biomarker questions, do not merge raw response or molecular
+matrices across PSets. Run each PSet separately and summarize effect direction,
+sample size, p-value/FDR, and consistency.
+
 ## Cross-PharmacoSet Analysis
 
 Use:
@@ -200,6 +224,8 @@ Use:
   sample-treatment pairs.
 - `pgx_compare_pset_response` to compare response values for the same drug and
   metric across datasets.
+- `pgx_multi_pset_association_test` for cross-PSet biomarker support using
+  per-PSet association followed by consensus summarization.
 
 Check identifier consistency before interpreting cross-PSet results. Matching
 names do not always guarantee the same biological sample or compound.

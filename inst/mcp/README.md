@@ -3,9 +3,9 @@
 This directory contains an optional Model Context Protocol (MCP) demo for
 calling a small, curated PharmacoGx analysis surface from agentic systems.
 
-The demo is intentionally narrow. It exposes JSON-serializable wrappers around
-bundled toy datasets and dose-response utilities rather than raw S4 objects or
-arbitrary R evaluation.
+The demo exposes JSON-serializable wrappers around bundled toy datasets, local
+`.qs`/`.rds` PharmacoSet files, and dose-response utilities rather than raw S4
+objects or arbitrary R evaluation.
 
 ## Requirements
 
@@ -79,6 +79,12 @@ If no live session is registered, the tools run in the MCP server process.
   Doxorubicin response in the toy data, and explain the limitations."
 - "Which samples, treatments, and sample-treatment pairs overlap between
   GDSCsmall and CCLEsmall?"
+- "Using this local GDSC-square Matrix `.qs` file path, list treatmentResponse
+  tables and rank high-confidence synergistic drug combinations."
+- "Find candidate biomarkers for Gemcitabine, then test SLC29A1/hENT1 support
+  across available PSets without pooling raw data."
+- "For this GDSC-square drug combo, test whether mutation or CNV features are
+  associated with the combo synergy score."
 - "List remote PharmacoSets available for download, then ask me before
   downloading one."
 
@@ -114,13 +120,19 @@ execution layer.
 
 ## Guardrails
 
-- Prefer bundled demo datasets for reproducible agent demos.
+- Prefer bundled demo datasets for reproducible agent demos; use explicit local
+  `.qs` or `.rds` file paths for real PSet-backed workflows.
 - Clearly distinguish toy-data demonstrations from real downloaded PSet-backed
   analyses.
 - Call `pgx_list_available_covariates()` before metadata lookup or filtering,
   because annotation fields differ between PharmacoSets.
 - Use `pgx_detect_assay_mode()` before any drug-combination or synergy
   workflow.
+- Use `pgx_list_treatment_response_tables()` before combo ranking or combo
+  biomarker workflows, because combo endpoints may live in `profiles`,
+  `synergy`, or `raw` treatmentResponse tables.
+- For multi-PSet biomarker workflows, run per-PSet associations and summarize
+  consistency; do not pool raw response or molecular matrices across PSets.
 - Use `pgx_list_available_psets()` to discover downloadable external datasets.
 - Do not call `pgx_download_pset()` unless the user explicitly asks for a large
   external dataset workflow and the tool call sets `confirm_download = TRUE`.

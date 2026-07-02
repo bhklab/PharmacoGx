@@ -5,35 +5,93 @@
 
 pgx_supported_datasets <- c("GDSCsmall", "CCLEsmall", "CMAPsmall")
 
+pgx_is_local_dataset <- function(dataset) {
+  if (pgx_is_blank(dataset)) {
+    return(FALSE)
+  }
+
+  file.exists(path.expand(dataset)) && !dir.exists(path.expand(dataset))
+}
+
+pgx_read_local_pset <- function(path) {
+  path <- normalizePath(path.expand(path), mustWork = TRUE)
+  extension <- tolower(tools::file_ext(path))
+
+  pset <- switch(
+    extension,
+    "qs" = {
+      if (requireNamespace("qs2", quietly = TRUE)) {
+        qs2::qs_read(path)
+      } else if (requireNamespace("qs", quietly = TRUE)) {
+        qs::qread(path)
+      } else {
+        stop("Reading .qs PharmacoSets requires the qs2 or qs package.")
+      }
+    },
+    "rds" = readRDS(path),
+    stop("Unsupported local PSet file extension: .", extension)
+  )
+
+  if (!inherits(pset, "PharmacoSet")) {
+    stop(
+      "Local file did not contain a PharmacoGx PharmacoSet object: ",
+      path
+    )
+  }
+
+  pset
+}
+
 pgx_load_dataset <- function(dataset) {
+  if (dataset %in% pgx_supported_datasets) {
+    env <- new.env(parent = emptyenv())
+    utils::data(list = dataset, package = "PharmacoGx", envir = env)
+    return(env[[dataset]])
+  }
+
+  if (pgx_is_local_dataset(dataset)) {
+    return(pgx_read_local_pset(dataset))
+  }
+
   if (!dataset %in% pgx_supported_datasets) {
     stop(
       "Unsupported dataset '",
       dataset,
-      "'. Use one of: ",
-      paste(pgx_supported_datasets, collapse = ", ")
+      "'. Use one of ",
+      paste(pgx_supported_datasets, collapse = ", "),
+      " or an explicit local .qs/.rds PharmacoSet file path."
     )
   }
-
-  env <- new.env(parent = emptyenv())
-  utils::data(list = dataset, package = "PharmacoGx", envir = env)
-  env[[dataset]]
 }
 
 pgx_dataset_catalog <- function() {
   data.frame(
-    dataset = c("GDSCsmall", "CCLEsmall", "CMAPsmall", "HDAC_genes"),
-    object_type = c("PharmacoSet", "PharmacoSet", "PharmacoSet", "data.frame"),
+    dataset = c(
+      "GDSCsmall",
+      "CCLEsmall",
+      "CMAPsmall",
+      "local .qs/.rds path",
+      "HDAC_genes"
+    ),
+    object_type = c(
+      "PharmacoSet",
+      "PharmacoSet",
+      "PharmacoSet",
+      "PharmacoSet",
+      "data.frame"
+    ),
     analysis_mode = c(
       "drug sensitivity toy dataset",
       "drug sensitivity toy dataset",
       "drug perturbation toy dataset",
+      "user-provided local PharmacoSet",
       "example HDAC inhibitor gene signature"
     ),
     recommended_demo_use = c(
       "summarize sensitivity profiles and rank responders",
       "inspect cross-study sensitivity and molecular profile examples",
       "connectivity and perturbation signature examples",
+      "real local PSet-backed biomarker, combo, and cross-PSet analysis",
       "signature lookup with CMAPsmall"
     ),
     stringsAsFactors = FALSE
@@ -493,16 +551,55 @@ pgx_required_column_result <- function(table_name, provided, required) {
 }
 
 pgx_pair_table <- function(pset) {
-  info <- PharmacoGx::sensitivityInfo(pset)
-  if (!all(c("sampleid", "treatmentid") %in% colnames(info))) {
-    return(data.frame(sample = character(), treatment = character()))
+  info <- tryCatch(PharmacoGx::sensitivityInfo(pset), error = function(e) {
+    data.frame()
+  })
+  if (all(c("sampleid", "treatmentid") %in% colnames(info))) {
+    return(unique(data.frame(
+      sample = info$sampleid,
+      treatment = info$treatmentid,
+      stringsAsFactors = FALSE
+    )))
   }
 
-  unique(data.frame(
-    sample = info$sampleid,
-    treatment = info$treatmentid,
-    stringsAsFactors = FALSE
-  ))
+  if (all(c("sampleid", "treatment1id", "treatment2id") %in% colnames(info))) {
+    return(unique(data.frame(
+      sample = info$sampleid,
+      treatment = paste(info$treatment1id, info$treatment2id, sep = " + "),
+      stringsAsFactors = FALSE
+    )))
+  }
+
+  treatment_response <- tryCatch(
+    pgx_treatment_response(pset),
+    error = function(e) {
+      list()
+    }
+  )
+  for (table_name in names(treatment_response)) {
+    x <- as.data.frame(treatment_response[[table_name]])
+    if (all(c("sampleid", "treatment1id", "treatment2id") %in% colnames(x))) {
+      return(unique(data.frame(
+        sample = x$sampleid,
+        treatment = paste(x$treatment1id, x$treatment2id, sep = " + "),
+        stringsAsFactors = FALSE
+      )))
+    }
+  }
+
+  data.frame(sample = character(), treatment = character())
+}
+
+pgx_sensitivity_measures <- function(pset) {
+  tryCatch(PharmacoGx::sensitivityMeasures(pset), error = function(e) {
+    character()
+  })
+}
+
+pgx_sensitivity_info <- function(pset) {
+  tryCatch(PharmacoGx::sensitivityInfo(pset), error = function(e) {
+    data.frame()
+  })
 }
 
 pgx_load_many_datasets <- function(datasets) {
@@ -512,6 +609,290 @@ pgx_load_many_datasets <- function(datasets) {
   }
   stats::setNames(lapply(datasets, pgx_load_dataset), datasets)
 }
+
+pgx_treatment_response <- function(pset) {
+  tryCatch(
+    PharmacoGx::treatmentResponse(pset),
+    error = function(e) {
+      stop("Could not access treatmentResponse(): ", conditionMessage(e))
+    }
+  )
+}
+
+pgx_treatment_response_table_names <- function(pset) {
+  names(pgx_treatment_response(pset))
+}
+
+pgx_response_table <- function(
+  pset,
+  table = "auto",
+  preferred = c("profiles", "synergy", "raw"),
+  as_data_table = FALSE
+) {
+  treatment_response <- pgx_treatment_response(pset)
+  tables <- names(treatment_response)
+  if (length(tables) == 0) {
+    stop("No treatmentResponse() tables are available.")
+  }
+
+  table <- if (pgx_is_blank(table) || identical(table, "auto")) {
+    preferred_match <- intersect(preferred, tables)
+    if (length(preferred_match) > 0) {
+      preferred_match[[1]]
+    } else {
+      tables[[1]]
+    }
+  } else {
+    table
+  }
+
+  if (!table %in% tables) {
+    stop(
+      "Unknown treatmentResponse table '",
+      table,
+      "'. Available tables are: ",
+      paste(tables, collapse = ", ")
+    )
+  }
+
+  x <- treatment_response[[table]]
+  if (isTRUE(as_data_table)) {
+    if (!requireNamespace("data.table", quietly = TRUE)) {
+      stop("The data.table package is required for combo table summaries.")
+    }
+    x <- data.table::as.data.table(x)
+  } else {
+    x <- as.data.frame(x)
+  }
+
+  list(name = table, table = x)
+}
+
+pgx_score_candidates <- function(x) {
+  cols <- colnames(x)
+  numeric_cols <- cols[vapply(x, is.numeric, logical(1))]
+  candidates <- grep(
+    paste(
+      c("synergy", "score", "excess", "combo_aac", "aac", "viability"),
+      collapse = "|"
+    ),
+    numeric_cols,
+    value = TRUE,
+    ignore.case = TRUE
+  )
+  candidates <- candidates[
+    !grepl("missing|expected", candidates, ignore.case = TRUE)
+  ]
+
+  priority <- c(
+    "mean_HSA_score_fit",
+    "median_HSA_score_fit",
+    "mean_HSA_score_obs",
+    "median_HSA_score_obs",
+    "mean_HSA_score",
+    "median_HSA_score",
+    "HSA_synergy_score",
+    "HSA_excess",
+    "mean_Bliss_score_fit",
+    "median_Bliss_score_fit",
+    "mean_Bliss_score_obs",
+    "median_Bliss_score_obs",
+    "mean_Bliss_score",
+    "median_Bliss_score",
+    "Bliss_synergy_score",
+    "Bliss_excess",
+    "mean_Loewe_score",
+    "median_Loewe_score",
+    "mean_ZIP_score",
+    "median_ZIP_score",
+    "combo_aac_observed"
+  )
+
+  unique(c(intersect(priority, candidates), candidates))
+}
+
+pgx_choose_score_column <- function(x, score = NULL) {
+  candidates <- pgx_score_candidates(x)
+  if (!pgx_is_blank(score)) {
+    if (!score %in% colnames(x)) {
+      stop(
+        "Unknown score column '",
+        score,
+        "'. Available columns are: ",
+        paste(colnames(x), collapse = ", ")
+      )
+    }
+    if (!is.numeric(x[[score]])) {
+      stop("Score column '", score, "' must be numeric.")
+    }
+    return(score)
+  }
+
+  if (length(candidates) == 0) {
+    stop("No numeric synergy or response score columns were detected.")
+  }
+
+  candidates[[1]]
+}
+
+pgx_score_direction <- function(score, rank_direction = "auto") {
+  rank_direction <- match.arg(rank_direction, c("auto", "lowest", "highest"))
+  if (!identical(rank_direction, "auto")) {
+    return(rank_direction)
+  }
+
+  if (grepl("viability|ic50|ec50|rmse", score, ignore.case = TRUE)) {
+    "lowest"
+  } else {
+    "highest"
+  }
+}
+
+pgx_filter_combo_rows <- function(
+  x,
+  treatment1 = NULL,
+  treatment2 = NULL,
+  match_mode = "exact",
+  symmetric = TRUE
+) {
+  required <- c("treatment1id", "treatment2id")
+  missing <- setdiff(required, colnames(x))
+  if (length(missing) > 0) {
+    stop(
+      "Combo table is missing required column(s): ",
+      paste(missing, collapse = ", ")
+    )
+  }
+
+  treatment1 <- pgx_clean_vector(treatment1)
+  treatment2 <- pgx_clean_vector(treatment2)
+  if (is.null(treatment1) && is.null(treatment2)) {
+    return(x)
+  }
+
+  match_mode <- pgx_resolve_match_mode(match_mode)
+  t1 <- as.character(x$treatment1id)
+  t2 <- as.character(x$treatment2id)
+
+  if (!is.null(treatment1) && !is.null(treatment2) && isTRUE(symmetric)) {
+    keep <- (pgx_match_filter_values(t1, treatment1, match_mode) &
+      pgx_match_filter_values(t2, treatment2, match_mode)) |
+      (pgx_match_filter_values(t1, treatment2, match_mode) &
+        pgx_match_filter_values(t2, treatment1, match_mode))
+  } else {
+    keep <- rep(TRUE, nrow(x))
+    if (!is.null(treatment1)) {
+      keep <- keep & pgx_match_filter_values(t1, treatment1, match_mode)
+    }
+    if (!is.null(treatment2)) {
+      keep <- keep & pgx_match_filter_values(t2, treatment2, match_mode)
+    }
+  }
+
+  x[keep, , drop = FALSE]
+}
+
+pgx_feature_response_association <- function(
+  mat,
+  response_values,
+  method,
+  p_adjust_method
+) {
+  if (nrow(mat) == 0 || ncol(mat) == 0) {
+    return(data.frame())
+  }
+
+  common_samples <- intersect(names(response_values), colnames(mat))
+
+  results <- do.call(
+    rbind,
+    lapply(rownames(mat), function(feature_id) {
+      x <- if (length(common_samples) > 0) {
+        as.vector(mat[feature_id, common_samples, drop = TRUE])
+      } else {
+        vector()
+      }
+      y <- as.numeric(response_values[common_samples])
+      complete <- stats::complete.cases(x, y) & is.finite(y)
+      x <- x[complete]
+      y <- y[complete]
+
+      if (length(y) < 3 || length(unique(x)) < 2) {
+        return(data.frame(
+          feature = feature_id,
+          method = method,
+          n = length(y),
+          effect_size = NA_real_,
+          p_value = NA_real_,
+          stringsAsFactors = FALSE
+        ))
+      }
+
+      if (method %in% c("spearman", "pearson") && is.numeric(x)) {
+        test <- suppressWarnings(stats::cor.test(x, y, method = method))
+        effect <- unname(test$estimate)
+        p_value <- test$p.value
+        method_used <- method
+      } else {
+        group <- as.factor(x)
+        if (length(levels(group)) != 2) {
+          return(data.frame(
+            feature = feature_id,
+            method = "wilcoxon",
+            n = length(y),
+            effect_size = NA_real_,
+            p_value = NA_real_,
+            stringsAsFactors = FALSE
+          ))
+        }
+        test <- suppressWarnings(stats::wilcox.test(y ~ group))
+        effect <- unname(diff(tapply(y, group, median, na.rm = TRUE))[[1]])
+        p_value <- test$p.value
+        method_used <- "wilcoxon"
+      }
+
+      data.frame(
+        feature = feature_id,
+        method = method_used,
+        n = length(y),
+        effect_size = effect,
+        p_value = p_value,
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  results$fdr <- stats::p.adjust(results$p_value, method = p_adjust_method)
+  results
+}
+
+pgx_fisher_p <- function(p_values) {
+  p_values <- p_values[!is.na(p_values) & is.finite(p_values)]
+  if (length(p_values) == 0) {
+    return(NA_real_)
+  }
+
+  p_values <- pmax(p_values, .Machine$double.xmin)
+  stats::pchisq(
+    -2 * sum(log(p_values)),
+    df = 2 * length(p_values),
+    lower.tail = FALSE
+  )
+}
+
+pgx_known_biomarker_candidates <- data.frame(
+  drug = c("Gemcitabine", "Gemcitabine", "Anagrelide"),
+  drug_aliases = c("gemcitabine;dFdC", "gemcitabine;dFdC", "anagrelide"),
+  feature = c("SLC29A1", "SLC28A1", "PDE3A"),
+  feature_aliases = c("hENT1;ENT1", "hCNT1;CNT1", "PDE3A"),
+  mDataType_hint = c("rna", "rna", "rna;mutation;cnv"),
+  context = c(
+    "Nucleoside transporter candidate for gemcitabine uptake and response.",
+    "Nucleoside transporter candidate sometimes evaluated with gemcitabine response.",
+    "Mechanistic target candidate for anagrelide response."
+  ),
+  stringsAsFactors = FALSE
+)
 
 pgx_capture <- function(expr) {
   warnings <- character()
@@ -589,7 +970,7 @@ pgx_list_entities <- function(
     entity,
     "treatments" = PharmacoGx::treatmentNames(pset),
     "samples" = PharmacoGx::sampleNames(pset),
-    "sensitivity_measures" = PharmacoGx::sensitivityMeasures(pset)
+    "sensitivity_measures" = pgx_sensitivity_measures(pset)
   )
 
   list(
@@ -603,6 +984,11 @@ pgx_list_entities <- function(
 
 pgx_list_available_covariates <- function(dataset = "GDSCsmall") {
   pset <- pgx_load_dataset(dataset)
+  sensitivity_info <- pgx_sensitivity_info(pset)
+  treatment_response_tables <- tryCatch(
+    pgx_treatment_response_table_names(pset),
+    error = function(e) character()
+  )
   molecular_profiles <- tryCatch(
     PharmacoGx::mDataNames(pset),
     error = function(e) character()
@@ -620,8 +1006,9 @@ pgx_list_available_covariates <- function(dataset = "GDSCsmall") {
     dataset = dataset,
     sample_fields = colnames(PharmacoGx::sampleInfo(pset)),
     treatment_fields = colnames(PharmacoGx::treatmentInfo(pset)),
-    sensitivity_info_fields = colnames(PharmacoGx::sensitivityInfo(pset)),
-    sensitivity_measures = PharmacoGx::sensitivityMeasures(pset),
+    sensitivity_info_fields = colnames(sensitivity_info),
+    sensitivity_measures = pgx_sensitivity_measures(pset),
+    treatment_response_tables = treatment_response_tables,
     molecular_profiles = molecular_profiles,
     feature_fields = feature_fields,
     note = paste(
@@ -767,7 +1154,13 @@ pgx_compare_metrics <- function(
   rank_direction = "auto"
 ) {
   pset <- pgx_load_dataset(dataset)
-  available <- PharmacoGx::sensitivityMeasures(pset)
+  available <- pgx_sensitivity_measures(pset)
+  if (length(available) == 0) {
+    stop(
+      "No classic sensitivity measures were available. For combo PSets, use",
+      " pgx_list_treatment_response_tables() and combo-specific tools."
+    )
+  }
   metrics <- pgx_clean_vector(metrics)
   if (is.null(metrics)) {
     metrics <- grep("auc|ic50", available, value = TRUE, ignore.case = TRUE)
@@ -1310,62 +1703,12 @@ pgx_association_test <- function(
     ))
   }
 
-  results <- do.call(
-    rbind,
-    lapply(rownames(mat), function(feature_id) {
-      common_samples <- intersect(names(response_values), colnames(mat))
-      x <- as.vector(mat[feature_id, common_samples, drop = TRUE])
-      y <- as.numeric(response_values[common_samples])
-      complete <- stats::complete.cases(x, y) & is.finite(y)
-      x <- x[complete]
-      y <- y[complete]
-
-      if (length(y) < 3 || length(unique(x)) < 2) {
-        return(data.frame(
-          feature = feature_id,
-          method = method,
-          n = length(y),
-          effect_size = NA_real_,
-          p_value = NA_real_,
-          stringsAsFactors = FALSE
-        ))
-      }
-
-      if (method %in% c("spearman", "pearson") && is.numeric(x)) {
-        test <- suppressWarnings(stats::cor.test(x, y, method = method))
-        effect <- unname(test$estimate)
-        p_value <- test$p.value
-        method_used <- method
-      } else {
-        group <- as.factor(x)
-        if (length(levels(group)) != 2) {
-          return(data.frame(
-            feature = feature_id,
-            method = "wilcoxon",
-            n = length(y),
-            effect_size = NA_real_,
-            p_value = NA_real_,
-            stringsAsFactors = FALSE
-          ))
-        }
-        test <- suppressWarnings(stats::wilcox.test(y ~ group))
-        effect <- diff(tapply(y, group, median, na.rm = TRUE))
-        p_value <- test$p.value
-        method_used <- "wilcoxon"
-      }
-
-      data.frame(
-        feature = feature_id,
-        method = method_used,
-        n = length(y),
-        effect_size = effect,
-        p_value = p_value,
-        stringsAsFactors = FALSE
-      )
-    })
+  results <- pgx_feature_response_association(
+    mat = mat,
+    response_values = response_values,
+    method = method,
+    p_adjust_method = p_adjust_method
   )
-
-  results$fdr <- stats::p.adjust(results$p_value, method = p_adjust_method)
 
   list(
     dataset = dataset,
@@ -1381,12 +1724,482 @@ pgx_association_test <- function(
   )
 }
 
+pgx_suggest_biomarker_candidates <- function(drug = NULL, limit = 20) {
+  candidates <- pgx_known_biomarker_candidates
+  drug <- pgx_clean_vector(drug)
+  limit <- max(1L, as.integer(limit))
+
+  if (!is.null(drug)) {
+    searchable <- paste(candidates$drug, candidates$drug_aliases, sep = ";")
+    keep <- pgx_match_filter_values(searchable, drug, "contains")
+    candidates <- candidates[keep, , drop = FALSE]
+  }
+
+  list(
+    query = drug,
+    total = nrow(candidates),
+    returned = min(nrow(candidates), limit),
+    candidates = pgx_limit_records(candidates, limit),
+    note = paste(
+      "These are workflow seed candidates, not statistical evidence. Use",
+      "pgx_association_test() or pgx_multi_pset_association_test() for",
+      "PSet-backed evidence and use primary literature for external support."
+    )
+  )
+}
+
+pgx_multi_pset_association_test <- function(
+  datasets = c("GDSCsmall", "CCLEsmall"),
+  drug,
+  metric = "auc_recomputed",
+  mDataType,
+  features,
+  method = "spearman",
+  feature_match_mode = "exact",
+  summary_stat = NULL,
+  p_adjust_method = "BH"
+) {
+  datasets <- pgx_clean_vector(datasets)
+  if (is.null(datasets) || length(datasets) < 2) {
+    stop("At least two datasets or local PSet file paths are required.")
+  }
+  method <- match.arg(method, c("spearman", "pearson", "wilcoxon"))
+
+  per_dataset <- list()
+  errors <- list()
+  for (dataset in datasets) {
+    result <- pgx_capture(pgx_association_test(
+      dataset = dataset,
+      drug = drug,
+      metric = metric,
+      mDataType = mDataType,
+      features = features,
+      method = method,
+      feature_match_mode = feature_match_mode,
+      summary_stat = summary_stat,
+      p_adjust_method = p_adjust_method
+    ))
+
+    if (isTRUE(result$ok)) {
+      records <- result$value$results
+      if (nrow(records) > 0) {
+        records$dataset <- dataset
+        per_dataset[[dataset]] <- records[,
+          c(
+            "dataset",
+            setdiff(colnames(records), "dataset")
+          ),
+          drop = FALSE
+        ]
+      }
+    } else {
+      errors[[dataset]] <- data.frame(
+        dataset = dataset,
+        error = result$value$message,
+        stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  per_dataset <- if (length(per_dataset) > 0) {
+    do.call(rbind, per_dataset)
+  } else {
+    data.frame()
+  }
+  errors <- if (length(errors) > 0) {
+    do.call(rbind, errors)
+  } else {
+    data.frame()
+  }
+
+  consensus <- if (nrow(per_dataset) > 0) {
+    valid <- per_dataset[
+      !is.na(per_dataset$p_value) &
+        is.finite(per_dataset$p_value) &
+        !is.na(per_dataset$effect_size) &
+        is.finite(per_dataset$effect_size),
+      ,
+      drop = FALSE
+    ]
+
+    if (nrow(valid) > 0) {
+      do.call(
+        rbind,
+        lapply(split(valid, valid$feature), function(feature_rows) {
+          directions <- ifelse(
+            feature_rows$effect_size > 0,
+            "positive",
+            "negative"
+          )
+          positive <- sum(directions == "positive")
+          negative <- sum(directions == "negative")
+          supported <- max(positive, negative)
+          data.frame(
+            feature = feature_rows$feature[[1]],
+            datasets_tested = length(unique(per_dataset$dataset[
+              per_dataset$feature == feature_rows$feature[[1]]
+            ])),
+            datasets_with_p_value = nrow(feature_rows),
+            positive_effects = positive,
+            negative_effects = negative,
+            consensus_direction = if (positive >= negative) {
+              "positive"
+            } else {
+              "negative"
+            },
+            direction_support = supported / max(1L, positive + negative),
+            median_effect_size = stats::median(
+              feature_rows$effect_size,
+              na.rm = TRUE
+            ),
+            min_p_value = min(feature_rows$p_value, na.rm = TRUE),
+            fisher_p_value = pgx_fisher_p(feature_rows$p_value),
+            stringsAsFactors = FALSE
+          )
+        })
+      )
+    } else {
+      data.frame()
+    }
+  } else {
+    data.frame()
+  }
+
+  if (nrow(consensus) > 0) {
+    consensus$fisher_fdr <- stats::p.adjust(
+      consensus$fisher_p_value,
+      method = p_adjust_method
+    )
+    consensus <- consensus[
+      order(consensus$fisher_fdr, -consensus$direction_support),
+      ,
+      drop = FALSE
+    ]
+  }
+
+  list(
+    datasets = datasets,
+    drug = drug,
+    metric = metric,
+    mDataType = mDataType,
+    features = pgx_clean_vector(features),
+    per_dataset_results = per_dataset,
+    consensus = consensus,
+    errors = errors,
+    note = paste(
+      "Each PSet was analyzed independently. Raw response or molecular data",
+      "were not pooled across PSets because of batch-effect risk."
+    )
+  )
+}
+
+pgx_list_treatment_response_tables <- function(
+  dataset = "GDSCsmall",
+  limit_columns = 50
+) {
+  pset <- pgx_load_dataset(dataset)
+  treatment_response <- pgx_treatment_response(pset)
+  limit_columns <- max(1L, as.integer(limit_columns))
+
+  tables <- do.call(
+    rbind,
+    lapply(names(treatment_response), function(table_name) {
+      x <- treatment_response[[table_name]]
+      columns <- colnames(x)
+      data.frame(
+        table = table_name,
+        rows = nrow(x),
+        columns = ncol(x),
+        id_columns = paste(
+          intersect(
+            c(
+              "treatmentid",
+              "treatment1id",
+              "treatment2id",
+              "sampleid",
+              "cellid",
+              "tech_rep",
+              "plateid",
+              "BARCODE"
+            ),
+            columns
+          ),
+          collapse = ", "
+        ),
+        score_candidates = paste(pgx_score_candidates(x), collapse = ", "),
+        returned_columns = paste(
+          pgx_trim(columns, limit_columns),
+          collapse = ", "
+        ),
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  list(
+    dataset = dataset,
+    tables = tables,
+    note = paste(
+      "Use score_candidates with combo ranking or combo biomarker tools. Local",
+      "combo PSets often store useful endpoints in treatmentResponse profiles",
+      "or synergy tables rather than classic sensitivity matrices."
+    )
+  )
+}
+
+pgx_rank_synergy_combinations <- function(
+  dataset,
+  table = "auto",
+  score = NULL,
+  rank_direction = "auto",
+  min_samples = 3,
+  limit = 20
+) {
+  pset <- pgx_load_dataset(dataset)
+  response <- pgx_response_table(
+    pset,
+    table = table,
+    preferred = c("profiles", "synergy", "raw"),
+    as_data_table = TRUE
+  )
+  x <- response$table
+  score <- pgx_choose_score_column(x, score)
+  rank_direction <- pgx_score_direction(score, rank_direction)
+  min_samples <- max(1L, as.integer(min_samples))
+  limit <- max(1L, as.integer(limit))
+
+  required <- c("treatment1id", "treatment2id", "sampleid")
+  missing <- setdiff(required, colnames(x))
+  if (length(missing) > 0) {
+    stop(
+      "Combo ranking requires column(s): ",
+      paste(missing, collapse = ", ")
+    )
+  }
+
+  x <- x[!is.na(x[[score]]) & is.finite(x[[score]])]
+  sample_scores <- x[,
+    list(
+      sample_score = stats::median(get(score), na.rm = TRUE),
+      records = .N
+    ),
+    by = c("treatment1id", "treatment2id", "sampleid")
+  ]
+  combo_scores <- sample_scores[,
+    list(
+      n_samples = data.table::uniqueN(sampleid),
+      n_records = sum(records),
+      mean_score = mean(sample_score, na.rm = TRUE),
+      median_score = stats::median(sample_score, na.rm = TRUE),
+      min_score = min(sample_score, na.rm = TRUE),
+      max_score = max(sample_score, na.rm = TRUE)
+    ),
+    by = c("treatment1id", "treatment2id")
+  ]
+  combo_scores <- combo_scores[n_samples >= min_samples]
+  data.table::setorderv(
+    combo_scores,
+    "median_score",
+    order = if (identical(rank_direction, "highest")) -1L else 1L
+  )
+  combo_scores <- combo_scores[seq_len(min(nrow(combo_scores), limit))]
+  combo_scores$rank <- seq_len(nrow(combo_scores))
+  data.table::setcolorder(combo_scores, "rank")
+
+  list(
+    dataset = dataset,
+    table = response$name,
+    score = score,
+    rank_direction = rank_direction,
+    min_samples = min_samples,
+    total_ranked = nrow(combo_scores),
+    combinations = as.data.frame(combo_scores),
+    note = paste(
+      "Scores are aggregated per sample first, then ranked across combinations.",
+      "Direction is inferred from the score name unless rank_direction is set."
+    )
+  )
+}
+
+pgx_get_combo_response_records <- function(
+  dataset,
+  treatment1 = NULL,
+  treatment2 = NULL,
+  table = "auto",
+  score = NULL,
+  match_mode = "exact",
+  symmetric = TRUE,
+  fields = NULL,
+  limit = 100
+) {
+  pset <- pgx_load_dataset(dataset)
+  response <- pgx_response_table(
+    pset,
+    table = table,
+    preferred = c("profiles", "synergy", "raw"),
+    as_data_table = FALSE
+  )
+  x <- pgx_filter_combo_rows(
+    response$table,
+    treatment1 = treatment1,
+    treatment2 = treatment2,
+    match_mode = match_mode,
+    symmetric = symmetric
+  )
+  limit <- max(1L, as.integer(limit))
+
+  score <- if (pgx_is_blank(score)) {
+    candidates <- pgx_score_candidates(x)
+    if (length(candidates) > 0) candidates[[1]] else NULL
+  } else {
+    pgx_choose_score_column(x, score)
+  }
+
+  default_fields <- unique(c(
+    "treatment1id",
+    "treatment2id",
+    "treatment1dose",
+    "treatment2dose",
+    "sampleid",
+    "tech_rep",
+    "plateid",
+    "BARCODE",
+    score,
+    pgx_trim(pgx_score_candidates(x), 10)
+  ))
+  fields <- pgx_clean_vector(fields)
+  if (is.null(fields)) {
+    keep_fields <- intersect(default_fields, colnames(x))
+  } else {
+    missing_fields <- setdiff(fields, colnames(x))
+    if (length(missing_fields) > 0) {
+      stop(
+        "Unknown combo field(s): ",
+        paste(missing_fields, collapse = ", ")
+      )
+    }
+    keep_fields <- fields
+  }
+
+  list(
+    dataset = dataset,
+    table = response$name,
+    treatment1 = pgx_clean_vector(treatment1),
+    treatment2 = pgx_clean_vector(treatment2),
+    match_mode = pgx_resolve_match_mode(match_mode),
+    symmetric = isTRUE(symmetric),
+    score = score,
+    total_matches = nrow(x),
+    returned = min(nrow(x), limit),
+    records = pgx_limit_records(x[, keep_fields, drop = FALSE], limit)
+  )
+}
+
+pgx_combo_biomarker_association <- function(
+  dataset,
+  treatment1,
+  treatment2,
+  mDataType,
+  features,
+  table = "auto",
+  score = NULL,
+  method = "spearman",
+  match_mode = "exact",
+  symmetric = TRUE,
+  feature_match_mode = "exact",
+  summary_stat = NULL,
+  p_adjust_method = "BH"
+) {
+  method <- match.arg(method, c("spearman", "pearson", "wilcoxon"))
+  pset <- pgx_load_dataset(dataset)
+  response <- pgx_response_table(
+    pset,
+    table = table,
+    preferred = c("profiles", "synergy", "raw"),
+    as_data_table = TRUE
+  )
+  x <- pgx_filter_combo_rows(
+    response$table,
+    treatment1 = treatment1,
+    treatment2 = treatment2,
+    match_mode = match_mode,
+    symmetric = symmetric
+  )
+  score <- pgx_choose_score_column(x, score)
+
+  if (!"sampleid" %in% colnames(x)) {
+    stop("Combo biomarker association requires a sampleid column.")
+  }
+  x <- x[!is.na(x[[score]]) & is.finite(x[[score]])]
+  if (nrow(x) == 0) {
+    stop("No finite combo phenotype values remained after filtering.")
+  }
+
+  phenotype <- x[,
+    list(
+      phenotype = stats::median(get(score), na.rm = TRUE),
+      records = .N
+    ),
+    by = "sampleid"
+  ]
+  response_values <- phenotype$phenotype
+  names(response_values) <- phenotype$sampleid
+
+  molecular <- pgx_get_molecular_matrix(
+    pset = pset,
+    mDataType = mDataType,
+    features = features,
+    samples = names(response_values),
+    feature_match_mode = feature_match_mode,
+    summary_stat = summary_stat,
+    limit_features = 100,
+    limit_samples = length(response_values)
+  )
+  results <- pgx_feature_response_association(
+    mat = molecular$matrix,
+    response_values = response_values,
+    method = method,
+    p_adjust_method = p_adjust_method
+  )
+
+  list(
+    dataset = dataset,
+    table = response$name,
+    treatment1 = pgx_clean_vector(treatment1),
+    treatment2 = pgx_clean_vector(treatment2),
+    score = score,
+    method = method,
+    mDataType = mDataType,
+    matched_features = molecular$matched_features,
+    phenotype_summary = data.frame(
+      samples = length(response_values),
+      records = sum(phenotype$records),
+      min = min(response_values, na.rm = TRUE),
+      median = stats::median(response_values, na.rm = TRUE),
+      max = max(response_values, na.rm = TRUE),
+      stringsAsFactors = FALSE
+    ),
+    results = results,
+    note = paste(
+      "Combo phenotype values are median-aggregated per sample before",
+      "feature-response association. Interpret as exploratory biomarker",
+      "support for this combo endpoint."
+    )
+  )
+}
+
 pgx_detect_assay_mode <- function(dataset = "GDSCsmall") {
   pset <- pgx_load_dataset(dataset)
-  info <- PharmacoGx::sensitivityInfo(pset)
+  info <- pgx_sensitivity_info(pset)
   treatment_names <- tryCatch(
     PharmacoGx::treatmentNames(pset),
     error = function(e) character()
+  )
+  treatment_response_tables <- tryCatch(
+    pgx_treatment_response(pset),
+    error = function(e) {
+      list()
+    }
   )
   dataset_type <- tryCatch(PharmacoGx::datasetType(pset), error = function(e) {
     character()
@@ -1399,7 +2212,18 @@ pgx_detect_assay_mode <- function(dataset = "GDSCsmall") {
     0L
   }
   combo_names <- sum(grepl("///", treatment_names, fixed = TRUE))
-  has_combo <- has_combo_cols && combo_rows > 0 || combo_names > 0
+  combo_table_rows <- sum(vapply(
+    names(treatment_response_tables),
+    function(table_name) {
+      x <- treatment_response_tables[[table_name]]
+      all(c("treatment1id", "treatment2id") %in% colnames(x)) && nrow(x) > 0
+    },
+    logical(1)
+  ))
+  has_combo <- has_combo_cols &&
+    combo_rows > 0 ||
+    combo_names > 0 ||
+    combo_table_rows > 0
   has_mono <- has_sensitivity && (nrow(info) > combo_rows)
 
   mode <- if (!has_sensitivity && "perturbation" %in% dataset_type) {
@@ -1421,6 +2245,7 @@ pgx_detect_assay_mode <- function(dataset = "GDSCsmall") {
     sensitivity_rows = nrow(info),
     combo_rows = combo_rows,
     combo_treatment_names = combo_names,
+    combo_treatment_response_tables = combo_table_rows,
     note = if (has_combo) {
       "Combination-like fields were detected; inspect raw data before synergy analysis."
     } else {
@@ -1488,7 +2313,7 @@ pgx_compare_pset_response <- function(
   records <- do.call(
     rbind,
     lapply(names(psets), function(dataset) {
-      if (!metric %in% PharmacoGx::sensitivityMeasures(psets[[dataset]])) {
+      if (!metric %in% pgx_sensitivity_measures(psets[[dataset]])) {
         return(data.frame())
       }
       mat <- PharmacoGx::summarizeSensitivityProfiles(
@@ -2263,6 +3088,216 @@ res <- list(
       samples = ellmer::type_array(
         "Optional sample IDs to include.",
         items = ellmer::type_string(),
+        required = FALSE
+      ),
+      feature_match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      summary_stat = ellmer::type_string(
+        "Optional molecular summary.stat override.",
+        required = FALSE
+      ),
+      p_adjust_method = ellmer::type_string(
+        "p.adjust method. Defaults to BH.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_suggest_biomarker_candidates = ellmer::tool(
+    fun = pgx_suggest_biomarker_candidates,
+    name = "pgx_suggest_biomarker_candidates",
+    description = paste(
+      "Return curated seed biomarker candidates for agent workflows, such as",
+      "SLC29A1/hENT1 for gemcitabine and PDE3A for anagrelide."
+    ),
+    arguments = list(
+      drug = ellmer::type_string(
+        "Optional drug name or alias to filter candidate biomarkers.",
+        required = FALSE
+      ),
+      limit = ellmer::type_integer(
+        "Maximum number of candidates to return. Defaults to 20.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_multi_pset_association_test = ellmer::tool(
+    fun = pgx_multi_pset_association_test,
+    name = "pgx_multi_pset_association_test",
+    description = paste(
+      "Run feature-response association independently across multiple",
+      "datasets or local PSet file paths and summarize consensus evidence."
+    ),
+    arguments = list(
+      datasets = ellmer::type_array(
+        "Dataset names or explicit local .qs/.rds PSet file paths.",
+        items = ellmer::type_string()
+      ),
+      drug = ellmer::type_string("Treatment or drug name."),
+      metric = ellmer::type_string(
+        "Sensitivity metric. Defaults to auc_recomputed.",
+        required = FALSE
+      ),
+      mDataType = ellmer::type_string(
+        "Molecular profile type such as rna, mutation, or cnv."
+      ),
+      features = ellmer::type_array(
+        "Feature IDs or symbols to test.",
+        items = ellmer::type_string()
+      ),
+      method = ellmer::type_string(
+        "One of spearman, pearson, or wilcoxon. Defaults to spearman.",
+        required = FALSE
+      ),
+      feature_match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      summary_stat = ellmer::type_string(
+        "Optional molecular summary.stat override.",
+        required = FALSE
+      ),
+      p_adjust_method = ellmer::type_string(
+        "p.adjust method. Defaults to BH.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_list_treatment_response_tables = ellmer::tool(
+    fun = pgx_list_treatment_response_tables,
+    name = "pgx_list_treatment_response_tables",
+    description = paste(
+      "List treatmentResponse tables, columns, and score candidates for a",
+      "bundled or local PharmacoSet."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset name or explicit local .qs/.rds PSet file path."
+      ),
+      limit_columns = ellmer::type_integer(
+        "Maximum number of column names to return per table. Defaults to 50.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_rank_synergy_combinations = ellmer::tool(
+    fun = pgx_rank_synergy_combinations,
+    name = "pgx_rank_synergy_combinations",
+    description = paste(
+      "Rank drug combinations from treatmentResponse combo tables using a",
+      "selected or auto-detected synergy/response score."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset name or explicit local .qs/.rds combo PSet file path."
+      ),
+      table = ellmer::type_string(
+        "treatmentResponse table name or auto. Defaults to auto.",
+        required = FALSE
+      ),
+      score = ellmer::type_string(
+        "Optional numeric score column. Auto-detected if omitted.",
+        required = FALSE
+      ),
+      rank_direction = ellmer::type_string(
+        "One of auto, lowest, or highest. Defaults to auto.",
+        required = FALSE
+      ),
+      min_samples = ellmer::type_integer(
+        "Minimum number of samples required per combo. Defaults to 3.",
+        required = FALSE
+      ),
+      limit = ellmer::type_integer(
+        "Maximum number of ranked combos to return. Defaults to 20.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_get_combo_response_records = ellmer::tool(
+    fun = pgx_get_combo_response_records,
+    name = "pgx_get_combo_response_records",
+    description = paste(
+      "Return bounded combo treatment-response rows for selected treatments",
+      "from a bundled or local combo PharmacoSet."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset name or explicit local .qs/.rds combo PSet file path."
+      ),
+      treatment1 = ellmer::type_string(
+        "Optional first treatment ID/name filter.",
+        required = FALSE
+      ),
+      treatment2 = ellmer::type_string(
+        "Optional second treatment ID/name filter.",
+        required = FALSE
+      ),
+      table = ellmer::type_string(
+        "treatmentResponse table name or auto. Defaults to auto.",
+        required = FALSE
+      ),
+      score = ellmer::type_string(
+        "Optional numeric score column to include.",
+        required = FALSE
+      ),
+      match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      symmetric = ellmer::type_boolean(
+        "Whether treatment1/treatment2 order can be swapped. Defaults to TRUE.",
+        required = FALSE
+      ),
+      fields = ellmer::type_array(
+        "Optional fields to return.",
+        items = ellmer::type_string(),
+        required = FALSE
+      ),
+      limit = ellmer::type_integer(
+        "Maximum number of rows to return. Defaults to 100.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_combo_biomarker_association = ellmer::tool(
+    fun = pgx_combo_biomarker_association,
+    name = "pgx_combo_biomarker_association",
+    description = paste(
+      "Associate selected molecular features with a combo response or synergy",
+      "score after aggregating the combo phenotype per sample."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset name or explicit local .qs/.rds combo PSet file path."
+      ),
+      treatment1 = ellmer::type_string("First treatment ID/name."),
+      treatment2 = ellmer::type_string("Second treatment ID/name."),
+      mDataType = ellmer::type_string(
+        "Molecular profile type such as mutation or cnv."
+      ),
+      features = ellmer::type_array(
+        "Feature IDs or symbols to test.",
+        items = ellmer::type_string()
+      ),
+      table = ellmer::type_string(
+        "treatmentResponse table name or auto. Defaults to auto.",
+        required = FALSE
+      ),
+      score = ellmer::type_string(
+        "Optional numeric combo phenotype column. Auto-detected if omitted.",
+        required = FALSE
+      ),
+      method = ellmer::type_string(
+        "One of spearman, pearson, or wilcoxon. Defaults to spearman.",
+        required = FALSE
+      ),
+      match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      symmetric = ellmer::type_boolean(
+        "Whether treatment1/treatment2 order can be swapped. Defaults to TRUE.",
         required = FALSE
       ),
       feature_match_mode = ellmer::type_string(
