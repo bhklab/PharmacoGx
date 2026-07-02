@@ -4,12 +4,15 @@
 \alias{computeHSA}
 \title{Compute HSA Null References}
 \usage{
-computeHSA(viability_1, viability_2)
+computeHSA(viability_1, viability_2, na.rm = FALSE)
 }
 \arguments{
 \item{viability_1}{\code{numeric} monotherapeutic response of treatment 1.}
 
 \item{viability_2}{\code{numeric} monotherapeutic response of treatment 2.}
+
+\item{na.rm}{\code{logical(1)} Should missing values be ignored when selecting
+the lower viability value?}
 }
 \value{
 \code{numeric} expected response of the two treatments combined

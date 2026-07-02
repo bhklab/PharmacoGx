@@ -117,6 +117,182 @@ mcp_servers:
             type: str
             required: false
             default: "auto"
+      - biomni_name: pgx_get_dose_response_points
+        description: "Retrieve raw concentration and viability points for a sample-drug pair"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          drug:
+            type: str
+            required: true
+          sample:
+            type: str
+            required: true
+          summarize_replicates:
+            type: bool
+            required: false
+            default: true
+      - biomni_name: pgx_plot_dose_response
+        description: "Create a PNG dose-response plot for a sample-drug pair"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          drug:
+            type: str
+            required: true
+          sample:
+            type: str
+            required: true
+          output_dir:
+            type: str
+            required: false
+          summarize_replicates:
+            type: bool
+            required: false
+            default: true
+          fit_curve:
+            type: bool
+            required: false
+            default: true
+      - biomni_name: pgx_pset_curation_questions
+        description: "Ask staged questions before PharmacoSet curation"
+        parameters:
+          workflow:
+            type: str
+            required: false
+            default: "unknown"
+      - biomni_name: pgx_validate_pset_inputs
+        description: "Validate available columns for a PharmacoSet curation workflow"
+        parameters:
+          workflow:
+            type: str
+            required: false
+            default: "sensitivity"
+          sample_columns:
+            type: list
+            required: false
+          treatment_columns:
+            type: list
+            required: false
+          response_columns:
+            type: list
+            required: false
+          dose_columns:
+            type: list
+            required: false
+          metadata_columns:
+            type: list
+            required: false
+      - biomni_name: pgx_get_molecular_profile
+        description: "Return summarized molecular profile values"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          mDataType:
+            type: str
+            required: true
+          features:
+            type: list
+            required: true
+          samples:
+            type: list
+            required: false
+          feature_match_mode:
+            type: str
+            required: false
+            default: "exact"
+          summary_stat:
+            type: str
+            required: false
+          limit_features:
+            type: int
+            required: false
+            default: 25
+          limit_samples:
+            type: int
+            required: false
+            default: 25
+      - biomni_name: pgx_association_test
+        description: "Run exploratory molecular feature-response association"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+          drug:
+            type: str
+            required: true
+          metric:
+            type: str
+            required: false
+            default: "auc_recomputed"
+          mDataType:
+            type: str
+            required: true
+          features:
+            type: list
+            required: true
+          method:
+            type: str
+            required: false
+            default: "spearman"
+          samples:
+            type: list
+            required: false
+          feature_match_mode:
+            type: str
+            required: false
+            default: "exact"
+          summary_stat:
+            type: str
+            required: false
+          p_adjust_method:
+            type: str
+            required: false
+            default: "BH"
+      - biomni_name: pgx_detect_assay_mode
+        description: "Detect whether a dataset is monotherapy, combination, mixed, or perturbation-only"
+        parameters:
+          dataset:
+            type: str
+            required: false
+            default: "GDSCsmall"
+      - biomni_name: pgx_find_pset_overlap
+        description: "Find shared samples, treatments, and pairs across datasets"
+        parameters:
+          datasets:
+            type: list
+            required: false
+          limit:
+            type: int
+            required: false
+            default: 50
+      - biomni_name: pgx_compare_pset_response
+        description: "Compare response values for one drug across datasets"
+        parameters:
+          datasets:
+            type: list
+            required: false
+          drug:
+            type: str
+            required: true
+          metric:
+            type: str
+            required: false
+            default: "auc_recomputed"
+          samples:
+            type: list
+            required: false
+          limit:
+            type: int
+            required: false
+            default: 50
       - biomni_name: pgx_top_responders
         description: "Rank cell-line responders for one drug"
         parameters:
@@ -166,6 +342,10 @@ mcp_servers:
           viability_2:
             type: list
             required: true
+          hsa_na_rm:
+            type: bool
+            required: false
+            default: false
       - biomni_name: pgx_list_available_psets
         description: "Fetch remote PharmacoSet download metadata"
         parameters:

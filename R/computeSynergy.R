@@ -1791,6 +1791,8 @@ computeBliss <- function(viability_1, viability_2) {
 #'
 #' @param viability_1 `numeric` monotherapeutic response of treatment 1.
 #' @param viability_2 `numeric` monotherapeutic response of treatment 2.
+#' @param na.rm `logical(1)` Should missing values be ignored when selecting
+#'   the lower viability value?
 #'
 #' @return `numeric` expected response of the two treatments combined
 #'     using the highest response of the two (lower viability).
@@ -1799,7 +1801,7 @@ computeBliss <- function(viability_1, viability_2) {
 #' (hsa <- computeHSA(0.75, 0.65))
 #'
 #' @export
-computeHSA <- function(viability_1, viability_2) {
-  HSA_ref <- pmin(viability_1, viability_2)
+computeHSA <- function(viability_1, viability_2, na.rm = FALSE) {
+  HSA_ref <- pmin(viability_1, viability_2, na.rm = na.rm)
   return(HSA_ref)
 }

@@ -70,8 +70,15 @@ If no live session is registered, the tools run in the MCP server process.
   measures?"
 - "Find GDSCsmall samples from a urogenital or breast lineage and summarize
   their metadata."
+- "Retrieve and plot the GDSCsmall Doxorubicin dose-response curve for 22RV1."
 - "Compute AUC, AAC, IC50, and AC50 for this dose-response vector."
 - "Compute Bliss and HSA references for these two monotherapy viabilities."
+- "Ask me the information needed to curate a sensitivity PharmacoSet from my
+  tables, then validate the columns I provide."
+- "Test whether ALK mutation or TSPAN6 expression is associated with
+  Doxorubicin response in the toy data, and explain the limitations."
+- "Which samples, treatments, and sample-treatment pairs overlap between
+  GDSCsmall and CCLEsmall?"
 - "List remote PharmacoSets available for download, then ask me before
   downloading one."
 
@@ -108,8 +115,12 @@ execution layer.
 ## Guardrails
 
 - Prefer bundled demo datasets for reproducible agent demos.
+- Clearly distinguish toy-data demonstrations from real downloaded PSet-backed
+  analyses.
 - Call `pgx_list_available_covariates()` before metadata lookup or filtering,
   because annotation fields differ between PharmacoSets.
+- Use `pgx_detect_assay_mode()` before any drug-combination or synergy
+  workflow.
 - Use `pgx_list_available_psets()` to discover downloadable external datasets.
 - Do not call `pgx_download_pset()` unless the user explicitly asks for a large
   external dataset workflow and the tool call sets `confirm_download = TRUE`.
