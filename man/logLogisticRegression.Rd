@@ -19,7 +19,8 @@ logLogisticRegression(
   viability_as_pct = TRUE,
   trunc = TRUE,
   verbose = FALSE,
-  fit_type = c("hill", "biphasic")
+  fit_type = c("hill", "biphasic"),
+  curve_direction = c("unconstrained", "decreasing")
 )
 }
 \arguments{
@@ -64,6 +65,11 @@ truncated to the unit interval prior to fitting.}
 
 \item{fit_type}{Character string selecting the curve family to fit. One of
 \code{"hill"} (default) or \code{"biphasic"}.}
+
+\item{curve_direction}{Character string controlling asymptote ordering.
+\code{"unconstrained"} preserves the existing behavior. \code{"decreasing"}
+requires fitted viability to be non-increasing with dose by constraining
+every fitted high-dose asymptote to be no greater than \code{E0}.}
 }
 \value{
 A named list of fitted parameters with an \code{Rsquare} attribute. For

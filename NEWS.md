@@ -1,5 +1,12 @@
 # Package Release News
 
+# 3.14.1
+- Stabilized Hill and biphasic dose-response optimization with deterministic
+  bounded multi-start fitting.
+- Added opt-in non-increasing Hill and biphasic fits through
+  `logLogisticRegression(curve_direction = "decreasing")`. The default
+  unconstrained mode continues to support increasing and hormetic profiles.
+
 # 3.14.0
 - Breaking change: `computeAUC()` now returns the normalized viability area from
   `.compute_normalized_viability_area()`. In earlier releases it returned the

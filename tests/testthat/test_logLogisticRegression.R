@@ -50,6 +50,11 @@ test_that("Errors are checked.", {
     family = "The Addams Family"
   )) #should complain
   expect_error(logLogisticRegression(c(1, 2), c(70, 60)))
+  expect_error(logLogisticRegression(
+    c(1, 2, 3),
+    c(70, 60, 50),
+    curve_direction = "sideways"
+  ))
 })
 
 test_that("Hill and biphasic fits recover known parameters", {
@@ -331,6 +336,84 @@ test_that("multi-start fitting avoids divergent CTRPv2 minima", {
         3.198
       ),
       minimum_r_squared = 0.70
+    ),
+    list(
+      conc = c(
+        0.001,
+        0.002,
+        0.0041,
+        0.0081,
+        0.016,
+        0.032,
+        0.065,
+        0.13,
+        0.26,
+        0.52,
+        1,
+        2.1,
+        4.2,
+        8.3,
+        17,
+        33
+      ),
+      viability = c(
+        105.8,
+        108,
+        102.3,
+        101.7,
+        103.2,
+        106.4,
+        102.6,
+        104.7,
+        104.4,
+        104.5,
+        101.9,
+        101.9,
+        105.3,
+        108.1,
+        99.97,
+        100.7
+      ),
+      minimum_r_squared = 0.40
+    ),
+    list(
+      conc = c(
+        0.002,
+        0.0041,
+        0.0081,
+        0.016,
+        0.032,
+        0.065,
+        0.13,
+        0.26,
+        0.52,
+        1,
+        2.1,
+        4.2,
+        8.3,
+        17,
+        33,
+        66
+      ),
+      viability = c(
+        101.1,
+        94.53,
+        97.12,
+        97.52,
+        93.17,
+        92.48,
+        98.43,
+        98.93,
+        100.5,
+        97.02,
+        94.49,
+        96.09,
+        95.6,
+        106.3,
+        95.04,
+        96.56
+      ),
+      minimum_r_squared = 0.12
     )
   )
 
@@ -356,4 +439,220 @@ test_that("multi-start fitting avoids divergent CTRPv2 minima", {
       tolerance = 1e-4
     )
   }
+})
+
+test_that("unconstrained remains the default curve direction", {
+  conc <- 10^seq(-2, 2, length.out = 16)
+  viability <- seq(95, 15, length.out = 16)
+
+  default_fit <- logLogisticRegression(conc, viability)
+  explicit_fit <- logLogisticRegression(
+    conc,
+    viability,
+    curve_direction = "unconstrained"
+  )
+
+  expect_equal(default_fit, explicit_fit)
+  expect_equal(attr(default_fit, "Rsquare"), attr(explicit_fit, "Rsquare"))
+})
+
+test_that("decreasing Hill fits are non-increasing across data modes", {
+  log_conc <- seq(-3, 3, length.out = 25)
+  native_pars <- c(HS = 1.4, E0 = 0.95, E_inf = 0.15, log10EC50 = -0.2)
+  fractional_viability <- PharmacoGx:::.pgx_hill_curve(log_conc, native_pars)
+
+  for (family in c("normal", "Cauchy")) {
+    for (viability_as_pct in c(FALSE, TRUE)) {
+      viability <- if (viability_as_pct) {
+        fractional_viability * 100
+      } else {
+        fractional_viability
+      }
+      fit <- logLogisticRegression(
+        conc = 10^log_conc,
+        viability = viability,
+        viability_as_pct = viability_as_pct,
+        family = family,
+        curve_direction = "decreasing"
+      )
+      scale_factor <- if (viability_as_pct) 100 else 1
+      fitted_native <- c(
+        fit$HS,
+        fit$E0 / scale_factor,
+        fit$E_inf / scale_factor,
+        log10(fit$EC50)
+      )
+      dense_predictions <- PharmacoGx:::.pgx_hill_curve(
+        seq(-4, 4, length.out = 501),
+        fitted_native
+      )
+
+      expect_named(fit, c("HS", "E0", "E_inf", "EC50"))
+      expect_lte(fit$E_inf, fit$E0 + 1e-8)
+      expect_true(all(diff(dense_predictions) <= 1e-10))
+      expect_gt(attr(fit, "Rsquare"), 0.99)
+    }
+  }
+})
+
+test_that("decreasing biphasic fits constrain both asymptotes", {
+  log_conc <- seq(-3, 3, length.out = 31)
+  native_pars <- c(
+    HS1 = 1.3,
+    E0 = 1,
+    E_inf1 = 0.25,
+    HS2 = 0.8,
+    E_inf2 = 0.1,
+    log10EC50_1 = -0.7,
+    log10EC50_2 = 0.6,
+    Frac = 0.6
+  )
+  viability <- PharmacoGx:::.pgx_biphasic_curve(log_conc, native_pars)
+
+  for (family in c("normal", "Cauchy")) {
+    for (viability_as_pct in c(FALSE, TRUE)) {
+      observed_viability <- if (viability_as_pct) viability * 100 else viability
+      fit <- logLogisticRegression(
+        conc = 10^log_conc,
+        viability = observed_viability,
+        viability_as_pct = viability_as_pct,
+        family = family,
+        fit_type = "biphasic",
+        curve_direction = "decreasing"
+      )
+      scale_factor <- if (viability_as_pct) 100 else 1
+      fitted_native <- c(
+        fit$HS1,
+        fit$E0 / scale_factor,
+        fit$E_inf1 / scale_factor,
+        fit$HS2,
+        fit$E_inf2 / scale_factor,
+        log10(fit$EC50_1),
+        log10(fit$EC50_2),
+        fit$Frac
+      )
+      dense_predictions <- PharmacoGx:::.pgx_biphasic_curve(
+        seq(-4, 4, length.out = 501),
+        fitted_native
+      )
+
+      expect_named(
+        fit,
+        c("HS1", "E0", "E_inf1", "HS2", "E_inf2", "EC50_1", "EC50_2", "Frac")
+      )
+      expect_lte(fit$E_inf1, fit$E0 + 1e-8)
+      expect_lte(fit$E_inf2, fit$E0 + 1e-8)
+      expect_true(all(diff(dense_predictions) <= 1e-10))
+      expect_gt(attr(fit, "Rsquare"), 0.99)
+    }
+  }
+})
+
+test_that("decreasing fits preserve feasible native custom bounds", {
+  log_conc <- seq(-2, 2, length.out = 25)
+  viability <- PharmacoGx:::.pgx_hill_curve(
+    log_conc,
+    c(HS = 1.1, E0 = 0.9, E_inf = 0.25, log10EC50 = 0.1)
+  )
+  lower <- c(0.5, 0.7, 0.1, -1)
+  upper <- c(2, 1, 0.5, 1)
+  fit <- logLogisticRegression(
+    conc = 10^log_conc,
+    viability = viability,
+    viability_as_pct = FALSE,
+    lower_bounds = lower,
+    upper_bounds = upper,
+    curve_direction = "decreasing"
+  )
+  fitted_native <- c(fit$HS, fit$E0, fit$E_inf, log10(fit$EC50))
+
+  expect_true(all(fitted_native >= lower - 1e-8))
+  expect_true(all(fitted_native <= upper + 1e-8))
+  expect_lte(fit$E_inf, fit$E0 + 1e-8)
+
+  biphasic_pars <- c(
+    HS1 = 1.2,
+    E0 = 0.95,
+    E_inf1 = 0.3,
+    HS2 = 0.7,
+    E_inf2 = 0.15,
+    log10EC50_1 = -0.5,
+    log10EC50_2 = 0.6,
+    Frac = 0.55
+  )
+  biphasic_viability <- PharmacoGx:::.pgx_biphasic_curve(
+    log_conc,
+    biphasic_pars
+  )
+  biphasic_lower <- c(0.4, 0.8, 0.1, 0.3, 0.05, -1, 0.1, 0.25)
+  biphasic_upper <- c(2, 1.1, 0.6, 1.5, 0.5, 0, 1.2, 0.8)
+  biphasic_fit <- logLogisticRegression(
+    conc = 10^log_conc,
+    viability = biphasic_viability,
+    viability_as_pct = FALSE,
+    fit_type = "biphasic",
+    lower_bounds = biphasic_lower,
+    upper_bounds = biphasic_upper,
+    curve_direction = "decreasing"
+  )
+  biphasic_fitted_native <- c(
+    biphasic_fit$HS1,
+    biphasic_fit$E0,
+    biphasic_fit$E_inf1,
+    biphasic_fit$HS2,
+    biphasic_fit$E_inf2,
+    log10(biphasic_fit$EC50_1),
+    log10(biphasic_fit$EC50_2),
+    biphasic_fit$Frac
+  )
+  expect_true(all(biphasic_fitted_native >= biphasic_lower - 1e-8))
+  expect_true(all(biphasic_fitted_native <= biphasic_upper + 1e-8))
+  expect_lte(biphasic_fit$E_inf1, biphasic_fit$E0 + 1e-8)
+  expect_lte(biphasic_fit$E_inf2, biphasic_fit$E0 + 1e-8)
+
+  expect_error(
+    logLogisticRegression(
+      conc = 10^log_conc,
+      viability = viability,
+      viability_as_pct = FALSE,
+      lower_bounds = c(0.5, 0.1, 0.6, -1),
+      upper_bounds = c(2, 0.5, 1, 1),
+      curve_direction = "decreasing"
+    ),
+    "E0 upper bound"
+  )
+  expect_error(
+    logLogisticRegression(
+      conc = 10^log_conc,
+      viability = viability,
+      viability_as_pct = FALSE,
+      fit_type = "biphasic",
+      lower_bounds = c(0.2, 0.1, 0.6, 0.2, 0.7, -2, -2, 0),
+      upper_bounds = c(2, 0.5, 1, 2, 1, 2, 2, 1),
+      curve_direction = "decreasing"
+    ),
+    "E0 upper bound"
+  )
+})
+
+test_that("decreasing mode handles flat and increasing profiles", {
+  conc <- 10^seq(-2, 2, length.out = 21)
+  flat_fit <- logLogisticRegression(
+    conc,
+    rep(50, length(conc)),
+    curve_direction = "decreasing"
+  )
+  expect_lte(flat_fit$E_inf, flat_fit$E0 + 1e-8)
+  expect_true(is.na(attr(flat_fit, "Rsquare")))
+
+  increasing_viability <- seq(15, 90, length.out = length(conc))
+  unconstrained_fit <- logLogisticRegression(conc, increasing_viability)
+  decreasing_fit <- logLogisticRegression(
+    conc,
+    increasing_viability,
+    curve_direction = "decreasing"
+  )
+
+  expect_gt(unconstrained_fit$E_inf, unconstrained_fit$E0)
+  expect_lte(decreasing_fit$E_inf, decreasing_fit$E0 + 1e-8)
 })

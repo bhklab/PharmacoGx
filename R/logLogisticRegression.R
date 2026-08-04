@@ -34,6 +34,10 @@
 #' @param verbose Logical flag enabling diagnostic warnings.
 #' @param fit_type Character string selecting the curve family to fit. One of
 #'   `"hill"` (default) or `"biphasic"`.
+#' @param curve_direction Character string controlling asymptote ordering.
+#'   `"unconstrained"` preserves the existing behavior. `"decreasing"`
+#'   requires fitted viability to be non-increasing with dose by constraining
+#'   every fitted high-dose asymptote to be no greater than `E0`.
 #'
 #' @return A named list of fitted parameters with an `Rsquare` attribute. For
 #'   Hill fits: `HS`, `E0`, `E_inf`, and `EC50`. For biphasic fits: `HS1`, `E0`,
@@ -62,9 +66,14 @@ logLogisticRegression <- function(
   viability_as_pct = TRUE,
   trunc = TRUE,
   verbose = FALSE,
-  fit_type = c("hill", "biphasic")
+  fit_type = c("hill", "biphasic"),
+  curve_direction = c("unconstrained", "decreasing")
 ) {
   fit_type <- match.arg(tolower(fit_type), c("hill", "biphasic"))
+  curve_direction <- match.arg(
+    tolower(curve_direction),
+    c("unconstrained", "decreasing")
+  )
   family <- match.arg(tolower(family), c("normal", "cauchy"))
   family <- if (family == "cauchy") "Cauchy" else "normal"
 
@@ -123,6 +132,12 @@ logLogisticRegression <- function(
     fit_type = fit_type
   )
 
+  parameterization <- .pgx_parameterization(
+    lower_bounds = bounds$lower,
+    upper_bounds = bounds$upper,
+    fit_type = fit_type,
+    curve_direction = curve_direction
+  )
   curve_fun <- if (fit_type == "hill") .pgx_hill_curve else .pgx_biphasic_curve
 
   fitted <- .pgx_fit_curve(
@@ -140,6 +155,39 @@ logLogisticRegression <- function(
     trunc = trunc,
     starting_guesses = starting_guesses
   )
+
+  if (curve_direction == "decreasing") {
+    asymptote_indices <- if (fit_type == "hill") 3L else c(3L, 5L)
+    unconstrained_is_decreasing <- all(
+      fitted$pars[asymptote_indices] <= fitted$pars[2L]
+    )
+
+    if (!unconstrained_is_decreasing) {
+      starting_guesses <- t(apply(
+        starting_guesses,
+        1,
+        parameterization$to_optimizer
+      ))
+      colnames(starting_guesses) <- names(guess)
+
+      fitted <- .pgx_fit_curve(
+        x = log_conc,
+        y = viability_clean,
+        f = curve_fun,
+        density = bounds$density,
+        step = bounds$step,
+        precision = precision,
+        lower_bounds = parameterization$lower,
+        upper_bounds = parameterization$upper,
+        scale = scale,
+        family = family,
+        median_n = median_n,
+        trunc = trunc,
+        starting_guesses = starting_guesses,
+        to_native = parameterization$to_native
+      )
+    }
+  }
 
   params <- fitted$pars
 
@@ -497,6 +545,87 @@ logLogisticRegression <- function(
   guesses
 }
 
+.pgx_parameterization <- function(
+  lower_bounds,
+  upper_bounds,
+  fit_type,
+  curve_direction
+) {
+  identity_transform <- function(parameters) {
+    parameters
+  }
+  if (curve_direction == "unconstrained") {
+    return(list(
+      lower = lower_bounds,
+      upper = upper_bounds,
+      to_optimizer = identity_transform,
+      to_native = identity_transform
+    ))
+  }
+
+  e0_index <- 2L
+  asymptote_indices <- if (fit_type == "hill") 3L else c(3L, 5L)
+  required_e0 <- max(lower_bounds[asymptote_indices])
+  if (upper_bounds[e0_index] < required_e0) {
+    stop(
+      "Decreasing curves require the E0 upper bound to be at least every high-dose asymptote lower bound."
+    )
+  }
+
+  optimizer_lower <- lower_bounds
+  optimizer_upper <- upper_bounds
+  optimizer_lower[e0_index] <- max(
+    optimizer_lower[e0_index],
+    required_e0
+  )
+  optimizer_lower[asymptote_indices] <- 0
+  optimizer_upper[asymptote_indices] <- 1
+
+  to_native <- function(parameters) {
+    native <- parameters
+    e0 <- native[e0_index]
+    for (index in asymptote_indices) {
+      asymptote_upper <- min(upper_bounds[index], e0)
+      native[index] <- lower_bounds[index] +
+        parameters[index] * (asymptote_upper - lower_bounds[index])
+    }
+    names(native) <- names(parameters)
+    native
+  }
+
+  to_optimizer <- function(parameters) {
+    optimizer <- parameters
+    optimizer[e0_index] <- pmin(
+      pmax(optimizer[e0_index], optimizer_lower[e0_index]),
+      optimizer_upper[e0_index]
+    )
+    e0 <- optimizer[e0_index]
+    for (index in asymptote_indices) {
+      asymptote_upper <- min(upper_bounds[index], e0)
+      asymptote_range <- asymptote_upper - lower_bounds[index]
+      if (asymptote_range <= .Machine$double.eps) {
+        optimizer[index] <- 0
+      } else {
+        native_asymptote <- pmin(
+          pmax(parameters[index], lower_bounds[index]),
+          asymptote_upper
+        )
+        optimizer[index] <-
+          (native_asymptote - lower_bounds[index]) / asymptote_range
+      }
+    }
+    names(optimizer) <- names(parameters)
+    optimizer
+  }
+
+  list(
+    lower = optimizer_lower,
+    upper = optimizer_upper,
+    to_optimizer = to_optimizer,
+    to_native = to_native
+  )
+}
+
 .pgx_fit_curve <- function(
   x,
   y,
@@ -511,16 +640,18 @@ logLogisticRegression <- function(
   median_n,
   trunc,
   starting_guesses,
+  to_native = identity,
   span = 1,
   delta = 1
 ) {
   starting_guesses <- as.matrix(starting_guesses)
   objective <- function(pars) {
+    native_pars <- to_native(pars)
     residual <- .pgx_curve_residual(
       x = x,
       y = y,
       n = median_n,
-      pars = pars,
+      pars = native_pars,
       f = f,
       scale = scale,
       family = family,
@@ -545,6 +676,15 @@ logLogisticRegression <- function(
     canonical_indices
   )]
   selected_indices <- unique(c(1L, utils::head(canonical_order, 2L)))
+  optimization_scales <- abs(raw_residuals[selected_indices])
+  optimization_scales <- optimization_scales[
+    is.finite(optimization_scales) & optimization_scales > .Machine$double.eps
+  ]
+  optimization_scale <- if (length(optimization_scales)) {
+    min(optimization_scales)
+  } else {
+    1
+  }
 
   optimized <- lapply(selected_indices, function(index) {
     result <- try(
@@ -555,6 +695,8 @@ logLogisticRegression <- function(
         upper = upper_bounds,
         control = list(
           factr = 1e-08,
+          fnscale = optimization_scale,
+          maxit = 500L,
           ndeps = rep(1e-4, ncol(starting_guesses)),
           trace = 0
         ),
@@ -623,19 +765,10 @@ logLogisticRegression <- function(
         n = median_n,
         scale = scale,
         family = family,
-        trunc = trunc
-      )
-      guess_residual <- sum(.pgx_curve_residual(
-        x = x,
-        y = y,
-        n = median_n,
-        pars = guess,
-        f = f,
-        scale = scale,
-        family = family,
         trunc = trunc,
-        delta = delta
-      ))
+        to_native = to_native
+      )
+      guess_residual <- objective(guess)
     } else {
       warning(sprintf(
         "Skipping full mesh evaluation: grid size (%s) exceeds max_grid_points (%s). Adjust density or option 'PharmacoGx.max_mesh_points' to enable mesh search.",
@@ -660,10 +793,12 @@ logLogisticRegression <- function(
       step = step,
       scale = scale,
       family = family,
-      trunc = trunc
+      trunc = trunc,
+      to_native = to_native
     )
   }
 
+  guess <- to_native(guess)
   fitted_vals <- f(x, guess)
   rsq <- if (stats::var(y) == 0) {
     NA_real_
@@ -747,13 +882,14 @@ logLogisticRegression <- function(
   n,
   scale,
   family,
-  trunc
+  trunc,
+  to_native = identity
 ) {
   guess_residual <- sum(.pgx_curve_residual(
     x = x,
     y = y,
     n = n,
-    pars = guess,
+    pars = to_native(guess),
     f = f,
     scale = scale,
     family = family,
@@ -776,7 +912,7 @@ logLogisticRegression <- function(
       x = x,
       y = y,
       n = n,
-      pars = current,
+      pars = to_native(current),
       f = f,
       scale = scale,
       family = family,
@@ -815,7 +951,8 @@ logLogisticRegression <- function(
   step,
   scale,
   family,
-  trunc
+  trunc,
+  to_native = identity
 ) {
   neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
   neighbour_residuals <- rep(NA_real_, nrow(neighbours))
@@ -839,7 +976,7 @@ logLogisticRegression <- function(
         x = x,
         y = y,
         f = f,
-        pars = neighbours[idx, ],
+        pars = to_native(neighbours[idx, ]),
         n = n,
         scale = scale,
         family = family,
