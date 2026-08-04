@@ -11,7 +11,7 @@ filterNoisyCurves(
   pSet,
   epsilon = 25,
   positive.cutoff.percent = 0.8,
-  mean.viablity = 200,
+  mean.viability = 200,
   nthread = 1
 )
 }
@@ -25,7 +25,7 @@ in the analysis, out of dna, rna, rnaseq, snp, cnv}
 \item{positive.cutoff.percent}{\code{numeric} This value indicates that function
 may violate epsilon rule for how many points on drug-response curve}
 
-\item{mean.viablity}{\code{numeric} average expected viability value}
+\item{mean.viability}{\code{numeric} average expected viability value}
 
 \item{nthread}{\code{numeric} if multiple cores are available, how many cores
 should the computation be parallelized over?}

@@ -8,7 +8,7 @@ effectToDose(viability, EC50, HS, E_inf, is_pct = FALSE)
 }
 \arguments{
 \item{viability}{\code{numeric} is a vector whose entries are the viability values
-in the range [0, 1] if \code{is_pct} is \code{FALSE} or [0, 100] if it is
+between 0 and 1 when \code{is_pct} is \code{FALSE} or between 0 and 100 when it is
 \code{TRUE}.}
 
 \item{EC50}{\code{numeric} is a vector of relative EC50 for drug-response equation.}

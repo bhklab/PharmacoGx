@@ -6,14 +6,24 @@
 and returns the Amax of the fitted curve.
 Amax: 100 - viability at maximum concentarion (in fitted curve)}
 \usage{
-computeAmax(concentration, viability, trunc = TRUE, verbose = FALSE)
+computeAmax(
+  concentration,
+  viability,
+  viability_as_pct = TRUE,
+  trunc = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{concentration}{\code{numeric} is a vector of drug concentrations.}
 
 \item{viability}{\code{numeric} is a vector whose entries are the viability values observed in the presence of the
 drug concentrations whose logarithms are in the corresponding entries of the log_conc, expressed as percentages
-of viability in the absence of any drug.}
+of viability in the absence of any drug when \code{viability_as_pct = TRUE}, or
+as decimals when \code{viability_as_pct = FALSE}.}
+
+\item{viability_as_pct}{\code{logical(1)} whether the viability values are given
+as percentages or decimals.}
 
 \item{trunc}{\code{logical}, if true, causes viability data to be truncated to lie between 0 and 1 before
 curve-fitting is performed.}
@@ -21,7 +31,7 @@ curve-fitting is performed.}
 \item{verbose}{\code{logical} should warnings be printed}
 }
 \value{
-The numerical Amax
+The numerical Amax expressed as a percentage.
 }
 \description{
 Fits dose-response curves to data given by the user

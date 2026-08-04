@@ -14,7 +14,7 @@ fitTwowayZIP(
 )
 }
 \arguments{
-\item{combo_profiles}{\link{data.table} contains three parameters of dose-response curves
+\item{combo_profiles}{\link[data.table:data.table]{data.table::data.table} contains three parameters of dose-response curves
 for each single agent in a drug comnbination,
 and the observed viability of two treatments combined.}
 
@@ -39,7 +39,7 @@ considering the truncated probability distribution (as in their names) for the r
 These get passed to losss via \code{do.call} analagously to using \code{...}.}
 }
 \value{
-\link{data.table} contains parameters of projected dose-response curves
+\link[data.table:data.table]{data.table::data.table} contains parameters of projected dose-response curves
 for adding one treatment to the other.
 }
 \description{
@@ -47,10 +47,24 @@ Fit projected dose-response curves with \code{E_min} as the viability
 of the treatment being added to the other treament at a fixed dose.
 }
 \examples{
-\dontrun{
-combo_profiles <- CoreGx::buildComboProfiles(tre, c("HS", "EC50", "E_inf", "viability"))
-combo_twowayFit <- fitTwowayZIP(combo_profiles)
-}
+combo_profiles <- data.table::as.data.table(expand.grid(
+  treatment1dose = c(0.1, 1, 10),
+  treatment2dose = c(0.2, 1, 5)
+))
+combo_profiles[, `:=`(
+  treatment1id = "drugA",
+  treatment2id = "drugB",
+  sampleid = "cell1",
+  combo_viability = 0.85 - 0.05 * treatment1dose - 0.04 * treatment2dose,
+  HS_1 = 1,
+  HS_2 = 1,
+  E_inf_1 = 0.2,
+  E_inf_2 = 0.3,
+  EC50_1 = 0.5,
+  EC50_2 = 0.6
+)]
+combo_profiles <- combo_profiles[order(treatment1dose, treatment2dose)]
+fitTwowayZIP(combo_profiles)
 
 }
 \references{

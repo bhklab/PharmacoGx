@@ -117,8 +117,9 @@ dependencies are available from CRAN or Bioconductor.
 \vspace{5pt}
 \footnotesize
 ```{r install-pkg, eval=FALSE, results='hide'}
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
 BiocManager::install('PharmacoGx')
 ```
 \normalsize
@@ -201,6 +202,13 @@ both datasets, so we are left with one gene expression profile and one
 sensitivity profile per cell line within each dataset. We can then compare the
 gene expression and sensitivity measures between the datasets using a standard
 correlation coefficient.
+
+For LongTable-backed sensitivity data, `summarizeSensitivityProfiles()` first
+uses `treatmentid` when it is available. If a dataset instead stores
+monotherapy treatments in `treatment1id`, the function now falls back to that
+column and ignores rows with a non-empty `treatment2id`. Combination response
+summaries still require an explicit sensitivity matrix, and atypical profile
+columns may require an explicit `sensitivity.measure` such as `"SCORE"`.
 
 \vspace{5pt}
 \footnotesize
@@ -317,27 +325,38 @@ GSEA connectivity score to determine the correlation between the two signatures.
 \vspace{5pt}
 \footnotesize
 ```{r, eval=TRUE, results='asis'}
-  library(PharmacoGx)
-  library(pander)
-  data(CMAPsmall)
-  drug.perturbation <- drugPerturbationSig(CMAPsmall,
-                                           mDataType="rna",
-                                           verbose=FALSE)
-  data(HDAC_genes)
+library(PharmacoGx)
+library(pander)
+data(CMAPsmall)
+drug.perturbation <- drugPerturbationSig(
+  CMAPsmall,
+  mDataType = "rna",
+  verbose = FALSE
+)
+data(HDAC_genes)
 
-  res <- apply(drug.perturbation[,,c("tstat", "fdr")],
-               2, function(x, HDAC){
-	    return(connectivityScore(x=x,
-	                             y=HDAC[,2,drop=FALSE],
-                               method="fgsea", nperm=100))
-	}, HDAC=HDAC_genes)
+res <- apply(
+  drug.perturbation[,, c("tstat", "fdr")],
+  2,
+  function(x, HDAC) {
+    return(connectivityScore(
+      x = x,
+      y = HDAC[, 2, drop = FALSE],
+      method = "fgsea",
+      nperm = 100
+    ))
+  },
+  HDAC = HDAC_genes
+)
 
-  rownames(res) <- c("Connectivity", "P Value")
-  res <- t(res)
-  res <- res[order(res[,1], decreasing=TRUE),]
-  pander::pandoc.table(res,
-    caption='Connectivity Score results for HDAC inhibitor gene signature.',
-    style = 'rmarkdown')
+rownames(res) <- c("Connectivity", "P Value")
+res <- t(res)
+res <- res[order(res[, 1], decreasing = TRUE), ]
+pander::pandoc.table(
+  res,
+  caption = 'Connectivity Score results for HDAC inhibitor gene signature.',
+  style = 'rmarkdown'
+)
 ```
 \normalsize
 
@@ -354,25 +373,26 @@ treatments and drug repurposing.
 
 # Estimating Drug Sensitivity Measures
 
-*PharmacoGx* includes functions to calculate estimated AUC (Area Under
-drug response Curve) and IC50 values from drugs dose response experiments that
+*PharmacoGx* includes functions to calculate estimated AAC (Area Above
+response Curve), AUC (Area Under the viability Curve) and IC50 values from
+drugs dose response experiments that
 measure cell viability after applications of varying concentrations of drug.
 Additionally, these measures are recomputed for every *sensitivity*
 `PharmacoSet` we create and included alongside any measures published
-with the original data. The AUC measures originally published are labelled as
-*auc\_published*, while the recomputed measures are labelled as
-*auc\_recomputed*, and likewise for the IC50.
+with the original data. The historical sensitivity summaries are labelled as
+*auc\_published* or *auc\_recomputed* in older objects, while new recomputed
+values should be interpreted as AAC sensitivity summaries.
 
-While the *PharmacoSets* already contain the recomputed data, the AUC and
-IC50 can be calculated for arbitrary data using the *computeIC50* and
-*computeAUC* functions. The AUC can be calculated using either the area
-under the curve defined by the actual points recorded, or the area under the
-curve fitted to the data.
+While the *PharmacoSets* already contain the recomputed sensitivity data, the
+AUC, AAC and IC50 can be calculated for arbitrary data using the
+*computeIC50*, *computeAUC* and *computeAAC* functions. Both area summaries can
+be calculated using either the area under the actual points recorded, or the
+area under the fitted curve.
 
 
 ## Curve Fitting
 
-While AUC can be numerically calculated without curve fitting, to estimate the
+While AUC and AAC can be numerically calculated without curve fitting, to estimate the
 IC50 a drug dose response curve must be fit to the data.The dose-response curves
 are fitted to the equation
 $$
@@ -572,7 +592,6 @@ contribution towards testing and feedback during the design of the package.
 \vspace{5pt}
 \footnotesize
 ```{r sessioninfo, eval = TRUE}
-# set eval = FALSE if you don't want this info (useful for reproducibility) to appear
 sessionInfo()
 ```
 \normalsize

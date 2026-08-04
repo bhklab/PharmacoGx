@@ -14,12 +14,12 @@ drugDoseResponseCurve(
   viability_as_pct = TRUE,
   trunc = TRUE,
   legends.label = c("ic50_published", "gi50_published", "auc_published",
-    "auc_recomputed", "ic50_recomputed"),
+    "aac_recomputed", "ic50_recomputed"),
   ylim = c(0, 100),
   xlim,
   mycol,
   title,
-  plot.type = c("Fitted", "Actual", "Both"),
+  plot.type = c("Actual", "Fitted", "Both"),
   summarize.replicates = TRUE,
   lwd = 0.5,
   cex = 0.7,
@@ -54,7 +54,7 @@ than a percentage, and that E_inf passed in as decimal. Applies only to the viab
 \item{trunc}{\code{logical(1)} Should the viability values be truncated to lie in [0-100] before doing the fitting}
 
 \item{legends.label}{\code{numeric} A vector of sensitivity measurment types which could
-be any combination of  ic50_published, auc_published, auc_recomputed and auc_recomputed_star.
+be any combination of  ic50_published, auc_published, aac_recomputed and aac_recomputed_star.
 A legend will be displayed on the top right of the plot which each line of the legend is
 the values of requested sensitivity measerments for one of the requested pSets.
 If this parameter is missed no legend would be provided for the plot.}
@@ -77,8 +77,11 @@ missed default colors from Rcolorbrewer package will be used as curves color.}
 the one fitted by logl logistic regression ("Fitted") or both of them ("Both").
 If this parameter is missed by default actual curve is plotted.}
 
-\item{summarize.replicates}{\code{character} If this parameter is set to true replicates
-are summarized and replicates are plotted individually otherwise}
+\item{summarize.replicates}{\code{logical(1)} If \code{TRUE}, replicate measurements at
+identical concentrations are summarized by median viability before plotting
+and fitting. If replicate experiments have non-identical dose grids, only
+exact duplicate doses are summarized and a warning is emitted. If \code{FALSE},
+replicate experiments are plotted individually.}
 
 \item{lwd}{\code{numeric} The line width to plot with}
 

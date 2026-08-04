@@ -1,0 +1,10 @@
+[
+  {
+    "name": "mcp_auto_loader_pharmacogx",
+    "description": "Automatically load PharmacoGx MCP tools for preclinical pharmacogenomic demos",
+    "type": "MCPAutoLoaderTool",
+    "tool_prefix": "",
+    "server_url": "http://127.0.0.1:8080/mcp",
+    "required_api_keys": []
+  }
+]

@@ -4,7 +4,7 @@
 \alias{hillCurve}
 \title{4-Parameter Hill Equation for Stimuli-Response Curves}
 \usage{
-hillCurve(dose, HS, EC50, E_inf, E_ninf)
+hillCurve(dose, HS, EC50, E_inf, E_ninf = 1)
 }
 \arguments{
 \item{dose}{\code{numeric()} A vector of \code{log10(dose)} values (or equivalent for

@@ -47,7 +47,7 @@ your download to persist past your current R session.`
 }
 
 \examples{
-\dontrun{
+\donttest{
     if (interactive()) downloadPSet("CTRPv2_2015")
 }
 

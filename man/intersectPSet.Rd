@@ -23,11 +23,11 @@ should find the intersection}
 drugs, cell lines, or concentrations}
 
 \item{cells}{a \code{character}vector of common cell lines between pSets.
-In case user is intersted on getting intersection on certain cell lines,
+In case user is interested on getting intersection on certain cell lines,
 they can provide their list of cell lines}
 
 \item{drugs}{a \code{character} vector of common drugs between pSets.
-In case user is intersted on getting intersection on certain drugs,
+In case user is interested on getting intersection on certain drugs,
 they can provide their list of drugs.}
 
 \item{strictIntersect}{\code{boolean} Should the intersection keep only the drugs
