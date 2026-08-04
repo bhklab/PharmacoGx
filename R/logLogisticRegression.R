@@ -114,6 +114,15 @@ logLogisticRegression <- function(
     fit_type = fit_type
   )
 
+  starting_guesses <- .pgx_starting_guesses(
+    log_conc = log_conc,
+    viability = viability_clean,
+    initial_guess = guess,
+    lower_bounds = bounds$lower,
+    upper_bounds = bounds$upper,
+    fit_type = fit_type
+  )
+
   curve_fun <- if (fit_type == "hill") .pgx_hill_curve else .pgx_biphasic_curve
 
   fitted <- .pgx_fit_curve(
@@ -129,7 +138,7 @@ logLogisticRegression <- function(
     family = family,
     median_n = median_n,
     trunc = trunc,
-    gritty_guess = guess
+    starting_guesses = starting_guesses
   )
 
   params <- fitted$pars
@@ -212,9 +221,9 @@ logLogisticRegression <- function(
       0.1,
       0,
       0,
-      min(log_conc) - 3,
       0.1,
       0,
+      min(log_conc) - 3,
       min(log_conc) - 3,
       0
     )
@@ -222,9 +231,9 @@ logLogisticRegression <- function(
       5,
       1.5,
       1.5,
-      max(log_conc) + 3,
       5,
       1.5,
+      max(log_conc) + 3,
       max(log_conc) + 3,
       1
     )
@@ -441,6 +450,53 @@ logLogisticRegression <- function(
   guess
 }
 
+.pgx_starting_guesses <- function(
+  log_conc,
+  viability,
+  initial_guess,
+  lower_bounds,
+  upper_bounds,
+  fit_type
+) {
+  dose_quantiles <- as.numeric(stats::quantile(
+    log_conc,
+    probs = c(0.25, 0.5, 0.75),
+    names = FALSE
+  ))
+
+  if (fit_type == "hill") {
+    canonical_guesses <- cbind(
+      HS = 1,
+      E0 = max(viability),
+      E_inf = min(viability),
+      log10EC50 = dose_quantiles
+    )
+  } else {
+    ec50_pairs <- rbind(
+      c(dose_quantiles[1], dose_quantiles[2]),
+      c(dose_quantiles[1], dose_quantiles[3]),
+      c(dose_quantiles[2], dose_quantiles[3])
+    )
+    canonical_guesses <- cbind(
+      HS1 = 1,
+      E0 = max(viability),
+      E_inf1 = min(viability),
+      HS2 = 1,
+      E_inf2 = min(viability),
+      log10EC50_1 = ec50_pairs[, 1],
+      log10EC50_2 = ec50_pairs[, 2],
+      Frac = 0.5
+    )
+  }
+
+  guesses <- rbind(initial_guess, canonical_guesses)
+  guesses <- sweep(guesses, 2, lower_bounds, pmax)
+  guesses <- sweep(guesses, 2, upper_bounds, pmin)
+  guesses <- unique(guesses)
+  colnames(guesses) <- names(initial_guess)
+  guesses
+}
+
 .pgx_fit_curve <- function(
   x,
   y,
@@ -454,11 +510,11 @@ logLogisticRegression <- function(
   family,
   median_n,
   trunc,
-  gritty_guess,
+  starting_guesses,
   span = 1,
   delta = 1
 ) {
-  names(gritty_guess) <- names(gritty_guess)
+  starting_guesses <- as.matrix(starting_guesses)
   objective <- function(pars) {
     residual <- .pgx_curve_residual(
       x = x,
@@ -482,54 +538,71 @@ logLogisticRegression <- function(
     }
   }
 
-  opt <- try(
-    stats::optim(
-      par = gritty_guess,
-      fn = objective,
-      lower = lower_bounds,
-      upper = upper_bounds,
-      control = list(
-        factr = 1e-08,
-        ndeps = rep(1e-4, length(gritty_guess)),
-        trace = 0
-      ),
-      method = "L-BFGS-B"
-    ),
-    silent = TRUE
-  )
+  raw_residuals <- apply(starting_guesses, 1, objective)
+  canonical_indices <- seq_len(nrow(starting_guesses))[-1]
+  canonical_order <- canonical_indices[order(
+    raw_residuals[canonical_indices],
+    canonical_indices
+  )]
+  selected_indices <- unique(c(1L, utils::head(canonical_order, 2L)))
 
-  if (inherits(opt, "try-error")) {
-    failed <- TRUE
-    guess <- gritty_guess
+  optimized <- lapply(selected_indices, function(index) {
+    result <- try(
+      stats::optim(
+        par = starting_guesses[index, ],
+        fn = objective,
+        lower = lower_bounds,
+        upper = upper_bounds,
+        control = list(
+          factr = 1e-08,
+          ndeps = rep(1e-4, ncol(starting_guesses)),
+          trace = 0
+        ),
+        method = "L-BFGS-B"
+      ),
+      silent = TRUE
+    )
+    if (inherits(result, "try-error") || any(!is.finite(result$par))) {
+      return(NULL)
+    }
+    result$residual <- objective(result$par)
+    if (!is.finite(result$residual)) {
+      return(NULL)
+    }
+    result$start_index <- index
+    result
+  })
+  optimized <- Filter(Negate(is.null), optimized)
+
+  raw_best <- min(raw_residuals)
+  raw_tolerance <- sqrt(.Machine$double.eps) * max(1, abs(raw_best))
+  raw_best_index <- which(raw_residuals <= raw_best + raw_tolerance)[1]
+  raw_guess <- starting_guesses[raw_best_index, ]
+
+  if (length(optimized)) {
+    optimized_residuals <- vapply(
+      optimized,
+      function(result) result$residual,
+      numeric(1)
+    )
+    optimized_best <- min(optimized_residuals)
+    optimized_tolerance <- sqrt(.Machine$double.eps) *
+      max(1, abs(optimized_best))
+    optimized_best_index <- which(
+      optimized_residuals <= optimized_best + optimized_tolerance
+    )[1]
+    guess <- optimized[[optimized_best_index]]$par
+    guess_residual <- optimized_residuals[optimized_best_index]
   } else {
-    failed <- FALSE
-    guess <- opt$par
+    guess <- raw_guess
+    guess_residual <- raw_best
   }
 
-  guess_residual <- sum(.pgx_curve_residual(
-    x = x,
-    y = y,
-    n = median_n,
-    pars = guess,
-    f = f,
-    scale = scale,
-    family = family,
-    trunc = trunc,
-    delta = delta
-  ))
-  gritty_residual <- sum(.pgx_curve_residual(
-    x = x,
-    y = y,
-    n = median_n,
-    pars = gritty_guess,
-    f = f,
-    scale = scale,
-    family = family,
-    trunc = trunc,
-    delta = delta
-  ))
+  use_fallback <- !length(optimized) ||
+    !is.finite(guess_residual) ||
+    guess_residual >= raw_best - raw_tolerance
 
-  if (failed || any(!is.finite(guess)) || guess_residual >= gritty_residual) {
+  if (use_fallback) {
     density_vec <- rep_len(density, length(lower_bounds))
     grid_counts <- ceiling(pmax(
       1,
@@ -543,7 +616,7 @@ logLogisticRegression <- function(
         x = x,
         y = y,
         f = f,
-        guess = gritty_guess,
+        guess = raw_guess,
         lower_bounds = lower_bounds,
         upper_bounds = upper_bounds,
         density = density,
@@ -569,8 +642,8 @@ logLogisticRegression <- function(
         format(grid_size, scientific = TRUE),
         format(max_grid_points, scientific = TRUE)
       ))
-      guess <- gritty_guess
-      guess_residual <- gritty_residual
+      guess <- raw_guess
+      guess_residual <- raw_best
     }
 
     guess <- .pgx_pattern_search(
@@ -598,7 +671,7 @@ logLogisticRegression <- function(
     1 - (stats::var(y - fitted_vals) / stats::var(y))
   }
 
-  names(guess) <- names(gritty_guess)
+  names(guess) <- colnames(starting_guesses)
   attr(guess, "Rsquare") <- rsq
   list(pars = guess, Rsquare = rsq)
 }
