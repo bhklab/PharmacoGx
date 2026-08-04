@@ -670,12 +670,7 @@ logLogisticRegression <- function(
   }
 
   raw_residuals <- apply(starting_guesses, 1, objective)
-  canonical_indices <- seq_len(nrow(starting_guesses))[-1]
-  canonical_order <- canonical_indices[order(
-    raw_residuals[canonical_indices],
-    canonical_indices
-  )]
-  selected_indices <- unique(c(1L, utils::head(canonical_order, 2L)))
+  selected_indices <- seq_len(nrow(starting_guesses))
   optimization_scales <- abs(raw_residuals[selected_indices])
   optimization_scales <- optimization_scales[
     is.finite(optimization_scales) & optimization_scales > .Machine$double.eps
@@ -717,7 +712,8 @@ logLogisticRegression <- function(
   optimized <- Filter(Negate(is.null), optimized)
 
   raw_best <- min(raw_residuals)
-  raw_tolerance <- sqrt(.Machine$double.eps) * max(1, abs(raw_best))
+  raw_tolerance <- sqrt(.Machine$double.eps) *
+    max(abs(raw_best), .Machine$double.eps)
   raw_best_index <- which(raw_residuals <= raw_best + raw_tolerance)[1]
   raw_guess <- starting_guesses[raw_best_index, ]
 
@@ -729,7 +725,7 @@ logLogisticRegression <- function(
     )
     optimized_best <- min(optimized_residuals)
     optimized_tolerance <- sqrt(.Machine$double.eps) *
-      max(1, abs(optimized_best))
+      max(abs(optimized_best), .Machine$double.eps)
     optimized_best_index <- which(
       optimized_residuals <= optimized_best + optimized_tolerance
     )[1]

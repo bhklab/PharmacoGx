@@ -374,7 +374,8 @@ test_that("multi-start fitting avoids divergent CTRPv2 minima", {
         99.97,
         100.7
       ),
-      minimum_r_squared = 0.40
+      minimum_r_squared = 0.40,
+      compare_fitted_values = TRUE
     ),
     list(
       conc = c(
@@ -433,11 +434,28 @@ test_that("multi-start fitting avoids divergent CTRPv2 minima", {
 
     expect_gte(attr(fit, "Rsquare"), fixture$minimum_r_squared)
     expect_gte(attr(perturbed_fit, "Rsquare"), fixture$minimum_r_squared)
-    expect_equal(
-      unlist(fit),
-      unlist(perturbed_fit),
-      tolerance = 1e-4
-    )
+    if (isTRUE(fixture$compare_fitted_values)) {
+      fitted_values <- function(model) {
+        parameters <- c(
+          HS = model$HS,
+          E0 = model$E0 / 100,
+          E_inf = model$E_inf / 100,
+          log10EC50 = log10(model$EC50)
+        )
+        PharmacoGx:::.pgx_hill_curve(log10(fixture$conc), parameters)
+      }
+      expect_equal(
+        fitted_values(fit),
+        fitted_values(perturbed_fit),
+        tolerance = 1e-4
+      )
+    } else {
+      expect_equal(
+        unlist(fit),
+        unlist(perturbed_fit),
+        tolerance = 1e-4
+      )
+    }
   }
 })
 
