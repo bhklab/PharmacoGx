@@ -3,7 +3,279 @@
 # This file is sourced by mcptools::mcp_server(tools = ...). It must evaluate to
 # a named list of ellmer::tool() objects.
 
+.datatable.aware <- TRUE
+
 pgx_supported_datasets <- c("GDSCsmall", "CCLEsmall", "CMAPsmall")
+pgx_dataset_cache <- new.env(parent = emptyenv())
+
+pgx_log_file <- function() {
+  log_file <- Sys.getenv("PHARMACOGX_MCP_LOG_FILE", "")
+  if (nzchar(log_file)) {
+    return(path.expand(log_file))
+  }
+
+  file.path(tools::R_user_dir("PharmacoGx", which = "cache"), "mcp.log")
+}
+
+pgx_log_event <- function(tool, status, detail = "") {
+  log_file <- pgx_log_file()
+  dir.create(dirname(log_file), recursive = TRUE, showWarnings = FALSE)
+  detail <- gsub("[\r\n\t]+", " ", as.character(detail))
+  if (nchar(detail) > 12000L) {
+    detail <- paste0(substr(detail, 1L, 12000L), " [truncated]")
+  }
+  write(
+    paste(
+      format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z"),
+      tool,
+      status,
+      paste0("pid=", Sys.getpid()),
+      detail,
+      sep = "\t"
+    ),
+    file = log_file,
+    append = TRUE
+  )
+  invisible(NULL)
+}
+
+pgx_execute_logged <- function(fun, tool_name, call_args, call_environment) {
+  argument_names <- names(call_args)
+  argument_names <- argument_names[nzchar(argument_names)]
+  pgx_log_event(
+    tool_name,
+    "start",
+    paste0("arguments=", paste(argument_names, collapse = ","))
+  )
+
+  error_calls <- NULL
+  tryCatch(
+    {
+      value <- withCallingHandlers(
+        do.call(fun, call_args, envir = call_environment),
+        error = function(e) {
+          error_calls <<- sys.calls()
+        }
+      )
+      pgx_log_event(tool_name, "success")
+      value
+    },
+    error = function(e) {
+      calls <- error_calls
+      if (is.null(calls)) {
+        calls <- sys.calls()
+      }
+      calls <- vapply(
+        calls,
+        function(x) {
+          call_text <- paste(deparse(x, width.cutoff = 200L), collapse = " ")
+          if (nchar(call_text) > 500L) {
+            call_text <- paste0(substr(call_text, 1L, 500L), "...")
+          }
+          call_text
+        },
+        character(1)
+      )
+      pgx_log_event(
+        tool_name,
+        "error",
+        paste0(
+          "message=",
+          conditionMessage(e),
+          " | call=",
+          paste(deparse(conditionCall(e)), collapse = " "),
+          " | stack=",
+          paste(calls, collapse = " > ")
+        )
+      )
+      stop(
+        tool_name,
+        " failed: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
+}
+
+pgx_logged_tool_function <- function(fun, tool_name) {
+  wrapper <- function() NULL
+  formals(wrapper) <- formals(fun)
+  environment(wrapper) <- list2env(
+    list(.pgx_fun = fun, .pgx_tool_name = tool_name),
+    parent = environment()
+  )
+  body(wrapper) <- quote({
+    .pgx_call_args <- as.list(match.call(expand.dots = FALSE))[-1]
+    pgx_execute_logged(
+      .pgx_fun,
+      .pgx_tool_name,
+      .pgx_call_args,
+      environment()
+    )
+  })
+  wrapper
+}
+
+pgx_tool <- function(fun, name, description, arguments = list()) {
+  ellmer::tool(
+    fun = pgx_logged_tool_function(fun, name),
+    name = name,
+    description = description,
+    arguments = arguments
+  )
+}
+
+pgx_default_local_manifest_path <- function() {
+  env_path <- Sys.getenv("PHARMACOGX_LOCAL_PSET_MANIFEST", "")
+  if (nzchar(env_path)) {
+    return(path.expand(env_path))
+  }
+
+  mcp_dir <- Sys.getenv("PHARMACOGX_MCP_DIR", "")
+  candidates <- c(
+    if (nzchar(mcp_dir)) {
+      file.path(mcp_dir, "local-pset-manifest.csv")
+    },
+    file.path(getwd(), "inst", "mcp", "local-pset-manifest.csv"),
+    file.path(getwd(), "local-pset-manifest.csv")
+  )
+  candidates <- candidates[nzchar(candidates)]
+  existing <- candidates[file.exists(candidates)]
+  if (length(existing) > 0) {
+    return(existing[[1]])
+  }
+
+  candidates[[1]]
+}
+
+pgx_empty_local_manifest <- function() {
+  data.frame(
+    name = character(),
+    path = character(),
+    object_type = character(),
+    analysis_mode = character(),
+    recommended_demo_use = character(),
+    aliases = character(),
+    notes = character(),
+    path_expanded = character(),
+    path_normalized = character(),
+    exists = logical(),
+    extension = character(),
+    supported = logical(),
+    stringsAsFactors = FALSE
+  )
+}
+
+pgx_read_local_pset_manifest <- function(
+  manifest_path = NULL,
+  include_missing = TRUE
+) {
+  if (pgx_is_blank(manifest_path)) {
+    manifest_path <- pgx_default_local_manifest_path()
+  }
+  manifest_path <- path.expand(manifest_path)
+
+  if (!file.exists(manifest_path)) {
+    return(pgx_empty_local_manifest())
+  }
+
+  manifest <- utils::read.csv(
+    manifest_path,
+    stringsAsFactors = FALSE,
+    na.strings = c("", "NA")
+  )
+  required <- c("name", "path")
+  missing <- setdiff(required, colnames(manifest))
+  if (length(missing) > 0) {
+    stop(
+      "Local PSet manifest is missing required column(s): ",
+      paste(missing, collapse = ", ")
+    )
+  }
+
+  optional <- setdiff(colnames(pgx_empty_local_manifest()), colnames(manifest))
+  optional <- setdiff(
+    optional,
+    c(
+      "path_expanded",
+      "path_normalized",
+      "exists",
+      "extension",
+      "supported"
+    )
+  )
+  for (field in optional) {
+    manifest[[field]] <- NA_character_
+  }
+
+  manifest$path_expanded <- path.expand(manifest$path)
+  manifest$exists <- file.exists(manifest$path_expanded)
+  manifest$path_normalized <- ifelse(
+    manifest$exists,
+    normalizePath(manifest$path_expanded, mustWork = FALSE),
+    manifest$path_expanded
+  )
+  manifest$extension <- tolower(tools::file_ext(manifest$path_expanded))
+  manifest$supported <- manifest$extension %in% c("qs", "rds")
+
+  if (!isTRUE(include_missing)) {
+    manifest <- manifest[manifest$exists & manifest$supported, , drop = FALSE]
+  }
+
+  manifest
+}
+
+pgx_manifest_alias_values <- function(row) {
+  aliases <- pgx_clean_vector(strsplit(row$aliases, ";", fixed = TRUE)[[1]])
+  unique(c(row$name, aliases))
+}
+
+pgx_resolve_local_pset_alias <- function(dataset) {
+  if (pgx_is_blank(dataset)) {
+    return(NULL)
+  }
+
+  manifest <- pgx_read_local_pset_manifest(include_missing = TRUE)
+  if (nrow(manifest) == 0) {
+    return(NULL)
+  }
+
+  dataset <- as.character(dataset[[1]])
+  exact <- manifest$name == dataset
+  alias <- vapply(
+    seq_len(nrow(manifest)),
+    function(i) {
+      dataset %in% pgx_manifest_alias_values(manifest[i, , drop = FALSE])
+    },
+    logical(1)
+  )
+  matches <- manifest[exact | alias, , drop = FALSE]
+  if (nrow(matches) == 0) {
+    return(NULL)
+  }
+  matches <- matches[order(!(matches$name == dataset)), , drop = FALSE]
+  resolved <- matches[1, , drop = FALSE]
+
+  if (!isTRUE(resolved$exists)) {
+    stop(
+      "Local PSet alias '",
+      dataset,
+      "' resolves to a missing file: ",
+      resolved$path_expanded
+    )
+  }
+  if (!isTRUE(resolved$supported)) {
+    stop(
+      "Local PSet alias '",
+      dataset,
+      "' resolves to an unsupported file extension: .",
+      resolved$extension
+    )
+  }
+
+  resolved
+}
 
 pgx_is_local_dataset <- function(dataset) {
   if (pgx_is_blank(dataset)) {
@@ -42,15 +314,56 @@ pgx_read_local_pset <- function(path) {
   pset
 }
 
+pgx_cached_dataset <- function(cache_key, fingerprint, loader) {
+  cached <- pgx_dataset_cache[[cache_key]]
+  if (!is.null(cached) && identical(cached$fingerprint, fingerprint)) {
+    return(cached$pset)
+  }
+
+  pset <- loader()
+  pgx_dataset_cache[[cache_key]] <- list(
+    fingerprint = fingerprint,
+    loaded_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z"),
+    pset = pset
+  )
+  pset
+}
+
+pgx_load_local_pset_cached <- function(path) {
+  path <- normalizePath(path.expand(path), mustWork = TRUE)
+  info <- file.info(path)
+  fingerprint <- paste(
+    as.numeric(info$size),
+    as.numeric(info$mtime),
+    sep = ":"
+  )
+  pgx_cached_dataset(
+    cache_key = paste0("local:", path),
+    fingerprint = fingerprint,
+    loader = function() pgx_read_local_pset(path)
+  )
+}
+
 pgx_load_dataset <- function(dataset) {
   if (dataset %in% pgx_supported_datasets) {
-    env <- new.env(parent = emptyenv())
-    utils::data(list = dataset, package = "PharmacoGx", envir = env)
-    return(env[[dataset]])
+    return(pgx_cached_dataset(
+      cache_key = paste0("bundled:", dataset),
+      fingerprint = as.character(utils::packageVersion("PharmacoGx")),
+      loader = function() {
+        env <- new.env(parent = emptyenv())
+        utils::data(list = dataset, package = "PharmacoGx", envir = env)
+        env[[dataset]]
+      }
+    ))
+  }
+
+  resolved <- pgx_resolve_local_pset_alias(dataset)
+  if (!is.null(resolved)) {
+    return(pgx_load_local_pset_cached(resolved$path_normalized))
   }
 
   if (pgx_is_local_dataset(dataset)) {
-    return(pgx_read_local_pset(dataset))
+    return(pgx_load_local_pset_cached(dataset))
   }
 
   if (!dataset %in% pgx_supported_datasets) {
@@ -59,13 +372,13 @@ pgx_load_dataset <- function(dataset) {
       dataset,
       "'. Use one of ",
       paste(pgx_supported_datasets, collapse = ", "),
-      " or an explicit local .qs/.rds PharmacoSet file path."
+      ", a local manifest alias, or an explicit local .qs/.rds PharmacoSet file path."
     )
   }
 }
 
 pgx_dataset_catalog <- function() {
-  data.frame(
+  bundled <- data.frame(
     dataset = c(
       "GDSCsmall",
       "CCLEsmall",
@@ -96,6 +409,23 @@ pgx_dataset_catalog <- function() {
     ),
     stringsAsFactors = FALSE
   )
+
+  local_manifest <- tryCatch(
+    pgx_read_local_pset_manifest(include_missing = TRUE),
+    error = function(e) pgx_empty_local_manifest()
+  )
+  if (nrow(local_manifest) == 0) {
+    return(bundled)
+  }
+
+  local_entries <- data.frame(
+    dataset = local_manifest$name,
+    object_type = local_manifest$object_type,
+    analysis_mode = local_manifest$analysis_mode,
+    recommended_demo_use = local_manifest$recommended_demo_use,
+    stringsAsFactors = FALSE
+  )
+  rbind(bundled, local_entries)
 }
 
 pgx_trim <- function(x, limit) {
@@ -120,7 +450,7 @@ pgx_clean_vector <- function(x) {
   }
 
   x <- as.character(x)
-  x[nzchar(x)]
+  x[!is.na(x) & nzchar(x)]
 }
 
 pgx_is_blank <- function(x) {
@@ -128,6 +458,20 @@ pgx_is_blank <- function(x) {
 }
 
 pgx_matrix_to_records <- function(x, value_name = "value", limit = 50) {
+  if (length(dim(x)) != 2) {
+    stop("Expected a two-dimensional matrix-like object.")
+  }
+  if (any(dim(x) == 0)) {
+    records <- data.frame(
+      treatment = character(),
+      sample = character(),
+      value = numeric(),
+      stringsAsFactors = FALSE
+    )
+    names(records)[[3]] <- value_name
+    return(records)
+  }
+
   records <- as.data.frame(as.table(x), stringsAsFactors = FALSE)
   names(records) <- c("treatment", "sample", value_name)
   records <- records[!is.na(records[[value_name]]), , drop = FALSE]
@@ -151,6 +495,254 @@ pgx_plain_matrix <- function(x) {
   }
 
   as.matrix(x)
+}
+
+pgx_legacy_attr <- function(pset, names) {
+  for (name in names) {
+    value <- attr(pset, name, exact = TRUE)
+    if (!is.null(value)) {
+      return(value)
+    }
+  }
+
+  NULL
+}
+
+pgx_has_legacy_attrs <- function(pset) {
+  any(
+    !vapply(
+      c("cell", "drug", "sensitivity"),
+      function(name) is.null(attr(pset, name, exact = TRUE)),
+      logical(1)
+    )
+  )
+}
+
+pgx_as_data_frame <- function(x) {
+  if (is.null(x)) {
+    return(data.frame())
+  }
+
+  as.data.frame(x, stringsAsFactors = FALSE)
+}
+
+pgx_sample_info <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    return(pgx_as_data_frame(pgx_legacy_attr(pset, c("sample", "cell"))))
+  }
+
+  info <- tryCatch(
+    suppressWarnings(PharmacoGx::sampleInfo(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(info)) {
+    return(pgx_as_data_frame(info))
+  }
+
+  pgx_as_data_frame(pgx_legacy_attr(pset, c("sample", "cell")))
+}
+
+pgx_treatment_info <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    return(pgx_as_data_frame(pgx_legacy_attr(pset, c("treatment", "drug"))))
+  }
+
+  info <- tryCatch(
+    suppressWarnings(PharmacoGx::treatmentInfo(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(info)) {
+    return(pgx_as_data_frame(info))
+  }
+
+  pgx_as_data_frame(pgx_legacy_attr(pset, c("treatment", "drug")))
+}
+
+pgx_id_values <- function(info, preferred_columns) {
+  if (nrow(info) == 0) {
+    return(character())
+  }
+
+  values <- character()
+  for (field in intersect(preferred_columns, colnames(info))) {
+    values <- c(values, as.character(info[[field]]))
+  }
+  row_ids <- rownames(info)
+  if (
+    !is.null(row_ids) && !identical(row_ids, as.character(seq_len(nrow(info))))
+  ) {
+    values <- c(row_ids, values)
+  }
+
+  unique(pgx_clean_vector(values))
+}
+
+pgx_sample_names <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    return(pgx_id_values(
+      pgx_sample_info(pset),
+      c("sampleid", "cellid", "sample", "cell", "depmap_id", "COSMICID")
+    ))
+  }
+
+  values <- tryCatch(
+    suppressWarnings(PharmacoGx::sampleNames(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(values) && length(values) > 0) {
+    return(as.character(values))
+  }
+
+  pgx_id_values(
+    pgx_sample_info(pset),
+    c("sampleid", "cellid", "sample", "cell", "depmap_id", "COSMICID")
+  )
+}
+
+pgx_treatment_names <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    return(pgx_id_values(
+      pgx_treatment_info(pset),
+      c("treatmentid", "drugid", "treatment", "drug", "name", "compound")
+    ))
+  }
+
+  values <- tryCatch(
+    suppressWarnings(PharmacoGx::treatmentNames(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(values) && length(values) > 0) {
+    return(as.character(values))
+  }
+
+  pgx_id_values(
+    pgx_treatment_info(pset),
+    c("treatmentid", "drugid", "treatment", "drug", "name", "compound")
+  )
+}
+
+pgx_molecular_profiles <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    profiles <- pgx_legacy_attr(pset, "molecularProfiles")
+    if (is.null(profiles)) {
+      return(list())
+    }
+    return(profiles)
+  }
+
+  profiles <- tryCatch(
+    suppressWarnings(PharmacoGx::molecularProfilesSlot(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(profiles)) {
+    return(profiles)
+  }
+
+  profiles <- pgx_legacy_attr(pset, "molecularProfiles")
+  if (is.null(profiles)) {
+    list()
+  } else {
+    profiles
+  }
+}
+
+pgx_mdata_names <- function(pset) {
+  values <- tryCatch(
+    suppressWarnings(PharmacoGx::mDataNames(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(values) && length(values) > 0) {
+    return(as.character(values))
+  }
+
+  names(pgx_molecular_profiles(pset))
+}
+
+pgx_feature_info <- function(pset, mDataType) {
+  if (pgx_has_legacy_attrs(pset)) {
+    profile <- pgx_molecular_profiles(pset)[[mDataType]]
+    if (!is.null(profile)) {
+      row_data <- tryCatch(
+        as.data.frame(SummarizedExperiment::rowData(profile)),
+        error = function(e) data.frame()
+      )
+      if (nrow(row_data) > 0) {
+        return(row_data)
+      }
+
+      mat <- pgx_plain_matrix(profile)
+      return(data.frame(row.names = rownames(mat)))
+    }
+  }
+
+  info <- tryCatch(
+    suppressWarnings(PharmacoGx::featureInfo(pset, mDataType)),
+    error = function(e) NULL
+  )
+  if (!is.null(info)) {
+    return(pgx_as_data_frame(info))
+  }
+
+  profile <- pgx_molecular_profiles(pset)[[mDataType]]
+  if (is.null(profile)) {
+    return(data.frame())
+  }
+
+  row_data <- tryCatch(
+    as.data.frame(SummarizedExperiment::rowData(profile)),
+    error = function(e) data.frame()
+  )
+  if (nrow(row_data) > 0) {
+    return(row_data)
+  }
+
+  mat <- pgx_plain_matrix(profile)
+  data.frame(row.names = rownames(mat))
+}
+
+pgx_summarize_molecular_profiles <- function(
+  pset,
+  mDataType,
+  features,
+  cell.lines,
+  summary.stat
+) {
+  if (pgx_has_legacy_attrs(pset)) {
+    profile <- pgx_molecular_profiles(pset)[[mDataType]]
+    if (is.null(profile)) {
+      stop("Molecular profile '", mDataType, "' was not found.")
+    }
+
+    mat <- pgx_plain_matrix(profile)
+    feature_keep <- intersect(features, rownames(mat))
+    sample_keep <- intersect(cell.lines, colnames(mat))
+    return(mat[feature_keep, sample_keep, drop = FALSE])
+  }
+
+  summarized <- tryCatch(
+    suppressWarnings(PharmacoGx::summarizeMolecularProfiles(
+      pset,
+      mDataType = mDataType,
+      features = features,
+      cell.lines = cell.lines,
+      summary.stat = summary.stat,
+      verbose = FALSE
+    )),
+    error = function(e) NULL
+  )
+  if (!is.null(summarized)) {
+    return(pgx_plain_matrix(summarized))
+  }
+
+  profile <- pgx_molecular_profiles(pset)[[mDataType]]
+  if (is.null(profile)) {
+    stop("Molecular profile '", mDataType, "' was not found.")
+  }
+
+  mat <- pgx_plain_matrix(profile)
+  feature_keep <- intersect(features, rownames(mat))
+  sample_keep <- intersect(cell.lines, colnames(mat))
+  mat[feature_keep, sample_keep, drop = FALSE]
 }
 
 pgx_select_fields <- function(x, id_name, fields = NULL) {
@@ -286,18 +878,411 @@ pgx_metric_direction <- function(metric, rank_direction = "auto") {
   }
 }
 
-pgx_sensitivity_records <- function(pset, metric, drug = NULL) {
-  args <- list(
-    object = pset,
-    sensitivity.measure = metric,
-    verbose = FALSE
-  )
-
-  if (!pgx_is_blank(drug)) {
-    args$drugs <- drug
+pgx_first_present_column <- function(x, candidates) {
+  matched <- intersect(candidates, colnames(x))
+  if (length(matched) == 0) {
+    return(NULL)
   }
 
-  summary <- do.call(PharmacoGx::summarizeSensitivityProfiles, args)
+  matched[[1]]
+}
+
+pgx_sensitivity_id_columns <- c(
+  "treatmentid",
+  "treatment1id",
+  "drugid",
+  "drug",
+  "treatment",
+  "sampleid",
+  "cellid",
+  "cell",
+  "sample",
+  "tech_rep",
+  "replicate",
+  "dose",
+  "treatment1dose",
+  "viability",
+  "mean_viability"
+)
+
+pgx_numeric_metric_columns <- function(x) {
+  numeric_cols <- vapply(x, is.numeric, logical(1))
+  setdiff(colnames(x)[numeric_cols], pgx_sensitivity_id_columns)
+}
+
+pgx_sensitivity_metric_catalog <- function(pset) {
+  response <- pgx_treatment_response(pset)
+  table_names <- c(
+    intersect(c("mono_profiles", "profiles"), names(response)),
+    setdiff(names(response), c("mono_profiles", "profiles"))
+  )
+  rows <- lapply(table_names, function(table_name) {
+    x <- response[[table_name]]
+    metrics <- pgx_numeric_metric_columns(x)
+    if (length(metrics) == 0) {
+      return(NULL)
+    }
+    data.frame(
+      table = table_name,
+      metric = metrics,
+      stringsAsFactors = FALSE
+    )
+  })
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows) == 0) {
+    return(data.frame(
+      table = character(),
+      metric = character(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  unique(do.call(rbind, rows))
+}
+
+pgx_sensitivity_table_for_metric <- function(pset, sensitivity.measure) {
+  response <- pgx_treatment_response(pset)
+  preferred <- c(
+    intersect(c("mono_profiles", "profiles"), names(response)),
+    setdiff(names(response), c("mono_profiles", "profiles"))
+  )
+  matching <- preferred[vapply(
+    preferred,
+    function(table_name) {
+      sensitivity.measure %in%
+        colnames(response[[table_name]]) &&
+        is.numeric(response[[table_name]][[sensitivity.measure]])
+    },
+    logical(1)
+  )]
+  if (length(matching) == 0) {
+    catalog <- pgx_sensitivity_metric_catalog(pset)
+    available <- unique(catalog$metric)
+    stop(
+      "Sensitivity measure '",
+      sensitivity.measure,
+      "' was not found in a monotherapy profile table. Available measures are: ",
+      if (length(available) > 0) paste(available, collapse = ", ") else "none",
+      "."
+    )
+  }
+
+  list(name = matching[[1]], table = response[[matching[[1]]]])
+}
+
+pgx_aligned_sensitivity_info <- function(pset, profiles, columns = NULL) {
+  info <- pgx_sensitivity_info(pset)
+  if (nrow(info) == 0 || nrow(profiles) == 0) {
+    return(data.frame())
+  }
+  if (!is.null(columns)) {
+    info <- info[, intersect(columns, colnames(info)), drop = FALSE]
+  }
+
+  profile_ids <- rownames(profiles)
+  info_ids <- rownames(info)
+  if (
+    !is.null(profile_ids) &&
+      !is.null(info_ids) &&
+      !identical(profile_ids, as.character(seq_len(nrow(profiles))))
+  ) {
+    index <- match(profile_ids, info_ids)
+    if (any(!is.na(index))) {
+      return(info[index, , drop = FALSE])
+    }
+  }
+
+  if (nrow(info) == nrow(profiles)) {
+    return(info)
+  }
+
+  data.frame()
+}
+
+pgx_profile_identifier <- function(
+  pset,
+  profiles,
+  profile_candidates,
+  info_candidates
+) {
+  profile_col <- pgx_first_present_column(profiles, profile_candidates)
+  if (!is.null(profile_col)) {
+    return(list(
+      values = as.character(profiles[[profile_col]]),
+      source = profile_col
+    ))
+  }
+
+  info <- pgx_aligned_sensitivity_info(
+    pset,
+    profiles,
+    columns = info_candidates
+  )
+  info_col <- pgx_first_present_column(info, info_candidates)
+  if (!is.null(info_col)) {
+    return(list(
+      values = as.character(info[[info_col]]),
+      source = paste0("sensitivityInfo:", info_col)
+    ))
+  }
+
+  NULL
+}
+
+pgx_resolve_metadata_queries <- function(
+  info,
+  queries,
+  available_values,
+  preferred_id_columns
+) {
+  queries <- pgx_clean_vector(queries)
+  available_values <- unique(pgx_clean_vector(available_values))
+  if (is.null(queries)) {
+    return(data.frame(
+      query = character(),
+      resolved = character(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  rows <- lapply(queries, function(query) {
+    direct <- available_values[
+      tolower(available_values) == tolower(query)
+    ]
+    if (length(direct) > 0) {
+      return(data.frame(
+        query = query,
+        resolved = direct,
+        stringsAsFactors = FALSE
+      ))
+    }
+    if (nrow(info) == 0) {
+      return(NULL)
+    }
+
+    searchable <- data.frame(
+      .row = rownames(info),
+      info,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    )
+    matches <- apply(
+      searchable,
+      1,
+      function(row) {
+        any(tolower(as.character(row)) == tolower(query), na.rm = TRUE)
+      }
+    )
+    if (!any(matches)) {
+      return(NULL)
+    }
+
+    id_columns <- unique(c(
+      intersect(preferred_id_columns, colnames(searchable)),
+      colnames(searchable)
+    ))
+    candidates <- unique(unlist(
+      searchable[matches, id_columns, drop = FALSE],
+      use.names = FALSE
+    ))
+    candidates <- pgx_clean_vector(as.character(candidates))
+    resolved <- available_values[
+      tolower(available_values) %in% tolower(candidates)
+    ]
+    if (length(resolved) == 0) {
+      return(NULL)
+    }
+
+    data.frame(
+      query = query,
+      resolved = resolved,
+      stringsAsFactors = FALSE
+    )
+  })
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows) == 0) {
+    return(data.frame(
+      query = character(),
+      resolved = character(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  unique(do.call(rbind, rows))
+}
+
+pgx_resolve_treatment_queries <- function(pset, queries, available_values) {
+  pgx_resolve_metadata_queries(
+    info = pgx_treatment_info(pset),
+    queries = queries,
+    available_values = available_values,
+    preferred_id_columns = c(
+      "treatmentid",
+      "drugid",
+      "NSC_number",
+      "NSC",
+      "name",
+      "compound",
+      ".row"
+    )
+  )
+}
+
+pgx_summary_treatment_rows <- function(pset, summary, query) {
+  available <- rownames(summary)
+  resolution <- attr(summary, "resolved_treatments", exact = TRUE)
+  if (is.null(resolution) || nrow(resolution) == 0) {
+    resolution <- pgx_resolve_treatment_queries(pset, query, available)
+  }
+  unique(resolution$resolved[resolution$query == query])
+}
+
+pgx_summarize_sensitivity_profiles <- function(
+  pset,
+  sensitivity.measure,
+  drugs = NULL,
+  cell.lines = NULL
+) {
+  if (pgx_has_legacy_attrs(pset)) {
+    return(pgx_summarize_legacy_sensitivity_profiles(
+      pset = pset,
+      sensitivity.measure = sensitivity.measure,
+      drugs = drugs,
+      cell.lines = cell.lines
+    ))
+  }
+
+  args <- list(
+    object = pset,
+    sensitivity.measure = sensitivity.measure,
+    verbose = FALSE
+  )
+  if (!is.null(drugs)) {
+    args$drugs <- drugs
+  }
+  if (!is.null(cell.lines)) {
+    args$cell.lines <- cell.lines
+  }
+
+  summary <- tryCatch(
+    suppressWarnings(do.call(PharmacoGx::summarizeSensitivityProfiles, args)),
+    error = function(e) NULL
+  )
+  if (!is.null(summary)) {
+    return(summary)
+  }
+
+  pgx_summarize_legacy_sensitivity_profiles(
+    pset = pset,
+    sensitivity.measure = sensitivity.measure,
+    drugs = drugs,
+    cell.lines = cell.lines
+  )
+}
+
+pgx_summarize_legacy_sensitivity_profiles <- function(
+  pset,
+  sensitivity.measure,
+  drugs = NULL,
+  cell.lines = NULL
+) {
+  selected <- pgx_sensitivity_table_for_metric(pset, sensitivity.measure)
+  profiles <- selected$table
+  treatment <- pgx_profile_identifier(
+    pset = pset,
+    profiles = profiles,
+    profile_candidates = c(
+      "treatmentid",
+      "treatment1id",
+      "drugid",
+      "drug",
+      "treatment"
+    ),
+    info_candidates = c("treatmentid", "drugid", "drug", "treatment")
+  )
+  sample <- pgx_profile_identifier(
+    pset = pset,
+    profiles = profiles,
+    profile_candidates = c("sampleid", "cellid", "cell", "sample"),
+    info_candidates = c("sampleid", "cellid", "cell", "sample")
+  )
+  if (is.null(treatment) || is.null(sample)) {
+    stop(
+      "Could not resolve treatment and sample identifiers for response table '",
+      selected$name,
+      "'."
+    )
+  }
+
+  values <- profiles[[sensitivity.measure]]
+  keep <- !is.na(values) & is.finite(values)
+  resolved_treatments <- pgx_resolve_treatment_queries(
+    pset,
+    drugs,
+    unique(treatment$values[keep])
+  )
+  if (!is.null(drugs)) {
+    keep <- keep &
+      tolower(treatment$values) %in% tolower(resolved_treatments$resolved)
+  }
+  if (!is.null(cell.lines)) {
+    keep <- keep & tolower(sample$values) %in% tolower(cell.lines)
+  }
+  x <- data.frame(
+    treatment = treatment$values[keep],
+    sample = sample$values[keep],
+    value = values[keep],
+    stringsAsFactors = FALSE
+  )
+  if (nrow(x) == 0) {
+    result <- matrix(numeric(), nrow = 0, ncol = 0)
+    attr(result, "response_table") <- selected$name
+    attr(result, "resolved_treatments") <- resolved_treatments
+    return(result)
+  }
+
+  summarized <- stats::aggregate(
+    value ~ treatment + sample,
+    data = x,
+    FUN = median,
+    na.rm = TRUE
+  )
+  treatments <- unique(summarized$treatment)
+  samples <- unique(summarized$sample)
+  mat <- matrix(
+    NA_real_,
+    nrow = length(treatments),
+    ncol = length(samples),
+    dimnames = list(treatments, samples)
+  )
+  mat[cbind(
+    match(summarized$treatment, treatments),
+    match(summarized$sample, samples)
+  )] <- summarized$value
+  attr(mat, "response_table") <- selected$name
+  attr(mat, "resolved_treatments") <- resolved_treatments
+  attr(mat, "treatment_identifier_source") <- treatment$source
+  attr(mat, "sample_identifier_source") <- sample$source
+  mat
+}
+
+pgx_sensitivity_records <- function(pset, metric, drug = NULL) {
+  summary <- pgx_summarize_sensitivity_profiles(
+    pset = pset,
+    sensitivity.measure = metric,
+    drugs = if (!pgx_is_blank(drug)) drug else NULL
+  )
+  if (length(dim(summary)) != 2 || any(dim(summary) == 0)) {
+    records <- data.frame(
+      treatment = character(),
+      sample = character(),
+      value = numeric(),
+      stringsAsFactors = FALSE
+    )
+    names(records)[[3]] <- metric
+    return(records)
+  }
+
   records <- as.data.frame(as.table(summary), stringsAsFactors = FALSE)
   names(records) <- c("treatment", "sample", metric)
   records <- records[!is.na(records[[metric]]), , drop = FALSE]
@@ -333,7 +1318,7 @@ pgx_safe_filename <- function(...) {
 }
 
 pgx_resolve_experiments <- function(pset, drug, sample) {
-  info <- PharmacoGx::sensitivityInfo(pset)
+  info <- pgx_sensitivity_info(pset)
   required <- c("sampleid", "treatmentid")
   missing_cols <- setdiff(required, colnames(info))
   if (length(missing_cols) > 0) {
@@ -363,14 +1348,14 @@ pgx_extract_dose_response <- function(
     )
   }
 
-  raw <- PharmacoGx::sensitivityRaw(pset)
+  raw <- pgx_sensitivity_raw(pset)
   if (is.null(dim(raw)) || length(dim(raw)) != 3 || any(dim(raw) == 0)) {
     stop(
       "No sensitivityRaw() dose-response array is available for this dataset."
     )
   }
 
-  info <- PharmacoGx::sensitivityInfo(pset)
+  info <- pgx_sensitivity_info(pset)
   records <- do.call(
     rbind,
     lapply(exp_idx, function(idx) {
@@ -423,10 +1408,9 @@ pgx_default_molecular_summary_stat <- function(
     return(summary_stat)
   }
 
+  profiles <- pgx_molecular_profiles(pset)
   annotation <- tryCatch(
-    S4Vectors::metadata(PharmacoGx::molecularProfilesSlot(pset)[[
-      mDataType
-    ]])$annotation,
+    S4Vectors::metadata(profiles[[mDataType]])$annotation,
     error = function(e) NA_character_
   )
 
@@ -447,9 +1431,7 @@ pgx_resolve_features <- function(
   match_mode = "exact",
   limit = 50
 ) {
-  feature_info <- as.data.frame(
-    PharmacoGx::featureInfo(pset, mDataType)
-  )
+  feature_info <- pgx_feature_info(pset, mDataType)
   match_fields <- colnames(feature_info)
   matched <- pgx_find_rows(feature_info, features, match_mode, match_fields)
   if (length(matched) == 0) {
@@ -482,9 +1464,25 @@ pgx_get_molecular_matrix <- function(
   limit_features = 25,
   limit_samples = 25
 ) {
+  available_profiles <- pgx_mdata_names(pset)
+  if (!mDataType %in% available_profiles) {
+    available_text <- if (length(available_profiles) == 0) {
+      "none"
+    } else {
+      paste(available_profiles, collapse = ", ")
+    }
+    stop(
+      "Molecular profile '",
+      mDataType,
+      "' is not available. Available profiles are: ",
+      available_text,
+      ". Call pgx_list_available_covariates() before requesting molecular data."
+    )
+  }
+
   samples <- pgx_clean_vector(samples)
   if (is.null(samples)) {
-    samples <- PharmacoGx::sampleNames(pset)
+    samples <- pgx_sample_names(pset)
   }
   samples <- samples[seq_len(min(
     length(samples),
@@ -511,15 +1509,13 @@ pgx_get_molecular_matrix <- function(
     ))
   }
 
-  mat <- PharmacoGx::summarizeMolecularProfiles(
+  mat <- pgx_summarize_molecular_profiles(
     pset,
     mDataType = mDataType,
     features = resolved$feature_ids,
     cell.lines = samples,
-    summary.stat = summary_stat,
-    verbose = FALSE
+    summary.stat = summary_stat
   )
-  mat <- pgx_plain_matrix(mat)
 
   list(
     matrix = mat,
@@ -529,6 +1525,20 @@ pgx_get_molecular_matrix <- function(
 }
 
 pgx_matrix_records <- function(mat, row_name = "feature", col_name = "sample") {
+  if (length(dim(mat)) != 2) {
+    stop("Expected a two-dimensional molecular profile matrix.")
+  }
+  if (any(dim(mat) == 0)) {
+    records <- data.frame(
+      row = character(),
+      column = character(),
+      value = numeric(),
+      stringsAsFactors = FALSE
+    )
+    names(records) <- c(row_name, col_name, "value")
+    return(records)
+  }
+
   records <- as.data.frame(as.table(mat), stringsAsFactors = FALSE)
   names(records) <- c(row_name, col_name, "value")
   records
@@ -551,9 +1561,7 @@ pgx_required_column_result <- function(table_name, provided, required) {
 }
 
 pgx_pair_table <- function(pset) {
-  info <- tryCatch(PharmacoGx::sensitivityInfo(pset), error = function(e) {
-    data.frame()
-  })
+  info <- pgx_sensitivity_info(pset)
   if (all(c("sampleid", "treatmentid") %in% colnames(info))) {
     return(unique(data.frame(
       sample = info$sampleid,
@@ -591,15 +1599,70 @@ pgx_pair_table <- function(pset) {
 }
 
 pgx_sensitivity_measures <- function(pset) {
-  tryCatch(PharmacoGx::sensitivityMeasures(pset), error = function(e) {
-    character()
-  })
+  response <- tryCatch(
+    pgx_treatment_response(pset),
+    error = function(e) NULL
+  )
+  if (!is.null(response) && "mono_profiles" %in% names(response)) {
+    return(pgx_numeric_metric_columns(response$mono_profiles))
+  }
+  if (pgx_has_legacy_attrs(pset) && !is.null(response$profiles)) {
+    return(pgx_numeric_metric_columns(response$profiles))
+  }
+
+  measures <- tryCatch(
+    suppressWarnings(PharmacoGx::sensitivityMeasures(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(measures)) {
+    return(measures)
+  }
+
+  if (is.null(response)) {
+    response <- pgx_treatment_response(pset)
+  }
+  profiles <- response$profiles
+  if (is.null(profiles)) {
+    return(character())
+  }
+
+  pgx_numeric_metric_columns(profiles)
 }
 
 pgx_sensitivity_info <- function(pset) {
-  tryCatch(PharmacoGx::sensitivityInfo(pset), error = function(e) {
-    data.frame()
-  })
+  if (pgx_has_legacy_attrs(pset)) {
+    sensitivity <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+    return(pgx_as_data_frame(sensitivity$info))
+  }
+
+  info <- tryCatch(
+    suppressWarnings(PharmacoGx::sensitivityInfo(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(info)) {
+    return(pgx_as_data_frame(info))
+  }
+
+  sensitivity <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+  pgx_as_data_frame(sensitivity$info)
+}
+
+pgx_sensitivity_raw <- function(pset) {
+  if (pgx_has_legacy_attrs(pset)) {
+    sensitivity <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+    return(sensitivity$raw)
+  }
+
+  raw <- tryCatch(
+    suppressWarnings(PharmacoGx::sensitivityRaw(pset)),
+    error = function(e) NULL
+  )
+  if (!is.null(raw)) {
+    return(raw)
+  }
+
+  sensitivity <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+  sensitivity$raw
 }
 
 pgx_load_many_datasets <- function(datasets) {
@@ -611,12 +1674,42 @@ pgx_load_many_datasets <- function(datasets) {
 }
 
 pgx_treatment_response <- function(pset) {
-  tryCatch(
-    PharmacoGx::treatmentResponse(pset),
+  if (pgx_has_legacy_attrs(pset)) {
+    response <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+    if (is.null(response)) {
+      stop("Could not access legacy sensitivity data.")
+    }
+    return(response[vapply(
+      response,
+      function(x) {
+        is.data.frame(x) || is.matrix(x) || length(dim(x)) >= 2
+      },
+      logical(1)
+    )])
+  }
+
+  response <- tryCatch(
+    suppressWarnings(PharmacoGx::treatmentResponse(pset)),
     error = function(e) {
-      stop("Could not access treatmentResponse(): ", conditionMessage(e))
+      NULL
     }
   )
+  if (!is.null(response)) {
+    return(response)
+  }
+
+  response <- pgx_legacy_attr(pset, c("treatmentResponse", "sensitivity"))
+  if (is.null(response)) {
+    stop("Could not access treatmentResponse() or legacy sensitivity data.")
+  }
+
+  response[vapply(
+    response,
+    function(x) {
+      is.data.frame(x) || is.matrix(x) || length(dim(x)) >= 2
+    },
+    logical(1)
+  )]
 }
 
 pgx_treatment_response_table_names <- function(pset) {
@@ -673,7 +1766,19 @@ pgx_score_candidates <- function(x) {
   numeric_cols <- cols[vapply(x, is.numeric, logical(1))]
   candidates <- grep(
     paste(
-      c("synergy", "score", "excess", "combo_aac", "aac", "viability"),
+      c(
+        "synergy",
+        "score",
+        "delta",
+        "excess",
+        "HSA",
+        "Bliss",
+        "Loewe",
+        "ZIP",
+        "combo_aac",
+        "aac",
+        "viability"
+      ),
       collapse = "|"
     ),
     numeric_cols,
@@ -685,6 +1790,11 @@ pgx_score_candidates <- function(x) {
   ]
 
   priority <- c(
+    "ZIP_delta",
+    "ZIP_score",
+    "Bliss_score",
+    "HSA_score",
+    "Loewe_score",
     "mean_HSA_score_fit",
     "median_HSA_score_fit",
     "mean_HSA_score_obs",
@@ -705,6 +1815,7 @@ pgx_score_candidates <- function(x) {
     "median_Loewe_score",
     "mean_ZIP_score",
     "median_ZIP_score",
+    "ZIP_synergy_score",
     "combo_aac_observed"
   )
 
@@ -944,8 +2055,35 @@ pgx_list_example_datasets <- function() {
   list(
     datasets = pgx_dataset_catalog(),
     note = paste(
-      "These are bundled demonstration datasets. Use downloadPSet() only when",
-      "an explicit large external dataset workflow is intended."
+      "Bundled datasets are toy fixtures. Local manifest aliases point to",
+      "real PSet-backed demo objects when those files exist. Use downloadPSet()",
+      "only when an explicit large external dataset workflow is intended."
+    )
+  )
+}
+
+pgx_list_local_psets <- function(
+  manifest_path = NULL,
+  include_missing = TRUE
+) {
+  manifest_path <- if (pgx_is_blank(manifest_path)) {
+    pgx_default_local_manifest_path()
+  } else {
+    path.expand(manifest_path)
+  }
+  manifest <- pgx_read_local_pset_manifest(
+    manifest_path = manifest_path,
+    include_missing = include_missing
+  )
+
+  list(
+    manifest_path = normalizePath(manifest_path, mustWork = FALSE),
+    include_missing = isTRUE(include_missing),
+    total = nrow(manifest),
+    local_psets = manifest,
+    note = paste(
+      "Use the name column as the dataset argument for MCP tools. Set",
+      "PHARMACOGX_LOCAL_PSET_MANIFEST to override this manifest."
     )
   )
 }
@@ -968,8 +2106,8 @@ pgx_list_entities <- function(
   pset <- pgx_load_dataset(dataset)
   values <- switch(
     entity,
-    "treatments" = PharmacoGx::treatmentNames(pset),
-    "samples" = PharmacoGx::sampleNames(pset),
+    "treatments" = pgx_treatment_names(pset),
+    "samples" = pgx_sample_names(pset),
     "sensitivity_measures" = pgx_sensitivity_measures(pset)
   )
 
@@ -990,13 +2128,13 @@ pgx_list_available_covariates <- function(dataset = "GDSCsmall") {
     error = function(e) character()
   )
   molecular_profiles <- tryCatch(
-    PharmacoGx::mDataNames(pset),
+    pgx_mdata_names(pset),
     error = function(e) character()
   )
 
   feature_fields <- lapply(molecular_profiles, function(mDataType) {
     tryCatch(
-      colnames(PharmacoGx::featureInfo(pset, mDataType)),
+      colnames(pgx_feature_info(pset, mDataType)),
       error = function(e) character()
     )
   })
@@ -1004,8 +2142,8 @@ pgx_list_available_covariates <- function(dataset = "GDSCsmall") {
 
   list(
     dataset = dataset,
-    sample_fields = colnames(PharmacoGx::sampleInfo(pset)),
-    treatment_fields = colnames(PharmacoGx::treatmentInfo(pset)),
+    sample_fields = colnames(pgx_sample_info(pset)),
+    treatment_fields = colnames(pgx_treatment_info(pset)),
     sensitivity_info_fields = colnames(sensitivity_info),
     sensitivity_measures = pgx_sensitivity_measures(pset),
     treatment_response_tables = treatment_response_tables,
@@ -1026,7 +2164,7 @@ pgx_get_sample_metadata <- function(
   limit = 25
 ) {
   pset <- pgx_load_dataset(dataset)
-  info <- PharmacoGx::sampleInfo(pset)
+  info <- pgx_sample_info(pset)
   search_fields <- pgx_candidate_columns(
     info,
     c("sample", "cell", "name", "alias", "id", "tissue", "histology", "source")
@@ -1058,7 +2196,7 @@ pgx_get_treatment_metadata <- function(
   limit = 25
 ) {
   pset <- pgx_load_dataset(dataset)
-  info <- PharmacoGx::treatmentInfo(pset)
+  info <- pgx_treatment_info(pset)
   search_fields <- pgx_candidate_columns(
     info,
     c(
@@ -1101,7 +2239,7 @@ pgx_filter_samples <- function(
   limit = 50
 ) {
   pset <- pgx_load_dataset(dataset)
-  info <- PharmacoGx::sampleInfo(pset)
+  info <- pgx_sample_info(pset)
   filters <- pgx_parse_filters(filters)
   operator <- match.arg(operator, c("and", "or"))
   match_mode <- pgx_resolve_match_mode(match_mode)
@@ -1624,6 +2762,25 @@ pgx_get_molecular_profile <- function(
   limit_samples = 25
 ) {
   pset <- pgx_load_dataset(dataset)
+  available_profiles <- pgx_mdata_names(pset)
+  if (!mDataType %in% available_profiles) {
+    return(list(
+      dataset = dataset,
+      mDataType = mDataType,
+      available = FALSE,
+      available_molecular_profiles = available_profiles,
+      matched_features = data.frame(),
+      dimensions = c(features = 0L, samples = 0L),
+      records = pgx_matrix_records(matrix(numeric(), nrow = 0, ncol = 0)),
+      note = paste0(
+        "Molecular profile '",
+        mDataType,
+        "' is not available. Call pgx_list_available_covariates() before ",
+        "requesting molecular data."
+      )
+    ))
+  }
+
   molecular <- pgx_get_molecular_matrix(
     pset = pset,
     mDataType = mDataType,
@@ -1638,13 +2795,20 @@ pgx_get_molecular_profile <- function(
   list(
     dataset = dataset,
     mDataType = mDataType,
+    available = TRUE,
+    available_molecular_profiles = available_profiles,
     summary_stat = molecular$summary_stat,
     matched_features = molecular$matched_features,
     dimensions = stats::setNames(
       as.integer(dim(molecular$matrix)),
       c("features", "samples")
     ),
-    records = pgx_matrix_records(molecular$matrix)
+    records = pgx_matrix_records(molecular$matrix),
+    note = if (nrow(molecular$matched_features) == 0) {
+      "No requested features matched this molecular profile."
+    } else {
+      "Values are bounded to the requested feature and sample limits."
+    }
   )
 }
 
@@ -1662,17 +2826,58 @@ pgx_association_test <- function(
 ) {
   method <- match.arg(method, c("spearman", "pearson", "wilcoxon"))
   pset <- pgx_load_dataset(dataset)
-  response <- PharmacoGx::summarizeSensitivityProfiles(
-    pset,
+  available_metrics <- pgx_sensitivity_measures(pset)
+  if (!metric %in% available_metrics) {
+    return(list(
+      dataset = dataset,
+      drug = drug,
+      metric = metric,
+      mDataType = mDataType,
+      available = FALSE,
+      available_sensitivity_measures = available_metrics,
+      matched_features = data.frame(),
+      results = data.frame(),
+      note = paste0(
+        "Sensitivity measure '",
+        metric,
+        "' is unavailable. Inspect available_sensitivity_measures and retry."
+      )
+    ))
+  }
+  response <- pgx_summarize_sensitivity_profiles(
+    pset = pset,
     sensitivity.measure = metric,
-    drugs = drug,
-    verbose = FALSE
+    drugs = drug
   )
-  if (!drug %in% rownames(response)) {
-    stop("Drug '", drug, "' was not found in sensitivity summaries.")
+  treatment_rows <- pgx_summary_treatment_rows(pset, response, drug)
+  if (length(treatment_rows) != 1) {
+    return(list(
+      dataset = dataset,
+      drug = drug,
+      metric = metric,
+      mDataType = mDataType,
+      available = FALSE,
+      available_sensitivity_measures = available_metrics,
+      resolved_treatments = treatment_rows,
+      matched_features = data.frame(),
+      results = data.frame(),
+      note = if (length(treatment_rows) == 0) {
+        paste0(
+          "Treatment '",
+          drug,
+          "' did not match the stored treatment identifiers."
+        )
+      } else {
+        paste0(
+          "Treatment '",
+          drug,
+          "' matched multiple stored identifiers. Retry with one exact ID."
+        )
+      }
+    ))
   }
 
-  response_values <- response[drug, , drop = TRUE]
+  response_values <- response[treatment_rows[[1]], , drop = TRUE]
   if (!is.null(samples)) {
     response_values <- response_values[names(response_values) %in% samples]
   }
@@ -1713,8 +2918,10 @@ pgx_association_test <- function(
   list(
     dataset = dataset,
     drug = drug,
+    resolved_treatment = treatment_rows[[1]],
     metric = metric,
     mDataType = mDataType,
+    available = TRUE,
     matched_features = molecular$matched_features,
     results = results,
     note = paste(
@@ -1780,7 +2987,7 @@ pgx_multi_pset_association_test <- function(
       p_adjust_method = p_adjust_method
     ))
 
-    if (isTRUE(result$ok)) {
+    if (isTRUE(result$ok) && !isFALSE(result$value$available)) {
       records <- result$value$results
       if (nrow(records) > 0) {
         records$dataset <- dataset
@@ -1793,9 +3000,14 @@ pgx_multi_pset_association_test <- function(
         ]
       }
     } else {
+      error_message <- if (isTRUE(result$ok)) {
+        result$value$note
+      } else {
+        result$value$message
+      }
       errors[[dataset]] <- data.frame(
         dataset = dataset,
-        error = result$value$message,
+        error = error_message,
         stringsAsFactors = FALSE
       )
     }
@@ -1955,14 +3167,15 @@ pgx_rank_synergy_combinations <- function(
   min_samples = 3,
   limit = 20
 ) {
+  .datatable.aware <- TRUE
   pset <- pgx_load_dataset(dataset)
   response <- pgx_response_table(
     pset,
     table = table,
-    preferred = c("profiles", "synergy", "raw"),
+    preferred = c("combo_viability", "synergy", "profiles", "raw"),
     as_data_table = TRUE
   )
-  x <- response$table
+  x <- data.table::as.data.table(response$table)
   score <- pgx_choose_score_column(x, score)
   rank_direction <- pgx_score_direction(score, rank_direction)
   min_samples <- max(1L, as.integer(min_samples))
@@ -1977,7 +3190,11 @@ pgx_rank_synergy_combinations <- function(
     )
   }
 
-  x <- x[!is.na(x[[score]]) & is.finite(x[[score]])]
+  x <- x[
+    !is.na(x[[score]]) & is.finite(x[[score]]),
+    ,
+    drop = FALSE
+  ]
   sample_scores <- x[,
     list(
       sample_score = stats::median(get(score), na.rm = TRUE),
@@ -2036,7 +3253,7 @@ pgx_get_combo_response_records <- function(
   response <- pgx_response_table(
     pset,
     table = table,
-    preferred = c("profiles", "synergy", "raw"),
+    preferred = c("combo_viability", "synergy", "profiles", "raw"),
     as_data_table = FALSE
   )
   x <- pgx_filter_combo_rows(
@@ -2068,17 +3285,15 @@ pgx_get_combo_response_records <- function(
     pgx_trim(pgx_score_candidates(x), 10)
   ))
   fields <- pgx_clean_vector(fields)
+  missing_fields <- character()
   if (is.null(fields)) {
     keep_fields <- intersect(default_fields, colnames(x))
   } else {
     missing_fields <- setdiff(fields, colnames(x))
-    if (length(missing_fields) > 0) {
-      stop(
-        "Unknown combo field(s): ",
-        paste(missing_fields, collapse = ", ")
-      )
+    keep_fields <- intersect(fields, colnames(x))
+    if (length(keep_fields) == 0) {
+      keep_fields <- intersect(default_fields, colnames(x))
     }
-    keep_fields <- fields
   }
 
   list(
@@ -2091,6 +3306,18 @@ pgx_get_combo_response_records <- function(
     score = score,
     total_matches = nrow(x),
     returned = min(nrow(x), limit),
+    requested_fields = fields,
+    unavailable_fields = missing_fields,
+    available_fields = colnames(x),
+    note = if (length(missing_fields) > 0) {
+      paste0(
+        "Unavailable requested fields were omitted: ",
+        paste(missing_fields, collapse = ", "),
+        ". Inspect available_fields before retrying."
+      )
+    } else {
+      "Returned fields are present in the selected combination-response table."
+    },
     records = pgx_limit_records(x[, keep_fields, drop = FALSE], limit)
   )
 }
@@ -2110,12 +3337,13 @@ pgx_combo_biomarker_association <- function(
   summary_stat = NULL,
   p_adjust_method = "BH"
 ) {
+  .datatable.aware <- TRUE
   method <- match.arg(method, c("spearman", "pearson", "wilcoxon"))
   pset <- pgx_load_dataset(dataset)
   response <- pgx_response_table(
     pset,
     table = table,
-    preferred = c("profiles", "synergy", "raw"),
+    preferred = c("combo_viability", "synergy", "profiles", "raw"),
     as_data_table = TRUE
   )
   x <- pgx_filter_combo_rows(
@@ -2125,12 +3353,17 @@ pgx_combo_biomarker_association <- function(
     match_mode = match_mode,
     symmetric = symmetric
   )
+  x <- data.table::as.data.table(x)
   score <- pgx_choose_score_column(x, score)
 
   if (!"sampleid" %in% colnames(x)) {
     stop("Combo biomarker association requires a sampleid column.")
   }
-  x <- x[!is.na(x[[score]]) & is.finite(x[[score]])]
+  x <- x[
+    !is.na(x[[score]]) & is.finite(x[[score]]),
+    ,
+    drop = FALSE
+  ]
   if (nrow(x) == 0) {
     stop("No finite combo phenotype values remained after filtering.")
   }
@@ -2188,11 +3421,531 @@ pgx_combo_biomarker_association <- function(
   )
 }
 
+pgx_summarize_numeric <- function(x, summary_stat = "median") {
+  x <- x[is.finite(x)]
+  if (length(x) == 0) {
+    return(NA_real_)
+  }
+
+  switch(
+    summary_stat,
+    median = stats::median(x, na.rm = TRUE),
+    mean = mean(x, na.rm = TRUE),
+    max = max(x, na.rm = TRUE),
+    min = min(x, na.rm = TRUE),
+    stop("Unsupported summary_stat: ", summary_stat)
+  )
+}
+
+pgx_mono_biomarker_association_for_pset <- function(
+  pset,
+  treatment,
+  mDataType,
+  features,
+  mono_table = "mono_profiles",
+  mono_metric = "aac_recomputed",
+  method = "spearman",
+  match_mode = "exact",
+  feature_match_mode = "exact",
+  summary_stat = NULL,
+  p_adjust_method = "BH"
+) {
+  .datatable.aware <- TRUE
+  response <- pgx_response_table(
+    pset,
+    table = mono_table,
+    preferred = c("mono_profiles", "profiles", "raw"),
+    as_data_table = TRUE
+  )
+  x <- response$table
+  x <- data.table::as.data.table(x)
+  treatment_col <- intersect(c("treatmentid", "treatment1id"), colnames(x))
+  if (length(treatment_col) == 0 || !"sampleid" %in% colnames(x)) {
+    stop(
+      "Mono biomarker comparison requires treatmentid or treatment1id plus sampleid."
+    )
+  }
+  treatment_col <- treatment_col[[1]]
+  if (!mono_metric %in% colnames(x) || !is.numeric(x[[mono_metric]])) {
+    stop(
+      "Mono metric '",
+      mono_metric,
+      "' is not a numeric column in treatmentResponse table '",
+      response$name,
+      "'."
+    )
+  }
+
+  keep <- pgx_match_filter_values(x[[treatment_col]], treatment, match_mode)
+  x <- x[keep & is.finite(x[[mono_metric]]), , drop = FALSE]
+  if (nrow(x) == 0) {
+    return(list(
+      table = response$name,
+      treatment = treatment,
+      metric = mono_metric,
+      phenotype_summary = data.frame(),
+      matched_features = data.frame(),
+      results = data.frame()
+    ))
+  }
+
+  phenotype <- x[,
+    list(
+      phenotype = stats::median(get(mono_metric), na.rm = TRUE),
+      records = .N
+    ),
+    by = "sampleid"
+  ]
+  response_values <- phenotype$phenotype
+  names(response_values) <- phenotype$sampleid
+
+  molecular <- pgx_get_molecular_matrix(
+    pset = pset,
+    mDataType = mDataType,
+    features = features,
+    samples = names(response_values),
+    feature_match_mode = feature_match_mode,
+    summary_stat = summary_stat,
+    limit_features = 100,
+    limit_samples = length(response_values)
+  )
+  results <- pgx_feature_response_association(
+    mat = molecular$matrix,
+    response_values = response_values,
+    method = method,
+    p_adjust_method = p_adjust_method
+  )
+
+  list(
+    table = response$name,
+    treatment = treatment,
+    metric = mono_metric,
+    phenotype_summary = data.frame(
+      samples = length(response_values),
+      records = sum(phenotype$records),
+      min = min(response_values, na.rm = TRUE),
+      median = stats::median(response_values, na.rm = TRUE),
+      max = max(response_values, na.rm = TRUE),
+      stringsAsFactors = FALSE
+    ),
+    matched_features = molecular$matched_features,
+    results = results
+  )
+}
+
+pgx_prefix_result_columns <- function(results, prefix) {
+  if (nrow(results) == 0) {
+    return(data.frame(feature = character(), stringsAsFactors = FALSE))
+  }
+  out <- results
+  names(out)[names(out) != "feature"] <- paste0(
+    prefix,
+    "_",
+    names(out)[names(out) != "feature"]
+  )
+  out
+}
+
+pgx_effect_direction <- function(x) {
+  direction <- rep(NA_character_, length(x))
+  direction[is.finite(x) & x > 0] <- "positive"
+  direction[is.finite(x) & x < 0] <- "negative"
+  direction[is.finite(x) & x == 0] <- "zero"
+  direction
+}
+
+pgx_direction_agreement <- function(x, y) {
+  out <- rep(NA_character_, length(x))
+  comparable <- !is.na(x) & !is.na(y) & x != "zero" & y != "zero"
+  out[comparable] <- ifelse(x[comparable] == y[comparable], "same", "opposite")
+  out
+}
+
+pgx_compare_mono_combo_biomarkers <- function(
+  dataset,
+  treatment1,
+  treatment2,
+  mDataType,
+  features,
+  combo_table = "auto",
+  combo_score = NULL,
+  mono_table = "mono_profiles",
+  mono_metric = "aac_recomputed",
+  method = "spearman",
+  match_mode = "exact",
+  symmetric = TRUE,
+  feature_match_mode = "exact",
+  summary_stat = NULL,
+  p_adjust_method = "BH"
+) {
+  .datatable.aware <- TRUE
+  method <- match.arg(method, c("spearman", "pearson", "wilcoxon"))
+  pset <- pgx_load_dataset(dataset)
+
+  combo_response <- pgx_response_table(
+    pset,
+    table = combo_table,
+    preferred = c("combo_viability", "synergy", "profiles", "raw"),
+    as_data_table = TRUE
+  )
+  combo_rows <- pgx_filter_combo_rows(
+    combo_response$table,
+    treatment1 = treatment1,
+    treatment2 = treatment2,
+    match_mode = match_mode,
+    symmetric = symmetric
+  )
+  combo_rows <- data.table::as.data.table(combo_rows)
+  combo_score <- pgx_choose_score_column(combo_rows, combo_score)
+  combo_rows <- combo_rows[
+    is.finite(combo_rows[[combo_score]]),
+    ,
+    drop = FALSE
+  ]
+  if (!"sampleid" %in% colnames(combo_rows) || nrow(combo_rows) == 0) {
+    stop("No finite combo phenotype rows with sample IDs remained.")
+  }
+
+  combo_phenotype <- combo_rows[,
+    list(
+      phenotype = stats::median(get(combo_score), na.rm = TRUE),
+      records = .N
+    ),
+    by = "sampleid"
+  ]
+  combo_response_values <- combo_phenotype$phenotype
+  names(combo_response_values) <- combo_phenotype$sampleid
+  combo_molecular <- pgx_get_molecular_matrix(
+    pset = pset,
+    mDataType = mDataType,
+    features = features,
+    samples = names(combo_response_values),
+    feature_match_mode = feature_match_mode,
+    summary_stat = summary_stat,
+    limit_features = 100,
+    limit_samples = length(combo_response_values)
+  )
+  combo_results <- pgx_feature_response_association(
+    mat = combo_molecular$matrix,
+    response_values = combo_response_values,
+    method = method,
+    p_adjust_method = p_adjust_method
+  )
+
+  mono1 <- pgx_mono_biomarker_association_for_pset(
+    pset = pset,
+    treatment = treatment1,
+    mDataType = mDataType,
+    features = features,
+    mono_table = mono_table,
+    mono_metric = mono_metric,
+    method = method,
+    match_mode = match_mode,
+    feature_match_mode = feature_match_mode,
+    summary_stat = summary_stat,
+    p_adjust_method = p_adjust_method
+  )
+  mono2 <- pgx_mono_biomarker_association_for_pset(
+    pset = pset,
+    treatment = treatment2,
+    mDataType = mDataType,
+    features = features,
+    mono_table = mono_table,
+    mono_metric = mono_metric,
+    method = method,
+    match_mode = match_mode,
+    feature_match_mode = feature_match_mode,
+    summary_stat = summary_stat,
+    p_adjust_method = p_adjust_method
+  )
+
+  comparison <- Reduce(
+    function(x, y) merge(x, y, by = "feature", all = TRUE),
+    list(
+      pgx_prefix_result_columns(combo_results, "combo"),
+      pgx_prefix_result_columns(mono1$results, "mono1"),
+      pgx_prefix_result_columns(mono2$results, "mono2")
+    )
+  )
+  comparison$combo_direction <- pgx_effect_direction(
+    comparison$combo_effect_size
+  )
+  comparison$mono1_direction <- pgx_effect_direction(
+    comparison$mono1_effect_size
+  )
+  comparison$mono2_direction <- pgx_effect_direction(
+    comparison$mono2_effect_size
+  )
+  comparison$combo_vs_mono1_direction <- pgx_direction_agreement(
+    comparison$combo_direction,
+    comparison$mono1_direction
+  )
+  comparison$combo_vs_mono2_direction <- pgx_direction_agreement(
+    comparison$combo_direction,
+    comparison$mono2_direction
+  )
+
+  list(
+    dataset = dataset,
+    treatment1 = treatment1,
+    treatment2 = treatment2,
+    mDataType = mDataType,
+    features = pgx_clean_vector(features),
+    method = method,
+    combo_table = combo_response$name,
+    combo_score = combo_score,
+    mono_table = mono1$table,
+    mono_metric = mono_metric,
+    matched_features = combo_molecular$matched_features,
+    phenotype_summaries = list(
+      combo = data.frame(
+        samples = length(combo_response_values),
+        records = sum(combo_phenotype$records),
+        min = min(combo_response_values, na.rm = TRUE),
+        median = stats::median(combo_response_values, na.rm = TRUE),
+        max = max(combo_response_values, na.rm = TRUE),
+        stringsAsFactors = FALSE
+      ),
+      mono1 = mono1$phenotype_summary,
+      mono2 = mono2$phenotype_summary
+    ),
+    comparison = comparison,
+    note = paste(
+      "This bounded workflow compares feature-response associations for one",
+      "combo phenotype against each monotherapy arm. It is exploratory and",
+      "does not run genome-wide biomarker discovery unless the caller supplies",
+      "a broad feature list."
+    )
+  )
+}
+
+pgx_plot_synergy_heatmap <- function(
+  dataset,
+  treatment1 = NULL,
+  treatment2 = NULL,
+  sample = NULL,
+  table = "auto",
+  score = NULL,
+  rank_direction = "auto",
+  match_mode = "exact",
+  symmetric = TRUE,
+  output_dir = NULL,
+  summary_stat = "median"
+) {
+  .datatable.aware <- TRUE
+  summary_stat <- match.arg(summary_stat, c("median", "mean", "max", "min"))
+  if (pgx_is_blank(output_dir)) {
+    output_dir <- tempdir()
+  }
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+
+  pset <- pgx_load_dataset(dataset)
+  response <- pgx_response_table(
+    pset,
+    table = table,
+    preferred = c("combo_viability", "synergy", "raw", "profiles"),
+    as_data_table = TRUE
+  )
+  x <- data.table::as.data.table(response$table)
+  score <- pgx_choose_score_column(x, score)
+  rank_direction <- pgx_score_direction(score, rank_direction)
+
+  if (pgx_is_blank(treatment1) || pgx_is_blank(treatment2)) {
+    required <- c("treatment1id", "treatment2id", "sampleid")
+    missing <- setdiff(required, colnames(x))
+    if (length(missing) > 0) {
+      stop(
+        "Auto-selecting a combo requires column(s): ",
+        paste(missing, collapse = ", ")
+      )
+    }
+    ranked <- x[is.finite(x[[score]]), ][,
+      list(
+        sample_score = stats::median(get(score), na.rm = TRUE),
+        records = .N
+      ),
+      by = c("treatment1id", "treatment2id", "sampleid")
+    ][,
+      list(
+        n_samples = data.table::uniqueN(sampleid),
+        median_score = stats::median(sample_score, na.rm = TRUE),
+        n_records = sum(records)
+      ),
+      by = c("treatment1id", "treatment2id")
+    ]
+    data.table::setorderv(
+      ranked,
+      "median_score",
+      order = if (identical(rank_direction, "highest")) -1L else 1L
+    )
+    if (nrow(ranked) == 0) {
+      stop("No finite combo scores were available for heatmap selection.")
+    }
+    treatment1 <- ranked$treatment1id[[1]]
+    treatment2 <- ranked$treatment2id[[1]]
+  }
+
+  x <- pgx_filter_combo_rows(
+    x,
+    treatment1 = treatment1,
+    treatment2 = treatment2,
+    match_mode = match_mode,
+    symmetric = symmetric
+  )
+  x <- data.table::as.data.table(x)
+  if (!pgx_is_blank(sample)) {
+    if (!"sampleid" %in% colnames(x)) {
+      stop("Sample filtering requires a sampleid column.")
+    }
+    x <- x[
+      pgx_match_filter_values(x$sampleid, sample, match_mode),
+      ,
+      drop = FALSE
+    ]
+  }
+  if (nrow(x) == 0) {
+    stop("No combo rows matched the requested treatments/sample.")
+  }
+
+  required <- c("treatment1dose", "treatment2dose", "sampleid")
+  missing <- setdiff(required, colnames(x))
+  if (length(missing) > 0) {
+    stop(
+      "Synergy heatmap requires column(s): ",
+      paste(missing, collapse = ", ")
+    )
+  }
+  x <- x[
+    is.finite(x[[score]]) &
+      is.finite(x[["treatment1dose"]]) &
+      is.finite(x[["treatment2dose"]]),
+    ,
+    drop = FALSE
+  ]
+  if (nrow(x) == 0) {
+    stop("No finite dose/score rows remained for the heatmap.")
+  }
+
+  if (pgx_is_blank(sample)) {
+    sample_scores <- x[,
+      list(sample_score = stats::median(get(score), na.rm = TRUE)),
+      by = "sampleid"
+    ]
+    data.table::setorderv(
+      sample_scores,
+      "sample_score",
+      order = if (identical(rank_direction, "highest")) -1L else 1L
+    )
+    sample <- sample_scores$sampleid[[1]]
+    x <- x[x[["sampleid"]] == sample, , drop = FALSE]
+  }
+
+  grid <- x[,
+    list(
+      score_value = pgx_summarize_numeric(get(score), summary_stat),
+      records = .N
+    ),
+    by = c("treatment1dose", "treatment2dose")
+  ]
+  dose1 <- sort(unique(grid$treatment1dose))
+  dose2 <- sort(unique(grid$treatment2dose))
+  z <- matrix(
+    NA_real_,
+    nrow = length(dose1),
+    ncol = length(dose2),
+    dimnames = list(dose1, dose2)
+  )
+  for (i in seq_len(nrow(grid))) {
+    z[
+      match(grid$treatment1dose[[i]], dose1),
+      match(grid$treatment2dose[[i]], dose2)
+    ] <- grid$score_value[[i]]
+  }
+
+  output_file <- file.path(
+    output_dir,
+    paste0(
+      pgx_safe_filename(
+        "PharmacoGx_synergy_heatmap",
+        dataset,
+        treatment1,
+        treatment2,
+        sample,
+        score
+      ),
+      ".png"
+    )
+  )
+
+  z_range <- range(z, na.rm = TRUE)
+  if (!all(is.finite(z_range))) {
+    stop("Heatmap score matrix contains no finite values.")
+  }
+  z_abs <- max(abs(z_range), na.rm = TRUE)
+  colors <- grDevices::colorRampPalette(c("#2c7bb6", "white", "#d7191c"))(101)
+
+  grDevices::png(output_file, width = 1100, height = 900, res = 120)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  graphics::image(
+    x = seq_along(dose1),
+    y = seq_along(dose2),
+    z = z,
+    col = colors,
+    zlim = c(-z_abs, z_abs),
+    axes = FALSE,
+    xlab = "Treatment 1 dose",
+    ylab = "Treatment 2 dose",
+    main = paste(
+      dataset,
+      treatment1,
+      treatment2,
+      sample,
+      score,
+      sep = " / "
+    )
+  )
+  graphics::axis(
+    1,
+    at = seq_along(dose1),
+    labels = signif(dose1, 3),
+    las = 2,
+    cex.axis = 0.75
+  )
+  graphics::axis(
+    2,
+    at = seq_along(dose2),
+    labels = signif(dose2, 3),
+    las = 2,
+    cex.axis = 0.75
+  )
+  graphics::box()
+
+  list(
+    dataset = dataset,
+    table = response$name,
+    treatment1 = as.character(treatment1),
+    treatment2 = as.character(treatment2),
+    sample = as.character(sample),
+    score = score,
+    rank_direction = rank_direction,
+    summary_stat = summary_stat,
+    output_file = normalizePath(output_file, mustWork = FALSE),
+    grid = as.data.frame(grid),
+    note = paste(
+      "Heatmap cells summarize matched combo rows at each dose pair. Positive",
+      "values indicate synergy for standard expected-minus-observed score",
+      "columns such as Bliss_score, HSA_score, ZIP_score, or ZIP_delta."
+    )
+  )
+}
+
 pgx_detect_assay_mode <- function(dataset = "GDSCsmall") {
   pset <- pgx_load_dataset(dataset)
   info <- pgx_sensitivity_info(pset)
   treatment_names <- tryCatch(
-    PharmacoGx::treatmentNames(pset),
+    pgx_treatment_names(pset),
     error = function(e) character()
   )
   treatment_response_tables <- tryCatch(
@@ -2261,8 +4014,8 @@ pgx_find_pset_overlap <- function(
   psets <- pgx_load_many_datasets(datasets)
   limit <- max(1L, as.integer(limit))
 
-  sample_sets <- lapply(psets, PharmacoGx::sampleNames)
-  treatment_sets <- lapply(psets, PharmacoGx::treatmentNames)
+  sample_sets <- lapply(psets, pgx_sample_names)
+  treatment_sets <- lapply(psets, pgx_treatment_names)
   pair_sets <- lapply(psets, pgx_pair_table)
 
   shared_samples <- Reduce(intersect, sample_sets)
@@ -2316,23 +4069,28 @@ pgx_compare_pset_response <- function(
       if (!metric %in% pgx_sensitivity_measures(psets[[dataset]])) {
         return(data.frame())
       }
-      mat <- PharmacoGx::summarizeSensitivityProfiles(
-        psets[[dataset]],
+      mat <- pgx_summarize_sensitivity_profiles(
+        pset = psets[[dataset]],
         sensitivity.measure = metric,
-        drugs = drug,
-        verbose = FALSE
+        drugs = drug
       )
-      if (!drug %in% rownames(mat)) {
+      treatment_rows <- pgx_summary_treatment_rows(
+        psets[[dataset]],
+        mat,
+        drug
+      )
+      if (length(treatment_rows) != 1) {
         return(data.frame())
       }
-      values <- mat[drug, , drop = TRUE]
+      values <- mat[treatment_rows[[1]], , drop = TRUE]
       if (!is.null(samples)) {
         values <- values[names(values) %in% samples]
       }
       data.frame(
         dataset = dataset,
         sample = names(values),
-        treatment = drug,
+        requested_treatment = drug,
+        treatment = treatment_rows[[1]],
         metric = metric,
         value = unname(as.numeric(values)),
         stringsAsFactors = FALSE
@@ -2405,25 +4163,42 @@ pgx_summarize_sensitivity <- function(
   drugs <- pgx_clean_vector(drugs)
   cell_lines <- pgx_clean_vector(cell_lines)
   limit <- max(1L, as.integer(limit))
+  available_metrics <- pgx_sensitivity_measures(pset)
+  if (!sensitivity_measure %in% available_metrics) {
+    return(list(
+      dataset = dataset,
+      sensitivity_measure = sensitivity_measure,
+      available = FALSE,
+      available_sensitivity_measures = available_metrics,
+      available_response_tables = pgx_treatment_response_table_names(pset),
+      dimensions = c(treatments = 0L, samples = 0L),
+      records = data.frame(),
+      note = paste0(
+        "Sensitivity measure '",
+        sensitivity_measure,
+        "' is unavailable. Inspect available_sensitivity_measures and retry."
+      )
+    ))
+  }
 
-  args <- list(
-    object = pset,
+  summary <- pgx_summarize_sensitivity_profiles(
+    pset = pset,
     sensitivity.measure = sensitivity_measure,
-    verbose = FALSE
+    drugs = drugs,
+    cell.lines = cell_lines
   )
-
-  if (!is.null(drugs)) {
-    args$drugs <- drugs
-  }
-  if (!is.null(cell_lines)) {
-    args$cell.lines <- cell_lines
-  }
-
-  summary <- do.call(PharmacoGx::summarizeSensitivityProfiles, args)
 
   list(
     dataset = dataset,
     sensitivity_measure = sensitivity_measure,
+    available = TRUE,
+    requested_treatments = drugs,
+    resolved_treatments = attr(
+      summary,
+      "resolved_treatments",
+      exact = TRUE
+    ),
+    response_table = attr(summary, "response_table", exact = TRUE),
     dimensions = stats::setNames(
       as.integer(dim(summary)),
       c("treatments", "samples")
@@ -2446,25 +4221,56 @@ pgx_top_responders <- function(
   rank_direction <- match.arg(rank_direction, c("auto", "lowest", "highest"))
   limit <- max(1L, as.integer(limit))
   pset <- pgx_load_dataset(dataset)
-
-  summary <- PharmacoGx::summarizeSensitivityProfiles(
-    object = pset,
-    sensitivity.measure = sensitivity_measure,
-    drugs = drug,
-    verbose = FALSE
-  )
-
-  if (!drug %in% rownames(summary)) {
-    stop(
-      "Drug '",
-      drug,
-      "' was not found in summarized sensitivity results for ",
-      dataset,
-      "."
-    )
+  available_metrics <- pgx_sensitivity_measures(pset)
+  if (!sensitivity_measure %in% available_metrics) {
+    return(list(
+      dataset = dataset,
+      drug = drug,
+      sensitivity_measure = sensitivity_measure,
+      available = FALSE,
+      available_sensitivity_measures = available_metrics,
+      top_responders = data.frame(),
+      note = paste0(
+        "Sensitivity measure '",
+        sensitivity_measure,
+        "' is unavailable. Inspect available_sensitivity_measures and retry."
+      )
+    ))
   }
 
-  values <- summary[drug, , drop = TRUE]
+  summary <- pgx_summarize_sensitivity_profiles(
+    pset = pset,
+    sensitivity.measure = sensitivity_measure,
+    drugs = drug
+  )
+
+  treatment_rows <- pgx_summary_treatment_rows(pset, summary, drug)
+  if (length(treatment_rows) != 1) {
+    return(list(
+      dataset = dataset,
+      drug = drug,
+      sensitivity_measure = sensitivity_measure,
+      available = FALSE,
+      available_sensitivity_measures = available_metrics,
+      resolved_treatments = treatment_rows,
+      top_responders = data.frame(),
+      note = if (length(treatment_rows) == 0) {
+        paste0(
+          "Treatment '",
+          drug,
+          "' did not match the stored treatment identifiers."
+        )
+      } else {
+        paste0(
+          "Treatment '",
+          drug,
+          "' matched multiple stored identifiers. Retry with one exact ID."
+        )
+      }
+    ))
+  }
+
+  values <- summary[treatment_rows[[1]], , drop = TRUE]
   values <- values[!is.na(values)]
 
   if (identical(rank_direction, "auto")) {
@@ -2494,7 +4300,9 @@ pgx_top_responders <- function(
   list(
     dataset = dataset,
     drug = drug,
+    resolved_treatment = treatment_rows[[1]],
     sensitivity_measure = sensitivity_measure,
+    available = TRUE,
     rank_direction = rank_direction,
     interpretation = paste(
       "For AUC and IC50 measures, lower values usually indicate stronger",
@@ -2577,15 +4385,25 @@ pgx_compute_synergy_reference <- function(
 
   viability_1 <- as.numeric(viability_1)
   viability_2 <- as.numeric(viability_2)
-
-  data.frame(
-    viability_1 = viability_1,
-    viability_2 = viability_2,
-    bliss_reference = PharmacoGx::computeBliss(viability_1, viability_2),
-    hsa_reference = PharmacoGx::computeHSA(
+  hsa_arguments <- list(viability_1, viability_2)
+  if ("na.rm" %in% names(formals(PharmacoGx::computeHSA))) {
+    hsa_arguments$na.rm <- isTRUE(hsa_na_rm)
+    hsa_reference <- do.call(PharmacoGx::computeHSA, hsa_arguments)
+  } else {
+    hsa_reference <- pmin(
       viability_1,
       viability_2,
       na.rm = isTRUE(hsa_na_rm)
+    )
+  }
+
+  list(
+    hsa_na_rm = isTRUE(hsa_na_rm),
+    references = data.frame(
+      viability_1 = viability_1,
+      viability_2 = viability_2,
+      bliss_reference = PharmacoGx::computeBliss(viability_1, viability_2),
+      hsa_reference = hsa_reference
     )
   )
 }
@@ -2616,10 +4434,10 @@ pgx_pset_summary <- function(pset, file_path = NA_character_) {
   }
 
   sensitivity_measures <- capture_value(
-    PharmacoGx::sensitivityMeasures(pset),
+    pgx_sensitivity_measures(pset),
     character()
   )
-  molecular_profiles <- capture_value(PharmacoGx::mDataNames(pset), character())
+  molecular_profiles <- capture_value(pgx_mdata_names(pset), character())
 
   list(
     name = capture_value(PharmacoGx::name(pset), NA_character_),
@@ -2627,11 +4445,11 @@ pgx_pset_summary <- function(pset, file_path = NA_character_) {
     file_path = file_path,
     dataset_type = capture_value(PharmacoGx::datasetType(pset), NA_character_),
     sample_count = capture_value(
-      length(PharmacoGx::sampleNames(pset)),
+      length(pgx_sample_names(pset)),
       NA_integer_
     ),
     treatment_count = capture_value(
-      length(PharmacoGx::treatmentNames(pset)),
+      length(pgx_treatment_names(pset)),
       NA_integer_
     ),
     sensitivity_measures = sensitivity_measures,
@@ -2711,6 +4529,19 @@ pgx_session_info <- function() {
     character(1)
   )
 
+  tool_file <- Sys.getenv("PHARMACOGX_MCP_TOOL_FILE", "")
+  if (!nzchar(tool_file)) {
+    tool_file <- normalizePath(
+      file.path(Sys.getenv("PHARMACOGX_MCP_DIR", ""), "PharmacoGx-tools.R"),
+      mustWork = FALSE
+    )
+  }
+  tool_modified_at <- if (file.exists(tool_file)) {
+    format(file.info(tool_file)$mtime, "%Y-%m-%dT%H:%M:%S%z")
+  } else {
+    NA_character_
+  }
+
   list(
     r_version = as.character(getRversion()),
     package_versions = data.frame(
@@ -2720,7 +4551,20 @@ pgx_session_info <- function() {
       stringsAsFactors = FALSE
     ),
     working_directory = getwd(),
-    supported_demo_datasets = pgx_supported_datasets
+    supported_demo_datasets = pgx_supported_datasets,
+    mcp_process_id = Sys.getpid(),
+    mcp_server_started_at = Sys.getenv(
+      "PHARMACOGX_MCP_SERVER_STARTED_AT",
+      NA_character_
+    ),
+    pharmacogx_package_source = Sys.getenv(
+      "PHARMACOGX_MCP_PACKAGE_SOURCE",
+      "installed"
+    ),
+    mcp_tool_file = tool_file,
+    mcp_tool_file_modified_at = tool_modified_at,
+    mcp_log_file = pgx_log_file(),
+    cached_datasets = names(pgx_dataset_cache)
   )
 }
 
@@ -2738,7 +4582,7 @@ if (!requireNamespace("PharmacoGx", quietly = TRUE)) {
 }
 
 res <- list(
-  pgx_list_example_datasets = ellmer::tool(
+  pgx_list_example_datasets = pgx_tool(
     fun = pgx_list_example_datasets,
     name = "pgx_list_example_datasets",
     description = paste(
@@ -2747,7 +4591,25 @@ res <- list(
     ),
     arguments = list()
   ),
-  pgx_list_entities = ellmer::tool(
+  pgx_list_local_psets = pgx_tool(
+    fun = pgx_list_local_psets,
+    name = "pgx_list_local_psets",
+    description = paste(
+      "List local PSet manifest aliases such as nci_almanac, gdsc2_matrix,",
+      "and gdsc2_anchor for real PSet-backed demos."
+    ),
+    arguments = list(
+      manifest_path = ellmer::type_string(
+        "Optional manifest CSV path. Defaults to inst/mcp/local-pset-manifest.csv.",
+        required = FALSE
+      ),
+      include_missing = ellmer::type_boolean(
+        "Whether to include aliases whose files are missing. Defaults to TRUE.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_list_entities = pgx_tool(
     fun = pgx_list_entities,
     name = "pgx_list_entities",
     description = paste(
@@ -2772,21 +4634,24 @@ res <- list(
       )
     )
   ),
-  pgx_list_available_covariates = ellmer::tool(
+  pgx_list_available_covariates = pgx_tool(
     fun = pgx_list_available_covariates,
     name = "pgx_list_available_covariates",
     description = paste(
       "List sample, treatment, sensitivity, and molecular covariates",
-      "available in a bundled PharmacoGx dataset."
+      "available in a bundled or local PharmacoSet."
     ),
     arguments = list(
       dataset = ellmer::type_string(
-        "One of GDSCsmall, CCLEsmall, or CMAPsmall. Defaults to GDSCsmall.",
+        paste(
+          "Bundled dataset, local manifest alias, or explicit .qs/.rds path.",
+          "Defaults to GDSCsmall."
+        ),
         required = FALSE
       )
     )
   ),
-  pgx_get_sample_metadata = ellmer::tool(
+  pgx_get_sample_metadata = pgx_tool(
     fun = pgx_get_sample_metadata,
     name = "pgx_get_sample_metadata",
     description = paste(
@@ -2817,7 +4682,7 @@ res <- list(
       )
     )
   ),
-  pgx_get_treatment_metadata = ellmer::tool(
+  pgx_get_treatment_metadata = pgx_tool(
     fun = pgx_get_treatment_metadata,
     name = "pgx_get_treatment_metadata",
     description = paste(
@@ -2848,7 +4713,7 @@ res <- list(
       )
     )
   ),
-  pgx_filter_samples = ellmer::tool(
+  pgx_filter_samples = pgx_tool(
     fun = pgx_filter_samples,
     name = "pgx_filter_samples",
     description = paste(
@@ -2860,9 +4725,12 @@ res <- list(
         "One of GDSCsmall, CCLEsmall, or CMAPsmall. Defaults to GDSCsmall.",
         required = FALSE
       ),
-      filters = ellmer::type_object(
-        .description = "Named sample metadata filters, e.g. {\"tissueid\": \"lung\"}.",
-        .additional_properties = TRUE
+      filters = ellmer::type_from_schema(
+        text = paste0(
+          '{"type":"object","description":"Named sample metadata filters, ',
+          'for example {\\\"tissueid\\\": \\\"lung\\\"}.",',
+          '"additionalProperties":true}'
+        )
       ),
       operator = ellmer::type_string(
         "How to combine filters: and or or. Defaults to and.",
@@ -2883,7 +4751,7 @@ res <- list(
       )
     )
   ),
-  pgx_compare_metrics = ellmer::tool(
+  pgx_compare_metrics = pgx_tool(
     fun = pgx_compare_metrics,
     name = "pgx_compare_metrics",
     description = paste(
@@ -2914,7 +4782,7 @@ res <- list(
       )
     )
   ),
-  pgx_get_dose_response_points = ellmer::tool(
+  pgx_get_dose_response_points = pgx_tool(
     fun = pgx_get_dose_response_points,
     name = "pgx_get_dose_response_points",
     description = paste(
@@ -2934,7 +4802,7 @@ res <- list(
       )
     )
   ),
-  pgx_plot_dose_response = ellmer::tool(
+  pgx_plot_dose_response = pgx_tool(
     fun = pgx_plot_dose_response,
     name = "pgx_plot_dose_response",
     description = paste(
@@ -2962,7 +4830,7 @@ res <- list(
       )
     )
   ),
-  pgx_pset_curation_questions = ellmer::tool(
+  pgx_pset_curation_questions = pgx_tool(
     fun = pgx_pset_curation_questions,
     name = "pgx_pset_curation_questions",
     description = paste(
@@ -2976,7 +4844,7 @@ res <- list(
       )
     )
   ),
-  pgx_validate_pset_inputs = ellmer::tool(
+  pgx_validate_pset_inputs = pgx_tool(
     fun = pgx_validate_pset_inputs,
     name = "pgx_validate_pset_inputs",
     description = paste(
@@ -3015,16 +4883,19 @@ res <- list(
       )
     )
   ),
-  pgx_get_molecular_profile = ellmer::tool(
+  pgx_get_molecular_profile = pgx_tool(
     fun = pgx_get_molecular_profile,
     name = "pgx_get_molecular_profile",
     description = paste(
       "Return summarized molecular profile values for selected features and",
-      "samples from a bundled PharmacoGx dataset."
+      "samples from a bundled or local PharmacoSet."
     ),
     arguments = list(
       dataset = ellmer::type_string(
-        "One of GDSCsmall or CCLEsmall. Defaults to GDSCsmall.",
+        paste(
+          "Bundled dataset, local manifest alias, or explicit .qs/.rds path.",
+          "Defaults to GDSCsmall."
+        ),
         required = FALSE
       ),
       mDataType = ellmer::type_string(
@@ -3057,7 +4928,7 @@ res <- list(
       )
     )
   ),
-  pgx_association_test = ellmer::tool(
+  pgx_association_test = pgx_tool(
     fun = pgx_association_test,
     name = "pgx_association_test",
     description = paste(
@@ -3066,7 +4937,10 @@ res <- list(
     ),
     arguments = list(
       dataset = ellmer::type_string(
-        "One of GDSCsmall or CCLEsmall. Defaults to GDSCsmall.",
+        paste(
+          "Bundled dataset, local manifest alias, or explicit .qs/.rds path.",
+          "Defaults to GDSCsmall."
+        ),
         required = FALSE
       ),
       drug = ellmer::type_string("Treatment or drug name."),
@@ -3104,7 +4978,7 @@ res <- list(
       )
     )
   ),
-  pgx_suggest_biomarker_candidates = ellmer::tool(
+  pgx_suggest_biomarker_candidates = pgx_tool(
     fun = pgx_suggest_biomarker_candidates,
     name = "pgx_suggest_biomarker_candidates",
     description = paste(
@@ -3122,7 +4996,7 @@ res <- list(
       )
     )
   ),
-  pgx_multi_pset_association_test = ellmer::tool(
+  pgx_multi_pset_association_test = pgx_tool(
     fun = pgx_multi_pset_association_test,
     name = "pgx_multi_pset_association_test",
     description = paste(
@@ -3164,7 +5038,7 @@ res <- list(
       )
     )
   ),
-  pgx_list_treatment_response_tables = ellmer::tool(
+  pgx_list_treatment_response_tables = pgx_tool(
     fun = pgx_list_treatment_response_tables,
     name = "pgx_list_treatment_response_tables",
     description = paste(
@@ -3181,7 +5055,7 @@ res <- list(
       )
     )
   ),
-  pgx_rank_synergy_combinations = ellmer::tool(
+  pgx_rank_synergy_combinations = pgx_tool(
     fun = pgx_rank_synergy_combinations,
     name = "pgx_rank_synergy_combinations",
     description = paste(
@@ -3214,7 +5088,7 @@ res <- list(
       )
     )
   ),
-  pgx_get_combo_response_records = ellmer::tool(
+  pgx_get_combo_response_records = pgx_tool(
     fun = pgx_get_combo_response_records,
     name = "pgx_get_combo_response_records",
     description = paste(
@@ -3250,7 +5124,10 @@ res <- list(
         required = FALSE
       ),
       fields = ellmer::type_array(
-        "Optional fields to return.",
+        paste(
+          "Optional fields to return. Unknown fields are reported and omitted;",
+          "inspect available_fields in the result."
+        ),
         items = ellmer::type_string(),
         required = FALSE
       ),
@@ -3260,7 +5137,60 @@ res <- list(
       )
     )
   ),
-  pgx_combo_biomarker_association = ellmer::tool(
+  pgx_plot_synergy_heatmap = pgx_tool(
+    fun = pgx_plot_synergy_heatmap,
+    name = "pgx_plot_synergy_heatmap",
+    description = paste(
+      "Create a PNG heatmap for a selected or auto-selected combo dose matrix",
+      "using a synergy or response score."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset alias, dataset name, or explicit local .qs/.rds combo PSet path."
+      ),
+      treatment1 = ellmer::type_string(
+        "Optional first treatment ID/name. If omitted, the top combo is auto-selected.",
+        required = FALSE
+      ),
+      treatment2 = ellmer::type_string(
+        "Optional second treatment ID/name. If omitted, the top combo is auto-selected.",
+        required = FALSE
+      ),
+      sample = ellmer::type_string(
+        "Optional sample/cell-line ID. If omitted, the strongest sample is auto-selected.",
+        required = FALSE
+      ),
+      table = ellmer::type_string(
+        "treatmentResponse table name or auto. Defaults to auto.",
+        required = FALSE
+      ),
+      score = ellmer::type_string(
+        "Optional numeric score column such as ZIP_delta or Bliss_score.",
+        required = FALSE
+      ),
+      rank_direction = ellmer::type_string(
+        "One of auto, lowest, or highest. Defaults to auto.",
+        required = FALSE
+      ),
+      match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      symmetric = ellmer::type_boolean(
+        "Whether treatment1/treatment2 order can be swapped. Defaults to TRUE.",
+        required = FALSE
+      ),
+      output_dir = ellmer::type_string(
+        "Directory where the PNG should be written. Defaults to tempdir().",
+        required = FALSE
+      ),
+      summary_stat = ellmer::type_string(
+        "One of median, mean, max, or min. Defaults to median.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_combo_biomarker_association = pgx_tool(
     fun = pgx_combo_biomarker_association,
     name = "pgx_combo_biomarker_association",
     description = paste(
@@ -3314,7 +5244,69 @@ res <- list(
       )
     )
   ),
-  pgx_detect_assay_mode = ellmer::tool(
+  pgx_compare_mono_combo_biomarkers = pgx_tool(
+    fun = pgx_compare_mono_combo_biomarkers,
+    name = "pgx_compare_mono_combo_biomarkers",
+    description = paste(
+      "Compare bounded molecular feature associations for a selected combo",
+      "phenotype against each monotherapy arm."
+    ),
+    arguments = list(
+      dataset = ellmer::type_string(
+        "Dataset alias, dataset name, or explicit local .qs/.rds combo PSet path."
+      ),
+      treatment1 = ellmer::type_string("First treatment ID/name."),
+      treatment2 = ellmer::type_string("Second treatment ID/name."),
+      mDataType = ellmer::type_string(
+        "Molecular profile type such as rna, mutation, or cnv."
+      ),
+      features = ellmer::type_array(
+        "Feature IDs or symbols to compare.",
+        items = ellmer::type_string()
+      ),
+      combo_table = ellmer::type_string(
+        "Combo treatmentResponse table name or auto. Defaults to auto.",
+        required = FALSE
+      ),
+      combo_score = ellmer::type_string(
+        "Optional combo phenotype column such as Bliss_score or ZIP_delta.",
+        required = FALSE
+      ),
+      mono_table = ellmer::type_string(
+        "Mono treatmentResponse table name. Defaults to mono_profiles.",
+        required = FALSE
+      ),
+      mono_metric = ellmer::type_string(
+        "Monotherapy metric column. Defaults to aac_recomputed.",
+        required = FALSE
+      ),
+      method = ellmer::type_string(
+        "One of spearman, pearson, or wilcoxon. Defaults to spearman.",
+        required = FALSE
+      ),
+      match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      symmetric = ellmer::type_boolean(
+        "Whether treatment1/treatment2 order can be swapped. Defaults to TRUE.",
+        required = FALSE
+      ),
+      feature_match_mode = ellmer::type_string(
+        "One of exact or contains. Defaults to exact.",
+        required = FALSE
+      ),
+      summary_stat = ellmer::type_string(
+        "Optional molecular summary.stat override.",
+        required = FALSE
+      ),
+      p_adjust_method = ellmer::type_string(
+        "p.adjust method. Defaults to BH.",
+        required = FALSE
+      )
+    )
+  ),
+  pgx_detect_assay_mode = pgx_tool(
     fun = pgx_detect_assay_mode,
     name = "pgx_detect_assay_mode",
     description = "Detect whether a bundled PharmacoGx dataset appears monotherapy, combination, mixed, or perturbation-only.",
@@ -3325,7 +5317,7 @@ res <- list(
       )
     )
   ),
-  pgx_find_pset_overlap = ellmer::tool(
+  pgx_find_pset_overlap = pgx_tool(
     fun = pgx_find_pset_overlap,
     name = "pgx_find_pset_overlap",
     description = "Find shared samples, treatments, and sample-treatment pairs across bundled PharmacoGx datasets.",
@@ -3341,16 +5333,16 @@ res <- list(
       )
     )
   ),
-  pgx_compare_pset_response = ellmer::tool(
+  pgx_compare_pset_response = pgx_tool(
     fun = pgx_compare_pset_response,
     name = "pgx_compare_pset_response",
     description = paste(
-      "Compare response values for the same drug and metric across bundled",
-      "PharmacoGx datasets using exact sample IDs."
+      "Compare response values for the same drug and metric across bundled or",
+      "local PharmacoSets using exact sample IDs."
     ),
     arguments = list(
       datasets = ellmer::type_array(
-        "Dataset names to compare.",
+        "Dataset names, local manifest aliases, or explicit .qs/.rds paths.",
         items = ellmer::type_string(),
         required = FALSE
       ),
@@ -3370,7 +5362,7 @@ res <- list(
       )
     )
   ),
-  pgx_summarize_sensitivity = ellmer::tool(
+  pgx_summarize_sensitivity = pgx_tool(
     fun = pgx_summarize_sensitivity,
     name = "pgx_summarize_sensitivity",
     description = paste(
@@ -3379,11 +5371,17 @@ res <- list(
     ),
     arguments = list(
       dataset = ellmer::type_string(
-        "One of GDSCsmall or CCLEsmall. Defaults to GDSCsmall.",
+        paste(
+          "Bundled dataset, local manifest alias, or explicit .qs/.rds path.",
+          "Defaults to GDSCsmall."
+        ),
         required = FALSE
       ),
       sensitivity_measure = ellmer::type_string(
-        "Sensitivity measure such as auc_recomputed, auc_published, or ic50_recomputed.",
+        paste(
+          "Sensitivity measure such as auc_recomputed or ic50_recomputed.",
+          "Unavailable measures return a catalog instead of raising an error."
+        ),
         required = FALSE
       ),
       drugs = ellmer::type_array(
@@ -3402,7 +5400,7 @@ res <- list(
       )
     )
   ),
-  pgx_top_responders = ellmer::tool(
+  pgx_top_responders = pgx_tool(
     fun = pgx_top_responders,
     name = "pgx_top_responders",
     description = paste(
@@ -3411,7 +5409,10 @@ res <- list(
     ),
     arguments = list(
       dataset = ellmer::type_string(
-        "One of GDSCsmall or CCLEsmall. Defaults to GDSCsmall.",
+        paste(
+          "Bundled dataset, local manifest alias, or explicit .qs/.rds path.",
+          "Defaults to GDSCsmall."
+        ),
         required = FALSE
       ),
       drug = ellmer::type_string("Treatment name to rank."),
@@ -3429,7 +5430,7 @@ res <- list(
       )
     )
   ),
-  pgx_compute_dose_response_metrics = ellmer::tool(
+  pgx_compute_dose_response_metrics = pgx_tool(
     fun = pgx_compute_dose_response_metrics,
     name = "pgx_compute_dose_response_metrics",
     description = paste(
@@ -3455,7 +5456,7 @@ res <- list(
       )
     )
   ),
-  pgx_compute_synergy_reference = ellmer::tool(
+  pgx_compute_synergy_reference = pgx_tool(
     fun = pgx_compute_synergy_reference,
     name = "pgx_compute_synergy_reference",
     description = paste(
@@ -3477,7 +5478,7 @@ res <- list(
       )
     )
   ),
-  pgx_list_available_psets = ellmer::tool(
+  pgx_list_available_psets = pgx_tool(
     fun = pgx_list_available_psets,
     name = "pgx_list_available_psets",
     description = paste(
@@ -3495,7 +5496,7 @@ res <- list(
       )
     )
   ),
-  pgx_download_pset = ellmer::tool(
+  pgx_download_pset = pgx_tool(
     fun = pgx_download_pset,
     name = "pgx_download_pset",
     description = paste(
@@ -3524,7 +5525,7 @@ res <- list(
       )
     )
   ),
-  pgx_session_info = ellmer::tool(
+  pgx_session_info = pgx_tool(
     fun = pgx_session_info,
     name = "pgx_session_info",
     description = "Return R and package version metadata for the PharmacoGx MCP demo.",

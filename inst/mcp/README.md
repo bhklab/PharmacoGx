@@ -7,6 +7,30 @@ The demo exposes JSON-serializable wrappers around bundled toy datasets, local
 `.qs`/`.rds` PharmacoSet files, and dose-response utilities rather than raw S4
 objects or arbitrary R evaluation.
 
+## Local PSet Manifest
+
+The MCP tools also look for `inst/mcp/local-pset-manifest.csv`, or the path in
+`PHARMACOGX_LOCAL_PSET_MANIFEST`, to resolve short dataset aliases to local
+`.qs`/`.rds` PharmacoSet files. In the PGX3 development workspace, the manifest
+includes:
+
+- `nci_almanac`: canonical NCI-ALMANAC combo PSet at
+  `/Users/michael/Projects/BHKLab/pgx3/nci_almanac_pset_5.rds`.
+- `gdsc2_matrix`: GDSC2 Matrix combo PSet.
+- `gdsc2_anchor`: GDSC2 Anchor combo PSet.
+- `prism`, `hmcl`, and `nci60_legacy`: additional local demo/reference PSets.
+
+Call `pgx_list_local_psets()` before real-data demos to confirm which aliases
+exist on the current machine. Explicit local file paths still work when a PSet
+is not listed in the manifest.
+
+The local aliases are read-only analysis inputs. `nci_almanac` is large and can
+take about a minute to load from cold storage, so use one long-lived R/MCP
+session for multi-step combo demos. Some legacy aliases, such as `prism` and
+`nci60_legacy`, use older serialized PharmacoSet slots; the MCP includes
+read-only fallbacks for metadata, molecular profile, and sensitivity-profile
+access where those legacy tables are present.
+
 ## Requirements
 
 Install the optional agent integration packages in the R environment used by
@@ -29,6 +53,20 @@ From a source checkout:
 ```sh
 Rscript inst/mcp/run-pharmacogx-mcp.R
 ```
+
+When the runner is started from a source checkout, it uses the sibling
+`PharmacoGx-tools.R` file before any installed-package copy. Restart the MCP
+server after editing the tool file; an already-running stdio server keeps the
+version it sourced at startup. The runner also loads the PharmacoGx namespace
+from the checkout with `pkgload` by default, avoiding mismatches between the
+branch and an older installed package. Set
+`PHARMACOGX_MCP_USE_SOURCE_PACKAGE=false` to use the installed package instead.
+
+Set `PHARMACOGX_MCP_LOG_FILE` to capture tool start, success, and R error
+details without writing diagnostics to the stdio protocol stream. The VS Code
+example in `.vscode/mcp.json` writes to `.vscode/pharmacogx-mcp.log`.
+`pgx_session_info()` reports the active tool file, its modification time, the
+server start time, process ID, and log path for troubleshooting stale servers.
 
 From an installed package:
 
@@ -79,6 +117,12 @@ If no live session is registered, the tools run in the MCP server process.
   Doxorubicin response in the toy data, and explain the limitations."
 - "Which samples, treatments, and sample-treatment pairs overlap between
   GDSCsmall and CCLEsmall?"
+- "List local PSet aliases, then use `nci_almanac` to list treatmentResponse
+  tables and score candidates."
+- "Using `nci_almanac`, rank high-confidence synergistic combinations by
+  `ZIP_delta`, then plot a heatmap for the top pair."
+- "Using `nci_almanac`, compare selected RNA biomarker associations for a drug
+  pair against each monotherapy arm."
 - "Using this local GDSC-square Matrix `.qs` file path, list treatmentResponse
   tables and rank high-confidence synergistic drug combinations."
 - "Find candidate biomarkers for Gemcitabine, then test SLC29A1/hENT1 support
