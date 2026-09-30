@@ -1341,6 +1341,85 @@ pgx_molecular_profile_capabilities <- function(pset) {
   do.call(rbind, rows)
 }
 
+pgx_summarize_profile_by_sample <- function(
+  profile,
+  features,
+  samples,
+  summary_stat
+) {
+  summary_stat <- match.arg(
+    summary_stat,
+    c("mean", "median", "first", "last", "and", "or")
+  )
+  feature_ids <- intersect(features, rownames(profile))
+  sample_ids <- colnames(profile)
+  if (inherits(profile, "SummarizedExperiment")) {
+    annotation <- as.data.frame(SummarizedExperiment::colData(profile))
+    id_fields <- intersect(c("cellid", "sampleid"), names(annotation))
+    if (length(id_fields) > 0L) {
+      sample_ids <- as.character(annotation[[id_fields[[1L]]]])
+    }
+  }
+  if (
+    length(sample_ids) != ncol(profile) ||
+      anyNA(sample_ids) ||
+      any(!nzchar(trimws(sample_ids)))
+  ) {
+    stop("Molecular assay columns have missing biological sample identifiers.")
+  }
+  sample_keep <- intersect(samples, sample_ids)
+  # Subset features before materializing a potentially large expression assay.
+  mat <- pgx_plain_matrix(profile[feature_ids, , drop = FALSE])
+  result <- matrix(
+    NA_real_,
+    nrow = length(feature_ids),
+    ncol = length(sample_keep),
+    dimnames = list(feature_ids, sample_keep)
+  )
+  summarize_values <- function(values) {
+    if (summary_stat == "first") {
+      return(values[[1L]])
+    }
+    if (summary_stat == "last") {
+      return(values[[length(values)]])
+    }
+    if (summary_stat %in% c("and", "or")) {
+      if (!all(is.na(values) | values %in% c(0, 1))) {
+        stop("Logical molecular aggregation requires binary 0/1 values.")
+      }
+      if (all(is.na(values))) {
+        return(NA_real_)
+      }
+      return(as.numeric(
+        if (summary_stat == "and") {
+          all(as.logical(as.numeric(values)), na.rm = TRUE)
+        } else {
+          any(as.logical(as.numeric(values)), na.rm = TRUE)
+        }
+      ))
+    }
+    if (!is.numeric(values)) {
+      stop("Mean/median molecular aggregation requires numeric values.")
+    }
+    values <- values[is.finite(values)]
+    if (length(values) == 0L) {
+      return(NA_real_)
+    }
+    if (summary_stat == "median") median(values) else mean(values)
+  }
+  for (sample in sample_keep) {
+    columns <- which(sample_ids == sample)
+    result[, sample] <- vapply(
+      seq_along(feature_ids),
+      function(i) {
+        summarize_values(mat[i, columns])
+      },
+      numeric(1)
+    )
+  }
+  result
+}
+
 pgx_summarize_molecular_profiles <- function(
   pset,
   mDataType,
@@ -1354,10 +1433,12 @@ pgx_summarize_molecular_profiles <- function(
       stop("Molecular profile '", mDataType, "' was not found.")
     }
 
-    mat <- pgx_plain_matrix(profile)
-    feature_keep <- intersect(features, rownames(mat))
-    sample_keep <- intersect(cell.lines, colnames(mat))
-    return(mat[feature_keep, sample_keep, drop = FALSE])
+    return(pgx_summarize_profile_by_sample(
+      profile,
+      features,
+      cell.lines,
+      summary.stat
+    ))
   }
 
   summarized <- tryCatch(
@@ -1380,10 +1461,7 @@ pgx_summarize_molecular_profiles <- function(
     stop("Molecular profile '", mDataType, "' was not found.")
   }
 
-  mat <- pgx_plain_matrix(profile)
-  feature_keep <- intersect(features, rownames(mat))
-  sample_keep <- intersect(cell.lines, colnames(mat))
-  mat[feature_keep, sample_keep, drop = FALSE]
+  pgx_summarize_profile_by_sample(profile, features, cell.lines, summary.stat)
 }
 
 pgx_select_fields <- function(x, id_name, fields = NULL) {
@@ -2937,10 +3015,13 @@ pgx_feature_response_association <- function(
       }
       y <- as.numeric(response_values[common_samples])
       complete <- stats::complete.cases(x, y) & is.finite(y)
+      if (is.numeric(x)) {
+        complete <- complete & is.finite(x)
+      }
       x <- x[complete]
       y <- y[complete]
 
-      if (length(y) < 3 || length(unique(x)) < 2) {
+      if (length(y) < 3 || length(unique(x)) < 2 || length(unique(y)) < 2) {
         return(data.frame(
           feature = feature_id,
           method = method,
@@ -2952,7 +3033,7 @@ pgx_feature_response_association <- function(
       }
 
       if (method %in% c("spearman", "pearson") && is.numeric(x)) {
-        test <- suppressWarnings(stats::cor.test(x, y, method = method))
+        test <- stats::cor.test(x, y, method = method, exact = FALSE)
         effect <- unname(test$estimate)
         p_value <- test$p.value
         method_used <- method
@@ -2986,6 +3067,11 @@ pgx_feature_response_association <- function(
   )
 
   results$fdr <- stats::p.adjust(results$p_value, method = p_adjust_method)
+  results$p_value_method <- ifelse(
+    results$method == "spearman",
+    "asymptotic (exact=FALSE)",
+    ifelse(results$method == "pearson", "Pearson t-test", "wilcoxon default")
+  )
   results
 }
 
@@ -6767,7 +6853,9 @@ res <- list(
     name = "pgx_association_test",
     description = paste(
       "Run exploratory feature-response associations for one drug using",
-      "summarized molecular profiles and sensitivity metrics."
+      "summarized molecular profiles and sensitivity metrics.",
+      "Spearman p-values are two-sided asymptotic (exact=FALSE).",
+      "p_adjust_method applies within this call, not across separate datasets."
     ),
     arguments = list(
       dataset = ellmer::type_string(
