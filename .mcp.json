@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "pharmacogx": {
+      "type": "stdio",
+      "command": "Rscript",
+      "args": [
+        "-e",
+        "source(file.path(Sys.getenv('CLAUDE_PROJECT_DIR', unset = getwd()), 'inst', 'mcp', 'run-pharmacogx-mcp.R'), chdir = TRUE)"
+      ],
+      "env": {
+        "PHARMACOGX_MCP_USE_SOURCE_PACKAGE": "true",
+        "PHARMACOGX_MCP_SINGLE_CONTENT": "true",
+        "PHARMACOGX_MCP_SESSION_TOOLS": "false"
+      }
+    }
+  }
+}

@@ -24,6 +24,11 @@ AGENTS.md
 !.github
 !.gitignore
 !.mcp.json
+!.claude/
+.claude/*
+!.claude/skills/
+!.claude/skills/pharmacogx-agentic-analysis/
+!.claude/skills/pharmacogx-agentic-analysis/SKILL.md
 !.vscode/
 .vscode/*
 !.vscode/mcp.json
