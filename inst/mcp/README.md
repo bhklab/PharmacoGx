@@ -78,6 +78,24 @@ the index.
 
 ## Requirements
 
+### Legacy molecular profiles and inference
+
+Archived PharmacoSets can store molecular assay IDs as matrix column names
+and biological cell-line IDs in `colData$cellid` (or `sampleid`). MCP maps
+through that annotation before aggregating replicate assays using the requested
+`summary_stat`. Already sample-labelled matrices remain supported. Missing
+mapping identifiers produce an explicit error rather than fabricated coverage.
+Mean/median summaries use finite measurements and preserve all-missing groups
+as `NA`. Binary `and`/`or` summaries require 0/1 values; `first`/`last` retain
+assay order.
+
+Correlation tests use finite complete pairs and return no estimate for a
+constant variable. Spearman p-values are explicitly two-sided and asymptotic
+(`exact=FALSE`), reported in `p_value_method`. Adjustments within a single
+association call do not replace correction across a pre-specified family of
+separate dataset tests. These behaviours were checked against independently
+computed GDSC2 and gCSI2019 results; they are not a claim of biomarker validation.
+
 Install the optional agent integration packages in the R environment used by
 your MCP client:
 
@@ -140,9 +158,38 @@ Example client configuration:
 
 ## Development Host Setup
 
-The workspace includes `.vscode/mcp.json` for VS Code. Use the client example
-above for other MCP-compatible development hosts. These are adapters for exercising
+The workspace includes `.vscode/mcp.json` for VS Code and `.mcp.json` for
+Claude Code (including local Code sessions in the Claude desktop app).
+The Claude Skill entry point in `.claude/skills/pharmacogx-agentic-analysis`
+loads the canonical Skill under `inst/skills`, avoiding duplicated scientific
+instructions. These are adapters for exercising
 the same plugin surface that Claude, Biomni, and other compatible hosts load.
+
+### Claude Code
+
+1. Install the R integration dependencies above and open this repository as
+   the local session folder. Review and approve workspace/server trust when
+   requested. This grants the local server access under your OS account; it
+   is not a sandbox or a remote hosted service.
+2. Start a fresh session after adding or changing `.mcp.json`. The launcher
+   uses `Rscript` from the host's PATH and resolves the repository using
+   `CLAUDE_PROJECT_DIR` (or the working directory if unset). No developer path
+   or API key is embedded in the configuration.
+3. Ask Claude to use `pharmacogx-agentic-analysis`, discover the actual
+   `pgx_*` tools and call `pgx_session_info`. Stop if tools are unavailable;
+   direct R execution is not evidence of MCP integration.
+4. For a no-download smoke test, check `GDSCsmall` for `Doxorubicin` and
+   `auc_recomputed`, with `include_local=false`, then request three top
+   responders. Label this a bundled toy integration test.
+
+A Claude Code desktop session was tested on 2026-09-30: the Skill loaded,
+33 tools were discovered, and session information, requirements preflight
+and responder ranking succeeded through MCP. This is not a scientific
+benchmark or verification of another user's installation. Regular Claude
+web chat does not launch this project-local stdio configuration.
+
+### VS Code
+
 The VS Code configuration:
 
 - starts the source runner with `${workspaceFolder}` paths
