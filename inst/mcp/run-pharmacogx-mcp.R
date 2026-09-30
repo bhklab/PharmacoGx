@@ -91,6 +91,10 @@ write(
     "server_start",
     paste0("pid=", Sys.getpid()),
     paste0("transport=", Sys.getenv("PHARMACOGX_MCP_TRANSPORT", "stdio")),
+    paste0(
+      "session_tools=",
+      Sys.getenv("PHARMACOGX_MCP_SESSION_TOOLS", "false")
+    ),
     paste0("package_source=", Sys.getenv("PHARMACOGX_MCP_PACKAGE_SOURCE")),
     paste0("tool_file=", normalizePath(tool_file, mustWork = TRUE)),
     sep = "\t"
@@ -101,9 +105,15 @@ write(
 
 transport <- Sys.getenv("PHARMACOGX_MCP_TRANSPORT", "stdio")
 port <- as.integer(Sys.getenv("MCPTOOLS_PORT", "8080"))
+session_tools <- tolower(Sys.getenv(
+  "PHARMACOGX_MCP_SESSION_TOOLS",
+  "false"
+)) %in%
+  c("1", "true", "yes", "on")
 
 mcptools::mcp_server(
   tools = tool_file,
   type = transport,
-  port = port
+  port = port,
+  session_tools = session_tools
 )
