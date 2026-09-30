@@ -1,14 +1,21 @@
-# PharmacoGx Agentic Architecture And Manuscript Figures
+# PharmacoGx Plugin Architecture And Manuscript Figures
+
+PharmacoGx is a portable skill-and-tool plugin for external agent platforms. It
+does not define a standalone agent or prescribe a foundation model.
 
 ## Architecture Schematic
 
 ```mermaid
 flowchart LR
-  A["PharmacoGx PSets\nbundled, downloaded, or local .qs/.rds"] --> B["R session\nPharmacoGx + CoreGx"]
-  B --> C["PharmacoGx MCP tools\nbounded JSON-safe analysis"]
-  C --> D["Agent skills\nworkflow policy and guardrails"]
-  D --> E["Agent frameworks\nCodex, Biomni, ToolUniverse"]
-  E --> F["Outputs\nrankings, plots, biomarker evidence, reports"]
+  A["Host platforms\nClaude, Biomni, compatible agents"] --> B["PharmacoGx skills\nworkflow policy and guardrails"]
+  B --> C["PharmacoGx MCP tools\nbounded JSON-safe execution"]
+  B --> W["Declared direct-R route\nBiomni web skill-only"]
+  C --> D["R session\nPharmacoGx + CoreGx"]
+  W --> D
+  D --> E["PharmacoSets\nlocal, bundled, or ORCESTRA-provided"]
+  E --> D
+  C --> F["Evidence returned to host\nrankings, plots, provenance, limitations"]
+  W --> F
 
   C --> G["Biomarker workflows\nsingle PSet and per-PSet consensus"]
   C --> H["Combo workflows\nsynergy ranking and combo biomarkers"]
@@ -17,8 +24,8 @@ flowchart LR
 
 ## Candidate Figures
 
-1. Architecture schematic showing PharmacoGx PSets, R/MCP execution, skills,
-   and agent frameworks.
+1. Plugin schematic showing external hosts, shared Skills, typed MCP and
+   Skill-only direct-R execution, and local or ORCESTRA-provided PharmacoSets.
 2. Gemcitabine biomarker case study seeded by SLC29A1/hENT1, with PSet-backed
    evidence and external context kept separate.
 3. Multi-PSet biomarker consensus workflow showing independent per-PSet tests
@@ -39,3 +46,13 @@ flowchart LR
 - Explain why a combo biomarker result is exploratory when sample or feature
   support is sparse.
 - Distinguish toy-data demonstrations from real local PSet-backed analyses.
+
+## Deployment Stages
+
+1. Skill-only Biomni web demonstration using the current PharmacoGx PSet
+   catalog, approved downloads, and direct R.
+2. ORCESTRA metadata discovery once the query API is available.
+3. Hosted authenticated MCP endpoint registered as a Biomni web custom
+   connector.
+4. Matched baseline, Skill, MCP, and Skill+MCP evaluation before manuscript
+   claims are finalized.

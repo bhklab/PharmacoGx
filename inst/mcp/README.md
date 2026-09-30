@@ -1,35 +1,80 @@
-# PharmacoGx Agentic Integration Demo
+# PharmacoGx Agent Plugin
 
-This directory contains an optional Model Context Protocol (MCP) demo for
-calling a small, curated PharmacoGx analysis surface from agentic systems.
+This directory contains the typed execution layer for a portable PharmacoGx
+plugin. External hosts load the shared PharmacoGx Skill for workflow policy.
+Hosts with MCP support can call this server for bounded execution; hosts such
+as Biomni web can initially use the same Skill with a declared direct-R route.
+PharmacoGx does not ship a standalone agent or its own model-level planner.
 
 The demo exposes JSON-serializable wrappers around bundled toy datasets, local
 `.qs`/`.rds` PharmacoSet files, and dose-response utilities rather than raw S4
 objects or arbitrary R evaluation.
 
-## Local PSet Manifest
+## Local PSet Discovery
 
-The MCP tools also look for `inst/mcp/local-pset-manifest.csv`, or the path in
-`PHARMACOGX_LOCAL_PSET_MANIFEST`, to resolve short dataset aliases to local
-`.qs`/`.rds` PharmacoSet files. In the PGX3 development workspace, the manifest
-includes:
+No developer machine, shared lab mount, or pre-existing data collection is
+required. Each user runs R and this MCP server on their own computer or an
+approved compute host. The model host calls the server; it does not execute R
+merely by loading the Skill. A hosted, authenticated remote MCP service is a
+separate deployment, not a prerequisite for this local stdio MVP.
 
-- `nci_almanac`: canonical NCI-ALMANAC combo PSet at
-  `/Users/michael/Projects/BHKLab/pgx3/nci_almanac_pset_5.rds`.
-- `gdsc2_matrix`: GDSC2 Matrix combo PSet.
-- `gdsc2_anchor`: GDSC2 Anchor combo PSet.
-- `prism`, `hmcl`, and `nci60_legacy`: additional local demo/reference PSets.
+### Downloading from the current ORCESTRA service
 
-Call `pgx_list_local_psets()` before real-data demos to confirm which aliases
-exist on the current machine. Explicit local file paths still work when a PSet
-is not listed in the manifest.
+1. Call `pgx_list_available_psets(canonical = FALSE)` to obtain the current
+   ORCESTRA catalogue and exact PSet names.
+2. Ask the user to approve the dataset, download location and resource use.
+3. Call `pgx_download_pset(name = "<exact PSet name>", confirm_download = TRUE)`.
+   This delegates to `PharmacoGx::downloadPSet()`. By default it saves under
+   `file.path(tools::R_user_dir("PharmacoGx", "data"), "psets")`, not a temporary
+   directory. This directory is automatically scanned on subsequent sessions.
+4. Pass the returned `file_path` to `pgx_check_analysis_requirements()` and
+   analysis tools. A custom download directory need not be in the discovery
+   roots; use the file path directly or configure `PHARMACOGX_LOCAL_PSET_DIRS`.
 
-The local aliases are read-only analysis inputs. `nci_almanac` is large and can
-take about a minute to load from cold storage, so use one long-lived R/MCP
-session for multi-step combo demos. Some legacy aliases, such as `prism` and
-`nci60_legacy`, use older serialized PharmacoSet slots; the MCP includes
-read-only fallbacks for metadata, molecular profile, and sensitivity-profile
-access where those legacy tables are present.
+The existing ORCESTRA catalogue supplies the download URL. Downloads may still
+use Zenodo and be slow; increase the timeout when appropriate. Neither entity
+coverage discovery (genes, cell lines, drugs) nor GCP-backed downloads is assumed
+available. Both remain future ORCESTRA collaboration work. Catalogue membership
+alone does not establish that a PSet supports a particular analysis. No large
+download is made automatically to answer a feasibility question.
+
+`pgx_list_local_psets()` combines two local discovery mechanisms:
+
+1. An optional manifest from `PHARMACOGX_LOCAL_PSET_MANIFEST` or
+   `inst/mcp/local-pset-manifest.csv`.
+2. Recursive discovery of likely PSet `.rds` and `.qs` files under the
+   directories in `PHARMACOGX_LOCAL_PSET_DIRS`, plus the source checkout's
+   `local_data` directory and the PharmacoGx user data directory.
+
+Multiple discovery directories use the platform path separator. Manifest paths
+may be relative to the manifest file, so shared configuration does not require
+machine-specific absolute paths. Explicit local file paths also remain valid.
+
+Auto-discovered names remove a leading `PSet_` and use lowercase snake case.
+Known local names such as `NCI_ALMANAC_2017.rds` and `PSet_PRISM.rds` resolve to
+`nci_almanac` and `prism`. Use `pgx_check_analysis_requirements()` before
+loading several PSets or attempting an association.
+
+Local requirements checks run in isolated R workers and retain only compact
+capability snapshots in the long-lived MCP process. A large or malformed PSet
+therefore cannot consume the server's memory and cause later datasets to be
+reported as unavailable. Snapshots are invalidated when the PSet or MCP tool
+file changes and are cached under `PHARMACOGX_MCP_CAPABILITY_CACHE_DIR`, or the
+platform PharmacoGx cache directory by default. Set
+`PHARMACOGX_MCP_PROBE_TIMEOUT` to change the default 300-second per-PSet probe
+limit.
+
+The requirements check resolves exact identifiers across PSet annotations,
+including treatment names, PubChem CIDs, gene symbols, versioned Ensembl IDs,
+and dataset-specific row identifiers. When no PSet meets every requirement, it
+returns the closest successfully checked candidates and separates them from
+files that could not be loaded. The remote `availablePSets()` table is not a
+coverage index and is not used as an automatic fallback.
+
+Directories named `PSets` are treated as curated PSet collections. In broader
+project trees, discovery requires `pset` in the filename or a recognized PSet
+filename, which prevents unrelated serialized analysis tables from entering
+the index.
 
 ## Requirements
 
@@ -40,11 +85,17 @@ your MCP client:
 if (!requireNamespace("pak", quietly = TRUE)) {
   install.packages("pak")
 }
-pak::pkg_install(c("mcptools", "ellmer", "btw"))
+pak::pkg_install(c("bhklab/PharmacoGx@feat/mcp", "mcptools", "ellmer"))
 ```
 
-`btw` is optional but useful when an MCP client also needs general R session
-inspection tools.
+Until this branch is merged, install `feat/mcp`, not the release package. Record
+the installed `RemoteSha` for reproducibility. For checkout development also
+install `pkgload`; transport smoke testing additionally requires `processx`.
+Local unpushed changes are not included in a GitHub installation.
+
+General R session tools are disabled by default to keep VS Code focused on the
+curated PharmacoGx surface. Set `PHARMACOGX_MCP_SESSION_TOOLS=true` only when a
+live general-purpose R session is intentionally needed.
 
 ## Start The MCP Server
 
@@ -71,7 +122,7 @@ server start time, process ID, and log path for troubleshooting stale servers.
 From an installed package:
 
 ```sh
-Rscript -e "mcptools::mcp_server(tools = system.file('mcp', 'PharmacoGx-tools.R', package = 'PharmacoGx'))"
+Rscript -e "source(system.file('mcp', 'run-pharmacogx-mcp.R', package = 'PharmacoGx'), chdir = TRUE)"
 ```
 
 Example client configuration:
@@ -87,15 +138,56 @@ Example client configuration:
 }
 ```
 
-To let the MCP server route tool calls into a live R session, run this inside
-that R session:
+## Development Host Setup
+
+The workspace includes `.vscode/mcp.json` for VS Code. Use the client example
+above for other MCP-compatible development hosts. These are adapters for exercising
+the same plugin surface that Claude, Biomni, and other compatible hosts load.
+The VS Code configuration:
+
+- starts the source runner with `${workspaceFolder}` paths
+- scans `${workspaceFolder}/local_data` and the current user's PSet data directory
+- returns one JSON content block per tool call
+- disables unrelated R-session tools
+- restarts the MCP server when an `inst/mcp/*.R` file changes
+
+After opening the checkout in VS Code:
+
+1. Run **MCP: List Servers**, select `pgx`, and choose **Restart**.
+2. If tools were previously cached, run **MCP: Reset Cached Tools**.
+3. Ask a pharmacogenomic question through the host's ordinary agent. For
+   biomarker questions, the
+   generic skill can load automatically, or invoke it explicitly with
+   `/biomarker-validation` followed by the question.
+4. Confirm that the first call is `pgx_session_info` and that a requirements
+   preflight occurs before analysis. Treat terminal or generic-R fallback as an
+   evaluation failure when the question requires plugin-backed evidence.
+
+The reusable instruction layers are:
+
+```text
+.github/skills/biomarker-validation/SKILL.md
+inst/skills/pharmacogx-agentic-analysis/SKILL.md
+```
+
+Run the transport-level smoke test after changing the registry or runner:
+
+```sh
+Rscript inst/mcp/smoke-test-pharmacogx-mcp.R
+```
+
+To intentionally expose general R-session routing, set
+`PHARMACOGX_MCP_SESSION_TOOLS=true`, restart the server, and run this inside the
+target R session:
 
 ```r
 library(PharmacoGx)
 mcptools::mcp_session()
 ```
 
-If no live session is registered, the tools run in the MCP server process.
+The normal VS Code configuration keeps this disabled. Analysis tools share one
+persistent MCP process, while local capability discovery uses isolated workers
+and stores only lightweight snapshots in the server.
 
 ## Demo Prompts
 
@@ -125,18 +217,38 @@ If no live session is registered, the tools run in the MCP server process.
   pair against each monotherapy arm."
 - "Using this local GDSC-square Matrix `.qs` file path, list treatmentResponse
   tables and rank high-confidence synergistic drug combinations."
-- "Find candidate biomarkers for Gemcitabine, then test SLC29A1/hENT1 support
-  across available PSets without pooling raw data."
+- "For a biomarker, treatment, and disease context I provide, identify which
+  PSets contain all required response, sample, and molecular data before
+  attempting an association."
+- "Validate a user-provided molecular feature against treatment response in
+  each compatible PSet independently, then compare effect direction and
+  uncertainty without pooling raw data."
 - "For this GDSC-square drug combo, test whether mutation or CNV features are
   associated with the combo synergy score."
-- "List remote PharmacoSets available for download, then ask me before
-  downloading one."
+- "Use `availablePSets()` through the remote catalog tool to list downloadable
+  PharmacoSets, then ask me before calling the guarded `downloadPSet()` tool."
 
 ## Biomni
 
-Biomni can import external MCP servers with `agent.add_mcp(config_path = ...)`.
-Use `biomni-mcp-config.yaml` as a template and replace the script path with the
-absolute path to `run-pharmacogx-mcp.R`.
+Biomni has two distinct integration paths:
+
+1. The open-source Python client can start a local stdio MCP server with
+   `agent.add_mcp(config_path = ...)`. Use `biomni-mcp-config.yaml` as a
+   template and replace the script path with the absolute path to
+   `run-pharmacogx-mcp.R`.
+2. Biomni web can attach the portable Skill and execute PharmacoGx through R.
+   Its custom MCP connector requires an organization administrator to register
+   a remotely reachable HTTPS MCP URL and configure OAuth or per-user token
+   authentication. The local stdio template is not a web-portal connector.
+
+For the immediate Biomni web route, attach the complete
+`inst/skills/pharmacogx-agentic-analysis` folder and follow
+`references/biomni-web.md`. Record the evaluation condition as `skill`, not
+`plugin`. During pre-merge testing, that route installs exactly
+`bhklab/PharmacoGx@feat/mcp` with `pak` and verifies the installed Git reference
+and commit before analysis. It must not fall back to Bioconductor or another
+GitHub branch. A future hosted, authenticated server can be evaluated as
+`plugin`.
 
 ## ToolUniverse
 
@@ -150,7 +262,7 @@ PHARMACOGX_MCP_TRANSPORT=http MCPTOOLS_PORT=8080 \
 
 Then load `tooluniverse-mcp-tools-config.json` from ToolUniverse.
 
-## Agent Skill
+## Plugin Skill
 
 The companion skill is at:
 
@@ -158,9 +270,31 @@ The companion skill is at:
 inst/skills/pharmacogx-agentic-analysis/SKILL.md
 ```
 
-Install or copy that skill into the skill directory supported by your agent
-harness. The skill is an instruction/routing layer only; MCP remains the
-execution layer.
+Install or copy the complete skill folder into the skill area supported by the
+host platform so its conditional references remain available. The Skill is the
+shared workflow layer. MCP is the preferred typed execution route when it is
+available, while direct R is an explicit constrained route for hosts without
+the connector. Host-specific configuration should remain a thin adapter.
+
+## Evaluation
+
+The host-neutral development suite lives under `inst/agentic-eval/`. Validate
+the case manifest and initialize a run record with:
+
+```sh
+Rscript inst/agentic-eval/scripts/validate-cases.R
+Rscript inst/agentic-eval/scripts/init-run.R \
+  --host biomni-web \
+  --condition skill \
+  --model MODEL_ID \
+  --plugin-commit GIT_COMMIT \
+  --output /path/to/run.json
+```
+
+Claude, Biomni, and future hosts should receive identical prompts for matched
+comparisons. Host adapters write the raw response, execution trace, artifacts,
+timing, and adjudication into the initialized record. Development cases may be
+used to improve the plugin; locked benchmark cases must not be used for tuning.
 
 ## Guardrails
 

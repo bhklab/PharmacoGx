@@ -1,0 +1,25 @@
+{
+	"servers": {
+		"pgx": {
+			"type": "stdio",
+			"command": "Rscript",
+			"args": [
+				"${workspaceFolder}/inst/mcp/run-pharmacogx-mcp.R"
+			],
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"PHARMACOGX_MCP_LOG_FILE": "${workspaceFolder}/.vscode/pharmacogx-mcp.log",
+				"PHARMACOGX_MCP_USE_SOURCE_PACKAGE": "true",
+				"PHARMACOGX_LOCAL_PSET_DIRS": "${workspaceFolder}/local_data",
+				"PHARMACOGX_MCP_SINGLE_CONTENT": "true",
+				"PHARMACOGX_MCP_SESSION_TOOLS": "false"
+			},
+			"dev": {
+				"watch": [
+					"inst/mcp/*.R"
+				]
+			}
+		}
+	},
+	"inputs": []
+}

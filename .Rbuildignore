@@ -1,7 +1,12 @@
 vignettes/figure
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
+^AGENTS\.md$
 \\..*
+^\.env\.template$
+^\.mcp\.json$
+^\.claude$
+^\.vscode$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$

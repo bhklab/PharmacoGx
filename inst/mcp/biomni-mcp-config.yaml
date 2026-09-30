@@ -1,3 +1,7 @@
+# This template is for the open-source Biomni Python client, which can start a
+# local stdio MCP process. Biomni web requires a hosted HTTPS MCP endpoint and
+# administrator-managed connector configuration; do not upload this file as a
+# web-portal connector.
 mcp_servers:
   pharmacogx:
     enabled: true
@@ -10,28 +14,84 @@ mcp_servers:
         description: "List bundled PharmacoGx demo datasets"
         parameters: {}
       - biomni_name: pgx_list_local_psets
-        description: "List local PSet manifest aliases for real PSet-backed demos"
+        description: "Discover local PSet files and their reusable aliases"
         parameters:
           manifest_path:
             type: str
             required: false
-          include_missing:
+          roots:
+            type: list
+            required: false
+            description: "Optional directories to scan recursively for likely PSet .rds and .qs files"
+          discover:
             type: bool
             required: false
             default: true
+          include_missing:
+            type: bool
+            required: false
+            default: false
+      - biomni_name: pgx_check_analysis_requirements
+        description: "Check candidate PSets for all data needed by an analysis before loading or downloading anything"
+        parameters:
+          datasets:
+            type: list
+            required: false
+          drug:
+            type: str
+            required: false
+          sample_query:
+            type: str
+            required: false
+          metric:
+            type: str
+            required: false
+          mDataType:
+            type: str
+            required: false
+          features:
+            type: list
+            required: false
+          include_local:
+            type: bool
+            required: false
+            default: true
+          include_bundled:
+            type: bool
+            required: false
+            default: true
+          limit:
+            type: int
+            required: false
+            default: 50
       - biomni_name: pgx_list_entities
-        description: "List treatments, samples, sensitivity measures, or datasets"
+        description: "Search or page through treatments, samples, or sensitivity measures"
         parameters:
           dataset:
             type: str
             required: false
             default: "GDSCsmall"
-            description: "One of GDSCsmall, CCLEsmall, or CMAPsmall"
+            description: "A bundled dataset name, discovered local alias, or local PSet path"
           entity:
             type: str
             required: false
             default: "treatments"
-            description: "treatments, samples, sensitivity_measures, or datasets"
+            description: "treatments, samples, or sensitivity_measures"
+          query:
+            type: list
+            required: false
+          match_mode:
+            type: str
+            required: false
+            default: "contains"
+          offset:
+            type: int
+            required: false
+            default: 0
+          limit:
+            type: int
+            required: false
+            default: 100
       - biomni_name: pgx_list_available_covariates
         description: "List sample, treatment, sensitivity, and molecular covariates"
         parameters:
@@ -220,6 +280,10 @@ mcp_servers:
           summary_stat:
             type: str
             required: false
+          limit:
+            type: int
+            required: false
+            description: "Convenience limit applied to both feature and sample dimensions"
           limit_features:
             type: int
             required: false
