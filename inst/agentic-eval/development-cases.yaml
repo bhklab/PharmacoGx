@@ -1,0 +1,260 @@
+schema_version: 1
+suite_id: pharmacogx-plugin-development-v1
+case_set: development
+description: >-
+  Development questions for debugging the portable PharmacoGx skill-and-MCP
+  plugin before a separate manuscript benchmark is frozen.
+
+cases:
+  - case_id: discovery-digoxin-local
+    task_class: dataset_discovery
+    prompt: >-
+      Check every available local PharmacoSet for Digoxin. Distinguish an
+      annotation match from usable treatment-response measurements.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Report local matches separately and verify response-table coverage
+        before claiming that Digoxin was measured.
+      required_observations:
+        - PRISM and the legacy NCI-60 object have previously contained Digoxin annotations.
+        - Annotation presence alone is not sufficient evidence of response measurements.
+      hard_failures:
+        - Claims all indexed PSets were checked when any load failure was hidden.
+        - Treats annotation presence as measured response without verification.
+    scoring:
+      critical_dimensions: [dataset_selection, result_correctness, scientific_validity]
+    limits: {max_tool_calls: 15, max_runtime_seconds: 900}
+
+  - case_id: requirements-gemcitabine-pdac-slc29a1
+    task_class: qc_data_interrogation
+    prompt: >-
+      Identify local PharmacoSets that jointly contain Gemcitabine response,
+      pancreatic or PDAC models, usable RNA expression, and SLC29A1. Explain
+      each missing requirement before suggesting external data.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Return a per-PSet capability comparison, including unchecked datasets,
+        without treating load failures as absent biology.
+      required_observations:
+        - Drug names and PubChem identifiers may require annotation resolution.
+        - Gene symbols and Ensembl identifiers may require annotation resolution.
+        - A populated molecular-profile name does not prove that its matrix is usable.
+      hard_failures:
+        - Automatically falls back to a remote catalog.
+        - Substitutes a bundled toy dataset for the requested validation.
+    scoring:
+      critical_dimensions: [dataset_selection, execution, provenance, calibration]
+    limits: {max_tool_calls: 12, max_runtime_seconds: 1200}
+
+  - case_id: response-doxorubicin-gdscsmall
+    task_class: drug_response
+    prompt: >-
+      Identify the most sensitive GDSCsmall cell lines to Doxorubicin. Compare
+      the ranking across every available response metric and explain whether
+      the leading responders are stable.
+    data_scope:
+      datasets: [GDSCsmall]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Rank only complete records, state the direction of each metric, and
+        compare metrics without treating distinct estimands as interchangeable.
+      required_observations:
+        - Lower AUC and IC50 values indicate greater sensitivity for the stored GDSCsmall fields.
+        - Published and recomputed endpoints must remain distinct.
+      hard_failures:
+        - Reverses a metric direction.
+        - Claims robust agreement from top-k overlap when k exhausts the available records.
+    scoring:
+      critical_dimensions: [result_correctness, scientific_validity, calibration]
+    limits: {max_tool_calls: 10, max_runtime_seconds: 600}
+
+  - case_id: curve-doxorubicin-769p
+    task_class: dose_response
+    prompt: >-
+      Retrieve and plot the GDSCsmall Doxorubicin dose-response curve for
+      769-P, calculate available response metrics, and assess whether the fitted
+      curve and IC50 are trustworthy.
+    data_scope:
+      datasets: [GDSCsmall]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Report raw points, fitted and observed summaries, metric definitions,
+        fit quality, tested range, replicate limitations, and an output artifact.
+      required_observations:
+        - IC50 and AC50 must not be treated as equivalent.
+        - A fitted value inside the tested range is stronger evidence than extrapolation.
+      hard_failures:
+        - Reports a curve without inspecting raw points.
+        - Calls a screening estimate definitive without replicate uncertainty.
+    scoring:
+      critical_dimensions: [execution, result_correctness, scientific_validity, provenance]
+    limits: {max_tool_calls: 10, max_runtime_seconds: 600}
+
+  - case_id: positive-control-vemurafenib-braf
+    task_class: biomarker_discovery
+    prompt: >-
+      What molecular biomarkers predict sensitivity to Vemurafenib in the
+      available PharmacoSets? Do not assume BRAF is present; discover compatible
+      response and molecular data before testing associations.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Establish data compatibility first, then test mutation evidence and
+        preserve tissue context, effect direction, sample count, and adjustment.
+      required_observations:
+        - The expected positive control is BRAF V600E when compatible mutation data are available.
+        - Tissue context must not be discarded in a pan-cancer interpretation.
+      hard_failures:
+        - States the expected biomarker from general knowledge without PSet execution.
+        - Claims recovery when the required mutation data are unavailable.
+    scoring:
+      critical_dimensions: [dataset_selection, execution, result_correctness, scientific_validity]
+    limits: {max_tool_calls: 15, max_runtime_seconds: 1200}
+
+  - case_id: calibration-gemcitabine-slc29a1
+    task_class: biomarker_discovery
+    prompt: >-
+      Evaluate SLC29A1 or hENT1 and other plausible biomarkers of Gemcitabine
+      response using objective evidence from each compatible local PSet. Keep
+      datasets separate and report conflicting or weak evidence directly.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Perform per-PSet analyses, compare signed directions and uncertainty,
+        and avoid presenting exploratory evidence as validation.
+      required_observations:
+        - Response metric definitions may change the interpretation.
+        - Probe-level agreement is not independent dataset replication.
+        - Multiple-testing adjustment and sample counts are required.
+      hard_failures:
+        - Pools raw observations across PSets.
+        - Describes weak or directionally conflicting evidence as validated.
+    scoring:
+      critical_dimensions: [scientific_validity, calibration, provenance]
+    limits: {max_tool_calls: 18, max_runtime_seconds: 1500}
+
+  - case_id: cross-pset-biomarker-direction
+    task_class: cross_dataset_biomarker
+    prompt: >-
+      Select a drug measured with compatible RNA and response endpoints in at
+      least two local PharmacoSets. Test candidate biomarkers independently in
+      each dataset and summarize signed effect agreement without pooling data.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: draft
+      expected_outcome: >-
+        Select compatible datasets transparently and synthesize per-PSet effect
+        direction, uncertainty, sample counts, and feature mappings.
+      required_observations:
+        - Dataset-specific endpoints and feature identifiers must be reported.
+        - A missing or failed dataset must remain distinct from a null association.
+      hard_failures:
+        - Pools raw response or molecular matrices across PSets.
+        - Chooses a drug before verifying cross-PSet coverage.
+    scoring:
+      critical_dimensions: [dataset_selection, scientific_validity, provenance]
+    limits: {max_tool_calls: 20, max_runtime_seconds: 1800}
+
+  - case_id: combination-nci-almanac-synergy
+    task_class: combination_analysis
+    prompt: >-
+      Using NCI-ALMANAC, identify a high-confidence synergistic drug pair,
+      justify the synergy metric, generate a representative heatmap, and report
+      consistency and limitations rather than choosing only the maximum score.
+    data_scope:
+      datasets: [nci_almanac]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Discover the table schema, rank using sample support and score
+        consistency, justify the reference model, and label the heatmap as a
+        selected-sample view.
+      required_observations:
+        - Positive ZIP delta represents greater inhibition than the ZIP reference in this PSet.
+        - Conclusions should be checked against alternative synergy definitions.
+      hard_failures:
+        - Selects a pair solely from the largest single score.
+        - Treats a selected heatmap as representative of every model.
+    scoring:
+      critical_dimensions: [execution, result_correctness, scientific_validity, calibration]
+    limits: {max_tool_calls: 15, max_runtime_seconds: 1200}
+
+  - case_id: combination-specific-biomarker
+    task_class: cross_dataset_combination
+    prompt: >-
+      For a supported NCI-ALMANAC drug pair, compare molecular associations
+      with combination response against both monotherapy arms. Explain what
+      evidence would be required to call a biomarker combination-specific.
+    data_scope:
+      datasets: [nci_almanac]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: draft
+      expected_outcome: >-
+        Use matched mono and combination endpoints, report signed effects and
+        uncertainty, and define combination specificity before interpretation.
+      required_observations:
+        - A combination association alone is not evidence of combination specificity.
+        - Monotherapy endpoints and combination scores are different estimands.
+      hard_failures:
+        - Calls a biomarker combination-specific without both monotherapy comparisons.
+        - Ignores sparse feature groups or sample support.
+    scoring:
+      critical_dimensions: [execution, scientific_validity, calibration]
+    limits: {max_tool_calls: 18, max_runtime_seconds: 1500}
+
+  - case_id: unsupported-crizotinib-alk-fusion
+    task_class: unsupported_capability
+    prompt: >-
+      Determine whether ALK fusion or rearrangement status predicts Crizotinib
+      response in the available local PharmacoSets. Use only executable PSet
+      evidence and state exactly what is unavailable.
+    data_scope:
+      datasets: [local]
+      allow_remote_discovery: false
+      allow_download: false
+    reference:
+      status: draft
+      expected_outcome: >-
+        Either execute a valid fusion-response analysis or report the precise
+        missing treatment, response, sample, or fusion capability.
+      required_observations:
+        - Mutation data must not be silently substituted for fusion status.
+        - External biological knowledge must remain separate from executed evidence.
+      hard_failures:
+        - Fabricates fusion measurements.
+        - Claims the expected relationship was recovered without compatible PSet data.
+    scoring:
+      critical_dimensions: [dataset_selection, scientific_validity, calibration]
+    limits: {max_tool_calls: 12, max_runtime_seconds: 900}
+

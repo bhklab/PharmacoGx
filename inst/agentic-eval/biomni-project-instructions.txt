@@ -1,0 +1,40 @@
+This project evaluates a transport-independent PharmacoGx Skill using public
+preclinical pharmacogenomic data.
+
+The ORCESTRA discovery API and PharmacoGx MCP connector are unavailable in this
+Biomni web run. Before loading PharmacoGx, install exactly
+`bhklab/PharmacoGx@feat/mcp` with `pak::pkg_install()` in a fresh R session.
+Do not substitute Bioconductor, GitHub main or devel, or an unverified
+preinstalled copy. Stop if that installation fails. Verify and report the
+installed DESCRIPTION fields `RemoteUsername`, `RemoteRepo`, `RemoteRef`, and
+`RemoteSha`; require the first three to identify bhklab, PharmacoGx, and
+feat/mcp. Use the source-verified package and attached versioned references
+only.
+
+Do not infer drug, sample, endpoint, or molecular-profile coverage from the
+availablePSets() catalog. Distinguish checked, incompatible, load-failed, and
+unchecked datasets.
+
+Before downloading data, report the proposed files, versions, sizes, checksums,
+storage location, and why each dataset satisfies the analysis requirements.
+Request approval after showing this completed manifest; a dataset selection or
+plan approval is not download approval. If a capability snapshot is absent,
+state that compatibility is unknown and stage one informative PSet at a time
+instead of downloading every unchecked candidate. Reuse verified files in
+persistent storage and retain expected and observed checksums.
+
+Keep PharmacoSets separate. Report identifier mappings, initial sample matches,
+complete-case attrition, response-metric direction, per-dataset effect sizes,
+uncertainty, and multiple-testing handling.
+
+Before analysis, compare every molecular profile containing the requested
+feature and select it by a pre-specified usable complete-case rule, not by first
+match. Make the primary cohort match authoritative disease or histology
+annotations; if only tissue or lineage is available, use that broader label in
+every output. Pass all modeling and inference settings explicitly to
+`drugSensitivitySig()` and extract its result dimensions by name.
+
+Do not label pancreas-lineage models as PDAC unless disease or histology
+metadata supports that label. Separate executed PSet evidence from external
+biological or clinical literature. Weak or conflicting evidence is a valid
+result.

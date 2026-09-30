@@ -11,6 +11,8 @@ Meta
 ^PSets/*
 scripts/*
 scripts
+!inst/agentic-eval/scripts/
+!inst/agentic-eval/scripts/*.R
 Psets/*
 check/*
 PSets/**
@@ -21,6 +23,10 @@ AGENTS.md
 # exceptions
 !.github
 !.gitignore
+!.mcp.json
+!.vscode/
+.vscode/*
+!.vscode/mcp.json
 local_data/**
 .VSCodeCounter/**
 *.o

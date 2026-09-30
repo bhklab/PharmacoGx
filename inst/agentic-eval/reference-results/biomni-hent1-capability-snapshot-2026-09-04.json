@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-04T00:00:55-04:00",
+  "reference_status": "needs_independent_review",
+  "source": {
+    "git_commit": "28c58707eece80086bee75d8ef0e8afae96389ca",
+    "worktree_dirty": true,
+    "tool_file_md5": "8a60382469c48d481d4e93b7a9bb3a98",
+    "check_mode": "isolated_worker_disk",
+    "remote_catalog_assesses_compatibility": false
+  },
+  "request": {
+    "drug": "gemcitabine",
+    "sample_query": "pancreas",
+    "metric": "aac_recomputed",
+    "molecular_profile": "rna",
+    "features": ["SLC29A1"]
+  },
+  "scope": {
+    "checked_datasets": 4,
+    "compatible_datasets": ["gdsc2", "gcsi2019"],
+    "unchecked_remote_catalog_entries_must_remain_unchecked": true
+  },
+  "datasets": [
+    {
+      "dataset": "gdsc2",
+      "display_name": "GDSC2020 v2",
+      "file": "GDSC2.rds",
+      "bytes": 1560079648,
+      "expected_md5": "e6fc02954e3ad117829b0e96ef7564f1",
+      "record_url": "https://zenodo.org/records/5787145",
+      "requirements_satisfied": 5,
+      "requirements_requested": 5,
+      "missing_requirements": [],
+      "drug_matches": ["Gemcitabine"],
+      "sample_match_count": 33,
+      "metric_matches": ["aac_recomputed"],
+      "molecular_profile_matches": ["rna"],
+      "feature_matches": ["ENSG00000112759"]
+    },
+    {
+      "dataset": "gcsi2019",
+      "display_name": "gCSI2019",
+      "file": "PSet_gCSI2019.rds",
+      "bytes": 1715241196,
+      "expected_md5": "34ae55ebb9a84050879172920d83840e",
+      "record_url": "https://zenodo.org/records/7829857",
+      "requirements_satisfied": 5,
+      "requirements_requested": 5,
+      "missing_requirements": [],
+      "drug_matches": ["Gemcitabine"],
+      "sample_match_count": 41,
+      "metric_matches": ["aac_recomputed"],
+      "molecular_profile_matches": [
+        "Kallisto_0.46.1.rnaseq",
+        "Kallisto_0.46.1.rnaseq.counts"
+      ],
+      "feature_matches": ["ENSG00000112759.19"]
+    },
+    {
+      "dataset": "ccle_pharmacoset",
+      "display_name": "CCLE2019",
+      "file": "CCLE_PharmacoSet.RDS",
+      "bytes": 3024318664,
+      "expected_md5": "b0f4636d8f4ec41d2d11d52dc7203bac",
+      "record_url": "https://zenodo.org/records/18759113",
+      "requirements_satisfied": 4,
+      "requirements_requested": 5,
+      "missing_requirements": ["drug"],
+      "drug_matches": [],
+      "sample_match_count": 49,
+      "metric_matches": ["aac_recomputed"],
+      "molecular_profile_matches": [
+        "rnaseq.gene_tpm",
+        "rnaseq.transcript_tpm",
+        "rnaseq.gene_counts",
+        "rnaseq.gene_rpkm"
+      ],
+      "feature_matches": ["ENSG00000112759.12"]
+    },
+    {
+      "dataset": "ctrpv2",
+      "display_name": "CTRPv2",
+      "file": "PSet_CTRPv2.rds",
+      "bytes": 40707609,
+      "expected_md5": "c7a0c27dba6e294ec1d3548538c94c57",
+      "record_url": "https://zenodo.org/records/7826870",
+      "requirements_satisfied": 3,
+      "requirements_requested": 5,
+      "missing_requirements": ["molecular_profile", "molecular_feature"],
+      "drug_matches": ["Gemcitabine"],
+      "sample_match_count": 40,
+      "metric_matches": ["aac_recomputed"],
+      "molecular_profile_matches": ["rna"],
+      "molecular_profile_usable": false,
+      "feature_matches": []
+    }
+  ],
+  "interpretation_limits": [
+    "This is a dated partial capability snapshot, not a complete remote coverage index.",
+    "File identity must match the recorded size and checksum before the capability result is reused.",
+    "Sample match counts precede response and molecular complete-case filtering.",
+    "The snapshot contains no biomarker association result."
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bhklab.ca/schemas/pharmacogx-agentic-run-v1.json",
+  "title": "PharmacoGx plugin evaluation run",
+  "type": "object",
+  "required": ["schema_version", "run_id", "suite", "environment", "cases"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string"},
+    "created_at": {"type": "string"},
+    "suite": {
+      "type": "object",
+      "required": ["suite_id", "case_set", "manifest", "manifest_md5"]
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "host", "condition", "model", "plugin_commit", "execution_route",
+        "mcp_enabled", "skill", "attached_resources"
+      ],
+      "properties": {
+        "host": {"type": "string"},
+        "condition": {"enum": ["baseline", "skill", "mcp", "plugin"]},
+        "model": {"type": "string"},
+        "model_version": {"type": ["string", "null"]},
+        "plugin_commit": {"type": "string"},
+        "execution_route": {
+          "enum": ["host_native", "skill_direct", "mcp", "skill_mcp"]
+        },
+        "mcp_enabled": {"type": "boolean"},
+        "skill": {
+          "type": ["object", "null"],
+          "properties": {
+            "name": {"type": "string"},
+            "path": {"type": "string"},
+            "md5": {"type": "string"}
+          },
+          "required": ["name", "path", "md5"],
+          "additionalProperties": false
+        },
+        "attached_resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "path", "md5"],
+            "properties": {
+              "name": {"type": "string"},
+              "path": {"type": "string"},
+              "md5": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "temperature": {"type": ["number", "null"]},
+        "pset_versions": {"type": "object"}
+      }
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id", "prompt", "status", "raw_response", "tool_trace",
+          "artifacts", "timing", "adjudication"
+        ]
+      }
+    }
+  }
+}

@@ -29,7 +29,8 @@ Suggests: pander,
     testthat,
     markdown,
     BiocStyle,
-    R.utils
+    R.utils,
+    yaml
 Encoding: UTF-8
 Imports:
     BiocGenerics,

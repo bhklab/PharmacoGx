@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bhklab.ca/schemas/pharmacogx-agentic-case-v1.json",
+  "title": "PharmacoGx plugin evaluation suite",
+  "type": "object",
+  "required": ["schema_version", "suite_id", "case_set", "cases"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "suite_id": {"type": "string", "minLength": 1},
+    "case_set": {"enum": ["development", "held_out"]},
+    "description": {"type": "string"},
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id", "task_class", "prompt", "data_scope", "reference",
+          "scoring", "limits"
+        ],
+        "properties": {
+          "case_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "task_class": {"type": "string", "minLength": 1},
+          "prompt": {"type": "string", "minLength": 1},
+          "data_scope": {
+            "type": "object",
+            "required": ["datasets", "allow_remote_discovery", "allow_download"],
+            "properties": {
+              "datasets": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+              "allow_remote_discovery": {"type": "boolean"},
+              "allow_download": {"type": "boolean"}
+            },
+            "additionalProperties": false
+          },
+          "reference": {
+            "type": "object",
+            "required": ["status", "expected_outcome", "required_observations", "hard_failures"],
+            "properties": {
+              "status": {"enum": ["draft", "needs_independent_review", "verified"]},
+              "expected_outcome": {"type": "string", "minLength": 1},
+              "required_observations": {"type": "array", "items": {"type": "string"}},
+              "hard_failures": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+            },
+            "additionalProperties": false
+          },
+          "scoring": {
+            "type": "object",
+            "required": ["critical_dimensions"],
+            "properties": {
+              "critical_dimensions": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+            },
+            "additionalProperties": false
+          },
+          "limits": {
+            "type": "object",
+            "required": ["max_tool_calls", "max_runtime_seconds"],
+            "properties": {
+              "max_tool_calls": {"type": "integer", "minimum": 1},
+              "max_runtime_seconds": {"type": "integer", "minimum": 1}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
+

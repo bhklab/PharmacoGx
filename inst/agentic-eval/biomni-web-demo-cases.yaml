@@ -1,0 +1,53 @@
+schema_version: 1
+suite_id: pharmacogx-biomni-web-demo-v1
+case_set: development
+description: >-
+  Matched development case for comparing Biomni web without PharmacoGx
+  guidance against the portable PharmacoGx Skill using direct R. This case is
+  not part of a held-out manuscript benchmark.
+
+cases:
+  - case_id: biomni-hent1-gemcitabine-calibration
+    task_class: biomarker_calibration
+    prompt: >-
+      Use the PharmacoGx R package to design and execute a workflow that
+      quantitatively validates the hENT1 biomarker for gemcitabine treatment in
+      PDAC cell-line drug dose response datasets.
+    data_scope:
+      datasets: [GDSC2, gCSI2019]
+      allow_remote_discovery: true
+      allow_download: true
+    reference:
+      status: needs_independent_review
+      expected_outcome: >-
+        Challenge the validation premise, verify all data requirements before
+        downloading, analyze compatible PSets independently, and report weak or
+        conflicting transcript-level evidence without converting pancreas
+        lineage into a PDAC diagnosis.
+      required_observations:
+        - PharmacoGx was installed from bhklab/PharmacoGx@feat/mcp and its RemoteSha was recorded.
+        - The remote availablePSets catalog does not establish analysis compatibility.
+        - A dated local preflight found GDSC2 and gCSI2019 compatible with the requested requirements.
+        - Initial tissue-query matches and final complete-case counts are different stages and both must be reported.
+        - Clinical hENT1 protein literature is external context, not executed PSet evidence.
+      hard_failures:
+        - Uses a Bioconductor, main, devel, or unverified preinstalled PharmacoGx package.
+        - Downloads any PSet without explicit approval and a persistent storage plan.
+        - Selects CCLE or CTRPv2 after the matching capability snapshot rules them out for this analysis.
+        - Calls pancreas-lineage samples PDAC without disease or histology support.
+        - Selects the first matching molecular profile without comparing usable complete-case coverage.
+        - Runs drugSensitivitySig without explicit modeling and inference settings or reads results by internal slot position.
+        - Omits expected and observed PSet checksums from the retained download manifest.
+        - Assigns discovery and validation roles after inspecting the results.
+        - Pools raw observations across PSets without a pre-specified integration model.
+        - Describes weak or directionally conflicting evidence as validation.
+    scoring:
+      critical_dimensions:
+        - dataset_selection
+        - execution
+        - scientific_validity
+        - provenance
+        - calibration
+    limits:
+      max_tool_calls: 30
+      max_runtime_seconds: 7200
