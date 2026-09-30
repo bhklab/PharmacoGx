@@ -1,257 +1,139 @@
 ---
 name: pharmacogx-agentic-analysis
-description: Use PharmacoGx for preclinical pharmacogenomic analysis with MCP-backed R workflows.
+description: Plan and execute reproducible preclinical pharmacogenomic analyses with PharmacoGx from a host agent, using typed MCP tools when available or a constrained direct-R workflow in environments such as Biomni web.
 ---
 
-## Purpose
+# PharmacoGx agentic analysis
 
-Use this skill when a user asks an agent to perform, explain, or plan
-preclinical pharmacogenomic analysis with PharmacoGx.
+Use this Skill as a portable scientific workflow layer for an external host
+such as Biomni or Claude. It is not a standalone agent.
 
-Prefer typed PharmacoGx MCP tools over arbitrary R execution. Current tools:
+## Choose the execution route
 
-- `pgx_list_example_datasets`
-- `pgx_list_local_psets`
-- `pgx_list_entities`
-- `pgx_list_available_covariates`
-- `pgx_get_sample_metadata`
-- `pgx_get_treatment_metadata`
-- `pgx_filter_samples`
-- `pgx_compare_metrics`
-- `pgx_get_dose_response_points`
-- `pgx_plot_dose_response`
-- `pgx_summarize_sensitivity`
-- `pgx_top_responders`
-- `pgx_compute_dose_response_metrics`
-- `pgx_compute_synergy_reference`
-- `pgx_pset_curation_questions`
-- `pgx_validate_pset_inputs`
-- `pgx_get_molecular_profile`
-- `pgx_association_test`
-- `pgx_suggest_biomarker_candidates`
-- `pgx_multi_pset_association_test`
-- `pgx_detect_assay_mode`
-- `pgx_list_treatment_response_tables`
-- `pgx_rank_synergy_combinations`
-- `pgx_get_combo_response_records`
-- `pgx_plot_synergy_heatmap`
-- `pgx_combo_biomarker_association`
-- `pgx_compare_mono_combo_biomarkers`
-- `pgx_find_pset_overlap`
-- `pgx_compare_pset_response`
-- `pgx_list_available_psets`
-- `pgx_download_pset`
-- `pgx_session_info`
+Select one route before analyzing data and report it in the result:
 
-## General Workflow
+- **MCP:** if the host exposes `pgx_session_info` and the other typed
+  `pgx_*` tools, read [references/mcp-tools.md](references/mcp-tools.md).
+- **Direct R:** if the host can execute R with PharmacoGx but has no
+  PharmacoGx MCP tools, read
+  [references/biomni-web.md](references/biomni-web.md). This is the immediate
+  Biomni web route. For the current pre-merge demo, that reference pins
+  PharmacoGx to the GitHub `feat/mcp` branch and requires source verification
+  before analysis.
+- **Planning only:** if neither route is available, return a reproducible plan
+  and the missing capabilities. Do not imply that an analysis was executed.
 
-1. Start by identifying the dataset, PharmacoSet, sample, treatment, metric,
-   molecular profile, and metadata fields needed for the question.
-2. Use bundled toy datasets (`GDSCsmall`, `CCLEsmall`, `CMAPsmall`) only for
-   examples, testing, and lightweight demonstrations. For real analysis, accept
-   local manifest aliases such as `nci_almanac`, `gdsc2_matrix`, and
-   `gdsc2_anchor`, or explicit local `.qs` or `.rds` PharmacoSet file paths.
-   Clearly say whether results come from toy data or local PSet-backed data.
-   Keep large local PSets, especially `nci_almanac`, in one long-lived session
-   across multi-step workflows instead of repeatedly cold-loading them.
-3. Use `pgx_list_available_psets` for larger downloadable PharmacoSets only
-   when the user asks for external data. Do not call `pgx_download_pset` unless
-   the user explicitly approves runtime, storage, and network use.
-4. Call `pgx_list_available_covariates` before metadata lookup, filtering, or
-   molecular-profile analysis because annotation fields differ by PharmacoSet.
-5. Keep outputs bounded. Prefer ranked, filtered, summarized, or plotted
-   results over full matrices.
-6. Include `pgx_session_info` when summarizing a reproducible run.
+Do not silently switch routes. A Skill-only direct-R run is not a Skill+MCP
+plugin run.
 
-## Dataset Inspection
+## Workflow contract
 
-Do not assume all PharmacoSets contain the same samples, treatments, metrics,
-annotations, molecular data, fitted curves, or raw dose-response data.
+1. Identify the requested treatment, sample or disease context, response
+   endpoint, molecular profile, feature type, and candidate features. Resolve
+   synonyms only as needed and preserve stored identifiers.
+2. Check whether candidate PharmacoSets jointly contain every required element
+   before analysis. Distinguish compatible, incompatible, unchecked, and
+   load-failed datasets. A catalog entry or named molecular profile is not
+   proof that usable measurements exist.
+3. Use bundled fixtures only for tests and lightweight examples. Label toy and
+   real PSet-backed results explicitly.
+4. Before a remote download, show a filled manifest with the exact file,
+   source record, version, size, expected checksum, persistent storage
+   location, and compatibility rationale. Ask for approval after showing that
+   manifest. A dataset choice made during planning is not download approval.
+5. If compatibility cannot be checked without downloading, say so and propose
+   the smallest staged download. Do not download a batch of unchecked PSets
+   merely because they appear in a distribution catalog.
+6. Inspect actual sample, treatment, sensitivity, and every relevant molecular
+   profile before choosing fields. Compare usable cohort and complete-case
+   coverage using a pre-specified rule; do not select the first matching
+   profile.
+7. Freeze the cohort, endpoint, molecular profile, identifier mappings,
+   analysis method, inference settings, and multiplicity family before
+   inspecting the association result. Report initial matches, exclusions,
+   missingness, and final complete-case counts.
+8. Keep outputs bounded and preserve a complete analysis script plus compact
+   machine-readable results. Follow
+   [references/reporting-contract.md](references/reporting-contract.md).
 
-Use:
+## Scientific rules
 
-- `pgx_list_example_datasets` when no dataset is specified.
-- `pgx_list_local_psets` before real local PSet-backed demos.
-- `pgx_list_entities` before assuming a sample, drug, or metric exists.
-- `pgx_list_available_covariates` before using sample, treatment, or molecular
-  fields.
-- `pgx_detect_assay_mode` before any combination or synergy analysis.
-- `pgx_list_treatment_response_tables` when a real combo PSet may store useful
-  endpoints in treatmentResponse `profiles`, `synergy`, or `raw` tables.
+### Drug response
 
-If the requested dataset, sample, drug, metric, molecular profile, or metadata
-field is unavailable, state what is missing and ask for a valid option.
+State the metric definition and direction before ranking or associating it:
 
-## Metadata Lookup And Filtering
-
-Use metadata tools when users ask about cell lines, tissues, subtypes,
-lineages, drugs, targets, mechanisms, or sample/treatment annotations.
-
-Use:
-
-- `pgx_get_sample_metadata` for sample or cell-line annotations.
-- `pgx_get_treatment_metadata` for drug or treatment annotations.
-- `pgx_filter_samples` to subset samples by tissue, subtype, origin, source, or
-  other listed metadata fields.
-
-Use exact covariate names returned by `pgx_list_available_covariates`. Do not
-assume fields such as `disease`, `histology`, `lineage`, `age`, or `sex` exist.
-
-Do not call tissue, lineage, or site-level metadata patterns molecular
-biomarkers. If only sample metadata were used, describe the result as a
-metadata association.
-
-## Drug Sensitivity And Responder Analysis
-
-Use:
-
-- `pgx_top_responders` for most sensitive or resistant samples for a drug.
-- `pgx_summarize_sensitivity` for bounded treatment-sample metric tables.
-- `pgx_compare_metrics` before claiming a responder pattern is robust.
-
-Explain metric direction:
-
-- Lower AUC usually indicates stronger sensitivity.
-- Lower IC50 usually indicates stronger sensitivity when IC50 is reached or
-  estimated reliably.
-- Higher AAC-like or activity-area metrics usually indicate stronger
+- Lower AUC usually indicates greater sensitivity.
+- Lower IC50 usually indicates greater sensitivity when it is identified
+  within the tested concentration range.
+- Higher AAC-like or activity-area values usually indicate greater
   sensitivity.
 
-If metric correlations have unexpected direction, or top-N overlap is
-meaningless because N is too large, avoid claiming robustness.
+Compare response metrics before claiming that responder rankings are robust.
+Treat small cohorts and singleton metadata groups as exploratory.
 
-For small sample sizes or singleton metadata groups, describe results as
-exploratory.
+### Sample context
 
-## Dose-Response Analysis
+Use the exact available annotation field and stored value. Tissue, primary
+site, lineage, and disease or histology are not interchangeable. For example,
+do not label all pancreas-lineage models as pancreatic ductal adenocarcinoma
+without supporting disease or histology metadata.
 
-When users ask about dose-response curves, fitted response metrics, AUC, AAC,
-IC50, AC50, Einf, or curve quality, first determine whether they provided raw
-vectors or want PSet-backed data.
+Make the primary cohort match the requested disease context when authoritative
+disease or histology annotations permit it. If only a broader tissue or lineage
+cohort can be constructed, rename the analysis and every output to that broader
+context. Analyze a broader cohort only as a separately labeled sensitivity
+analysis.
 
-Use:
+Metadata-only associations are not molecular biomarkers.
 
-- `pgx_get_dose_response_points` to retrieve raw PSet-backed concentration and
-  viability points by dataset, drug, and sample.
-- `pgx_plot_dose_response` to create a PNG curve plot for a sample-drug pair.
-- `pgx_compute_dose_response_metrics` for user-supplied concentration and
-  viability vectors.
+### Biomarkers
 
-Mention that fitted metrics depend on dose range, curve quality, and whether
-the response crosses the target effect level. Avoid overinterpreting IC50 when
-the curve does not cross 50% viability in the tested range.
+For a continuous molecular feature and continuous response, default to a
+rank-based association unless the user or a frozen protocol specifies another
+model. For categorical features, use a suitable group comparison or regression
+model. Report sample size, effect size, direction, uncertainty, raw p-value,
+and adjusted p-value when applicable.
 
-## Combination And Synergy Analysis
+Define one primary endpoint and method before execution. Define the family of
+confirmatory tests across datasets, endpoints, and features, and either adjust
+within that family or give a specific pre-specified reason for not doing so.
+Label secondary endpoints and alternative methods as sensitivity or
+exploratory analyses. Do not infer that adjustment is unnecessary merely
+because only one molecular feature was requested.
 
-When users ask about drug combinations, Bliss, HSA, ZIP, Loewe, or synergy,
-first distinguish:
+Suggestions from prior knowledge are hypotheses, not evidence that a feature
+exists in the selected PSet or is associated with the treatment. Do not claim
+validation from weak, directionally conflicting, or single-PSet evidence.
 
-- raw monotherapy viability
-- raw combination viability
-- fitted monotherapy dose-response profiles
-- fitted combination response surfaces
-- summary synergy scores
+For multiple PSets, analyze each independently and summarize signed effects,
+uncertainty, sample counts, endpoint definitions, and feature mappings. Do not
+pool raw response or molecular values across PSets without a pre-specified
+integration model and justification. Do not assign discovery and validation
+roles after seeing the results.
 
-Use:
+### Combination response
 
-- `pgx_list_treatment_response_tables` to find available combo endpoints and
-  numeric score columns.
-- `pgx_rank_synergy_combinations` to rank high-confidence drug combinations
-  from combo treatmentResponse tables.
-- `pgx_get_combo_response_records` to inspect selected combination rows.
-- `pgx_plot_synergy_heatmap` to create a PNG dose-matrix heatmap for a
-  selected or top-ranked combo/sample.
-- `pgx_combo_biomarker_association` to associate molecular features with a
-  selected combo response or synergy phenotype.
-- `pgx_compare_mono_combo_biomarkers` to compare selected feature associations
-  for a combo phenotype against each monotherapy arm.
-- `pgx_detect_assay_mode` to check whether a dataset appears monotherapy,
-  combination, mixed, or perturbation-only.
-- `pgx_compute_synergy_reference` only when monotherapy viability vectors are
-  supplied or extracted.
+First determine whether the data contain monotherapy responses, combination
+responses, fitted surfaces, or summary synergy scores. Do not calculate or
+interpret Bliss, HSA, ZIP, or Loewe results unless the required inputs are
+present and their meaning is documented. Distinguish a combination-specific
+association from an association driven by either monotherapy arm.
 
-Do not imply that real combination data were retrieved unless matched mono and
-combination data were actually present. Standard bundled small datasets should
-not be treated as combination datasets unless combination assays are explicitly
-detected.
+### PSet curation
 
-For real combination PharmacoSets such as NCI-ALMANAC or GDSC-square, raw
-combination dose matrices are required before synergy heatmaps or synergy
-scores can be interpreted.
+Before constructing a PharmacoSet, identify and validate the sample,
+treatment, response, dose, molecular, and annotation tables. Do not construct
+an object until the user has supplied the required tables and requested that
+operation.
 
-## PSet Curation
+## Evidence boundary
 
-When users want help creating or validating a PharmacoSet, use a staged
-workflow.
-
-Use:
-
-- `pgx_pset_curation_questions` to ask what tables and columns they have.
-- `pgx_validate_pset_inputs` to check whether minimum sample, treatment,
-  response, dose, and metadata columns are present.
-
-Do not attempt automatic PharmacoSet construction unless the user has supplied
-validated tables and explicitly asks for construction.
-
-## Biomarker And Feature-Response Association
-
-When users ask whether a biomarker, molecular feature, or metadata feature is
-associated with drug response, identify:
-
-- dataset or PharmacoSet
-- treatment or drug
-- sensitivity metric
-- feature type: expression, mutation, CNV, pathway score, metadata, etc.
-- whether the feature is continuous or categorical
-
-Use:
-
-- `pgx_get_molecular_profile` to inspect molecular values for selected features
-  and samples.
-- `pgx_suggest_biomarker_candidates` only to seed expected positive-control
-  features such as SLC29A1/hENT1 for gemcitabine or PDE3A for anagrelide.
-- `pgx_association_test` for exploratory feature-response association.
-- `pgx_multi_pset_association_test` to run independent per-PSet associations
-  and summarize cross-PSet support without pooling raw data.
-
-Default to Spearman for continuous molecular features versus continuous
-sensitivity metrics. Use Wilcoxon/group comparison for binary or categorical
-features. Report sample size, effect size, p-value, and adjusted p-value when
-available.
-
-Do not claim molecular biomarker associations unless molecular profile data
-were actually used. For bundled small datasets, avoid strong biomarker claims;
-describe results as exploratory fixtures.
-
-For multi-PSet biomarker questions, do not merge raw response or molecular
-matrices across PSets. Run each PSet separately and summarize effect direction,
-sample size, p-value/FDR, and consistency.
-
-## Cross-PharmacoSet Analysis
-
-Use:
-
-- `pgx_find_pset_overlap` to find shared samples, treatments, and
-  sample-treatment pairs.
-- `pgx_compare_pset_response` to compare response values for the same drug and
-  metric across datasets.
-- `pgx_multi_pset_association_test` for cross-PSet biomarker support using
-  per-PSet association followed by consensus summarization.
-
-Check identifier consistency before interpreting cross-PSet results. Matching
-names do not always guarantee the same biological sample or compound.
-
-For cross-PSet biomarker support, treat the analysis as reproducibility
-evidence, not a single association test. Start with a drug-anchored question and
-confirm shared samples, treatments, metrics, and molecular features.
-
-## Limits
-
-- Do not present outputs as clinical treatment recommendations.
-- Do not invent data, fitted curves, synergy scores, or biomarkers.
-- Do not use arbitrary R execution when a typed MCP tool can answer the
-  question.
-- State clearly when an analysis is hypothetical, toy-data-backed, or
-  PSet-backed.
-- If MCP tools do not support the requested workflow, explain what structured
-  data or tool support is missing.
+- Separate executed PSet evidence, attached capability metadata, and external
+  biological literature.
+- Treat a failed feasibility check or a well-supported negative result as a
+  valid outcome.
+- Do not present preclinical findings as clinical treatment recommendations.
+- Do not invent measurements, identifiers, fitted curves, synergy scores, or
+  biomarkers.
+- Explain unavailable operations and required inputs instead of hiding them
+  behind an unrecorded fallback.
