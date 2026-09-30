@@ -257,4 +257,3 @@ cases:
     scoring:
       critical_dimensions: [dataset_selection, scientific_validity, calibration]
     limits: {max_tool_calls: 12, max_runtime_seconds: 900}
-
