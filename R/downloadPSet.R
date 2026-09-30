@@ -23,9 +23,9 @@
 #' @import jsonlite
 availablePSets <- function(canonical = TRUE) {
   if (canonical) {
-    avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/canonical")
+    avail.psets <- fromJSON("https://www.orcestra.ca/api/pset/canonical")
   } else {
-    avail.psets <- fromJSON("http://www.orcestra.ca/api/pset/available")
+    avail.psets <- fromJSON("https://www.orcestra.ca/api/pset/available")
   }
 
   pSetTable <- data.frame(
