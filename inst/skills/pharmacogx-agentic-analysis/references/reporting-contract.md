@@ -8,6 +8,10 @@ result and audit its interpretation.
 - execution route: MCP, direct R, or planning only
 - host and model identifiers when available
 - R and PharmacoGx versions, package repository, Git reference, and commit SHA
+- CoreGx version, installed package path or explicit source checkout, dirty
+  status, dependency lock/session information and complete Skill resource hashes
+- exact execution command, start/end times, exit status and host transcript or
+  replay location; record operator interventions and route changes
 - PSet names, versions, source records, filenames, expected and observed file
   sizes and checksums, persistent locations, and download approvals
 - treatment, sample, endpoint, molecular-profile, and feature identifiers

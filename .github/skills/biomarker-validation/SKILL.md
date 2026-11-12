@@ -9,11 +9,11 @@ Use this workflow for the biomarker, treatment, disease context, and response
 endpoint supplied by the user. Do not substitute entities from examples or
 assume a dataset contains the requested data.
 
-1. Choose and disclose the execution route. If PharmacoGx MCP tools are
-   available, call `pgx_session_info` once and confirm the expected source
-   checkout and tool registry. If only direct R is available, record the R and
-   PharmacoGx versions and follow the direct-R route in
-   `inst/skills/pharmacogx-agentic-analysis/references/biomni-web.md`.
+1. Choose and disclose the execution route. Prefer direct R and follow
+   `inst/skills/pharmacogx-agentic-analysis/references/direct-r.md`, recording
+   R/package versions and the approved source commit. If MCP is the explicitly
+   chosen route, call `pgx_session_info` once and confirm the expected source
+   checkout and tool registry.
 2. Resolve only necessary synonyms, then check all requested requirements
    together before analysis. With MCP, call `pgx_check_analysis_requirements`
    once. With direct R, use a versioned capability snapshot when available or

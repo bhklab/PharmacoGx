@@ -1,15 +1,10 @@
 ---
 name: pharmacogx-agentic-analysis
-description: Use PharmacoGx for reproducible preclinical pharmacogenomic analyses, including PharmacoSet feasibility checks, drug response, and biomarker questions.
+description: Analyze drug response, biomarkers, combinations and cross-PSet evidence with PharmacoGx in direct R, or optional explicitly selected MCP.
 ---
 
-# PharmacoGx workflow
-
-Read and follow the canonical Skill at
-`inst/skills/pharmacogx-agentic-analysis/SKILL.md` in this repository.
-Resolve its reference links relative to that canonical Skill's directory.
-
-Use the project's registered `pharmacogx` MCP server when available. Confirm
-execution with `pgx_session_info`; if tools are unavailable, report the missing
-connection instead of implying MCP execution. Respect the user's chosen route
-and permissions, including download and output-file approvals.
+Read `inst/skills/pharmacogx-agentic-analysis/SKILL.md` in this repository.
+Resolve its references relative to that canonical folder. Prefer direct R and
+verify the task-approved package source before analysis. If MCP is the chosen
+route, confirm it with `pgx_session_info`; missing MCP is not a prerequisite
+failure for a declared direct-R run. Preserve the script and analysis artifacts.

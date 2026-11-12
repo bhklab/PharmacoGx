@@ -1,6 +1,6 @@
 ---
 name: pharmacogx-agentic-analysis
-description: Plan and execute reproducible preclinical pharmacogenomic analyses with PharmacoGx from a host agent, using typed MCP tools when available or a constrained direct-R workflow in environments such as Biomni web.
+description: Plan and execute reproducible pharmacogenomic analyses with PharmacoGx in direct R, including response curves, biomarkers, cross-PSet comparisons, combinations and study reproduction. Use optional MCP only when that execution route is chosen.
 ---
 
 # PharmacoGx agentic analysis
@@ -10,21 +10,39 @@ such as Biomni or Claude. It is not a standalone agent.
 
 ## Choose the execution route
 
-Select one route before analyzing data and report it in the result:
+Prefer direct R; select one route before analyzing data and report it:
 
-- **MCP:** if the host exposes `pgx_session_info` and the other typed
-  `pgx_*` tools, read [references/mcp-tools.md](references/mcp-tools.md).
-- **Direct R:** if the host can execute R with PharmacoGx but has no
-  PharmacoGx MCP tools, read
-  [references/biomni-web.md](references/biomni-web.md). This is the immediate
-  Biomni web route. For the current pre-merge demo, that reference pins
-  PharmacoGx to the GitHub `feat/mcp` branch and requires source verification
-  before analysis.
+- **Direct R:** read [references/direct-r.md](references/direct-r.md) for
+  version verification, safe execution and package-specific decisions. In
+  Biomni web also read [references/biomni-web.md](references/biomni-web.md).
+- **MCP:** when explicitly chosen and the host exposes typed `pgx_*` tools,
+  read [references/mcp-tools.md](references/mcp-tools.md).
 - **Planning only:** if neither route is available, return a reproducible plan
   and the missing capabilities. Do not imply that an analysis was executed.
 
 Do not silently switch routes. A Skill-only direct-R run is not a Skill+MCP
 plugin run.
+
+For response summaries/curves, molecular associations, cross-PSet comparisons,
+combination analysis or paper reproduction, read
+[analysis workflows](references/analysis-workflows.md). A compact
+[development example](scripts/direct-r-examples.R) uses only bundled/synthetic
+data; it is an API check, not scientific validation or a held-out benchmark.
+
+For source-to-PSet construction, use the companion `pharmacogx-pset-curation`
+Skill when available. For remote measurement/catalog discovery, use
+`orcestra-discovery`. Neither is required to analyze an already verified local
+PSet. Do not expose evaluator scripts or expected results to benchmark agents.
+
+## Dataset-aware handling
+
+Before selecting cohorts, molecular profiles or combination summaries, read
+[dataset handling](references/dataset-handling.md). It covers biological model
+types, tissue-specific PSets, TRE score selection and known dataset differences.
+For PRISM with missing molecular measurements, read
+[PRISM and CCLE integration](references/prism-ccle.md) before proposing a
+validated pairing. External molecular augmentation must fit the user's scope
+and any frozen benchmark protocol; it is a distinct data condition.
 
 ## Workflow contract
 
@@ -72,6 +90,14 @@ Compare response metrics before claiming that responder rankings are robust.
 Treat small cohorts and singleton metadata groups as exploratory.
 
 ### Sample context
+
+Identify whether samples are established cell lines, primary patient specimens,
+patient-derived cultures or xenograft-derived cultures. Preserve that distinction
+in summaries and use consistent model-type colors and a legend in cross-PSet
+plots. Consider relevant disease-specific datasets even when tissue labels are
+missing or use equivalent terminology; verify source provenance and retain
+contradictory sample annotations for review. A frozen cohort definition takes
+precedence over a generic dataset recommendation.
 
 Use the exact available annotation field and stored value. Tissue, primary
 site, lineage, and disease or histology are not interchangeable. For example,

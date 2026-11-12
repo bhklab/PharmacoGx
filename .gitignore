@@ -41,3 +41,9 @@ docs
 *.tar.gz
 *.Rcheck/
 *.BiocCheck/
+
+# Portable skill helpers
+!inst/skills/orcestra-discovery/scripts/
+!inst/skills/orcestra-discovery/scripts/*.R
+!inst/skills/pharmacogx-agentic-analysis/scripts/
+!inst/skills/pharmacogx-agentic-analysis/scripts/*.R

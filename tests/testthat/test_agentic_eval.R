@@ -75,32 +75,35 @@ test_that("portable Skill routes execution without development-case leakage", {
   skill_path <- file.path(skill_dir, "SKILL.md")
   mcp_reference <- file.path(skill_dir, "references", "mcp-tools.md")
   biomni_reference <- file.path(skill_dir, "references", "biomni-web.md")
+  direct_reference <- file.path(skill_dir, "references", "direct-r.md")
 
   expect_true(file.exists(skill_path))
   expect_true(file.exists(mcp_reference))
   expect_true(file.exists(biomni_reference))
+  expect_true(file.exists(direct_reference))
 
   skill <- paste(readLines(skill_path, warn = FALSE), collapse = "\n")
   biomni <- paste(
     readLines(biomni_reference, warn = FALSE),
     collapse = "\n"
   )
+  direct <- paste(readLines(direct_reference, warn = FALSE), collapse = "\n")
   expect_match(skill, "Choose the execution route", fixed = TRUE)
   expect_match(skill, "references/mcp-tools.md", fixed = TRUE)
   expect_match(skill, "references/biomni-web.md", fixed = TRUE)
   expect_false(grepl("hENT1|SLC29A1|gemcitabine", skill, ignore.case = TRUE))
   expect_match(
     biomni,
-    'pak::pkg_install("bhklab/PharmacoGx@feat/mcp")',
+    'bhklab/PharmacoGx@feat/mcp',
     fixed = TRUE
   )
   expect_match(biomni, "RemoteSha", fixed = TRUE)
   expect_match(
     biomni,
-    "Earlier choices or approval of an analysis plan do not satisfy",
+    "approval of an analysis plan is not permission",
     fixed = TRUE
   )
   expect_match(biomni, "profile_selection.csv", fixed = TRUE)
-  expect_match(biomni, 'modeling.method = "spearman"', fixed = TRUE)
-  expect_match(biomni, "internal `.Data` slot", fixed = TRUE)
+  expect_match(direct, 'modeling.method = "spearman"', fixed = TRUE)
+  expect_match(direct, "internal `.Data` slot", fixed = TRUE)
 })
