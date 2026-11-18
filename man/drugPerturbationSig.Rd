@@ -13,14 +13,17 @@ drugPerturbationSig(
   features,
   nthread = 1,
   returnValues = c("estimate", "tstat", "pvalue", "fdr"),
-  verbose = FALSE
+  verbose = FALSE,
+  assay = NULL,
+  molecular.type = NULL
 )
 }
 \arguments{
 \item{pSet}{\link{PharmacoSet} a PharmacoSet of the perturbation experiment type}
 
-\item{mDataType}{\code{character} which one of the molecular data types to use
-in the analysis, out of dna, rna, rnaseq, snp, cnv}
+\item{mDataType}{Exact molecular profile key in \code{mDataNames(pSet)}.
+Perturbation modeling currently supports profiles annotated as \code{rna},
+including dotted annotation suffixes such as \code{rna.custom}.}
 
 \item{drugs}{\code{character} a vector of drug names for which to compute the
 signatures. Should match the names used in the PharmacoSet.}
@@ -38,6 +41,13 @@ should the computation be parallelized over?}
 should the function return for each gene drug pair?}
 
 \item{verbose}{\code{logical(1)} Should diagnostive messages be printed? (default false)}
+
+\item{assay}{A unique inner assay name or positive integer index within
+the profile selected by \code{mDataType}. \code{NULL} uses the first assay.}
+
+\item{molecular.type}{Set to \code{rna} to identify RNA profiles with missing or
+nonstandard annotation. A type conflicting with recognized annotation
+metadata is rejected. Other biological types remain unsupported.}
 }
 \value{
 \code{list} a 3D array with genes in the first dimension, drugs in the

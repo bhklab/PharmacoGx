@@ -200,70 +200,58 @@ intersectPSet <- function(
         for (SE in molecularProfilesSlot(pSet)) {
           molecular.types <- union(
             molecular.types,
-            ifelse(
-              length(grep("rna", S4Vectors::metadata(SE)$annotation) > 0),
-              "rna",
-              S4Vectors::metadata(SE)$annotation
-            )
+            .molecularAnnotationGroup(S4Vectors::metadata(SE)$annotation)
           )
         }
       }
       common.molecular.cells <- list()
-      for (molecular.type in molecular.types) {
+      for (molecular.type in molecular.types[!is.na(molecular.types)]) {
         if (strictIntersect) {
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function(pSet) {
-              SEs <- names(unlist(lapply(
+              SEs <- names(molecularProfilesSlot(pSet))[vapply(
                 molecularProfilesSlot(pSet),
                 function(SE) {
-                  grep(molecular.type, S4Vectors::metadata(SE)$annotation)
-                }
-              )))
+                  identical(
+                    molecular.type,
+                    .molecularAnnotationGroup(
+                      S4Vectors::metadata(SE)$annotation
+                    )
+                  )
+                },
+                logical(1)
+              )]
               if (length(SEs) > 0) {
                 return(.intersectList(lapply(SEs, function(SE) {
-                  if (
-                    length(grep(
-                      molecular.type,
-                      S4Vectors::metadata(
-                        molecularProfilesSlot(pSet)[[SE]]
-                      )$annotation
-                    )) >
-                      0
-                  ) {
-                    intersect(
-                      colData(molecularProfilesSlot(pSet)[[SE]])$sampleid,
-                      common.cells
-                    )
-                  }
+                  intersect(
+                    colData(molecularProfilesSlot(pSet)[[SE]])$sampleid,
+                    common.cells
+                  )
                 })))
               }
             }))
         } else {
           common.molecular.cells[[molecular.type]] <-
             .intersectList(lapply(pSets, function(pSet) {
-              SEs <- names(unlist(lapply(
+              SEs <- names(molecularProfilesSlot(pSet))[vapply(
                 molecularProfilesSlot(pSet),
                 function(SE) {
-                  grep(molecular.type, S4Vectors::metadata(SE)$annotation)
-                }
-              )))
-              return(CoreGx::.unionList(lapply(SEs, function(SE) {
-                if (
-                  length(grep(
+                  identical(
                     molecular.type,
-                    S4Vectors::metadata(molecularProfilesSlot(pSet)[[
-                      SE
-                    ]])$annotation
-                  )) >
-                    0
-                ) {
-                  intersect(
-                    SummarizedExperiment::colData(molecularProfilesSlot(pSet)[[
-                      SE
-                    ]])$sampleid,
-                    common.cells
+                    .molecularAnnotationGroup(
+                      S4Vectors::metadata(SE)$annotation
+                    )
                   )
-                }
+                },
+                logical(1)
+              )]
+              return(CoreGx::.unionList(lapply(SEs, function(SE) {
+                intersect(
+                  SummarizedExperiment::colData(molecularProfilesSlot(pSet)[[
+                    SE
+                  ]])$sampleid,
+                  common.cells
+                )
               })))
             }))
         }

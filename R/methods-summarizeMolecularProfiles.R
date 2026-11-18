@@ -40,6 +40,12 @@
 #'   binarize.threshold, if it is not NA.
 #' @param removeTreated \code{logical} If treated/perturbation experiments are present, should they
 #'   be removed? Defaults to yes.
+#' @param assay A unique inner assay name or positive integer index within
+#'   the profile selected by `mDataType`. `NULL` uses the first assay.
+#'   With `summarize = FALSE`, the entire profile is returned unchanged.
+#' @param molecular.type Biological type for missing or nonstandard annotation:
+#'   `rna`, `rnaseq`, `isoform`, `cnv`, `mirna`, `mutation`, or `fusion`.
+#'   A type conflicting with recognized annotation metadata is rejected.
 #'
 #' @return \code{matrix} An updated PharmacoSet with the molecular data summarized
 #'   per cell line.
@@ -64,15 +70,11 @@ setMethod(
     verbose = TRUE,
     binarize.threshold = NA,
     binarize.direction = c("less", "greater"),
-    removeTreated = TRUE
+    removeTreated = TRUE,
+    assay = NULL,
+    molecular.type = NULL
   ) {
-    mDataTypes <- mDataNames(object)
-    if (!(mDataType %in% mDataTypes)) {
-      stop(sprintf(
-        "Invalid mDataType, choose among: %s",
-        paste(names(molecularProfilesSlot(object)), collapse = ", ")
-      ))
-    }
+    selected <- .resolveMolecularProfile(object, mDataType, assay)
 
     if (!isTRUE(summarize)) {
       return(molecularProfilesSlot(object)[[mDataType]])
@@ -95,9 +97,10 @@ setMethod(
     summary.stat <- match.arg(summary.stat)
     binarize.direction <- match.arg(binarize.direction)
 
-    molecular_annotation <- S4Vectors::metadata(molecularProfilesSlot(object)[[
-      mDataType
-    ]])$annotation
+    molecular_annotation <- .resolveMolecularAnnotation(
+      selected$profile,
+      molecular.type
+    )
 
     if (
       !.isBinaryMolecularAnnotation(molecular_annotation) &&
@@ -133,44 +136,37 @@ setMethod(
     }
 
     ##TODO:: have less confusing variable names
-    dd <- molecularProfiles(object, mDataType)
+    dd <- SummarizedExperiment::assay(
+      molecularProfilesSlot(object)[[mDataType]],
+      selected$assay
+    )
     pp <- phenoInfo(object, mDataType)
 
-    if (.normalizeMolecularAnnotation(molecular_annotation) == "mutation") {
-      tt <- dd
-      tt[which(!is.na(dd) & dd == "wt")] <- FALSE
-      tt[which(!is.na(dd) & dd != "wt")] <- TRUE
-      tt <- apply(tt, 2, as.logical)
-      dimnames(tt) <- dimnames(dd)
-      dd <- tt
+    if (identical(molecular_annotation, "mutation")) {
+      # Accept both legacy wt/variant calls and curated binary 0/1 matrices.
+      # Numeric zero must remain wild type, including single-feature inputs.
+      if (
+        (is.numeric(dd) || is.logical(dd)) &&
+          any(!is.na(dd) & !dd %in% c(0, 1))
+      ) {
+        stop(
+          "Numeric mutation assays must contain only binary 0/1 values or NA"
+        )
+      }
+      dd <- if (all(is.na(dd) | dd %in% c(0, 1))) dd != 0 else dd != "wt"
     }
-    if (.normalizeMolecularAnnotation(molecular_annotation) == "fusion") {
-      tt <- dd
-      tt[which(!is.na(dd) & dd == "0")] <- FALSE
-      tt[which(!is.na(dd) & dd != "0")] <- TRUE
-      tt <- apply(tt, 2, as.logical)
-      dimnames(tt) <- dimnames(dd)
-      dd <- tt
+    if (identical(molecular_annotation, "fusion")) {
+      dd <- dd != 0
     }
     if (
       .isContinuousMolecularAnnotation(molecular_annotation) &&
         !is.na(binarize.threshold)
     ) {
-      tt <- dd
-      switch(
+      dd <- switch(
         binarize.direction,
-        "less" = {
-          tt[which(!is.na(dd) & dd < binarize.threshold)] <- TRUE
-          tt[which(!is.na(dd) & dd >= binarize.threshold)] <- FALSE
-        },
-        "greater" = {
-          tt[which(!is.na(dd) & dd > binarize.threshold)] <- TRUE
-          tt[which(!is.na(dd) & dd <= binarize.threshold)] <- FALSE
-        }
+        "less" = dd < binarize.threshold,
+        "greater" = dd > binarize.threshold
       )
-      tt <- apply(tt, 2, as.logical)
-      dimnames(tt) <- dimnames(dd)
-      dd <- tt
     }
     if (any(colnames(dd) != rownames(pp))) {
       warning(
@@ -253,12 +249,12 @@ setMethod(
           },
           "and" = {
             ddt <- apply(dd[, myx, drop = FALSE], 1, function(x) {
-              do.call(`&`, as.list(x))
+              all(x)
             })
           },
           "or" = {
             ddt <- apply(dd[, myx, drop = FALSE], 1, function(x) {
-              do.call(`|`, as.list(x))
+              any(x)
             })
           }
         )
@@ -285,12 +281,7 @@ setMethod(
     pp2 <- pp2[cell.lines, , drop = FALSE]
     pp2[, "sampleid"] <- cell.lines
     res <- molecularProfilesSlot(object)[[mDataType]]
-    if (
-      S4Vectors::metadata(molecularProfilesSlot(object)[[
-        mDataType
-      ]])$annotation %in%
-        c("mutation", "fusion")
-    ) {
+    if (.isBinaryMolecularAnnotation(molecular_annotation)) {
       tt <- dd2
       tt[which(!is.na(dd2) & dd2)] <- "1"
       tt[which(!is.na(dd2) & !dd2)] <- "0"
@@ -311,9 +302,9 @@ setMethod(
     #                                                 dimnames=dimnames(assay(res, 1))
     #                                                 )
     # }
-    assayNames(res) <- assayNames(molecularProfilesSlot(object)[[mDataType]])[[
-      1
-    ]]
+    if (!is.null(assayNames(selected$profile))) {
+      assayNames(res) <- assayNames(selected$profile)[selected$assay]
+    }
     res <- res[features, ]
     S4Vectors::metadata(res) <- S4Vectors::metadata(molecularProfilesSlot(
       object

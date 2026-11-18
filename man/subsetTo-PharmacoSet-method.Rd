@@ -25,7 +25,8 @@ the object will be subsetted. If left blank, then all drugs will be left in
 the dataset.}
 
 \item{molecular.data.cells}{A list or vector of cell names to keep in the
-molecular data}
+molecular data. Named lists may use exact molecular profile keys, which
+take precedence over legacy biological type keys (such as \code{rna}).}
 
 \item{keep.controls}{If the dataset has perturbation type experiments, should
 the controls be kept in the dataset? Defaults to true.}

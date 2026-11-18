@@ -323,8 +323,10 @@ checkPsetStructure <-
 
       # Testing plot rendering for rna and rnaseq
       if (
-        (S4Vectors::metadata(profile)$annotation == 'rna' ||
-          S4Vectors::metadata(profile)$annotation == 'rnaseq') &&
+        .normalizeMolecularAnnotation(
+          S4Vectors::metadata(profile)$annotation
+        ) %in%
+          c("rna", "rnaseq") &&
           plotDist
       ) {
         pdf(file = file.path(result.dir, sprintf('%s.pdf', nn)))
@@ -373,8 +375,10 @@ checkPsetStructure <-
 
       # Checking mDataType of the SummarizedExperiment for required columns
       if (
-        S4Vectors::metadata(profile)$annotation == 'rna' |
-          S4Vectors::metadata(profile)$annotation == 'rnaseq'
+        .normalizeMolecularAnnotation(
+          S4Vectors::metadata(profile)$annotation
+        ) %in%
+          c("rna", "rnaseq")
       ) {
         warning(ifelse(
           'BEST' %in% colnames(rowData(profile)),

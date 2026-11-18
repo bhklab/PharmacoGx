@@ -1,6 +1,13 @@
 # Package Release News
 
 # 3.14.1
+- Added explicit inner assay selection to molecular summaries and sensitivity
+  and perturbation signatures. Custom profile keys are independent of biological
+  annotation; nonstandard annotations can declare an explicit molecular type.
+- Recognized CCLE `mut` and `isoforms` annotation aliases and preserved wild-type
+  zeros in binary mutation profiles. Exact profile keys now work in named
+  `subsetTo()` molecular cell selectors; `intersectPSet()` uses the same explicit
+  biological annotation groups.
 - Stabilized Hill and biphasic dose-response optimization with deterministic
   bounded multi-start fitting.
 - Added opt-in non-increasing Hill and biphasic fits through

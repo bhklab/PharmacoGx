@@ -26,14 +26,16 @@ analysis.}
   modeling.method = c("anova", "pearson", "lm", "spearman"),
   inference.method = c("analytic", "resampling"),
   verbose = TRUE,
-  ...
+  ...,
+  assay = NULL,
+  molecular.type = NULL
 )
 }
 \arguments{
 \item{object}{\code{PharmacoSet} a PharmacoSet of the perturbation experiment type}
 
-\item{mDataType}{\code{character} identifying which molecular data type to use in
-the analysis. Continuous annotations such as \code{rna}, \code{rnaseq}, \code{isoform},
+\item{mDataType}{Exact molecular profile key in \code{mDataNames(object)}.
+Continuous annotations such as \code{rna}, \code{rnaseq}, \code{isoform},
 \code{cnv}, and \code{mirna} are supported, including dotted variants such as
 \code{rnaseq.comp}.}
 
@@ -100,6 +102,16 @@ used by \code{"pearson"} and \code{"spearman"}.}
 sensitivity matrix that bypasses internal sensitivity summarization, and
 \code{mProfiles}, a feature-by-cell molecular matrix that replaces the
 summarized molecular assay after feature and cell subsetting.}
+
+\item{assay}{A unique inner assay name or positive integer index within
+the profile selected by \code{mDataType}. \code{NULL} uses the first assay.}
+
+\item{molecular.type}{Biological type when profile annotation is missing or
+nonstandard: one of \code{rna}, \code{rnaseq}, \code{isoform}, \code{cnv}, \code{mirna}, \code{mutation},
+or \code{fusion}. Recognized annotation metadata takes precedence: conflicting
+overrides are rejected. Type is never inferred from storage names.
+The annotation aliases \code{mut} and \code{isoforms} are recognized as \code{mutation}
+and \code{isoform}, respectively.}
 }
 \value{
 \code{array} a 3D array with genes in the first dimension, drugs in the

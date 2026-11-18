@@ -16,7 +16,9 @@ into one entry per drug}
   verbose = TRUE,
   binarize.threshold = NA,
   binarize.direction = c("less", "greater"),
-  removeTreated = TRUE
+  removeTreated = TRUE,
+  assay = NULL,
+  molecular.type = NULL
 )
 }
 \arguments{
@@ -51,6 +53,14 @@ binarize.threshold, if it is not NA.}
 
 \item{removeTreated}{\code{logical} If treated/perturbation experiments are present, should they
 be removed? Defaults to yes.}
+
+\item{assay}{A unique inner assay name or positive integer index within
+the profile selected by \code{mDataType}. \code{NULL} uses the first assay.
+With \code{summarize = FALSE}, the entire profile is returned unchanged.}
+
+\item{molecular.type}{Biological type for missing or nonstandard annotation:
+\code{rna}, \code{rnaseq}, \code{isoform}, \code{cnv}, \code{mirna}, \code{mutation}, or \code{fusion}.
+A type conflicting with recognized annotation metadata is rejected.}
 }
 \value{
 \code{matrix} An updated PharmacoSet with the molecular data summarized

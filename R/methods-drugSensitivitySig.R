@@ -1,11 +1,15 @@
 #' @keywords internal
 .normalizeMolecularAnnotation <- function(annotation) {
-  if (length(annotation) == 0 || is.na(annotation[[1]])) {
+  if (
+    !is.character(annotation) || length(annotation) != 1 || is.na(annotation)
+  ) {
     return(NA_character_)
   }
 
   annotation <- tolower(annotation[[1]])
-  sub("\\..*$", "", annotation)
+  annotation <- sub("\\..*$", "", annotation)
+  # Explicit aliases used by published and refreshed CCLE profiles.
+  switch(annotation, mut = "mutation", isoforms = "isoform", annotation)
 }
 
 #' @keywords internal
@@ -18,6 +22,95 @@
 .isBinaryMolecularAnnotation <- function(annotation) {
   .normalizeMolecularAnnotation(annotation) %in%
     c("mutation", "fusion")
+}
+
+.molecularAnnotationGroup <- function(annotation) {
+  type <- .normalizeMolecularAnnotation(annotation)
+  if (type %in% c("rna", "rnaseq")) "rna" else type
+}
+
+# Resolve storage names independently from biological annotation. Never infer
+# biological type from an experiment key or an inner assay name.
+.resolveMolecularProfile <- function(object, mDataType, assay = NULL) {
+  profiles <- molecularProfilesSlot(object)
+  if (
+    !is.character(mDataType) ||
+      length(mDataType) != 1 ||
+      is.na(mDataType) ||
+      !mDataType %in% names(profiles)
+  ) {
+    stop(sprintf(
+      "Invalid mDataType, choose among: %s",
+      paste(names(profiles), collapse = ", ")
+    ))
+  }
+  profile <- profiles[[mDataType]]
+  assay_names <- SummarizedExperiment::assayNames(profile)
+  n_assays <- length(SummarizedExperiment::assays(profile))
+  if (is.null(assay)) {
+    index <- 1L
+  } else if (
+    is.character(assay) &&
+      length(assay) == 1 &&
+      !is.na(assay) &&
+      sum(assay_names == assay, na.rm = TRUE) == 1
+  ) {
+    index <- match(assay, assay_names)
+  } else if (
+    is.numeric(assay) &&
+      length(assay) == 1 &&
+      !is.na(assay) &&
+      is.finite(assay) &&
+      assay == floor(assay) &&
+      assay >= 1 &&
+      assay <= n_assays
+  ) {
+    index <- as.integer(assay)
+  } else {
+    stop(sprintf(
+      "Invalid assay for molecular profile '%s'; use a unique assay name or an index from 1 to %s. Available names: %s",
+      mDataType,
+      n_assays,
+      paste(assay_names, collapse = ", ")
+    ))
+  }
+  if (n_assays == 0) {
+    stop(sprintf("Molecular profile '%s' contains no assays", mDataType))
+  }
+  list(profile = profile, assay = index)
+}
+
+.resolveMolecularAnnotation <- function(profile, molecular.type = NULL) {
+  annotation <- .normalizeMolecularAnnotation(
+    S4Vectors::metadata(profile)$annotation
+  )
+  supported <- c(
+    "rna",
+    "rnaseq",
+    "isoform",
+    "cnv",
+    "mirna",
+    "mutation",
+    "fusion"
+  )
+  if (!is.null(molecular.type)) {
+    if (
+      !is.character(molecular.type) ||
+        length(molecular.type) != 1 ||
+        is.na(molecular.type) ||
+        !molecular.type %in% supported
+    ) {
+      stop(sprintf(
+        "Invalid molecular.type, choose among: %s",
+        paste(supported, collapse = ", ")
+      ))
+    }
+    if (annotation %in% supported && !identical(annotation, molecular.type)) {
+      stop("molecular.type conflicts with the molecular profile annotation")
+    }
+    annotation <- molecular.type
+  }
+  annotation
 }
 
 #' Creates a signature representing the association between gene expression (or
@@ -40,8 +133,8 @@
 #' print(drug.sensitivity)
 #'
 #' @param object `PharmacoSet` a PharmacoSet of the perturbation experiment type
-#' @param mDataType `character` identifying which molecular data type to use in
-#'   the analysis. Continuous annotations such as `rna`, `rnaseq`, `isoform`,
+#' @param mDataType Exact molecular profile key in `mDataNames(object)`.
+#'   Continuous annotations such as `rna`, `rnaseq`, `isoform`,
 #'   `cnv`, and `mirna` are supported, including dotted variants such as
 #'   `rnaseq.comp`.
 #' @param drugs `character` a vector of drug names for which to compute the
@@ -90,6 +183,14 @@
 #'   sensitivity matrix that bypasses internal sensitivity summarization, and
 #'   `mProfiles`, a feature-by-cell molecular matrix that replaces the
 #'   summarized molecular assay after feature and cell subsetting.
+#' @param assay A unique inner assay name or positive integer index within
+#'   the profile selected by `mDataType`. `NULL` uses the first assay.
+#' @param molecular.type Biological type when profile annotation is missing or
+#'   nonstandard: one of `rna`, `rnaseq`, `isoform`, `cnv`, `mirna`, `mutation`,
+#'   or `fusion`. Recognized annotation metadata takes precedence: conflicting
+#'   overrides are rejected. Type is never inferred from storage names.
+#'   The annotation aliases `mut` and `isoforms` are recognized as `mutation`
+#'   and `isoform`, respectively.
 #'
 #' @return `array` a 3D array with genes in the first dimension, drugs in the
 #'   second, and return values in the third.
@@ -119,7 +220,9 @@ setMethod(
     modeling.method = c("anova", "pearson", "lm", "spearman"),
     inference.method = c("analytic", "resampling"),
     verbose = TRUE,
-    ...
+    ...,
+    assay = NULL,
+    molecular.type = NULL
   ) {
     .drugSensitivitySigPharmacoSet(
       object,
@@ -141,7 +244,9 @@ setMethod(
       modeling.method,
       inference.method,
       verbose,
-      ...
+      ...,
+      assay = assay,
+      molecular.type = molecular.type
     )
   }
 )
@@ -169,7 +274,9 @@ setMethod(
   modeling.method = c("anova", "pearson", "lm", "spearman"),
   inference.method = c("analytic", "resampling"),
   verbose = TRUE,
-  ...
+  ...,
+  assay = NULL,
+  molecular.type = NULL
 ) {
   ### This function needs to: Get a table of AUC values per cell line / drug
   ### Be able to recompute those values on the fly from raw data if needed to change concentration
@@ -209,16 +316,11 @@ setMethod(
     }
   }
 
-  if (!(mDataType %in% names(molecularProfilesSlot(object)))) {
-    stop(sprintf(
-      "Invalid mDataType for %s, choose among: %s",
-      annotation(object)$name,
-      paste(names(molecularProfilesSlot(object)), collapse = ", ")
-    ))
-  }
-  molecular_annotation <- S4Vectors::metadata(
-    molecularProfilesSlot(object)[[mDataType]]
-  )$annotation
+  selected <- .resolveMolecularProfile(object, mDataType, assay)
+  molecular_annotation <- .resolveMolecularAnnotation(
+    selected$profile,
+    molecular.type
+  )
   if (.isBinaryMolecularAnnotation(molecular_annotation)) {
     if (identical(modeling.method, "spearman")) {
       stop(
@@ -249,7 +351,10 @@ setMethod(
   } else {
     stop(sprintf(
       "No summary statistic for %s has been implemented yet",
-      molecular_annotation
+      paste0(
+        molecular_annotation,
+        "; supply molecular.type for nonstandard annotation"
+      )
     ))
   }
 
@@ -372,7 +477,9 @@ setMethod(
     summary.stat = molecular.summary.stat,
     binarize.threshold = molecular.cutoff,
     binarize.direction = molecular.cutoff.direction,
-    verbose = verbose
+    verbose = verbose,
+    assay = selected$assay,
+    molecular.type = molecular.type
   )
 
   if (!is.null(dots[["mProfiles"]])) {
@@ -538,6 +645,8 @@ setMethod(
     SigType = "Sensitivity",
     Arguments = list(
       "mDataType" = mDataType,
+      "assay" = assay,
+      "molecular.type" = molecular.type,
       "drugs" = drugs,
       "features" = features,
       "cells" = cells,

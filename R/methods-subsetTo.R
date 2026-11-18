@@ -26,7 +26,8 @@
 #'   the object will be subsetted. If left blank, then all drugs will be left in
 #'   the dataset.
 #' @param molecular.data.cells A list or vector of cell names to keep in the
-#'   molecular data
+#'   molecular data. Named lists may use exact molecular profile keys, which
+#'   take precedence over legacy biological type keys (such as `rna`).
 #' @param keep.controls If the dataset has perturbation type experiments, should
 #'   the controls be kept in the dataset? Defaults to true.
 #' @param ... Other arguments passed by other function within the package
@@ -94,7 +95,11 @@ setMethod(
   }
 
   if (!missing(molecular.data.cells)) {
-    molecular.data.cells <- unique(molecular.data.cells)
+    molecular.data.cells <- if (is.list(molecular.data.cells)) {
+      lapply(molecular.data.cells, unique)
+    } else {
+      unique(molecular.data.cells)
+    }
   }
 
   ### TODO:: implement strict subsetting at this level!!!!
@@ -103,15 +108,17 @@ setMethod(
   ### the function missing does not work as expected in the context below, because the arguments are passed to the anonymous
   ### function in lapply, so it does not recognize them as missing
 
+  profiles <- molecularProfilesSlot(object)
   molecularProfilesSlot(object) <- lapply(
-    molecularProfilesSlot(object),
-    function(SE, cells, drugs, molecular.data.cells) {
-      molecular.data.type <- ifelse(
-        length(grep('rna', S4Vectors::metadata(SE)$annotation) > 0),
-        'rna',
+    stats::setNames(names(profiles), names(profiles)),
+    function(profile_name, cells, drugs, molecular.data.cells) {
+      SE <- profiles[[profile_name]]
+      molecular.data.type <- .molecularAnnotationGroup(
         S4Vectors::metadata(SE)$annotation
       )
-      if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
+      if (profile_name %in% names(molecular.data.cells)) {
+        cells <- molecular.data.cells[[profile_name]]
+      } else if (molecular.data.type %in% names(molecular.data.cells)) {
         cells <- molecular.data.cells[[molecular.data.type]]
       }
 

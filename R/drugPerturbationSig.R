@@ -17,8 +17,14 @@
 #' print(drug.perturbation)
 #'
 #' @param pSet [PharmacoSet] a PharmacoSet of the perturbation experiment type
-#' @param mDataType `character` which one of the molecular data types to use
-#'   in the analysis, out of dna, rna, rnaseq, snp, cnv
+#' @param mDataType Exact molecular profile key in `mDataNames(pSet)`.
+#'   Perturbation modeling currently supports profiles annotated as `rna`,
+#'   including dotted annotation suffixes such as `rna.custom`.
+#' @param assay A unique inner assay name or positive integer index within
+#'   the profile selected by `mDataType`. `NULL` uses the first assay.
+#' @param molecular.type Set to `rna` to identify RNA profiles with missing or
+#'   nonstandard annotation. A type conflicting with recognized annotation
+#'   metadata is rejected. Other biological types remain unsupported.
 #' @param drugs `character` a vector of drug names for which to compute the
 #'   signatures. Should match the names used in the PharmacoSet.
 #' @param cells `character` a vector of cell names to use in computing the
@@ -43,7 +49,9 @@ drugPerturbationSig <- function(
   features,
   nthread = 1,
   returnValues = c("estimate", "tstat", "pvalue", "fdr"),
-  verbose = FALSE
+  verbose = FALSE,
+  assay = NULL,
+  molecular.type = NULL
 ) {
   availcore <- parallel::detectCores()
   if (nthread > availcore) {
@@ -56,23 +64,15 @@ drugPerturbationSig <- function(
     }
     pSet <- subsetTo(pSet, cells = cells)
   }
-  if (mDataType %in% names(pSet@molecularProfiles)) {
-    #eset <- pSet@molecularProfiles[[mDataType]]
-    if (
-      S4Vectors::metadata(pSet@molecularProfiles[[mDataType]])$annotation !=
-        "rna"
-    ) {
-      stop(sprintf(
-        "Only rna data type perturbations are currently implemented"
-      ))
-    }
-  } else {
+  selected <- .resolveMolecularProfile(pSet, mDataType, assay)
+  molecular_annotation <- .resolveMolecularAnnotation(
+    selected$profile,
+    molecular.type
+  )
+  if (!identical(molecular_annotation, "rna")) {
     stop(
-      sprintf(
-        "This pSet does not have any molecular data of type %s, choose among: %s",
-        mDataType
-      ),
-      paste(names(pSet@molecularProfiles), collapse = ", ")
+      "Only rna data type perturbations are currently implemented; ",
+      "supply molecular.type = 'rna' for nonstandard RNA annotation"
     )
   }
 
@@ -132,7 +132,11 @@ drugPerturbationSig <- function(
       names(res) <- i
       return(res)
     },
-    exprs = t(molecularProfiles(pSet, mDataType)[features, , drop = FALSE]),
+    exprs = t(SummarizedExperiment::assay(selected$profile, selected$assay)[
+      features,
+      ,
+      drop = FALSE
+    ]),
     sampleinfo = PharmacoGx::phenoInfo(pSet, mDataType)
   )
   res <- do.call(c, mcres)
@@ -173,7 +177,12 @@ drugPerturbationSig <- function(
     drug.perturbation,
     PSetName = name(pSet),
     Call = as.character(match.call()),
-    SigType = 'Perturbation'
+    SigType = 'Perturbation',
+    Arguments = list(
+      mDataType = mDataType,
+      assay = assay,
+      molecular.type = molecular.type
+    )
   )
 
   return(drug.perturbation)
