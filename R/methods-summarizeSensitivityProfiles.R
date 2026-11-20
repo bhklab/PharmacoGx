@@ -73,6 +73,14 @@ setMethod(
   }
 )
 
+# LongTable keys describe the experimental grain, not response measures.
+.longTableSensitivityMeasureNames <- function(
+  longTable,
+  profile_cols = CoreGx::assayCols(longTable, "profiles")
+) {
+  setdiff(profile_cols, idCols(longTable))
+}
+
 .resolveLongTableSensitivityColumns <- function(
   sens_profiles,
   treatment_col = "treatmentid",
@@ -186,7 +194,10 @@ setMethod(
   sensProfiles <- resolvedCols$sens_profiles
   treatment_col <- resolvedCols$treatment_col
   sample_col <- resolvedCols$sample_col
-  profileOpts <- setdiff(colnames(sensProfiles), idCols(longTable))
+  profileOpts <- .longTableSensitivityMeasureNames(
+    longTable,
+    profile_cols = colnames(sensProfiles)
+  )
   sensitivity.measure <- .resolveSensitivityMeasureName(
     sensitivity.measure = sensitivity.measure,
     available_measures = c(profileOpts, "max.conc"),

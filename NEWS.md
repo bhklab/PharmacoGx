@@ -2,6 +2,8 @@
 
 # 3.17.1
 - Use one thread for drug signatures when the runtime cannot detect CPU cores.
+- Validate drug signature response measures against stored LongTable profiles
+  without rebuilding a legacy sensitivity table.
 
 # 3.14.1
 - Added explicit inner assay selection to molecular summaries and sensitivity

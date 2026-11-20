@@ -51,11 +51,10 @@ Should be a subset of sampleNames(pSet)}
 \item{tissues}{\code{character} a vector of which tissue types to include in the signature fitting.
 Should be a subset of sampleInfo(pSet)$tissueid}
 
-\item{sensitivity.measure}{\code{character} which measure of the drug dose
-sensitivity should the function use for its computations? Use the
-sensitivityMeasures function to find out what measures are available for
-each PSet. For atypical LongTable-backed datasets, this may need to be set
-explicitly, for example to \code{"SCORE"}.}
+\item{sensitivity.measure}{\code{character} stored drug-dose sensitivity
+measure for the PSet. For LongTable-backed datasets, the
+measure must be present in the stored \code{profiles} assay, for example
+\code{"SCORE"} if the usual AAC measure is absent.}
 
 \item{molecular.summary.stat}{\code{character} What summary statistic should be used to
 summarize duplicates for cell line molecular profile measurements?}

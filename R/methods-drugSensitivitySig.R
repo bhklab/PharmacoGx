@@ -149,11 +149,10 @@
 #'   should the computation be parallelized over?
 #' @param returnValues `character` Which of estimate, t-stat, p-value and fdr
 #'   should the function return for each gene drug pair?
-#' @param sensitivity.measure `character` which measure of the drug dose
-#'   sensitivity should the function use for its computations? Use the
-#'   sensitivityMeasures function to find out what measures are available for
-#'   each PSet. For atypical LongTable-backed datasets, this may need to be set
-#'   explicitly, for example to `"SCORE"`.
+#' @param sensitivity.measure `character` stored drug-dose sensitivity
+#'   measure for the PSet. For LongTable-backed datasets, the
+#'   measure must be present in the stored `profiles` assay, for example
+#'   `"SCORE"` if the usual AAC measure is absent.
 #' @param molecular.summary.stat `character` What summary statistic should be used to
 #'   summarize duplicates for cell line molecular profile measurements?
 #' @param sensitivity.summary.stat `character` What summary statistic should be used to
@@ -301,7 +300,23 @@ setMethod(
   has_s_profiles <- !is.null(dots[["sProfiles"]])
 
   if (!has_s_profiles) {
-    available_sensitivity_measures <- colnames(sensitivityProfiles(object))
+    response <- treatmentResponse(object)
+    if (is(response, "LongTable")) {
+      # Inspect the stored summary schema, not the legacy reconstructed table:
+      # a sparse assay may intentionally omit response row or column keys.
+      if (!("profiles" %in% names(response))) {
+        stop(
+          "No stored 'profiles' assay in the LongTable treatment response; ",
+          "provide a drug-by-cell sProfiles matrix.",
+          call. = FALSE
+        )
+      }
+      available_sensitivity_measures <- .longTableSensitivityMeasureNames(
+        response
+      )
+    } else {
+      available_sensitivity_measures <- colnames(sensitivityProfiles(object))
+    }
     sensitivity.measure <- .resolveSensitivityMeasureNames(
       sensitivity.measure = sensitivity.measure,
       available_measures = available_sensitivity_measures,
