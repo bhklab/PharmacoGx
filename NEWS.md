@@ -1,5 +1,8 @@
 # Package Release News
 
+# 3.17.1
+- Use one thread for drug signatures when the runtime cannot detect CPU cores.
+
 # 3.14.1
 - Added explicit inner assay selection to molecular summaries and sensitivity
   and perturbation signatures. Custom profile keys are independent of biological

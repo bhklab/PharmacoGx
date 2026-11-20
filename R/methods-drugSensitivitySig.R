@@ -385,11 +385,7 @@ setMethod(
     celln <- cells
   }
 
-  availcore <- parallel::detectCores()
-
-  if (nthread > availcore) {
-    nthread <- availcore
-  }
+  nthread <- .capSignatureThreads(nthread)
 
   if (parallel.on == "drug") {
     nthread_drug <- nthread

@@ -53,10 +53,7 @@ drugPerturbationSig <- function(
   assay = NULL,
   molecular.type = NULL
 ) {
-  availcore <- parallel::detectCores()
-  if (nthread > availcore) {
-    nthread <- availcore
-  }
+  nthread <- .capSignatureThreads(nthread)
   options("mc.cores" = nthread)
   if (!missing(cells)) {
     if (!all(cells %in% sampleNames(pSet))) {
