@@ -64,6 +64,15 @@ jobs:
                 "run_bioccheck" => true
               },
               {
+                "id" => "linux-devel-github-coregx",
+                "os" => "ubuntu-latest",
+                "r" => devel_r,
+                "bioc" => devel,
+                "container" => "bioconductor/bioconductor_docker:devel",
+                "run_bioccheck" => false,
+                "coregx_ref" => "github::bhklab/CoreGx@8cebf074b3218392ba7f39bee022ec10e3c43c80"
+              },
+              {
                 "id" => "linux-release",
                 "os" => "ubuntu-latest",
                 "r" => release_r,
@@ -175,8 +184,16 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 2
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            ${{ matrix.config.coregx_ref }}
           needs: check
+
+      - name: Require sparse LongTable support
+        if: matrix.config.coregx_ref != ''
+        shell: Rscript {0}
+        run: |
+          stopifnot(utils::packageVersion("CoreGx") >= "2.17.1")
 
       - name: Install and verify BiocCheck
         if: matrix.config.run_bioccheck
