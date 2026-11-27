@@ -60,6 +60,9 @@ make_signature_response_fixture <- function(layout) {
 }
 
 test_that("drug signatures read stored metrics from compact LongTable assays", {
+  # The compact fixture omits the dose row key. Only CoreGx >= 2.17.1
+  # can construct it; the devel CI job checks with that version.
+  skip_if_not_installed("CoreGx", minimum_version = "2.17.1")
   fixture <- make_signature_response_fixture("compact")
   response <- treatmentResponse(fixture$args$object)
   expect_true("dose" %in% CoreGx::rowIDs(response))

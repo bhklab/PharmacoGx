@@ -171,12 +171,24 @@ jobs:
             )
           )
 
+      - name: Use the official Bioconductor devel repository
+        if: matrix.config.id == 'linux-devel'
+        shell: bash
+        run: echo "R_BIOC_MIRROR=https://bioconductor.org" >> "$GITHUB_ENV"
+
       - name: Install package dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 2
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            ${{ matrix.config.id == 'linux-devel' && 'github::bhklab/CoreGx@devel' || '' }}
           needs: check
+
+      - name: Verify sparse LongTable support
+        if: matrix.config.id == 'linux-devel'
+        shell: Rscript {0}
+        run: stopifnot(utils::packageVersion("CoreGx") >= "2.17.1")
 
       - name: Install and verify BiocCheck
         if: matrix.config.run_bioccheck
