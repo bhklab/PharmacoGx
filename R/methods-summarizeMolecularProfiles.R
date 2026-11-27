@@ -80,10 +80,12 @@ setMethod(
       return(molecularProfilesSlot(object)[[mDataType]])
     }
 
+    feature_info <- featureInfo(object, mDataType)
+    feature_names <- rownames(feature_info)
     if (missing(features)) {
-      features <- rownames(featureInfo(object, mDataType))
+      features <- feature_names
     } else {
-      fix <- is.element(features, rownames(featureInfo(object, mDataType)))
+      fix <- is.element(features, feature_names)
       if (verbose && !all(fix)) {
         warning(sprintf(
           "Only %i/%i features can be found",
@@ -157,6 +159,15 @@ setMethod(
     }
     if (identical(molecular_annotation, "fusion")) {
       dd <- dd != 0
+    }
+    # Limit continuous/binary summaries to the requested rows before any
+    # cell-line expansion or replicate aggregation. Mutation type/encoding
+    # remains a property of the full input assay, not of a requested subset.
+    features_to_summarize <- unique(features)
+    if (length(features_to_summarize) &&
+        !identical(features_to_summarize, feature_names)) {
+      dd <- dd[features_to_summarize, , drop = FALSE]
+      feature_info <- feature_info[features_to_summarize, , drop = FALSE]
     }
     if (
       .isContinuousMolecularAnnotation(molecular_annotation) &&
@@ -280,7 +291,6 @@ setMethod(
     dd2 <- dd2[, cell.lines, drop = FALSE]
     pp2 <- pp2[cell.lines, , drop = FALSE]
     pp2[, "sampleid"] <- cell.lines
-    res <- molecularProfilesSlot(object)[[mDataType]]
     if (.isBinaryMolecularAnnotation(molecular_annotation)) {
       tt <- dd2
       tt[which(!is.na(dd2) & dd2)] <- "1"
@@ -291,7 +301,7 @@ setMethod(
     pp2 <- S4Vectors::DataFrame(pp2, row.names = rownames(pp2))
     pp2$tissueid <- sampleInfo(object)[pp2$sampleid, "tissueid"]
     SummarizedExperiment::colData(res) <- pp2
-    SummarizedExperiment::rowData(res) <- featureInfo(object, mDataType)
+    SummarizedExperiment::rowData(res) <- feature_info
     ##TODO:: Generalize this to multiple assay SummarizedExperiments!
     # if(!is.null(SummarizedExperiment::assay(res, 1))) {
     #   SummarizedExperiment::assay(res, 2) <- matrix(rep(NA,

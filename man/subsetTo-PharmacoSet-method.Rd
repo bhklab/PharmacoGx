@@ -37,13 +37,25 @@ the controls be kept in the dataset? Defaults to true.}
 A PharmacoSet with only the selected drugs and cells
 }
 \description{
-This is the prefered method of subsetting a PharmacoSet. This function allows
+This is the preferred method of subsetting a legacy monotherapy
+PharmacoSet. This function allows
 abstraction of the data to the level of biologically relevant objects: drugs
 and cells. The function will automatically go through all of the
 combined data in the PharmacoSet and ensure only the requested drugs
 and cell lines are found in any of the slots. This allows quickly picking out
 all the experiments for a drug or cell of interest, as well removes the need
 to keep track of all the metadata conventions between different datasets.
+}
+\details{
+For PSets that store treatment responses in a LongTable or
+TreatmentResponseExperiment, this method does not support subsetting the
+treatment-response data. In particular, it does not define how to select
+drug pairs. To inspect recorded combination profiles or observed wells,
+inspect the stored names with \code{CoreGx::assayNames(treatmentResponse(object))}.
+For example, use \code{CoreGx::assay(treatmentResponse(object), "raw", key = FALSE)}
+if the object stores observed wells in a \code{raw} assay. Filter the returned
+rows on the treatment columns (for example \code{treatment1id} and
+\code{treatment2id}) and \code{sampleid}. This returns rows, not a new PharmacoSet.
 }
 \examples{
 data(CCLEsmall)

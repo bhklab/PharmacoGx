@@ -117,3 +117,28 @@ test_that("Summarize Molecular Profiles parameters work as expected", {
     length(sampleNames(GDSCsmall2))
   )
 })
+
+test_that("requested molecular features preserve values, metadata and order", {
+  profile <- molecularProfilesSlot(GDSCsmall)$rna
+  selected <- rownames(profile)[c(5L, 2L, 5L)]
+  cells <- c("647-V", "22RV1")
+  full <- summarizeMolecularProfiles(
+    GDSCsmall, "rna", cell.lines = cells, summary.stat = "median",
+    verbose = FALSE
+  )
+
+  requested <- summarizeMolecularProfiles(
+    GDSCsmall, "rna", cell.lines = cells,
+    features = c(selected, "feature_not_in_profile"),
+    summary.stat = "median", verbose = FALSE
+  )
+
+  expect_identical(requested, full[selected, ])
+  expect_identical(
+    summarizeMolecularProfiles(
+      GDSCsmall, "rna", cell.lines = cells, features = "feature_not_in_profile",
+      summary.stat = "median", verbose = FALSE
+    ),
+    full[character(), ]
+  )
+})
